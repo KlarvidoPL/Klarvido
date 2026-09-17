@@ -1,0 +1,31 @@
+services:
+  backend:
+    volumes:
+      - ${PWD}/packages/webapp-libs/webapp-emails/build/email-renderer:/app/scripts/email/renderer:ro
+      - ./packages/backend/:/app
+      - ./packages/backend/cov:/app/cov
+      - ./packages/backend/docs:/app/docs
+    environment:
+      - CI=true
+    build:
+      args:
+        - SB_MIRROR_REPOSITORY=${SB_MIRROR_REPOSITORY}
+        - SB_PULL_THROUGH_CACHE_REPOSITORY=${SB_PULL_THROUGH_CACHE_REPOSITORY}
+
+  workers:
+    volumes:
+      - ./packages/workers/cov:/app/packages/workers/cov
+    environment:
+      - CI=true
+      - PROJECT_NAME=${PROJECT_NAME}
+      - ENV_STAGE=${ENV_STAGE}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      - AWS_SECURITY_TOKEN=${AWS_SECURITY_TOKEN}
+      - AWS_SESSION_EXPIRATION=${AWS_SESSION_EXPIRATION}
+    build:
+      args:
+        - SB_MIRROR_REPOSITORY=${SB_MIRROR_REPOSITORY}
+        - SB_PULL_THROUGH_CACHE_REPOSITORY=${SB_PULL_THROUGH_CACHE_REPOSITORY}

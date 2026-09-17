@@ -1,0 +1,121 @@
+services:
+  db:
+    image: postgres:16.1-alpine
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      - PGUSER=backend
+      - POSTGRES_USER=backend
+      - POSTGRES_PASSWORD=backend
+      - POSTGRES_DB=backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./packages/backend
+      target: backend
+    image: "${PROJECT_NAME}/backend"
+    command: ["./scripts/runtime/run_local.sh"]
+    ports:
+      - "5001:5001"
+    depends_on:
+      stripemock:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    links:
+      - db
+      - redis
+    environment:
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+      - AWS_DEFAULT_REGION=eu-west-1
+      - MCP_SERVER_URL=http://mcp-server:4000
+    stdin_open: true
+    tty: true
+
+  celery_beat:
+    image: '${PROJECT_NAME}/backend'
+    command: ["./scripts/runtime/run_celery_beat.sh"]
+    restart: always
+    depends_on:
+      backend:
+        condition: service_started
+
+  celery_default:
+    image: '${PROJECT_NAME}/backend'
+    command: ["./scripts/runtime/run_celery_worker_default.sh"]
+    restart: always
+    depends_on:
+      backend:
+        condition: service_started
+
+  workers:
+    build:
+      context: .
+      dockerfile: ./packages/workers/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+
+  redis:
+    image: redis:7.2.4-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  stripemock:
+    image: stripe/stripe-mock:v0.170.0
+    ports:
+      - "12111:12111"
+      - "12112:12112"
+
+  ssm-editor:
+    stdin_open: true
+    tty: true
+    build:
+      context: ./packages/internal/ssm-editor
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME:-}
+      - ENV_STAGE=${ENV_STAGE:-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+      - AWS_SECURITY_TOKEN=${AWS_SECURITY_TOKEN:-}
+      - AWS_SESSION_EXPIRATION=${AWS_SESSION_EXPIRATION:-}
+
+  # Apollo MCP Server for AI Assistant
+  # Exposes GraphQL operations as MCP tools for AI models
+  # NOTE: Pinned to specific SHA digest for reproducibility
+  mcp-server:
+    image: ghcr.io/apollographql/apollo-mcp-server:latest@sha256:a78a66c637236d2d72b1ff1fa34a0c7c7f7d2a84b372a2c54bd2eb13655a3dc1
+    container_name: mcp-server
+    command: ["/app/config.yaml"]
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./packages/mcp-server/config.yaml:/app/config.yaml:ro
+      - ./packages/mcp-server/operations:/app/operations:ro
+      - ./packages/webapp-libs/webapp-api-client/graphql/schema:/app/schema:ro
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
