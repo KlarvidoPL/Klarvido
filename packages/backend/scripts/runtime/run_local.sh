@@ -23,6 +23,9 @@ echo "LocalStack fixtures installed"
 python manage.py contentful_sync
 python manage.py migrate
 
+echo "Initializing locales..."
+python manage.py init_locales
+
 # Sync translation keys from master.json if it exists (mounted from webapp)
 TRANSLATIONS_MASTER_FILE="/app/translations/master.json"
 if [ -f "$TRANSLATIONS_MASTER_FILE" ]; then
@@ -30,6 +33,15 @@ if [ -f "$TRANSLATIONS_MASTER_FILE" ]; then
     python manage.py sync_translations "$TRANSLATIONS_MASTER_FILE"
 else
     echo "Translation master file not found, skipping sync"
+fi
+
+# Import pre-translated values so language switching has content to show locally
+TRANSLATIONS_EXPORT_FILE="/app/translations/translations_export.json"
+if [ -f "$TRANSLATIONS_EXPORT_FILE" ]; then
+    echo "Importing translations..."
+    python manage.py import_translations "$TRANSLATIONS_EXPORT_FILE"
+else
+    echo "Translations export file not found, skipping import"
 fi
 
 if (echo "$STRIPE_LIVE_SECRET_KEY" | grep -q "<CHANGE_ME>") && (echo "$STRIPE_TEST_SECRET_KEY" | grep -q "<CHANGE_ME>"); then
