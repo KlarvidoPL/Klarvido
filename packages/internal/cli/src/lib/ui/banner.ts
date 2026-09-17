@@ -1,13 +1,13 @@
 import { color } from '@oclif/color';
 
-// Large ASCII art for "SaaS"
-const ASCII_SAAS = [
-  '███████╗ █████╗  █████╗ ███████╗',
-  '██╔════╝██╔══██╗██╔══██╗██╔════╝',
-  '███████╗███████║███████║███████╗',
-  '╚════██║██╔══██║██╔══██║╚════██║',
-  '███████║██║  ██║██║  ██║███████║',
-  '╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝',
+// Large ASCII art for "Klarvido"
+const ASCII_KLARVIDO = [
+  '██╗  ██╗██╗      █████╗ ██████╗ ██╗   ██╗██╗██████╗  ██████╗ ',
+  '██║ ██╔╝██║     ██╔══██╗██╔══██╗██║   ██║██║██╔══██╗██╔═══██╗',
+  '█████╔╝ ██║     ███████║██████╔╝██║   ██║██║██║  ██║██║   ██║',
+  '██╔═██╗ ██║     ██╔══██║██╔══██╗╚██╗ ██╔╝██║██║  ██║██║   ██║',
+  '██║  ██╗███████╗██║  ██║██║  ██║ ╚████╔╝ ██║██████╔╝╚██████╔╝',
+  '╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ',
 ];
 
 // Medium ASCII art for "Boilerplate" (matching SaaS block style, 4 lines)
@@ -76,7 +76,7 @@ export function renderBanner(): string {
   const lines: string[] = [];
   lines.push('');
 
-  for (const line of ASCII_SAAS) {
+  for (const line of ASCII_KLARVIDO) {
     lines.push('  ' + applyGradientToLine(line));
   }
 
@@ -104,9 +104,9 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
   process.stdout.write('\x1B[?25l');
   console.log('');
 
-  // Phase 1: Animate "SaaS" - character by character reveal per line
-  for (let lineIdx = 0; lineIdx < ASCII_SAAS.length; lineIdx++) {
-    const line = ASCII_SAAS[lineIdx];
+  // Phase 1: Animate "Klarvido" - character by character reveal per line
+  for (let lineIdx = 0; lineIdx < ASCII_KLARVIDO.length; lineIdx++) {
+    const line = ASCII_KLARVIDO[lineIdx];
     await printLineAnimated('  ' + line, speed);
   }
 
