@@ -10,13 +10,6 @@ const ASCII_KLARVIDO = [
   '╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ',
 ];
 
-// Medium ASCII art for "Boilerplate" (matching SaaS block style, 4 lines)
-const ASCII_BOILERPLATE = [
-  '█▀▀▄ █▀▀█ ▀█▀ █   █▀▀ █▀▀█ █▀▀█ █   █▀▀█ ▀▀█▀▀ █▀▀',
-  '█▀▀▄ █  █  █  █   █▀▀ █▄▄▀ █▀▀▀ █   █▄▄█   █   █▀▀',
-  '▀▀▀  ▀▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀▀ ▀    ▀▀▀ ▀  ▀   ▀   ▀▀▀',
-];
-
 // Gradient colors: yellow (255, 254, 37) -> green (66, 242, 114)
 const GRADIENT_START = { r: 255, g: 254, b: 37 };
 const GRADIENT_END = { r: 66, g: 242, b: 114 };
@@ -81,14 +74,8 @@ export function renderBanner(): string {
   }
 
   lines.push('');
-
-  for (const line of ASCII_BOILERPLATE) {
-    lines.push('  ' + applyGradientToLine(line));
-  }
-
-  lines.push('');
-  lines.push('  ' + color.gray('by ') + color.bold('Apptension'));
-  lines.push('  ' + color.underline(color.cyan('https://apptension.com')));
+  lines.push('  ' + color.gray('by ') + color.bold('Ordigita'));
+  lines.push('  ' + color.underline(color.cyan('https://ordigita.pl')));
   lines.push('');
 
   return lines.join('\n');
@@ -110,28 +97,18 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
     await printLineAnimated('  ' + line, speed);
   }
 
-  // Small pause between sections
-  await sleep(100);
-  console.log('');
-
-  // Phase 2: Animate "Boilerplate" - character by character reveal per line
-  for (let lineIdx = 0; lineIdx < ASCII_BOILERPLATE.length; lineIdx++) {
-    const line = ASCII_BOILERPLATE[lineIdx];
-    await printLineAnimated('  ' + line, speed);
-  }
-
-  // Phase 3: Subtitle with typewriter effect
+  // Phase 2: Subtitle with typewriter effect
   await sleep(150);
   console.log('');
 
-  // "by Apptension"
+  // "by Ordigita"
   process.stdout.write('  ');
   for (const char of 'by ') {
     process.stdout.write(color.gray(char));
     await sleep(30);
   }
 
-  const companyText = 'Apptension';
+  const companyText = 'Ordigita';
   for (let i = 0; i < companyText.length; i++) {
     const char = companyText[i];
     const progress = i / (companyText.length - 1);
@@ -143,7 +120,7 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
 
   // URL
   await sleep(80);
-  const url = 'https://apptension.com';
+  const url = 'https://ordigita.pl';
   process.stdout.write('  ');
   for (let i = 0; i < url.length; i++) {
     const progress = i / (url.length - 1);
