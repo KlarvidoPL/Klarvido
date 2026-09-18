@@ -8,6 +8,14 @@ const compat = new FlatCompat({
 });
 
 module.exports = [
+  {
+    // Generated files (GraphQL codegen output, etc.) - never lint/fix these. Without this,
+    // running `eslint --fix` from the repo root (exactly what lint-staged's pre-commit hook
+    // does) resolves this root config instead of the per-package ignore in
+    // webapp-api-client/eslint.config.js, and silently strips codegen's own
+    // `/* eslint-disable */` header back out on every commit.
+    ignores: ['**/__generated/**', '**/__generated__/**'],
+  },
   { plugins: { '@nx': nxEslintPlugin } },
   {
     settings: {
