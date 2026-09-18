@@ -28,6 +28,8 @@ Local URLs: webapp `:3000`, backend/GraphQL `:5001`, admin `admin.localhost:5001
 
 `pnpm saas <area> <action>` (the `@sb/cli` in `packages/internal/cli`) is the standard entrypoint for nearly everything — Docker Compose orchestration, migrations, secrets, and deploys. Prefer it over raw `docker compose`/`nx` calls when a subcommand exists.
 
+`.env` files have distinct roles, per package: `.env` (real secrets, per-environment, **never committed**) vs `.env.shared` (committed, non-secret defaults e.g. `PROJECT_NAME`) vs `.env.test` (CI test-run overrides). The first superuser is created automatically from the initial backend migration **if `ADMIN_EMAIL` + `ADMIN_DEFAULT_PASSWORD` are set** at first `migrate` — not a separate seed command; change the password immediately outside local dev (the shared default in `.env.shared` is dev-only).
+
 ### Lint / type-check / test (frontend — per-package, via Nx)
 
 Every `webapp` and `webapp-libs/*` package has `lint`, `type-check`, `test` targets even though `project.json` often shows `"targets": {}` (they're added by inferred Nx plugins — use `pnpm nx show project <name>` if unsure what's available).
@@ -99,6 +101,13 @@ Run from `packages/webapp`: `pnpm plop` (interactive menu) or `pnpm plop <genera
 
 After generating `backend`/`crud`: add the app to `INSTALLED_APPS`, register its schema in `packages/backend/config/schema.py`, then `pnpm saas backend makemigrations && pnpm saas backend migrate`, then `pnpm saas webapp graphql download-schema` (+ generate-types). Plop won't overwrite existing files — delete/rename first if regenerating. If `pnpm plop` isn't found, run it from `packages/webapp` with deps installed, not the repo root.
 
+### Coding standards (tooling config, not just style)
+
+- **Black** (`packages/backend/pyproject.toml`): `line-length=120`, `skip-string-normalization=true` (preserves original quote style), excludes `migrations|libs|docs|data`.
+- **Ruff** (same file): several rules are intentionally ignored — don't "fix" these if seen: `S101` (assert), `A002`/`A003` (builtin shadowing), `S105` (hardcoded-password false positives), `SIM105` (contextlib.suppress), `B904` (raise-from), `PLR0913` (too many args).
+- **Prettier** (root `.prettierrc`): just `{"singleQuote": true}`. Plugins: `@trivago/prettier-plugin-sort-imports` (the import-order convention already noted above is enforced by this, not manual) and `prettier-plugin-tailwindcss` (sorts Tailwind classes).
+- **Stylelint** also runs on CSS/Tailwind as part of `pnpm nx run webapp:lint` (`packages/webapp/.stylelintrc`).
+
 ## Architecture
 
 ### Monorepo layout
@@ -126,6 +135,7 @@ After generating `backend`/`crud`: add the app to `INSTALLED_APPS`, register its
 - **Tests use pytest fixtures, not `django.test.TestCase`** (`TestCase` can cause `InterfaceError: connection already closed`). Mark with `pytestmark = pytest.mark.django_db`, use factories (`user_factory`, `tenant_factory`, ...). Factories that must not duplicate a row need `django_get_or_create` in `class Meta`. Factories become fixtures automatically via `pytest_factoryboy.register(...)` in each app's `tests/fixtures.py`, wired into `pytest_plugins` in the root `conftest.py` — that's why e.g. `product_factory`/`product` are available without importing them.
 - Emails go through `common.emails.Email` subclasses (`.send()`), not raw SMTP calls — the subclass has a `name` (e.g. `'ACCOUNT_ACTIVATION'`) and a `serializer_class` (DRF serializer validating the template's `data` dict). In-app notifications go through `apps.notifications.sender.send_notification`; which channels actually fire is controlled by the `NOTIFICATIONS_STRATEGIES` setting (default in-app only) — add e.g. push/SMS by subclassing `BaseNotificationStrategy` in `apps/notifications/strategies.py`.
 - **New Django app manually** (what `plop backend` automates): `pnpm saas backend shell` → `cd apps && django-admin startapp <name>`, fix `apps.py`'s `name = 'apps.<name>'`, add to `LOCAL_APPS` in `settings.py`. Model IDs conventionally use `hashid_field.HashidAutoField` (obfuscated, non-sequential).
+- **Activity/audit logging**: `common.action_logging` provides a `@log_create`/`@log_update`/`@log_delete` decorator form for mutations, or manual `ActionLogService.log_action(...)` + `compute_changes(old_instance, new_instance, fields_to_track=[...])` for auto-diffing field changes. Sensitive fields are never logged — configured in `EXCLUDED_LOGGING_FIELDS` (`password`, `secret_key`, `api_key`, `token`, ...); add any new sensitive field there. Retention via `ACTION_LOG_RETENTION_DAYS`.
 - **GraphQL error response shape** differs by error source — check both when handling errors on the frontend: field-validator errors come back as `extensions.<fieldName>`, object-level `validate()` errors as `extensions.non_field_errors`. Use the existing `extractGraphQLErrors` + `form.setApolloGraphQLResponseErrors` helpers rather than parsing `extensions` manually.
 
 ### Frontend patterns
@@ -143,7 +153,12 @@ After generating `backend`/`crud`: add the app to `INSTALLED_APPS`, register its
 
 Reference implementation: the `backup` module (`packages/backend/apps/backup` + `packages/webapp-libs/webapp-backup`). A self-contained feature owns its own permissions, notification types, and GraphQL schema on both sides; the main app/shared libs only wire it in (route registration, merging notification templates). Same permission code strings must be used in the backend `requires()` check, the frontend `usePermissionCheck()`, and route guards. Don't put a module's notification types inside `webapp-notifications` — define them locally and have the main webapp merge the maps.
 
-Scaffold the frontend package with `pnpm nx g @sb/tools:webapp-lib --directory webapp-libs mylib` (generator templates: `packages/internal/tools/src/generators/webapp-lib/files`), then manually: add the path alias to root `tsconfig.base.json` (`@sb/webapp-mylib` → `packages/webapp-libs/webapp-mylib/src/index.ts`, plus the `/*` wildcard variant), and add the dependency to the consuming package's `package.json` + `pnpm i`. Naming convention: package `webapp-{name}`, import path `@sb/webapp-{name}`.
+Scaffold the frontend package with `pnpm nx g @sb/tools:webapp-lib --directory webapp-libs mylib` (generator templates: `packages/internal/tools/src/generators/webapp-lib/files`), then manually: add the path alias to root `tsconfig.base.json` (`@sb/webapp-mylib` → `packages/webapp-libs/webapp-mylib/src/index.ts`, plus the `/*` wildcard variant), add the new package to the `@nx/enforce-module-boundaries` allow-list in root `eslint.config.js` (skip this and importing the new lib elsewhere fails lint), and add the dependency to the consuming package's `package.json` + `pnpm i`. Naming convention: package `webapp-{name}`, import path `@sb/webapp-{name}`.
+
+### AI integrations — two distinct systems, don't conflate
+
+1. **AI Agent (MCP)** — the chatbot/command-palette integration (`packages/mcp-server` + `@sb/webapp-ai-assistant`). New tools are `.graphql` operation files in `packages/mcp-server/operations/` with a `# @tool(name: "...", description: "...")` directive comment. `mutation_mode` in `packages/mcp-server/config.yaml` controls exposure: `none` (read-only) / `explicit` (only pre-defined mutation tools — production default) / `all` (dev/testing only). Every tool call is re-checked against a `TOOL_PERMISSIONS` map at execution time and activity-logged with `actor_type=AI_AGENT`.
+2. **Simple OpenAI integration** — the "SaaS Ideas Generator" demo (`packages/backend/apps/integrations/openai/client.py` + `webapp-generative-ai`). `OpenAIClient` is a singleton with automatic model fallback (gpt-4 → gpt-4-turbo-preview → gpt-3.5-turbo) if the configured model is unavailable; its mutation uses `@ratelimit(key="ip", rate='3/min')` — copy this pattern for any new simple, non-agentic AI-backed mutation rather than the MCP tool pattern above.
 
 ### Authorization: two coexisting systems — don't conflate them
 
@@ -155,11 +170,23 @@ Besides the tenant-scoped permission registry above (`register_app_permissions`,
 
 **Before adding an authorization check, identify which layer the resource belongs to**: a tenant/org-scoped feature → the permission-registry pattern; a global, non-tenant capability (internal support-only view, global admin action) → `AccessPolicy`/`CommonGroups`.
 
-Other auth extension points: new OAuth provider → `SOCIAL_AUTH_<PROVIDER>_KEY`/`SECRET` in `settings.py` + add to the frontend `OAuthProvider` enum (`modules/auth/auth.types.ts`) + wire a button via `useOAuthLogin(provider)`. New profile field → add to `UserProfile` model + migration, thread through `UserManager.create_user`, `UserSignupSerializer`, `CurrentUserType` (custom `graphene.String()` + `resolve_<field>`), and `UserProfileSerializer` if user-editable post-signup.
+Other auth extension points: new OAuth provider → `SOCIAL_AUTH_<PROVIDER>_KEY`/`SECRET` in `settings.py` + add to the frontend `OAuthProvider` enum (`modules/auth/auth.types.ts`) + wire a button via `useOAuthLogin(provider)`; `SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS` is the allow-list for OAuth redirect targets. New profile field → add to `UserProfile` model + migration, thread through `UserManager.create_user`, `UserSignupSerializer`, `CurrentUserType` (custom `graphene.String()` + `resolve_<field>`), and `UserProfileSerializer` if user-editable post-signup.
+
+### Enterprise SSO & directory sync
+
+A whole feature area, distinct from both authorization layers above: `apps.sso` (backend) + `@sb/webapp-sso` (frontend). Three independently-toggleable pieces:
+
+1. **SAML 2.0 / OIDC SSO** — per-tenant `SSOConnection` records, configured by _tenant owners/admins_ in Organization Settings → Security (not by app developers — devs only gate the feature class via env vars). SP metadata auto-served at `/api/sso/saml/{connection_id}/metadata`. Supports JIT (just-in-time) provisioning and IdP-group → tenant-role mapping (e.g. `{"Admins": "OWNER", "_default": "MEMBER"}`).
+2. **SCIM 2.0 directory sync** — provisioning/deprovisioning at `/api/sso/scim/v2/{Users,Groups}`, bearer-token auth (shown once on creation); requires an active SSO connection first. SCIM groups map read-only to tenant roles.
+3. **WebAuthn/Passkeys** — **personal, not org-scoped**: a passkey authenticates the _user_ across all their tenant memberships, managed only from the user's own Profile — an org admin can't see/delete another user's passkey. The same personal-vs-org distinction applies to session management (Profile → Active Sessions: each user manages only their own devices).
+
+Feature flags (env-driven, default all `true`, UI-only — don't fully remove `apps.sso` to "disable" it, that's destructive to existing SSO data): `VITE_ENABLE_SSO`, `VITE_ENABLE_PASSKEYS`, `VITE_ENABLE_SOCIAL_LOGIN`, `VITE_ENABLE_PASSWORD_LOGIN`.
+
+Every SSO/SCIM/passkey event is auto-logged to `SSOAuditLog` (tenant-isolated, viewable at Organization Settings → Security → Audit Log or `GET /api/sso/tenant/{id}/audit-logs/`); extend event types in `apps/sso/constants.py`, log custom ones with `SSOAuditLog.log_event(...)`. Provider setup (Okta, Azure AD/Entra ID) follows the same shape: create app in IdP → point ACS URL (`/api/sso/saml/{id}/acs`) or OIDC redirect URI (`/api/sso/oidc/{id}/callback`) at this app → copy IdP metadata/cert into the tenant's SSO connection → optionally enable SCIM. Azure AD caps group claims at 200 groups; mapping by Group ID (stable, unreadable) vs. display name (readable, breaks on rename) is a real tradeoff.
 
 ### Async / background jobs
 
-Two systems depending on deploy target — **only relevant if you're on the AWS path**; Render/VPS have no Lambda equivalent, so background jobs there are Celery-only regardless of what an AWS-oriented guide says (consistent with the env-portability rule below).
+Controlled by `TASK_BACKEND` (`lambda` | `celery`, default `lambda`). Two systems depending on deploy target — **only relevant if you're on the AWS path**; Render/VPS have no Lambda equivalent, so background jobs there are Celery-only (`TASK_BACKEND=celery`) regardless of what an AWS-oriented guide says (consistent with the env-portability rule below).
 
 - **Celery** (works everywhere, incl. Render/VPS) — `@shared_task` in `apps/*/tasks.py`, dispatched with `.delay(...)` or `.apply_async(...)`. Debug via **Flower** (`localhost:5555` locally, `http://flower.<stage-domain>` deployed); task results land in Postgres, browsable in Django admin at `/django_celery_results/taskresult/`.
 - **Lambda tasks (AWS-only)** — a class subclassing `LambdaTask`, dispatched via `.apply(data=...)` through EventBridge. New Lambda worker modules register in `packages/workers/serverless.yml` (function → eventBridge trigger matching `source`), per-stage config in `packages/workers/workers.conf.yml` (can pull secrets from SSM via `${ssm:/${self:custom.ssmService}/KEY}`). Skip this path entirely outside AWS.
@@ -194,23 +221,84 @@ Same Docker images run against three different infra setups; only environment/co
 
 **Environment portability rule**: because VPS and AWS differ only in config, never bypass the existing abstraction layers when writing a feature:
 
-- File I/O → always through Django's `default_storage` / the configured `STORAGE_BACKEND` (`local`, `s3`, `r2`, `b2`, `minio`), never a hardcoded local filesystem path assumed to persist.
+- File I/O → always through Django's `default_storage` / the configured `STORAGE_BACKEND` (`local`, `s3`, `r2`, `b2`, `minio`), never a hardcoded local filesystem path assumed to persist. Use `get_default_storage_backend()`/`get_public_storage()` (`common/storages.py`) directly when you need the backend explicitly rather than via the model field default — `get_public_storage()` specifically for anything needing a public URL (avatars, etc.). Debug which backend is active: `default_storage.__class__.__name__` in `pnpm saas backend shell`.
 - Email → always `django.core.mail` (`EMAIL_BACKEND` env-driven: SMTP, SES, SendGrid), never a direct provider SDK call.
+- Background jobs → `TASK_BACKEND` (`lambda`/`celery`, see above) — write against Celery `@shared_task` for anything that must also run on Render/VPS.
+- Tracing/observability → `TRACING_BACKEND` (`xray`/`otel`/`none`, default `xray`); AWS uses X-Ray, Render/VPS have no equivalent (Sentry there is error tracking only, not distributed tracing) — don't assume tracing spans exist outside AWS.
+- Database connection config has two mutually exclusive forms and the backend branches on which is set — **don't set both**: `DATABASE_URL` (single connection string — Render/Railway-style) vs `DB_CONNECTION` (JSON blob — AWS RDS). On Render's basic Postgres plan (22-25 max connections), also set `DB_CONN_MAX_AGE=0` or you'll hit "too many connections" once backend + celery worker + celery beat replicas add up.
 - Secrets/config → read via Django settings (`env(...)`), never hardcode something that would need to differ between environments.
+- Cross-origin cookies: `COOKIE_SAMESITE=None` + `COOKIE_SECURE=True` (plus explicit `CORS_ALLOWED_ORIGINS`/`CSRF_TRUSTED_ORIGINS`, no wildcards) are required when frontend/backend sit on different subdomains (Render-style split-domain), vs. `COOKIE_SAMESITE=Lax` when they share a parent domain (VPS/AWS+CloudFront) — missing this is the single most common "login works locally, fails on Render" bug. Safari/iOS additionally gets an automatic `Authorization`-header fallback (token mirrored to `X-Auth-Token` response header + `localStorage`) when third-party cookies are blocked — don't "simplify" session code to cookie-only.
 - Assume the container is stateless between deploys/restarts (matters more on AWS Fargate, but keeping it true everywhere avoids surprises when migrating from VPS to AWS later).
-- If a feature genuinely needs environment-specific behavior, gate it behind a new env var following the `STORAGE_BACKEND`/`EMAIL_BACKEND` pattern rather than branching on a hardcoded assumption.
+- If a feature genuinely needs environment-specific behavior, gate it behind a new env var following the `STORAGE_BACKEND`/`EMAIL_BACKEND`/`TASK_BACKEND` pattern rather than branching on a hardcoded assumption.
+
+Rough cost/setup-time per target (own estimates from earlier in this project, broadly consistent with the upstream docs' comparison table): AWS ~2h setup, $85-500+/mo depending on tier (NAT Gateway ~$45/mo flat is the biggest fixed cost; Fargate isn't covered by AWS free tier); Render ~30min, ~$40-70/mo; VPS ~1h, ~$20-50/mo. Reinforces the earlier recommendation to start on VPS/Render pre-revenue.
 
 ### Dev tools & operational extras
 
-- **Mailcatcher**: switch `EMAIL_BACKEND` in `packages/backend/.env` — `console.EmailBackend` writes emails to `docker compose logs celery_default` (emails send async via Celery, so check _worker_ logs, not backend logs); `smtp.EmailBackend` + `EMAIL_HOST=mailcatcher`/`EMAIL_PORT=1025` shows them at `localhost:1080`. Restart (`pnpm saas down && pnpm saas up`) after changing. Production uses `django_ses.SESBackend`. Storybook email templates have a "Send Email" button that dispatches straight to Mailcatcher.
+- **Mailcatcher**: switch `EMAIL_BACKEND` in `packages/backend/.env` — `console.EmailBackend` writes emails to `docker compose logs celery_default` (emails send async via Celery, so check _worker_ logs, not backend logs); `smtp.EmailBackend` + `EMAIL_HOST=mailcatcher`/`EMAIL_PORT=1025` shows them at `localhost:1080`. Restart (`pnpm saas down && pnpm saas up`) after changing. Production uses `django_ses.SESBackend`. Storybook email templates have a "Send Email" button that dispatches straight to Mailcatcher. `EMAIL_FROM_ADDRESS` is the only required var for sending to work at all. Flower's UI is unauthenticated unless `FLOWER_BASIC_AUTH` (`user1:password1,...`) is set (or `FLOWER_AUTH_PROVIDER`/`FLOWER_OAUTH2_*` for OAuth2).
 - **Sentry**: enable per-environment by setting `SENTRY_DSN` via `pnpm saas backend secrets` (after `pnpm saas aws set-env <stage>`) — AWS-specific activation path.
-- **SSH into a deployed (AWS) container**: no bastion — uses AWS ECS Exec directly (`aws-vault exec <PROFILE> -- aws ecs execute-command --cluster <CLUSTER> --task <TASK_ID> --container <CONTAINER> --command "/bin/bash" --interactive`), requires the SSM Session Manager CLI plugin. Locally/VPS, just `pnpm saas backend shell`.
+- **SSH into a deployed (AWS) container**: `pnpm saas backend remote-shell` wraps the cluster/task lookup + ECS Exec call — prefer it. Manual fallback (what it does under the hood, no bastion): `aws-vault exec <PROFILE> -- aws ecs execute-command --cluster <CLUSTER> --task <TASK_ID> --container <CONTAINER> --command "/bin/bash" --interactive`, requires the SSM Session Manager CLI plugin. Locally/VPS, just `pnpm saas backend shell`.
 - **CLI telemetry**: the `saas` CLI collects anonymous usage telemetry; `SB_TELEMETRY_DEBUG=1 pnpm saas <cmd>` to inspect, `SB_TELEMETRY_DISABLED=1` to opt out.
-- **Payments (one-time)**: reference implementation lives in `packages/backend/apps/finances/{serializers,schema}.py` + `packages/webapp-libs/webapp-finances/src/components/stripePayment.hooks.ts` — read those rather than re-deriving. `useStripePaymentIntent` (creates intent) + `useStripePayment` (confirms via `@stripe/react-stripe-js`).
+- **Payments (one-time)**: reference implementation lives in `packages/backend/apps/finances/{serializers,schema}.py` + `packages/webapp-libs/webapp-finances/src/components/stripePayment.hooks.ts` — read those rather than re-deriving. `useStripePaymentIntent` (creates intent) + `useStripePayment` (confirms via `@stripe/react-stripe-js`). `SUBSCRIPTION_TRIAL_PERIOD_DAYS` (default 7) controls trial length with no code change.
 - **Contentful sync**: `cd packages/contentful && node scripts/run_migrations.js` (needs `CONTENTFUL_SPACE_ID`/`CONTENTFUL_ACCESS_TOKEN`/`CONTENTFUL_ENVIRONMENT` in `packages/contentful/.env`). Manual/local only, not run in CI/CD.
+- **Workers ↔ backend secret coupling**: workers' `JWT_SECRET` and `HASHID_SALT` must exactly equal backend's `DJANGO_SECRET_KEY` and `HASHID_FIELD_SALT` (shared token/hash-id encoding) — an easy cross-service break if rotating one side's secrets without the other.
+
+### AWS deployment runbook
+
+The condensed step sequence for an actual AWS deployment (beyond the one-line summary above):
+
+**Prerequisites**: AWS account (admin), Docker Hub account (CodeBuild shares IPs across AWS customers and hits anonymous pull rate limits without it), `aws-cli`, `aws-vault` (encrypted credential storage), `chamber` (Parameter Store secrets), the SSM Session Manager plugin (only if using `remote-shell`/ECS Exec).
+
+**Credentials & domain**: create an IAM role (`AdministratorAccess`) rather than using root/user creds directly; `aws-vault add <profile>`, link via `~/.aws/config` (`source_profile` + `role_arn`), set `AWS_VAULT_PROFILE` in `.env`. Get a Route 53 hosted zone (ID + name) — external DNS is possible but means managing ACM certs/CNAMEs by hand.
+
+**Bootstrap + configure a stage** (once per account/region, then once per stage):
+
+```sh
+pnpm saas infra bootstrap                      # CDK bootstrap + KMS key for Chamber, once per account/region
+pnpm saas aws set-env qa                       # sets terminal context to this stage (per-terminal-session only)
+pnpm saas aws set-var SB_HOSTED_ZONE_ID Z0123456789ABCDEFGHIJ
+pnpm saas aws set-var SB_HOSTED_ZONE_NAME example.com
+pnpm saas aws set-var SB_DOMAIN_WEB_APP app.qa.example.com
+pnpm saas aws set-var SB_DOMAIN_API api.qa.example.com
+pnpm saas aws set-var SB_DOMAIN_ADMIN_PANEL admin.qa.example.com
+pnpm saas aws set-var SB_DOMAIN_CDN cdn.qa.example.com
+# optional: SB_DOMAIN_DOCS/SB_DOMAIN_FLOWER, SB_BASIC_AUTH user:pass (protect non-prod!),
+# SB_CI_MODE simple (new accounts — avoids CodeBuild concurrency limits; "parallel" once established),
+# SB_CERTIFICATE_DOMAIN example.com (only for prod serving from a bare root domain)
+```
+
+Variables persist in SSM Parameter Store (`/env-<PROJECT_NAME>-<stage>/*`), not locally.
+
+**Deploy infra** (30-45 min; provisions VPC/RDS/ElastiCache/ECS/CloudFront/CodePipeline):
+
+```sh
+pnpm saas infra deploy --diff   # preview
+pnpm saas infra deploy          # stacks in order: global -> main -> db -> ci -> components
+pnpm saas infra deploy <stack>  # redeploy one stack only
+```
+
+Then add Docker Hub creds to the `GlobalBuildSecrets` entry in Secrets Manager manually (`{"DOCKER_USERNAME":..., "DOCKER_PASSWORD":...}`) — CI/CD builds fail intermittently without this.
+
+**Secrets, then app deploy**:
+
+```sh
+pnpm saas backend secrets    # DJANGO_SECRET_KEY, HASHID_FIELD_SALT, ADMIN_EMAIL, ADMIN_DEFAULT_PASSWORD, FLOWER_BASIC_AUTH, STRIPE_*, SENTRY_DSN, SOCIAL_AUTH_*, OPENAI_API_KEY
+pnpm saas workers secrets    # JWT_SECRET/HASHID_SALT must equal backend's above (see Dev tools note)
+pnpm saas build && pnpm saas deploy   # everything; or per-service: backend deploy api/migrations, workers deploy, webapp deploy, backend deploy mcp-server
+```
+
+Changing a secret doesn't affect running containers until that service redeploys.
+
+**Verify**: `https://api.<domain>/api/healthcheck/` → `{"status":"ok"}`; admin panel login; Flower online if enabled; CloudWatch log groups `/ecs/<project>-<stage>-api`, `/ecs/<project>-<stage>-celery-*`, `/aws/lambda/<project>-<stage>-*`.
+
+**Tear down** (destructive, deletes the DB): `pnpm saas infra destroy components|ci|db|main`, in that reverse order.
+
+**CI/CD**: needs an `external-ci` IAM user (auto-created by the infra stack) — its access key becomes `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` repo secrets, plus a GitHub Environment per stage with `SB_CI_ARTIFACTS_BUCKET` (get via `pnpm saas ci get-artifacts-bucket`) and `SB_DEPLOY_STAGE`. Flow: push → GitHub Actions builds/tests → uploads to the artifacts S3 bucket → CodePipeline detects it → CodeBuild deploys to ECS/Lambda/S3 (matches this repo's `deploy-qa.yml`/`deploy-prod.yml`, currently `workflow_dispatch`-only). Slack notifications go through AWS Chatbot (console-only config, no repo changes). Manual re-trigger: `gh workflow run deploy-qa.yml --ref <branch>`, or `aws codepipeline start-pipeline-execution --name <project>-<stage>-pipeline` to re-run the last build. Rollback: `git revert` + redeploy, or pick a prior ECS task definition revision in the console.
+
+**Troubleshooting (non-obvious cases)**: cert covers `*.[stage].[domain]` by default — deploying prod on a bare root domain needs `SB_CERTIFICATE_DOMAIN` set explicitly. Cert stuck "Pending Validation" → check `SB_HOSTED_ZONE_ID` and DNS propagation. New accounts: SES sandbox (verified addresses only until production access requested), CodeBuild concurrency capped at 1 (`SB_CI_MODE=simple`). Stack stuck `ROLLBACK_COMPLETE` → delete it before retrying `infra deploy`. 502/503 right after deploy is normal for 2-5 min while ECS tasks pass health checks.
 
 ## Further reading in this repo
 
 `.cursor/rules/*.mdc` has deeper, example-heavy versions of the above (GraphQL mutation walkthroughs, full test patterns, styling/icon/i18n conventions, CI preflight decision trees) — check the relevant file there if you need copy-pasteable examples rather than the summary above.
 
-The "Architecture" and "Dev tools" sections above already fold in the actionable parts of every page under <https://docs.demo.saas.apptoku.com/working-with-sb/> (46 pages, crawled and distilled). For anything not covered here — or if the upstream docs have since changed — fetch that page directly rather than assuming this file is exhaustive.
+This file folds in the actionable parts of the **entire** upstream docs site (<https://docs.demo.saas.apptoku.com/>) — `working-with-sb/`, `getting-started/`, `introduction/`, `deployment/`, `aws/`, `features/enterprise-sso/`, plus the env-var/CLI-command pages under `api-reference/` — crawled and distilled page by page. Deliberately **not** crawled: `api-reference/*/generated/**`, which is Sphinx/TypeDoc output auto-generated straight from this repo's own source docstrings — reading the actual source is more current and authoritative than that mirror. For anything not covered here, or if the upstream docs have since changed, fetch the relevant page directly rather than assuming this file is exhaustive.
