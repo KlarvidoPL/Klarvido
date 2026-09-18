@@ -24,6 +24,14 @@ const codegenConfigs = webappLibs
 const config: CodegenConfig = {
   overwrite: true,
   ignoreNoDocuments: true,
+  // Runs after every write, including each regeneration cycle in `-w` watch mode -
+  // keeps gql.ts's throw-on-missing-query patch and duplicate-type cleanup from
+  // drifting out of sync between one-shot `generate-types` and `generate-types:watch`
+  // (the latter used to run raw codegen only, silently reverting both on every
+  // `pnpm saas up`).
+  hooks: {
+    afterAllFileWrite: ['node ./scripts/remove-duplicate-types.js', 'node ./scripts/patch-gql.js'],
+  },
   parserOptions: {
     plugins: [
       'typescript',
