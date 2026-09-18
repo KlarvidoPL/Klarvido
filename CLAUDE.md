@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Klarvido is built on Apptension's **SaaS Boilerplate**: an Nx/pnpm monorepo with a React/TypeScript frontend, a Django/GraphQL backend, Celery + event-driven workers, and infra-as-code that can deploy to AWS, Render.com, or a plain VPS. Requirements: Docker, Node 20+, pnpm 9+ (Python 3.11 + `uv` only needed if running backend/workers outside Docker).
 
+**Before building a new feature or modifying existing functionality, consult <https://docs.demo.saas.apptoku.com/working-with-sb/>** — the upstream boilerplate's own "working with SB" documentation. It covers the intended workflow for extending the boilerplate (module structure, GraphQL/CRUD generators, permissions, notifications, etc.) in more depth than this file, and following it keeps the codebase upgradeable against future upstream boilerplate releases.
+
 ## Commands
 
 ### Setup & local dev
