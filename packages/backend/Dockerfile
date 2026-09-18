@@ -14,6 +14,14 @@ FROM ${SB_PULL_THROUGH_CACHE_REPOSITORY}python:3.11-slim-bullseye AS backend_bui
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=off
 
+# deb.debian.org's live bullseye-security suite is inconsistent now that bullseye is EOL
+# (Packages index lists versions whose pool files have already been purged from the CDN,
+# causing intermittent 404s). Pin to a snapshot.debian.org mirror instead, which is immutable.
+RUN printf '%s\n' \
+  'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20250721T000000Z bullseye main' \
+  'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20250721T000000Z bullseye-security main' \
+  'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20250721T000000Z bullseye-updates main' \
+  > /etc/apt/sources.list
 
 RUN apt-get update && apt-get install -y gcc postgresql-client ca-certificates jq curl \
   && update-ca-certificates \

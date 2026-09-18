@@ -1,20 +1,13 @@
 import { color } from '@oclif/color';
 
-// Large ASCII art for "SaaS"
-const ASCII_SAAS = [
-  '███████╗ █████╗  █████╗ ███████╗',
-  '██╔════╝██╔══██╗██╔══██╗██╔════╝',
-  '███████╗███████║███████║███████╗',
-  '╚════██║██╔══██║██╔══██║╚════██║',
-  '███████║██║  ██║██║  ██║███████║',
-  '╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝',
-];
-
-// Medium ASCII art for "Boilerplate" (matching SaaS block style, 4 lines)
-const ASCII_BOILERPLATE = [
-  '█▀▀▄ █▀▀█ ▀█▀ █   █▀▀ █▀▀█ █▀▀█ █   █▀▀█ ▀▀█▀▀ █▀▀',
-  '█▀▀▄ █  █  █  █   █▀▀ █▄▄▀ █▀▀▀ █   █▄▄█   █   █▀▀',
-  '▀▀▀  ▀▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀▀ ▀    ▀▀▀ ▀  ▀   ▀   ▀▀▀',
+// Large ASCII art for "Klarvido"
+const ASCII_KLARVIDO = [
+  '██╗  ██╗██╗      █████╗ ██████╗ ██╗   ██╗██╗██████╗  ██████╗ ',
+  '██║ ██╔╝██║     ██╔══██╗██╔══██╗██║   ██║██║██╔══██╗██╔═══██╗',
+  '█████╔╝ ██║     ███████║██████╔╝██║   ██║██║██║  ██║██║   ██║',
+  '██╔═██╗ ██║     ██╔══██║██╔══██╗╚██╗ ██╔╝██║██║  ██║██║   ██║',
+  '██║  ██╗███████╗██║  ██║██║  ██║ ╚████╔╝ ██║██████╔╝╚██████╔╝',
+  '╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ',
 ];
 
 // Gradient colors: yellow (255, 254, 37) -> green (66, 242, 114)
@@ -76,19 +69,13 @@ export function renderBanner(): string {
   const lines: string[] = [];
   lines.push('');
 
-  for (const line of ASCII_SAAS) {
+  for (const line of ASCII_KLARVIDO) {
     lines.push('  ' + applyGradientToLine(line));
   }
 
   lines.push('');
-
-  for (const line of ASCII_BOILERPLATE) {
-    lines.push('  ' + applyGradientToLine(line));
-  }
-
-  lines.push('');
-  lines.push('  ' + color.gray('by ') + color.bold('Apptension'));
-  lines.push('  ' + color.underline(color.cyan('https://apptension.com')));
+  lines.push('  ' + color.gray('by ') + color.bold('Ordigita'));
+  lines.push('  ' + color.underline(color.cyan('https://ordigita.pl')));
   lines.push('');
 
   return lines.join('\n');
@@ -104,34 +91,24 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
   process.stdout.write('\x1B[?25l');
   console.log('');
 
-  // Phase 1: Animate "SaaS" - character by character reveal per line
-  for (let lineIdx = 0; lineIdx < ASCII_SAAS.length; lineIdx++) {
-    const line = ASCII_SAAS[lineIdx];
+  // Phase 1: Animate "Klarvido" - character by character reveal per line
+  for (let lineIdx = 0; lineIdx < ASCII_KLARVIDO.length; lineIdx++) {
+    const line = ASCII_KLARVIDO[lineIdx];
     await printLineAnimated('  ' + line, speed);
   }
 
-  // Small pause between sections
-  await sleep(100);
-  console.log('');
-
-  // Phase 2: Animate "Boilerplate" - character by character reveal per line
-  for (let lineIdx = 0; lineIdx < ASCII_BOILERPLATE.length; lineIdx++) {
-    const line = ASCII_BOILERPLATE[lineIdx];
-    await printLineAnimated('  ' + line, speed);
-  }
-
-  // Phase 3: Subtitle with typewriter effect
+  // Phase 2: Subtitle with typewriter effect
   await sleep(150);
   console.log('');
 
-  // "by Apptension"
+  // "by Ordigita"
   process.stdout.write('  ');
   for (const char of 'by ') {
     process.stdout.write(color.gray(char));
     await sleep(30);
   }
 
-  const companyText = 'Apptension';
+  const companyText = 'Ordigita';
   for (let i = 0; i < companyText.length; i++) {
     const char = companyText[i];
     const progress = i / (companyText.length - 1);
@@ -143,7 +120,7 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
 
   // URL
   await sleep(80);
-  const url = 'https://apptension.com';
+  const url = 'https://ordigita.pl';
   process.stdout.write('  ');
   for (let i = 0; i < url.length; i++) {
     const progress = i / (url.length - 1);

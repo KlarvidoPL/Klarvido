@@ -16,6 +16,15 @@ ENV DEST_CLI_PATH=$APP_PATH/$SRC_CLI_PATH
 ENV SRC_WORKERS_PATH=packages/workers
 ENV DEST_WORKERS_PATH=$APP_PATH/$SRC_WORKERS_PATH
 
+# deb.debian.org's live bullseye-security suite is inconsistent now that bullseye is EOL
+# (Packages index lists versions whose pool files have already been purged from the CDN,
+# causing intermittent 404s). Pin to a snapshot.debian.org mirror instead, which is immutable.
+RUN printf '%s\n' \
+  'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20250721T000000Z bullseye main' \
+  'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20250721T000000Z bullseye-security main' \
+  'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20250721T000000Z bullseye-updates main' \
+  > /etc/apt/sources.list
+
 RUN apt-get update && apt-get install -y wget gnupg curl unzip make xz-utils build-essential \
   && pip install --upgrade pip \
   && pip install --no-cache-dir uv==0.9.29
