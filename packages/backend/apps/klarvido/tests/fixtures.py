@@ -1,0 +1,13 @@
+import pytest_factoryboy
+
+from . import factories
+
+
+pytest_factoryboy.register(factories.CompanyProfileFactory)
+pytest_factoryboy.register(factories.DataImportFactory)
+pytest_factoryboy.register(factories.SourceRecordFactory)
+pytest_factoryboy.register(factories.CounterpartyFactory)
+pytest_factoryboy.register(factories.CategoryFactory)
+pytest_factoryboy.register(factories.InvoiceFactory)
+pytest_factoryboy.register(factories.InvoiceLineFactory)
+pytest_factoryboy.register(factories.AccountingPeriodFactory)
