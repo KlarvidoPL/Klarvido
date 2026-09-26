@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, klarvido]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -39,7 +39,7 @@ jobs:
         run: pnpm nx run workers:build
 
   test:
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, klarvido]
     steps:
       - uses: actions/checkout@v3
         with:
