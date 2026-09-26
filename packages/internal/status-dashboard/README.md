@@ -1,5 +1,7 @@
 # Version matrix
 
+<!-- CI smoke test: touched to verify status-dashboard.yml triggers correctly. Safe to revert. -->
+
 ## Push new environment version
 
 In order to upload new version information use `upload.js`. It will use:
