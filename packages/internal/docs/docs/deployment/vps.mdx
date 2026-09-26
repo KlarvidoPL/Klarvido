@@ -292,9 +292,9 @@ Or remove the `mcp-server` service from your `docker-compose.prod.yml`.
 
 ## Backups
 
-Two independent backup mechanisms, both needing a cloud storage backend configured
-(see [Storage Options](#storage-options) above) - `local` storage means backups only
-live in a VPS Docker volume, with no offsite copy if the VPS itself dies.
+Three independent backup mechanisms. The first two need a cloud storage backend
+configured (see [Storage Options](#storage-options) above) - `local` storage means
+backups only live in a VPS Docker volume, with no offsite copy if the VPS itself dies.
 
 ### Full Database Backups (Postgres -> S3)
 
@@ -337,6 +337,39 @@ BACKUP_MASTER_KEY=your-generated-key
 Exported files are written through the configured `STORAGE_BACKEND`, so they land in
 the same S3 bucket as other uploads (under an `exports/` prefix) once S3 storage is set
 up above - not a separate bucket.
+
+### Backing Up `.env` Itself
+
+`.env` on the VPS holds `DJANGO_SECRET_KEY`, `POSTGRES_PASSWORD`, AWS credentials,
+`BACKUP_MASTER_KEY`, Stripe/OAuth secrets, etc. It's never committed and lives only on
+the VPS disk - if the VPS is lost, this file is lost with it, which also makes the two
+backups above unusable (no `BACKUP_MASTER_KEY` to decrypt per-tenant exports, no AWS
+credentials to even reach the buckets). `scripts/backup-env-to-s3.sh` encrypts `.env`
+with a passphrase and uploads it to the same backups bucket.
+
+One-time setup on the VPS:
+
+```bash
+openssl rand -base64 48 > /opt/klarvido/.env-backup-key
+chmod 600 /opt/klarvido/.env-backup-key
+```
+
+**Copy that passphrase into a password manager immediately** - it's the only offsite
+copy. The key file on the VPS is only there so the cron job can encrypt automatically;
+it does you no good if the VPS is what died.
+
+Then add to crontab (right after the Postgres dump):
+
+```bash
+15 3 * * * cd /opt/klarvido && ./scripts/backup-env-to-s3.sh >> /var/log/klarvido-backup.log 2>&1
+```
+
+To restore after a total VPS loss, on the new VPS before starting any containers:
+
+```bash
+aws s3 cp s3://<bucket>/env-backups/<timestamp>.env.enc ./env-backup.enc
+openssl enc -d -aes-256-cbc -pbkdf2 -in env-backup.enc -out .env -pass pass:'<passphrase from password manager>'
+```
 
 ## Updates and Deployments
 
