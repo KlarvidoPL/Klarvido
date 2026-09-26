@@ -3,6 +3,13 @@ name: "Docs"
 on:
   push:
     branches: [ '**' ]
+    paths:
+      - 'packages/internal/docs/**'
+      - 'packages/backend/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/actions/setup/**'
 
 env:
   SB_BACKEND_BASE_IMAGE: python:3.11-slim-bullseye
@@ -10,17 +17,13 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [ 22, 24 ]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: ./.github/workflows/actions/setup
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - shell: bash
         run: pnpm install

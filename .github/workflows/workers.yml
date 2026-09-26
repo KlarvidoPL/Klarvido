@@ -4,21 +4,24 @@ name: "Workers"
 on:
   push:
     branches: [ '**' ]
+    paths:
+      - 'packages/workers/**'
+      - 'packages/webapp-libs/webapp-emails/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/workers.yml'
+      - '.github/workflows/actions/setup/**'
 
 jobs:
   build:
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [ 22, 24 ]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: ./.github/workflows/actions/setup
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - shell: bash
         run: pnpm install
@@ -37,16 +40,13 @@ jobs:
 
   test:
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        node-version: [ 22, 24 ]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: ./.github/workflows/actions/setup
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - shell: bash
         run: pnpm install
