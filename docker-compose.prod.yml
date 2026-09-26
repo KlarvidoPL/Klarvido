@@ -170,24 +170,34 @@ services:
       - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.smtp.EmailBackend}
       - TASK_BACKEND=celery
       - TRACING_BACKEND=none
-      
+
       # Django settings
       - DJANGO_DEBUG=False
       - ENVIRONMENT_NAME=production
       - DJANGO_ALLOWED_HOSTS=${DOMAIN},api.${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
-      
+
       # Database
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
-      
+
       # Redis
       - REDIS_CONNECTION=redis://redis:6379
-      
+
       # Storage (local filesystem for VPS)
       - MEDIA_ROOT=/app/media
       - MEDIA_URL=/media/
-      
+
+      # AWS S3 (if STORAGE_BACKEND=s3) - AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/
+      # AWS_DEFAULT_REGION are picked up automatically by boto3, not read by Django settings
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME:-}
+
+      # Per-tenant backup export encryption (apps.backup) - Fernet key, DB-fallback mode (no AWS Secrets Manager on VPS)
+      - BACKUP_MASTER_KEY=${BACKUP_MASTER_KEY:-}
+
       # Email (SMTP)
       - EMAIL_HOST=${EMAIL_HOST:-}
       - EMAIL_PORT=${EMAIL_PORT:-587}
@@ -307,6 +317,11 @@ services:
       - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-sk_test_<CHANGE_ME>}
       - STRIPE_CHECKS_ENABLED=False
       - SENTRY_DSN=${SENTRY_DSN:-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME:-}
+      - BACKUP_MASTER_KEY=${BACKUP_MASTER_KEY:-}
     volumes:
       - media_data:/app/media
     networks:

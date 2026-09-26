@@ -233,6 +233,24 @@ volumes:
   minio_data:
 ```
 
+### AWS S3
+
+For off-VPS durability (uploaded documents surviving a VPS rebuild, not just living in a
+Docker volume):
+
+```bash
+STORAGE_BACKEND=s3
+AWS_ACCESS_KEY_ID=your-key
+AWS_SECRET_ACCESS_KEY=your-secret
+AWS_DEFAULT_REGION=eu-central-1
+AWS_STORAGE_BUCKET_NAME=your-bucket
+```
+
+`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_DEFAULT_REGION` are picked up
+automatically by boto3 - only `AWS_STORAGE_BUCKET_NAME` is explicitly read by Django
+settings. Use an IAM user scoped to just this bucket (`s3:GetObject`/`PutObject`/
+`DeleteObject`/`ListBucket`), not admin credentials.
+
 ## AI Assistant (MCP Server) - Optional
 
 The MCP Server enables AI assistants to interact with your application's data. It's included in `docker-compose.prod.yml` and will start automatically with your other services.
@@ -274,44 +292,51 @@ Or remove the `mcp-server` service from your `docker-compose.prod.yml`.
 
 ## Backups
 
-### Database Backup Script
+Two independent backup mechanisms, both needing a cloud storage backend configured
+(see [Storage Options](#storage-options) above) - `local` storage means backups only
+live in a VPS Docker volume, with no offsite copy if the VPS itself dies.
 
-Create `/opt/saas-app/scripts/backup-db.sh`:
+### Full Database Backups (Postgres -> S3)
+
+`scripts/backup-postgres-to-s3.sh` (checked into the repo, kept in sync on the VPS by
+`deploy-vps.yml`) dumps the database via the running `db` container and uploads it to
+S3 using a one-off `amazon/aws-cli` container - no extra long-running service needed.
+
+Add to `.env` on the VPS:
 
 ```bash
-#!/bin/bash
-BACKUP_DIR="/opt/backups/postgres"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-mkdir -p $BACKUP_DIR
-
-docker compose -f /opt/saas-app/docker-compose.prod.yml exec -T db \
-    pg_dump -U backend backend | gzip > "$BACKUP_DIR/backup_$TIMESTAMP.sql.gz"
-
-# Keep only last 7 days
-find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
+BACKUP_S3_BUCKET=your-backups-bucket
+AWS_ACCESS_KEY_ID=your-key
+AWS_SECRET_ACCESS_KEY=your-secret
+AWS_DEFAULT_REGION=eu-central-1
 ```
 
-Add to crontab:
+Then add to crontab:
 
 ```bash
 # Run daily at 3 AM
-0 3 * * * /opt/saas-app/scripts/backup-db.sh
+0 3 * * * cd /opt/klarvido && ./scripts/backup-postgres-to-s3.sh >> /var/log/klarvido-backup.log 2>&1
 ```
 
-### Cloud Backups with Restic
+Retention is handled by an S3 Lifecycle rule on the bucket (e.g. expire after 30 days),
+not by the script - set it once when creating the bucket.
+
+### Per-Tenant Data Backups (built-in)
+
+The app also has a built-in, per-tenant encrypted backup/restore feature (`apps.backup`
++ `webapp-backup`) that XML-exports a tenant's data on a configurable schedule via
+Celery Beat (runs hourly, checking each tenant's config) and emails recipients when
+ready. Tenant owners/admins enable and configure it from within the app; it needs:
 
 ```bash
-# Install restic
-sudo apt install restic
-
-# Initialize repository (Backblaze B2 example)
-export B2_ACCOUNT_ID="your-account-id"
-export B2_ACCOUNT_KEY="your-account-key"
-restic -r b2:your-bucket:/backups init
-
-# Backup
-restic -r b2:your-bucket:/backups backup /opt/backups
+# Fernet key encrypting per-tenant backup keys (DB fallback - no AWS Secrets Manager on a VPS)
+# Generate with: openssl rand 32 | base64 | tr '+/' '-_'
+BACKUP_MASTER_KEY=your-generated-key
 ```
+
+Exported files are written through the configured `STORAGE_BACKEND`, so they land in
+the same S3 bucket as other uploads (under an `exports/` prefix) once S3 storage is set
+up above - not a separate bucket.
 
 ## Updates and Deployments
 
