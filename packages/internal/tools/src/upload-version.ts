@@ -1,3 +1,4 @@
+// CI smoke test: touched to verify tools.yml triggers correctly. Safe to revert.
 import {
   S3Client,
   PutObjectCommand,
