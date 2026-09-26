@@ -32,7 +32,7 @@ services:
   # Handles SSL termination, routing, and automatic certificate renewal
   # =============================================================================
   traefik:
-    image: traefik:v3.0
+    image: traefik:v3.7.13
     container_name: traefik
     restart: unless-stopped
     command:
