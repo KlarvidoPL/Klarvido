@@ -1,7 +1,5 @@
 # Website
 
-<!-- CI smoke test: touched to verify docs.yml triggers correctly. Safe to revert. -->
-
 This website is built using [Docusaurus 3](https://docusaurus.io/), a modern static website generator.
 
 ## Installation

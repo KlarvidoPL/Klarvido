@@ -1,4 +1,3 @@
-// CI smoke test: touched to verify infra.yml triggers correctly. Safe to revert.
 export * from './lib/internal-infra-core';
 export * from './lib/env-config';
 export * from './lib/constructs';

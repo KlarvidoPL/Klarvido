@@ -1,7 +1,5 @@
 # 🍔 Saas backend application
 
-<!-- CI smoke test: touched to verify backend.yml/docs.yml trigger correctly. Safe to revert. -->
-
 ### `saas backend test`
 
 Runs tests and linters inside docker container.

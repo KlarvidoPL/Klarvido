@@ -1,7 +1,5 @@
 # Workers
 
-<!-- CI smoke test: touched to verify workers.yml triggers correctly. Safe to revert. -->
-
 ### `pnpm saas workers test`
 
 Runs tests and linters.
