@@ -1,7 +1,17 @@
 const fs = require('fs-extra');
+const os = require('os');
 const path = require('path');
 
 const { runCommand } = require('./lib/runCommand');
+
+// Run the container as the calling user (not root) so generated files
+// bind-mounted back to the host aren't root-owned - matters on machines
+// that reuse a persistent checkout across runs (e.g. self-hosted CI
+// runners), where root-owned leftovers block the next `actions/checkout`.
+const dockerUserArgs =
+  process.platform !== 'win32' && os.userInfo().uid >= 0
+    ? ['--user', `${os.userInfo().uid}:${os.userInfo().gid}`]
+    : [];
 
 const GENERATED_BACKEND_DOCS_PATH = path.resolve(
   __dirname,
@@ -24,6 +34,7 @@ const GENERATED_BACKEND_DOCS_INTERNAL_PATH = path.resolve(
         '--rm',
         '-T',
         '--no-deps',
+        ...dockerUserArgs,
         'backend',
         'sh',
         '-c',
