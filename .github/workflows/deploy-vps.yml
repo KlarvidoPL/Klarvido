@@ -1,0 +1,133 @@
+# =============================================================================
+# VPS Deployment Workflow
+# =============================================================================
+#
+# Builds the backend and webapp images, pushes them to GHCR, then SSHes into
+# the VPS to pull the new images and restart the stack defined in
+# docker-compose.prod.yml. The VPS itself never builds anything - it only
+# pulls pre-built images, keeping the deploy fast and light on a small box.
+#
+# .env.prod (DB password, Django secret key, domain, etc.) lives ONLY on the
+# VPS and is never touched by this workflow - it's created once by hand
+# during initial server setup (see packages/internal/docs/docs/deployment/vps.mdx).
+#
+# Required repository secrets:
+# - VPS_HOST:        VPS IP or hostname
+# - VPS_USER:        SSH user (the one added to the `docker` group)
+# - VPS_SSH_KEY:     Private key (matching the public key in the VPS user's
+#                     ~/.ssh/authorized_keys) - use a dedicated deploy key,
+#                     not your personal one
+# - VPS_PORT:        SSH port (optional, defaults to 22)
+# - VPS_DEPLOY_PATH: Directory on the VPS containing docker-compose.yml/.env
+#                     (e.g. /opt/klarvido)
+#
+# Required repository variables (Settings > Secrets and variables > Actions >
+# Variables tab - non-sensitive):
+# - DOMAIN: your production domain (e.g. example.com), used for the
+#           VITE_BASE_API_URL build arg baked into the webapp image
+# =============================================================================
+
+name: "Deploy to VPS"
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: "Build & Push Images"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      backend_image: ${{ steps.meta.outputs.backend_image }}
+      webapp_image: ${{ steps.meta.outputs.webapp_image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute image names
+        id: meta
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "backend_image=${{ env.REGISTRY }}/${REPO_LOWER}-backend" >> "$GITHUB_OUTPUT"
+          echo "webapp_image=${{ env.REGISTRY }}/${REPO_LOWER}-webapp" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build & push backend image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./packages/backend
+          target: backend
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.backend_image }}:latest
+            ${{ steps.meta.outputs.backend_image }}:${{ github.sha }}
+          cache-from: type=gha,scope=vps-backend
+          cache-to: type=gha,mode=max,scope=vps-backend
+
+      - name: Build & push webapp image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./packages/webapp/Dockerfile.prod
+          push: true
+          build-args: |
+            VITE_BASE_API_URL=https://api.${{ vars.DOMAIN }}/api
+            VITE_ENVIRONMENT_NAME=production
+          tags: |
+            ${{ steps.meta.outputs.webapp_image }}:latest
+            ${{ steps.meta.outputs.webapp_image }}:${{ github.sha }}
+          cache-from: type=gha,scope=vps-webapp
+          cache-to: type=gha,mode=max,scope=vps-webapp
+
+  deploy:
+    name: "Deploy to VPS"
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload docker-compose.prod.yml
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: "docker-compose.prod.yml"
+          target: ${{ secrets.VPS_DEPLOY_PATH }}
+          strip_components: 0
+          rm: false
+
+      - name: Pull images and restart stack
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            cd ${{ secrets.VPS_DEPLOY_PATH }}
+            mv docker-compose.prod.yml docker-compose.yml
+            docker compose pull
+            # backend-migrations runs migrate and must exit 0 before backend/celery start (see depends_on)
+            docker compose up -d --remove-orphans
+            docker image prune -f

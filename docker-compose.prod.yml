@@ -7,18 +7,24 @@
 # 1. Docker and Docker Compose installed on your VPS
 # 2. Domain pointed to your VPS IP address
 # 3. Ports 80 and 443 open
+# 4. `docker login ghcr.io` run once on the VPS (images are pulled from GHCR, not built here)
 #
 # Quick Start:
-# 1. Copy .env.prod.example to .env.prod and configure
-# 2. Run: docker compose -f docker-compose.prod.yml up -d
+# 1. Copy .env.vps.example to .env.prod and configure
+# 2. Run: docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
 #
-# Environment Variables (create .env.prod file):
-# - DOMAIN: Your domain (e.g., example.com)
+# Environment Variables (create .env.prod file, kept only on the VPS - never in CI):
+# - DOMAIN: Your domain (e.g., example.com). Webapp at DOMAIN (logged-out
+#           visitors see the marketing/landing page, same app serves the
+#           authenticated product), API at api.DOMAIN.
 # - ACME_EMAIL: Email for Let's Encrypt certificates
 # - DJANGO_SECRET_KEY: Django secret key
 # - HASHID_FIELD_SALT: Salt for hashid fields
 # - POSTGRES_PASSWORD: Database password
-# - See docs/deployment/VPS.md for full list
+# - BACKEND_IMAGE / WEBAPP_IMAGE: full GHCR image refs, e.g.
+#     ghcr.io/<owner>/<repo>-backend:latest
+#     ghcr.io/<owner>/<repo>-webapp:latest
+# - See .env.vps.example for the full list
 
 services:
   # =============================================================================
@@ -117,9 +123,7 @@ services:
   # Database Migrations (runs once at startup, then exits)
   # =============================================================================
   backend-migrations:
-    build:
-      context: ./packages/backend
-      target: backend
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE must be set in .env}
     container_name: backend-migrations
     restart: "no"
     command: ["./scripts/runtime/run_migrations.sh"]
@@ -142,9 +146,7 @@ services:
   # Django Backend API
   # =============================================================================
   backend:
-    build:
-      context: ./packages/backend
-      target: backend
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE must be set in .env}
     container_name: backend
     restart: unless-stopped
     command: ["./scripts/runtime/run.sh"]
@@ -235,11 +237,7 @@ services:
   # Frontend Web Application
   # =============================================================================
   webapp:
-    build:
-      context: .
-      dockerfile: ./packages/webapp/Dockerfile.prod
-      args:
-        - VITE_BASE_API_URL=https://api.${DOMAIN}/api
+    image: ${WEBAPP_IMAGE:?WEBAPP_IMAGE must be set in .env}
     container_name: webapp
     restart: unless-stopped
     networks:
@@ -255,14 +253,20 @@ services:
       - "traefik.http.middlewares.webapp-headers.headers.contentTypeNosniff=true"
       - "traefik.http.middlewares.webapp-headers.headers.frameDeny=true"
       - "traefik.http.routers.webapp.middlewares=webapp-headers"
+      # www.DOMAIN -> 301 redirect to bare DOMAIN (same cert resolver, same service)
+      - "traefik.http.routers.webapp-www.rule=Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.webapp-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.webapp-www.service=webapp"
+      - "traefik.http.routers.webapp-www.middlewares=www-redirect"
+      - "traefik.http.middlewares.www-redirect.redirectregex.regex=^https://www\\.(.+)"
+      - "traefik.http.middlewares.www-redirect.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.www-redirect.redirectregex.permanent=true"
 
   # =============================================================================
   # Celery Worker (Background Tasks)
   # =============================================================================
   celery_worker:
-    build:
-      context: ./packages/backend
-      target: backend
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE must be set in .env}
     container_name: celery_worker
     restart: unless-stopped
     command: ["./scripts/runtime/run_celery_worker_default.sh"]
@@ -304,9 +308,7 @@ services:
   # Celery Beat (Scheduled Tasks)
   # =============================================================================
   celery_beat:
-    build:
-      context: ./packages/backend
-      target: backend
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE must be set in .env}
     container_name: celery_beat
     restart: unless-stopped
     command: ["./scripts/runtime/run_celery_beat.sh"]
