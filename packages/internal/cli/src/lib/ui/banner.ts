@@ -74,8 +74,8 @@ export function renderBanner(): string {
   }
 
   lines.push('');
-  lines.push('  ' + color.gray('by ') + color.bold('Ordigita'));
-  lines.push('  ' + color.underline(color.cyan('https://ordigita.pl')));
+  lines.push('  ' + color.gray('by ') + color.bold('Klarvido'));
+  lines.push('  ' + color.underline(color.cyan('https://klarvido.com')));
   lines.push('');
 
   return lines.join('\n');
@@ -101,14 +101,14 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
   await sleep(150);
   console.log('');
 
-  // "by Ordigita"
+  // "by Klarvido"
   process.stdout.write('  ');
   for (const char of 'by ') {
     process.stdout.write(color.gray(char));
     await sleep(30);
   }
 
-  const companyText = 'Ordigita';
+  const companyText = 'Klarvido';
   for (let i = 0; i < companyText.length; i++) {
     const char = companyText[i];
     const progress = i / (companyText.length - 1);
@@ -120,7 +120,7 @@ export async function printBannerAnimated(options: { speed?: number } = {}): Pro
 
   // URL
   await sleep(80);
-  const url = 'https://ordigita.pl';
+  const url = 'https://klarvido.com';
   process.stdout.write('  ');
   for (let i = 0; i < url.length; i++) {
     const progress = i / (url.length - 1);
