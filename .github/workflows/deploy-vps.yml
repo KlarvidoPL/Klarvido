@@ -104,14 +104,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Upload compose file + mcp-server config/schema + translations
+      - name: Upload compose file + mcp-server config/schema + translations + backup script
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
-          source: "docker-compose.prod.yml,packages/mcp-server/config.yaml,packages/mcp-server/operations,packages/webapp-libs/webapp-api-client/graphql/schema,packages/webapp-libs/webapp-core/src/translations"
+          source: "docker-compose.prod.yml,packages/mcp-server/config.yaml,packages/mcp-server/operations,packages/webapp-libs/webapp-api-client/graphql/schema,packages/webapp-libs/webapp-core/src/translations,scripts/backup-postgres-to-s3.sh,scripts/backup-env-to-s3.sh"
           target: ${{ secrets.VPS_DEPLOY_PATH }}
           strip_components: 0
           rm: false
