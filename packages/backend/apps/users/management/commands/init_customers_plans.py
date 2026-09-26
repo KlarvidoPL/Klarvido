@@ -19,6 +19,6 @@ class Command(BaseCommand):
             )
             return
 
-        tenants = Tenant.objects.filter(djstripe_customers__isnull=True)
+        tenants = Tenant.objects.filter(djstripe_customers__isnull=True).order_by("id")
         for tenant in tenants:
             subscriptions.initialize_tenant(tenant=tenant)

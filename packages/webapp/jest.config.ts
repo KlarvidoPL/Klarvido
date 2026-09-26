@@ -1,4 +1,3 @@
-// CI smoke test: touched to verify webapp.yml triggers correctly. Safe to revert.
 export default {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
