@@ -4,61 +4,48 @@ import { IntlProvider } from 'react-intl';
 
 import { KlarvidoShell } from '../klarvidoShell.component';
 
+jest.mock('../../klarvidoWorkspace/klarvidoWorkspace.component', () => ({
+  KlarvidoWorkspace: ({ activeRoute }: { activeRoute: string }) => (
+    <div data-testid="workspace-route">{activeRoute}</div>
+  ),
+}));
+
 const renderShell = (onLogout = jest.fn()) =>
   render(
     <IntlProvider locale="en">
       <KlarvidoShell
         companyName="Meble Kowalski Sp. z o.o."
         onLogout={onLogout}
+        tenantId="VGVuYW50VHlwZTox"
         user={{ email: 'administrator@klarvido.com', firstName: 'Klarvido' }}
       />
     </IntlProvider>,
   );
 
 describe('KlarvidoShell (KLV-007)', () => {
-  it('renders the React shell around the reference workspace', () => {
-    renderShell();
+  it('renders the native shell without the legacy mockup iframe', () => {
+    const { container } = renderShell();
 
     expect(screen.getAllByText('Start').length).toBeGreaterThan(0);
     expect(screen.getByText('Meble Kowalski Sp. z o.o.')).toBeInTheDocument();
-    expect(screen.getByTitle('Obszar roboczy Klarvido')).toHaveAttribute(
-      'src',
-      '/klarvido/mockup.html#/today',
-    );
+    expect(screen.getByTestId('workspace-route')).toHaveTextContent('today');
+    expect(container.querySelector('iframe')).not.toBeInTheDocument();
   });
 
-  it('forwards sidebar navigation to the reference workspace', async () => {
+  it('changes the native workspace from sidebar navigation', async () => {
     renderShell();
 
     await userEvent.click(screen.getAllByText('Faktury')[0]);
 
-    expect(screen.getByTitle<HTMLIFrameElement>('Obszar roboczy Klarvido').contentWindow?.location.hash).toBe(
-      '#/invoices',
-    );
+    expect(screen.getByTestId('workspace-route')).toHaveTextContent('invoices');
   });
 
-  it('closes the mobile menu after navigating', async () => {
+  it('routes notifications to the current settings view', async () => {
     renderShell();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Otwórz menu' }));
-    expect(screen.getAllByRole('button', { name: 'Zamknij menu' })).not.toHaveLength(0);
-    await userEvent.click(screen.getAllByText('Faktury').at(-1)!);
+    await userEvent.click(screen.getByRole('button', { name: 'Powiadomienia' }));
 
-    expect(screen.getByTitle<HTMLIFrameElement>('Obszar roboczy Klarvido').contentWindow?.location.hash).toBe(
-      '#/invoices',
-    );
-    expect(screen.queryByRole('button', { name: 'Zamknij menu' })).not.toBeInTheDocument();
-  });
-
-  it('opens and closes the assistant panel', async () => {
-    renderShell();
-
-    await userEvent.click(screen.getByRole('button', { name: 'Zapytaj Klarvido' }));
-    expect(screen.getByRole('complementary', { name: 'Asystent Klarvido' })).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: 'Zamknij asystenta' }));
-
-    expect(screen.queryByRole('complementary', { name: 'Asystent Klarvido' })).not.toBeInTheDocument();
+    expect(screen.getByTestId('workspace-route')).toHaveTextContent('settings');
   });
 
   it('keeps the existing logout callback connected', async () => {

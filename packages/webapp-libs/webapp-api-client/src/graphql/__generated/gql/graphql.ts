@@ -21,6 +21,12 @@ export type Scalars = {
    */
   BigInt: { input: any; output: any; }
   /**
+   * The `Date` scalar type represents a Date
+   * value as specified by
+   * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+   */
+  Date: { input: any; output: any; }
+  /**
    * A date-time string at UTC, such as 2007-12-03T10:15:30Z,
    *     compliant with the 'date-time' format outlined in section 5.6 of
    *     the RFC 3339 profile of the ISO 8601 standard for representation
@@ -173,6 +179,20 @@ export type AiChatEventType = {
 export type AiChatSubscription = {
   __typename?: 'AiChatSubscription';
   event?: Maybe<AiChatEventType>;
+};
+
+export type AnalyticalValueType = {
+  __typename?: 'AnalyticalValueType';
+  calculatedAt: Scalars['DateTime']['output'];
+  calculationVersion: Scalars['String']['output'];
+  comparisonPeriod?: Maybe<PeriodType>;
+  kind: Scalars['String']['output'];
+  limitations: Array<Scalars['String']['output']>;
+  period: PeriodType;
+  quality: DataQualityType;
+  sources: Array<SourceReferenceType>;
+  unit: Scalars['String']['output'];
+  value?: Maybe<Scalars['String']['output']>;
 };
 
 export type ApiMutation = {
@@ -1200,6 +1220,14 @@ export type CancelActiveSubscriptionMutationPayload = {
   subscriptionScheduleEdge?: Maybe<SubscriptionScheduleEdge>;
 };
 
+export type CategoryType = {
+  __typename?: 'CategoryType';
+  amount: AnalyticalValueType;
+  code?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  share: AnalyticalValueType;
+};
+
 export type ChangeActiveSubscriptionMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
@@ -1244,6 +1272,16 @@ export type ChargeEdge = {
   cursor: Scalars['String']['output'];
   /** The item at the end of the edge */
   node?: Maybe<StripeChargeType>;
+};
+
+export type CompanyType = {
+  __typename?: 'CompanyType';
+  countryCode: Scalars['String']['output'];
+  defaultCurrency: Scalars['String']['output'];
+  legalName: Scalars['String']['output'];
+  pkdCode: Scalars['String']['output'];
+  regon: Scalars['String']['output'];
+  taxIdentifier: Scalars['String']['output'];
 };
 
 export type ConfirmEmailMutationInput = {
@@ -1352,6 +1390,12 @@ export type ContentfulTag = {
   __typename?: 'ContentfulTag';
   id?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+};
+
+export type CostStructureType = {
+  __typename?: 'CostStructureType';
+  categories: Array<CategoryType>;
+  total: AnalyticalValueType;
 };
 
 export type CreateCrudDemoItemMutationInput = {
@@ -1612,6 +1656,13 @@ export type CurrentUserType = {
   otpVerified: Scalars['Boolean']['output'];
   roles?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   tenants?: Maybe<Array<Maybe<TenantType>>>;
+};
+
+export type DataQualityType = {
+  __typename?: 'DataQualityType';
+  limitations: Array<Scalars['String']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
+  status: Scalars['String']['output'];
 };
 
 /** Deactivate an SSO connection. Requires tenantId for tenant context. */
@@ -2410,6 +2461,23 @@ export type FileFieldType = {
   url?: Maybe<Scalars['String']['output']>;
 };
 
+export type FinancialSummaryType = {
+  __typename?: 'FinancialSummaryType';
+  costs: AnalyticalValueType;
+  costsChange?: Maybe<AnalyticalValueType>;
+  grossMargin: AnalyticalValueType;
+  grossMarginChange?: Maybe<AnalyticalValueType>;
+  incomeTax?: Maybe<AnalyticalValueType>;
+  netMargin?: Maybe<AnalyticalValueType>;
+  netMarginChange?: Maybe<AnalyticalValueType>;
+  netResult?: Maybe<AnalyticalValueType>;
+  netResultChange?: Maybe<AnalyticalValueType>;
+  preTaxResult: AnalyticalValueType;
+  preTaxResultChange?: Maybe<AnalyticalValueType>;
+  revenue: AnalyticalValueType;
+  revenueChange?: Maybe<AnalyticalValueType>;
+};
+
 export type GenerateOtpMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
 };
@@ -2527,6 +2595,41 @@ export type ImageTransformOptions = {
   width?: InputMaybe<Scalars['Dimension']['input']>;
 };
 
+export type InvoiceType = {
+  __typename?: 'InvoiceType';
+  categories: Array<Scalars['String']['output']>;
+  counterpartyName: Scalars['String']['output'];
+  counterpartyTaxIdentifier: Scalars['String']['output'];
+  currency: Scalars['String']['output'];
+  documentNumber: Scalars['String']['output'];
+  dueDate?: Maybe<Scalars['Date']['output']>;
+  grossAmount: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  invoiceType: Scalars['String']['output'];
+  issueDate: Scalars['Date']['output'];
+  netAmount: Scalars['String']['output'];
+  qualityStatus: Scalars['String']['output'];
+  sourceExternalId: Scalars['String']['output'];
+  sourceSystem: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  taxAmount: Scalars['String']['output'];
+};
+
+export type KlarvidoOverviewType = {
+  __typename?: 'KlarvidoOverviewType';
+  company?: Maybe<CompanyType>;
+  comparisonPeriod?: Maybe<PeriodType>;
+  costStructure: CostStructureType;
+  customers: PortfolioType;
+  financialSummary: FinancialSummaryType;
+  invoices: Array<InvoiceType>;
+  monthlySummaries: Array<MonthlySummaryType>;
+  period: PeriodType;
+  preset: Scalars['String']['output'];
+  readiness: Array<ReadinessType>;
+  suppliers: PortfolioType;
+};
+
 /** Type for locale translation progress. */
 export type LocaleProgressType = {
   __typename?: 'LocaleProgressType';
@@ -2566,6 +2669,13 @@ export type MarkReadAllNotificationsMutationPayload = {
   hasUnreadNotifications?: Maybe<Scalars['Boolean']['output']>;
   ok?: Maybe<Scalars['Boolean']['output']>;
   unreadNotificationsCount?: Maybe<Scalars['Int']['output']>;
+};
+
+export type MonthlySummaryType = {
+  __typename?: 'MonthlySummaryType';
+  label: Scalars['String']['output'];
+  period: PeriodType;
+  summary: FinancialSummaryType;
 };
 
 /** An enumeration. */
@@ -2747,6 +2857,25 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']['output']>;
 };
 
+export type PartyTrendPointType = {
+  __typename?: 'PartyTrendPointType';
+  amount?: Maybe<AnalyticalValueType>;
+  label: Scalars['String']['output'];
+  period: PeriodType;
+};
+
+export type PartyType = {
+  __typename?: 'PartyType';
+  amount: AnalyticalValueType;
+  id: Scalars['ID']['output'];
+  invoiceCount: AnalyticalValueType;
+  name: Scalars['String']['output'];
+  percentageChange?: Maybe<AnalyticalValueType>;
+  share: AnalyticalValueType;
+  taxIdentifier: Scalars['String']['output'];
+  trend: Array<PartyTrendPointType>;
+};
+
 export type PasskeyConnection = {
   __typename?: 'PasskeyConnection';
   /** Contains the nodes in this connection. */
@@ -2823,6 +2952,12 @@ export type PaymentMethodEdge = {
   node?: Maybe<StripePaymentMethodType>;
 };
 
+export type PeriodType = {
+  __typename?: 'PeriodType';
+  endDate: Scalars['Date']['output'];
+  startDate: Scalars['Date']['output'];
+};
+
 /** Categories for grouping permissions in the UI. */
 export enum PermissionCategory {
   BILLING = 'BILLING',
@@ -2870,6 +3005,16 @@ export type PermissionType = Node & {
   name: Scalars['String']['output'];
   /** Order within category for UI display */
   sortOrder: Scalars['Int']['output'];
+};
+
+export type PortfolioType = {
+  __typename?: 'PortfolioType';
+  activeCount: AnalyticalValueType;
+  invoiceType: Scalars['String']['output'];
+  largestParty: PartyType;
+  parties: Array<PartyType>;
+  topThreeConcentration: AnalyticalValueType;
+  total: AnalyticalValueType;
 };
 
 export type PublishTranslationsMutationInput = {
@@ -2930,6 +3075,7 @@ export type Query = {
   demoItemCollection?: Maybe<DemoItemCollection>;
   entryCollection?: Maybe<EntryCollection>;
   hasUnreadNotifications?: Maybe<Scalars['Boolean']['output']>;
+  klarvidoOverview?: Maybe<KlarvidoOverviewType>;
   /** Get translation progress for all locales */
   localeProgress?: Maybe<Array<Maybe<LocaleProgressType>>>;
   myDevices?: Maybe<UserDeviceConnection>;
@@ -3178,6 +3324,12 @@ export type QueryEntryCollectionArgs = {
 };
 
 
+export type QueryKlarvidoOverviewArgs = {
+  preset?: InputMaybe<Scalars['String']['input']>;
+  tenantId: Scalars['ID']['input'];
+};
+
+
 export type QueryMyDevicesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -3279,6 +3431,28 @@ export type QueryTenantArgs = {
 export type QueryTenantPasskeysArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   tenantId: Scalars['ID']['input'];
+};
+
+export type ReadinessMetricType = {
+  __typename?: 'ReadinessMetricType';
+  code: Scalars['String']['output'];
+  label: Scalars['String']['output'];
+  limitedThreshold: Scalars['Float']['output'];
+  readyThreshold: Scalars['Float']['output'];
+  status: Scalars['String']['output'];
+  unit: Scalars['String']['output'];
+  value: Scalars['Float']['output'];
+};
+
+export type ReadinessType = {
+  __typename?: 'ReadinessType';
+  analysis: Scalars['String']['output'];
+  checkedAt: Scalars['DateTime']['output'];
+  limitations: Array<Scalars['String']['output']>;
+  metrics: Array<ReadinessMetricType>;
+  policyVersion: Scalars['String']['output'];
+  score: Scalars['Float']['output'];
+  status: Scalars['String']['output'];
 };
 
 /**
@@ -3646,6 +3820,13 @@ export type SingUpMutationPayload = {
   email?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   refresh?: Maybe<Scalars['String']['output']>;
+};
+
+export type SourceReferenceType = {
+  __typename?: 'SourceReferenceType';
+  externalId: Scalars['String']['output'];
+  sourceRecordId?: Maybe<Scalars['ID']['output']>;
+  sourceSystem: Scalars['String']['output'];
 };
 
 /** An enumeration. */
@@ -5355,6 +5536,14 @@ export type GenerateSaasIdeasMutationMutationVariables = Exact<{
 
 export type GenerateSaasIdeasMutationMutation = { __typename?: 'ApiMutation', generateSaasIdeas?: { __typename?: 'GenerateSaasIdeasMutationPayload', response?: string | null } | null };
 
+export type KlarvidoOverviewQueryQueryVariables = Exact<{
+  tenantId: Scalars['ID']['input'];
+  preset: Scalars['String']['input'];
+}>;
+
+
+export type KlarvidoOverviewQueryQuery = { __typename?: 'Query', klarvidoOverview?: { __typename?: 'KlarvidoOverviewType', preset: string, period: { __typename?: 'PeriodType', startDate: any, endDate: any }, comparisonPeriod?: { __typename?: 'PeriodType', startDate: any, endDate: any } | null, company?: { __typename?: 'CompanyType', legalName: string, taxIdentifier: string, regon: string, pkdCode: string, countryCode: string, defaultCurrency: string } | null, financialSummary: { __typename?: 'FinancialSummaryType', revenue: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string, kind: string, calculationVersion: string, calculatedAt: any, quality: { __typename?: 'DataQualityType', status: string, score?: number | null, limitations: Array<string> }, revenueSources: Array<{ __typename?: 'SourceReferenceType', sourceSystem: string, externalId: string, sourceRecordId?: string | null }> }, costs: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string, kind: string, calculationVersion: string, calculatedAt: any, quality: { __typename?: 'DataQualityType', status: string, score?: number | null, limitations: Array<string> } }, preTaxResult: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string, kind: string, calculationVersion: string, calculatedAt: any, quality: { __typename?: 'DataQualityType', status: string, score?: number | null, limitations: Array<string> } }, grossMargin: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string, kind: string, calculationVersion: string, calculatedAt: any, quality: { __typename?: 'DataQualityType', status: string, score?: number | null, limitations: Array<string> } }, revenueChange?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null, costsChange?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null, preTaxResultChange?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null, grossMarginChange?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null }, monthlySummaries: Array<{ __typename?: 'MonthlySummaryType', label: string, period: { __typename?: 'PeriodType', startDate: any, endDate: any }, summary: { __typename?: 'FinancialSummaryType', revenue: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, costs: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, preTaxResult: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, grossMargin: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } } }>, customers: { __typename?: 'PortfolioType', total: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, activeCount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, topThreeConcentration: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, largestParty: { __typename?: 'PartyType', id: string, name: string, amount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, share: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, invoiceCount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, trend: Array<{ __typename?: 'PartyTrendPointType', label: string, amount?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null }> }, parties: Array<{ __typename?: 'PartyType', id: string, name: string, taxIdentifier: string, amount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, share: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, percentageChange?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null, invoiceCount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, trend: Array<{ __typename?: 'PartyTrendPointType', label: string, amount?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null }> }> }, suppliers: { __typename?: 'PortfolioType', total: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, activeCount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, topThreeConcentration: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, largestParty: { __typename?: 'PartyType', id: string, name: string, amount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, share: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, invoiceCount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, trend: Array<{ __typename?: 'PartyTrendPointType', label: string, amount?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null }> }, parties: Array<{ __typename?: 'PartyType', id: string, name: string, taxIdentifier: string, amount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, share: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, percentageChange?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null, invoiceCount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, trend: Array<{ __typename?: 'PartyTrendPointType', label: string, amount?: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } | null }> }> }, costStructure: { __typename?: 'CostStructureType', total: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, categories: Array<{ __typename?: 'CategoryType', code?: string | null, name: string, amount: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string }, share: { __typename?: 'AnalyticalValueType', value?: string | null, unit: string } }> }, invoices: Array<{ __typename?: 'InvoiceType', id: string, documentNumber: string, invoiceType: string, status: string, issueDate: any, dueDate?: any | null, counterpartyName: string, counterpartyTaxIdentifier: string, currency: string, netAmount: string, taxAmount: string, grossAmount: string, categories: Array<string>, sourceSystem: string, sourceExternalId: string, qualityStatus: string }>, readiness: Array<{ __typename?: 'ReadinessType', analysis: string, status: string, score: number, limitations: Array<string>, policyVersion: string, checkedAt: any, metrics: Array<{ __typename?: 'ReadinessMetricType', code: string, label: string, value: number, unit: string, status: string, readyThreshold: number, limitedThreshold: number }> }> } | null };
+
 export type NotificationMutationMutationVariables = Exact<{
   input: UpdateNotificationMutationInput;
 }>;
@@ -6003,6 +6192,7 @@ export const SubscriptionChangeActiveSubscriptionMutationDocument = {"kind":"Doc
 export const SubscriptionPlansAllQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"subscriptionPlansAllQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allSubscriptionPlans"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"subscriptionPriceItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"pk"}},{"kind":"Field","name":{"kind":"Name","value":"product"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"unitAmount"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"subscriptionPriceItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StripePriceType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"pk"}},{"kind":"Field","name":{"kind":"Name","value":"product"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"unitAmount"}}]}}]} as unknown as DocumentNode<SubscriptionPlansAllQueryQuery, SubscriptionPlansAllQueryQueryVariables>;
 export const StripeAllChargesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"stripeAllChargesQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allCharges"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"stripeChargeFragment"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"stripePaymentMethodFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StripePaymentMethodType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"pk"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"card"}},{"kind":"Field","name":{"kind":"Name","value":"billingDetails"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"subscriptionPlanItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SubscriptionPlanType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"pk"}},{"kind":"Field","name":{"kind":"Name","value":"product"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"stripeChargeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"StripeChargeType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"created"}},{"kind":"Field","name":{"kind":"Name","value":"billingDetails"}},{"kind":"Field","name":{"kind":"Name","value":"paymentMethod"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"stripePaymentMethodFragment"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"invoice"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"plan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"subscriptionPlanItemFragment"}}]}}]}}]}}]}}]} as unknown as DocumentNode<StripeAllChargesQueryQuery, StripeAllChargesQueryQueryVariables>;
 export const GenerateSaasIdeasMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"generateSaasIdeasMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GenerateSaasIdeasMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"generateSaasIdeas"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"response"}}]}}]}}]} as unknown as DocumentNode<GenerateSaasIdeasMutationMutation, GenerateSaasIdeasMutationMutationVariables>;
+export const KlarvidoOverviewQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"klarvidoOverviewQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"preset"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"klarvidoOverview"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"preset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"preset"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"preset"}},{"kind":"Field","name":{"kind":"Name","value":"period"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"comparisonPeriod"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"company"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"legalName"}},{"kind":"Field","name":{"kind":"Name","value":"taxIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"regon"}},{"kind":"Field","name":{"kind":"Name","value":"pkdCode"}},{"kind":"Field","name":{"kind":"Name","value":"countryCode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultCurrency"}}]}},{"kind":"Field","name":{"kind":"Name","value":"financialSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revenue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"calculationVersion"}},{"kind":"Field","name":{"kind":"Name","value":"calculatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"quality"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"limitations"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"revenueSources"},"name":{"kind":"Name","value":"sources"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sourceSystem"}},{"kind":"Field","name":{"kind":"Name","value":"externalId"}},{"kind":"Field","name":{"kind":"Name","value":"sourceRecordId"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"costs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"calculationVersion"}},{"kind":"Field","name":{"kind":"Name","value":"calculatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"quality"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"limitations"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"preTaxResult"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"calculationVersion"}},{"kind":"Field","name":{"kind":"Name","value":"calculatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"quality"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"limitations"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"grossMargin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"calculationVersion"}},{"kind":"Field","name":{"kind":"Name","value":"calculatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"quality"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"limitations"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"revenueChange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"costsChange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"preTaxResultChange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"grossMarginChange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"monthlySummaries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"period"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"summary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revenue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"costs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"preTaxResult"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"grossMargin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"customers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activeCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"topThreeConcentration"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"largestParty"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"share"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"invoiceCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"trend"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"parties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"taxIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"share"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"percentageChange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"invoiceCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"trend"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"suppliers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activeCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"topThreeConcentration"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"largestParty"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"share"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"invoiceCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"trend"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"parties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"taxIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"share"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"percentageChange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"invoiceCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"trend"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"costStructure"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"categories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"amount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"share"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"invoices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"documentNumber"}},{"kind":"Field","name":{"kind":"Name","value":"invoiceType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"issueDate"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"counterpartyName"}},{"kind":"Field","name":{"kind":"Name","value":"counterpartyTaxIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"netAmount"}},{"kind":"Field","name":{"kind":"Name","value":"taxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"grossAmount"}},{"kind":"Field","name":{"kind":"Name","value":"categories"}},{"kind":"Field","name":{"kind":"Name","value":"sourceSystem"}},{"kind":"Field","name":{"kind":"Name","value":"sourceExternalId"}},{"kind":"Field","name":{"kind":"Name","value":"qualityStatus"}}]}},{"kind":"Field","name":{"kind":"Name","value":"readiness"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"analysis"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"limitations"}},{"kind":"Field","name":{"kind":"Name","value":"policyVersion"}},{"kind":"Field","name":{"kind":"Name","value":"checkedAt"}},{"kind":"Field","name":{"kind":"Name","value":"metrics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"readyThreshold"}},{"kind":"Field","name":{"kind":"Name","value":"limitedThreshold"}}]}}]}}]}}]}}]} as unknown as DocumentNode<KlarvidoOverviewQueryQuery, KlarvidoOverviewQueryQueryVariables>;
 export const NotificationMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"notificationMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateNotificationMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateNotification"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasUnreadNotifications"}},{"kind":"Field","name":{"kind":"Name","value":"unreadNotificationsCount"}},{"kind":"Field","name":{"kind":"Name","value":"notificationEdge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"readAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<NotificationMutationMutation, NotificationMutationMutationVariables>;
 export const NotificationsListQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"notificationsListQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"count"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"20"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"notificationsListContentFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"notificationsButtonContent"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"notificationsListItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"NotificationType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"readAt"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"issuer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"notificationsListContentFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasUnreadNotifications"}},{"kind":"Field","name":{"kind":"Name","value":"allNotifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"count"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"notificationsListItemFragment"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endCursor"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"notificationsButtonContent"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasUnreadNotifications"}},{"kind":"Field","name":{"kind":"Name","value":"unreadNotificationsCount"}}]}}]} as unknown as DocumentNode<NotificationsListQueryQuery, NotificationsListQueryQueryVariables>;
 export const NotificationCreatedSubscriptionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"NotificationCreatedSubscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notificationCreated"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"notificationsListItemFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"notificationsListItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"NotificationType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"readAt"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"issuer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<NotificationCreatedSubscriptionSubscription, NotificationCreatedSubscriptionSubscriptionVariables>;

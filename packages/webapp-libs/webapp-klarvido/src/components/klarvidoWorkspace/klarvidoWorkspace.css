@@ -1,0 +1,150 @@
+.klarvido-page {
+  margin: 0 auto;
+  width: min(100%, 1480px);
+  padding: 30px 30px 64px;
+  color: #0b2545;
+}
+
+.klarvido-page-header {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) minmax(280px, 2fr) minmax(190px, 1fr);
+  align-items: start;
+  min-height: 92px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.klarvido-page-header h1 { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 750; letter-spacing: 0; }
+.klarvido-page-header p { margin: 7px 0 0; color: #6b7c93; font-size: 14px; }
+.klarvido-page-header > div > span { display: block; margin-bottom: 5px; color: #6b7c93; font-size: 11px; font-weight: 750; text-transform: uppercase; }
+.klarvido-page-leading { display: flex; justify-content: flex-start; }
+
+.klarvido-period-control {
+  position: relative;
+  display: grid;
+  min-width: 190px;
+  text-align: left;
+}
+.klarvido-period-control span { margin: 0 0 5px 2px; color: #6b7c93; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.klarvido-period-control select { height: 40px; appearance: none; border: 1px solid #dce4ed; border-radius: 6px; background: white; padding: 0 36px 0 12px; color: #0b2545; font-size: 13px; font-weight: 650; }
+.klarvido-period-control svg { position: absolute; right: 11px; bottom: 12px; pointer-events: none; color: #6b7c93; }
+
+.klarvido-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.klarvido-kpi-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.klarvido-kpi {
+  position: relative;
+  min-height: 132px;
+  overflow: hidden;
+  border: 1px solid #e4eaf1;
+  border-radius: 7px;
+  background: white;
+  padding: 19px 20px;
+  box-shadow: 0 2px 8px rgb(19 42 70 / 4%);
+}
+.klarvido-kpi::before { position: absolute; inset: 0 auto 0 0; width: 4px; content: ''; background: #0b2545; }
+.klarvido-kpi--green::before { background: #13a66a; }
+.klarvido-kpi--red::before { background: #e34d59; }
+.klarvido-kpi--amber::before { background: #f59e0b; }
+.klarvido-kpi > span { display: block; color: #66798f; font-size: 12px; font-weight: 650; }
+.klarvido-kpi > strong { display: block; margin-top: 9px; font-size: 25px; line-height: 1.2; }
+.klarvido-kpi > small { display: flex; align-items: center; gap: 3px; margin-top: 10px; color: #6b7c93; font-size: 11px; }
+.klarvido-kpi > small svg { width: 13px; height: 13px; }
+.klarvido-kpi .up, .klarvido-change.up { color: #138a5a; }
+.klarvido-kpi .down, .klarvido-change.down { color: #d44350; }
+
+.klarvido-grid-2 { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr); gap: 16px; margin-top: 16px; }
+.klarvido-panel { min-width: 0; border: 1px solid #e4eaf1; border-radius: 7px; background: white; padding: 19px; box-shadow: 0 2px 8px rgb(19 42 70 / 4%); }
+.klarvido-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 17px; }
+.klarvido-panel > header h2 { margin: 0; font-size: 15px; font-weight: 750; }
+.klarvido-chart { width: 100%; height: 280px; }
+.klarvido-chart--dialog { height: 260px; }
+
+.klarvido-analysis-tabs { display: flex; overflow-x: auto; margin: -4px 0 18px; border-bottom: 1px solid #dfe6ee; }
+.klarvido-analysis-tabs button { flex: 0 0 auto; border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 11px 18px; color: #66798f; font-size: 13px; font-weight: 650; }
+.klarvido-analysis-tabs button[aria-selected='true'] { border-color: #0b2545; color: #0b2545; }
+
+.klarvido-company-details, .klarvido-invoice-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 0; }
+.klarvido-company-details div, .klarvido-invoice-details div { border-bottom: 1px solid #edf1f5; padding: 12px 5px; }
+.klarvido-company-details dt, .klarvido-invoice-details dt { color: #6b7c93; font-size: 11px; }
+.klarvido-company-details dd, .klarvido-invoice-details dd { margin: 4px 0 0; font-size: 13px; font-weight: 650; }
+
+.klarvido-table-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; }
+.klarvido-search { position: relative; display: block; }
+.klarvido-search svg { position: absolute; z-index: 1; left: 10px; top: 11px; width: 16px; height: 16px; color: #8290a1; }
+.klarvido-search input { width: 230px; height: 38px; padding-left: 34px; border-color: #dce4ed; }
+.klarvido-filter { display: flex; align-items: center; height: 38px; border: 1px solid #dce4ed; border-radius: 6px; padding: 0 10px; }
+.klarvido-filter svg { width: 15px; color: #718298; }
+.klarvido-filter select { appearance: none; border: 0; background: transparent; padding: 0 8px; color: #0b2545; font-size: 13px; outline: 0; }
+.klarvido-result-count { margin: -4px 0 12px; color: #6b7c93; font-size: 11px; text-align: right; }
+
+.klarvido-table-wrap { max-width: 100%; overflow-x: auto; }
+.klarvido-data-table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 12px; }
+.klarvido-data-table th { border-bottom: 1px solid #dce4ed; padding: 9px 10px; color: #6b7c93; text-align: left; white-space: nowrap; }
+.klarvido-data-table th button { display: inline-flex; align-items: center; gap: 3px; border: 0; background: transparent; padding: 0; color: inherit; font: inherit; font-weight: 700; }
+.klarvido-data-table th svg { width: 12px; height: 12px; }
+.klarvido-data-table td { border-bottom: 1px solid #edf1f5; padding: 12px 10px; color: #354a62; vertical-align: middle; }
+.klarvido-data-table tbody tr:hover { background: #f8fafc; }
+.klarvido-table-link { border: 0; background: transparent; padding: 0; color: #0b2545; text-align: left; font-weight: 700; }
+.klarvido-table-link small { display: block; margin-top: 2px; color: #8795a5; font-size: 10px; font-weight: 500; }
+.klarvido-empty-row { height: 120px; color: #7b8a9d !important; text-align: center !important; }
+
+.klarvido-pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 10px; font-weight: 750; white-space: nowrap; }
+.klarvido-pill--green { background: #e7f7f0; color: #08764a; }
+.klarvido-pill--blue { background: #e9f0f8; color: #234f7e; }
+.klarvido-pill--amber { background: #fff3dc; color: #9a5b00; }
+.klarvido-pill--red { background: #fdebed; color: #b92f3b; }
+
+.klarvido-ranking > div, .klarvido-readiness > div, .klarvido-mini-table > div { display: grid; align-items: center; gap: 10px; min-height: 48px; border-bottom: 1px solid #edf1f5; }
+.klarvido-ranking > div { grid-template-columns: 24px minmax(100px, 1fr) 58px 100px; }
+.klarvido-ranking > div > span { display: grid; width: 21px; height: 21px; place-items: center; border-radius: 4px; background: #edf2f7; color: #63768b; font-size: 10px; }
+.klarvido-ranking b, .klarvido-mini-table b { min-width: 0; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.klarvido-ranking small, .klarvido-mini-table small { color: #74859a; font-size: 10px; }
+.klarvido-ranking strong, .klarvido-mini-table strong { font-size: 12px; text-align: right; }
+.klarvido-readiness > div { grid-template-columns: 10px minmax(120px, 1fr) 42px auto; }
+.klarvido-readiness-dot { width: 8px; height: 8px; border-radius: 50%; background: #13a66a; }
+.klarvido-readiness-dot--limited { background: #f59e0b; }
+.klarvido-readiness-dot--blocked { background: #e34d59; }
+.klarvido-readiness b { font-size: 12px; }
+.klarvido-readiness small { color: #6b7c93; font-size: 11px; }
+.klarvido-mini-table > div { grid-template-columns: 140px minmax(160px, 1fr) 90px 100px; }
+
+.klarvido-dialog-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.klarvido-dialog-kpis .klarvido-kpi { min-height: 112px; padding: 15px; }
+.klarvido-dialog-kpis .klarvido-kpi strong { font-size: 19px; }
+
+.klarvido-source-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.klarvido-source-heading { display: flex; align-items: center; gap: 12px; }
+.klarvido-source-heading > span { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 6px; background: #0b2545; color: white; font-size: 11px; font-weight: 800; }
+.klarvido-source-heading b, .klarvido-source-heading small { display: block; }
+.klarvido-source-heading small { margin-top: 3px; color: #13a66a; font-size: 11px; }
+.klarvido-source-grid p { color: #62758b; font-size: 12px; line-height: 1.6; }
+
+.klarvido-workspace-state { display: grid; height: 100%; min-height: 420px; place-content: center; justify-items: center; padding: 30px; color: #0b2545; text-align: center; }
+.klarvido-workspace-state > svg { width: 42px; height: 42px; color: #9aa8b7; }
+.klarvido-workspace-state h1 { margin: 18px 0 0; font-size: 23px; }
+.klarvido-workspace-state p { max-width: 480px; margin: 8px 0 20px; color: #6b7c93; font-size: 13px; }
+.klarvido-loading-heading { display: grid; justify-content: center; justify-items: center; gap: 10px; margin-bottom: 30px; }
+
+@media (max-width: 1100px) {
+  .klarvido-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .klarvido-source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .klarvido-page-header { grid-template-columns: 190px 1fr 80px; }
+}
+
+@media (max-width: 760px) {
+  .klarvido-page { padding: 20px 14px 48px; }
+  .klarvido-page-header { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 16px; text-align: left; }
+  .klarvido-page-header > div:nth-child(2) { order: 1; }
+  .klarvido-page-leading { order: 0; }
+  .klarvido-page-header h1 { font-size: 23px; }
+  .klarvido-kpi-grid, .klarvido-kpi-grid--3, .klarvido-grid-2, .klarvido-source-grid { grid-template-columns: 1fr; }
+  .klarvido-kpi { min-height: 112px; }
+  .klarvido-panel { padding: 15px; }
+  .klarvido-panel > header { align-items: flex-start; flex-direction: column; }
+  .klarvido-table-actions { width: 100%; justify-content: flex-start; }
+  .klarvido-search, .klarvido-search input { width: 100%; }
+  .klarvido-chart { height: 240px; }
+  .klarvido-dialog-kpis, .klarvido-company-details, .klarvido-invoice-details { grid-template-columns: 1fr; }
+  .klarvido-mini-table > div { grid-template-columns: 110px 1fr 90px; }
+  .klarvido-mini-table small { display: none; }
+}

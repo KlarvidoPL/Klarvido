@@ -8,6 +8,7 @@ from apps.finances import schema as finances_schema
 from apps.notifications import schema as notifications_schema
 from apps.users import schema as users_schema
 from apps.integrations import schema as integrations_schema
+from apps.klarvido import schema as klarvido_schema
 from apps.integrations.ai_assistant import subscription as ai_assistant_subscription
 from apps.multitenancy import schema as multitenancy_schema
 from apps.sso import schema as sso_schema
@@ -27,6 +28,7 @@ schema = graphene.Schema(
             sso_schema.TenantSSOQuery,
             translations_schema.TranslationsQuery,
             backup_schema.BackupQuery,
+            klarvido_schema.Query,
         ]
     ),
     mutation=graphql_mutation(
