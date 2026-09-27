@@ -1250,7 +1250,7 @@ class Query(graphene.ObjectType):
     @permission_classes(policies.AnyoneFullAccess)
     def resolve_all_tenants(root, info, **kwargs):
         if info.context.user.is_authenticated:
-            qs = models.Tenant.objects.filter(user_memberships__user=info.context.user).all()
+            qs = models.Tenant.objects.filter(user_memberships__user=info.context.user).order_by("id")
             return filter_tenants_for_password_session(info.context, qs)
         return []
 
