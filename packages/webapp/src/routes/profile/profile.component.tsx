@@ -312,7 +312,7 @@ export const Profile = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChangePasswordForm />
+            <ChangePasswordForm hasUsablePassword={currentUser?.hasUsablePassword ?? true} />
           </CardContent>
         </Card>
 

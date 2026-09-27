@@ -10,7 +10,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useChangePasswordForm } from './changePasswordForm.hooks';
 
-export const ChangePasswordForm = () => {
+export type ChangePasswordFormProps = {
+  hasUsablePassword: boolean;
+};
+
+export const ChangePasswordForm = ({ hasUsablePassword }: ChangePasswordFormProps) => {
   const intl = useIntl();
 
   const {
@@ -24,32 +28,34 @@ export const ChangePasswordForm = () => {
     hasGenericErrorOnly,
     loading,
     handleChangePassword,
-  } = useChangePasswordForm();
+  } = useChangePasswordForm(hasUsablePassword);
 
   const newPassword = watch('newPassword') || '';
 
   return (
     <div className="w-full">
       <form noValidate onSubmit={handleChangePassword} className="flex w-full flex-col gap-6">
-        <div className="w-full">
-          <Input
-            {...register('oldPassword', {
-              required: {
-                value: true,
-                message: intl.formatMessage({
-                  defaultMessage: 'Old password is required',
-                  id: 'Auth / Change password / Old password required',
-                }),
-              },
-            })}
-            type="password"
-            label={intl.formatMessage({
-              defaultMessage: 'Old password',
-              id: 'Auth / Change password / Old password placeholder',
-            })}
-            error={errors.oldPassword?.message}
-          />
-        </div>
+        {hasUsablePassword && (
+          <div className="w-full">
+            <Input
+              {...register('oldPassword', {
+                required: {
+                  value: true,
+                  message: intl.formatMessage({
+                    defaultMessage: 'Old password is required',
+                    id: 'Auth / Change password / Old password required',
+                  }),
+                },
+              })}
+              type="password"
+              label={intl.formatMessage({
+                defaultMessage: 'Old password',
+                id: 'Auth / Change password / Old password placeholder',
+              })}
+              error={errors.oldPassword?.message}
+            />
+          </div>
+        )}
 
         <div className="flex w-full flex-col gap-6">
           <div className="w-full">
@@ -146,7 +152,11 @@ export const ChangePasswordForm = () => {
 
         <div>
           <Button disabled={loading} type="submit" className="w-full sm:w-fit">
-            <FormattedMessage defaultMessage="Change password" id="Auth / Change password / Submit button" />
+            {hasUsablePassword ? (
+              <FormattedMessage defaultMessage="Change password" id="Auth / Change password / Submit button" />
+            ) : (
+              <FormattedMessage defaultMessage="Set password" id="Auth / Change password / Set submit button" />
+            )}
           </Button>
         </div>
       </form>

@@ -126,7 +126,7 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
 
 class UserAccountChangePasswordSerializer(serializers.Serializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    old_password = serializers.CharField(write_only=True, help_text=_("Old password"))
+    old_password = serializers.CharField(write_only=True, required=False, allow_blank=True, help_text=_("Old password"))
     new_password = serializers.CharField(write_only=True, help_text=_("New password"))
 
     refresh = serializers.CharField(read_only=True)
@@ -137,11 +137,18 @@ class UserAccountChangePasswordSerializer(serializers.Serializer):
         return new_password
 
     def validate(self, attrs):
-        old_password = attrs["old_password"]
-
         user = attrs["user"]
-        if not user.check_password(old_password):
-            raise exceptions.ValidationError({"old_password": _("Wrong old password")}, "wrong_password")
+
+        # An OAuth-only account has no password to check against - Django sets it
+        # "unusable" on signup, and check_password() would always return False for
+        # it, so a first-time password set must skip this rather than being
+        # permanently locked out of ever adding one.
+        if user.has_usable_password():
+            old_password = attrs.get("old_password")
+            if not old_password:
+                raise exceptions.ValidationError({"old_password": _("This field is required.")}, "required")
+            if not user.check_password(old_password):
+                raise exceptions.ValidationError({"old_password": _("Wrong old password")}, "wrong_password")
 
         return attrs
 

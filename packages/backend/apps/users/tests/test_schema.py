@@ -182,6 +182,7 @@ class TestCurrentUserQuery:
                 avatar
                 otpEnabled
                 otpVerified
+                hasUsablePassword
                 tenants {
                   id
                   name
@@ -217,11 +218,24 @@ class TestCurrentUserQuery:
         ), data["avatar"]
         assert data["otpEnabled"] == user.otp_enabled
         assert data["otpVerified"] == user.otp_verified
+        assert data["hasUsablePassword"] is True
         assert len(data["tenants"]) > 0
         assert data["tenants"][0]["name"] == "test@example.com"
         assert data["tenants"][0]["membership"]["role"] == "OWNER"
         assert data["tenants"][0]["type"] == "default"
         assert data["tenants"][0]["membership"]["invitationToken"] is None
+
+    def test_has_usable_password_false_for_oauth_only_account(self, graphene_client, user):
+        """The frontend uses this to show a "Set password" flow instead of
+        "Change password" for an account created via Google/Facebook, which has
+        no password to ask for."""
+        user.set_unusable_password()
+        user.save()
+        graphene_client.force_authenticate(user)
+
+        executed = graphene_client.query("query { currentUser { hasUsablePassword } }")
+
+        assert executed["data"]["currentUser"]["hasUsablePassword"] is False
 
     def test_response_data_invitation_token_active_invitation(
         self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
@@ -408,6 +422,42 @@ class TestChangePasswordMutation:
 
         assert len(executed["errors"]) == 1
         assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["data"] == {'changePassword': None}
+
+    def test_can_set_password_without_old_password_when_none_set_yet(self, graphene_client, user, faker):
+        """An OAuth-only account (Google/Facebook signup) has no password to check
+        against - it must be possible to set one for the first time without an old
+        password, or the account would be permanently locked out of ever having
+        one."""
+        user.set_unusable_password()
+        user.save()
+        graphene_client.force_authenticate(user)
+        new_password = faker.password()
+
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"newPassword": new_password}},
+        )
+
+        assert "errors" not in executed
+        assert validate_jwt(executed["data"]["changePassword"], user)
+
+        user.refresh_from_db()
+        assert user.check_password(new_password)
+
+    def test_still_requires_old_password_when_one_is_already_set(self, graphene_client, user_factory, faker):
+        """Omitting old_password must not become a way to silently take over an
+        account that already has a real password."""
+        user = user_factory(password=faker.password())
+        graphene_client.force_authenticate(user)
+
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"newPassword": faker.password()}},
+        )
+
+        assert len(executed["errors"]) == 1
+        assert executed["errors"][0]["message"] == "GraphQlValidationError"
         assert executed["data"] == {'changePassword': None}
 
 
