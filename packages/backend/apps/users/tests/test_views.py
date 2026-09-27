@@ -72,6 +72,46 @@ class TestTokenRefresh:
         assert RefreshToken(new_refresh_token_raw), new_refresh_token_raw
         assert BlacklistedToken.objects.filter(token__jti=refresh['jti']).exists()
 
+    def test_refresh_rejected_for_revoked_session(self, api_client, user: models.User):
+        """A device whose session was revoked (e.g. "Sign out" from Active Sessions
+        on another device) must not be able to mint new access tokens via /refresh."""
+        from apps.sso.tests.factories import SSOSessionFactory
+
+        refresh = RefreshToken.for_user(user)
+        session = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+        session.revoke(reason="User requested")
+
+        api_client.cookies = SimpleCookie({settings.REFRESH_TOKEN_COOKIE: str(refresh)})
+        response = api_client.post(reverse('jwt_token_refresh'))
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_refresh_keeps_session_revocable_after_rotation(self, api_client, user: models.User):
+        """Rotation mints a brand new refresh token (new jti) on every call - the
+        session's link must follow it, or the session becomes unrevocable after
+        its first refresh."""
+        from apps.sso.models import SSOSession
+        from apps.sso.tests.factories import SSOSessionFactory
+
+        refresh = RefreshToken.for_user(user)
+        session = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+
+        api_client.cookies = SimpleCookie({settings.REFRESH_TOKEN_COOKIE: str(refresh)})
+        response = api_client.post(reverse('jwt_token_refresh'))
+        assert response.status_code == status.HTTP_200_OK
+        rotated_refresh_raw = response.cookies[settings.REFRESH_TOKEN_COOKIE].value
+
+        session.refresh_from_db()
+        assert session.refresh_token_jti == RefreshToken(rotated_refresh_raw)['jti']
+        assert session.refresh_token_jti != refresh['jti']
+
+        # Revoking now (using the *new* jti) must still block a further refresh
+        SSOSession.objects.get(pk=session.pk).revoke(reason="User requested")
+
+        api_client.cookies = SimpleCookie({settings.REFRESH_TOKEN_COOKIE: rotated_refresh_raw})
+        second_response = api_client.post(reverse('jwt_token_refresh'))
+        assert second_response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 class TestLogout:
     def test_graceful_logout_without_token(self, api_client):
@@ -111,3 +151,16 @@ class TestLogout:
         refresh = RefreshToken.for_user(user)
         api_client.post(reverse('logout'), data={'refresh': str(refresh)})
         assert BlacklistedToken.objects.filter(token__jti=refresh['jti']).exists()
+
+    def test_logout_marks_linked_session_inactive(self, api_client, user: models.User):
+        """Without this, a logged-out device's session keeps showing as "active"
+        in Active Sessions until it naturally expires."""
+        from apps.sso.tests.factories import SSOSessionFactory
+
+        refresh = RefreshToken.for_user(user)
+        session = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'], is_active=True)
+
+        api_client.post(reverse('logout'), data={'refresh': str(refresh)})
+
+        session.refresh_from_db()
+        assert session.is_active is False

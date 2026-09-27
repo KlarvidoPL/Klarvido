@@ -276,6 +276,17 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
         except (jwt_exceptions.InvalidToken, jwt_exceptions.TokenError):
             self.fail("invalid_token")
 
+        # Reject the refresh if the session it belongs to has been revoked
+        # (e.g. via "Sign out" on another device in Active Sessions). Without
+        # this check, revoking a session only hides it from the session list
+        # - the device itself would keep minting new access tokens forever.
+        old_jti = refresh.get("jti")
+        from apps.sso.models import SSOSession
+
+        session = SSOSession.objects.filter(refresh_token_jti=old_jti).first() if old_jti else None
+        if session and not session.is_active:
+            self.fail("invalid_token")
+
         if jwt_api_settings.ROTATE_REFRESH_TOKENS:
             if jwt_api_settings.BLACKLIST_AFTER_ROTATION:
                 try:
@@ -288,6 +299,12 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
             new_refresh = jwt_tokens.RefreshToken.for_user(user)
             new_refresh['auth_method'] = auth_method
             new_refresh.access_token['auth_method'] = auth_method
+
+            # Rotation mints a brand new refresh token (new jti) - re-point the
+            # session's link so it stays revocable after this refresh too.
+            if session:
+                session.refresh_token_jti = new_refresh.get("jti")
+                session.save(update_fields=["refresh_token_jti"])
 
             return {"access": str(new_refresh.access_token), "refresh": str(new_refresh)}
 
@@ -325,6 +342,19 @@ class LogoutSerializer(serializers.Serializer):
                 refresh.blacklist()
             except Exception:
                 # Blacklisting failed - token might already be blacklisted
+                pass
+
+            # Also mark the linked SSOSession inactive, so a logged-out
+            # device stops showing as "active" in Active Sessions.
+            try:
+                from apps.sso.models import SSOSession
+
+                jti = refresh.get("jti")
+                session = SSOSession.objects.filter(refresh_token_jti=jti, is_active=True).first()
+                if session:
+                    session.revoke(reason="User logged out")
+            except Exception:
+                # Session bookkeeping failing shouldn't block logout
                 pass
         return {"ok": True}
 

@@ -51,9 +51,16 @@ class SSOSessionManager(models.Manager):
         return self.filter(user=user, is_active=True, expires_at__gt=now).order_by("-last_activity_at")
 
     def revoke_all_for_user(self, user, reason: str = "User requested"):
-        """Revoke all sessions for a user."""
-        now = timezone.now()
-        return self.filter(user=user, is_active=True).update(is_active=False, revoked_at=now, revoked_reason=reason)
+        """
+        Revoke all sessions for a user.
+
+        Revokes one at a time (not a bulk .update()) so each session's
+        linked refresh token is actually blacklisted - see SSOSession.revoke.
+        """
+        sessions = list(self.filter(user=user, is_active=True))
+        for session in sessions:
+            session.revoke(reason=reason)
+        return len(sessions)
 
     def cleanup_expired(self):
         """Clean up expired sessions."""

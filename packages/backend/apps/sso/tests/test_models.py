@@ -5,6 +5,8 @@ Tests for SSO models.
 import pytest
 from datetime import timedelta
 from django.utils import timezone
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.multitenancy.constants import TenantUserRole
 from apps.sso import models, constants
@@ -220,6 +222,24 @@ class TestSSOSession:
         assert sso_session.is_active is False
         assert sso_session.revoked_at is not None
         assert sso_session.revoked_reason == "User requested"
+
+    def test_revoke_session_blacklists_linked_refresh_token(self, user):
+        """Revoking a session must blacklist its refresh token, not just flag the row -
+        otherwise the device it belongs to can keep minting new access tokens forever."""
+        refresh = RefreshToken.for_user(user)
+        session = factories.SSOSessionFactory(user=user, refresh_token_jti=refresh["jti"])
+
+        session.revoke(reason="User requested")
+
+        assert BlacklistedToken.objects.filter(token__jti=refresh["jti"]).exists()
+
+    def test_revoke_session_without_linked_token_does_not_error(self, sso_session):
+        """Older/unlinked sessions (empty refresh_token_jti) must still revoke cleanly."""
+        assert sso_session.refresh_token_jti == ""
+
+        sso_session.revoke(reason="User requested")
+
+        assert sso_session.is_active is False
 
 
 class TestUserDevice:

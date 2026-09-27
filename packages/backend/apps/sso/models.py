@@ -390,6 +390,11 @@ class SSOSession(TimestampedMixin, models.Model):
     # Session identification
     session_id = models.CharField(max_length=128, unique=True)
 
+    # jti claim of the refresh token currently associated with this session.
+    # Lets `revoke()` blacklist the exact outstanding token tied to this
+    # session, rather than only marking the session inactive for display.
+    refresh_token_jti = models.CharField(max_length=255, blank=True, default="", db_index=True)
+
     # Device/client information
     device_name = models.CharField(max_length=255, blank=True, default="")
     device_type = models.CharField(max_length=50, blank=True, default="")  # desktop, mobile, tablet
@@ -428,11 +433,31 @@ class SSOSession(TimestampedMixin, models.Model):
         return self.is_active and not self.is_expired
 
     def revoke(self, reason: str = ""):
-        """Revoke this session."""
+        """
+        Revoke this session and blacklist its refresh token.
+
+        Marking the row inactive alone only affects what the session-list UI
+        shows: authentication is stateless JWT and never re-checks this row,
+        so the associated refresh token must also be blacklisted or the
+        device it belongs to would stay able to mint new access tokens
+        indefinitely via /refresh.
+        """
         self.is_active = False
         self.revoked_at = timezone.now()
         self.revoked_reason = reason
         self.save(update_fields=["is_active", "revoked_at", "revoked_reason"])
+        self.blacklist_refresh_token()
+
+    def blacklist_refresh_token(self):
+        """Blacklist the outstanding refresh token linked to this session, if any."""
+        if not self.refresh_token_jti:
+            return
+
+        from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+        outstanding = OutstandingToken.objects.filter(jti=self.refresh_token_jti).first()
+        if outstanding:
+            BlacklistedToken.objects.get_or_create(token=outstanding)
 
 
 class UserDevice(TimestampedMixin, models.Model):

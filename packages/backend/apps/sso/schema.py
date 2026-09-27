@@ -669,25 +669,18 @@ class RevokeAllSessionsMutation(graphene.Mutation):
     def mutate(cls, root, info):
         from django.conf import settings
 
+        from .services import SessionService
+
         user = get_user_from_resolver(info)
 
         # Get current session ID from cookie to exclude it
         request = info.context._request if hasattr(info.context, "_request") else info.context
         current_session_id = request.COOKIES.get(settings.SESSION_ID_COOKIE)
 
-        sessions = models.SSOSession.objects.filter(
-            user=user,
-            is_active=True,
-        )
-
-        # Exclude current session if we have one
-        if current_session_id:
-            sessions = sessions.exclude(session_id=current_session_id)
-
-        count = sessions.update(
-            is_active=False,
-            revoked_reason="User revoked all sessions",
-        )
+        # Delegate to SessionService so each session is revoked individually
+        # (SSOSession.revoke also blacklists that session's refresh token -
+        # a bulk .update() would skip that and leave the devices logged in).
+        count = SessionService(user).revoke_all_sessions(except_session_id=current_session_id)
 
         return cls(ok=True, revoked_count=count)
 

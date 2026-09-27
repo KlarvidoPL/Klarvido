@@ -17,16 +17,18 @@ from . import serializers
 from .services.users import get_user_from_resolver, get_role_names, get_user_avatar_url
 
 
-def _create_session_for_user(user, request):
+def _create_session_for_user(user, request, refresh_token: str = None):
     """
     Create an SSOSession for the user and return the session_id.
     Returns None if session creation fails.
     """
     try:
         from apps.sso.services import SessionService
+        from .jwt import get_jti_from_refresh_token
 
         session_service = SessionService(user)
-        session, session_id = session_service.create_session(request)
+        refresh_token_jti = get_jti_from_refresh_token(refresh_token) if refresh_token else None
+        session, session_id = session_service.create_session(request, refresh_token_jti=refresh_token_jti)
         return session_id
     except Exception:
         # Don't fail login if session creation fails
@@ -65,7 +67,7 @@ class ObtainTokenMutation(mutations.SerializerMutation):
 
             session_id = None
             if user:
-                session_id = _create_session_for_user(user, info.context._request)
+                session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
 
             auth_cookies = {
                 settings.ACCESS_TOKEN_COOKIE: mutation.access,
@@ -101,7 +103,7 @@ class SingUpMutation(mutations.SerializerMutation):
 
         session_id = None
         if user:
-            session_id = _create_session_for_user(user, info.context._request)
+            session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
 
         auth_cookies = {
             settings.ACCESS_TOKEN_COOKIE: mutation.access,
@@ -165,7 +167,7 @@ class ValidateOTPMutation(mutations.SerializerMutation):
         user = cls._get_user_from_otp_token(info, input)
         session_id = None
         if user:
-            session_id = _create_session_for_user(user, info.context._request)
+            session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
 
         auth_cookies = {
             settings.ACCESS_TOKEN_COOKIE: mutation.access,
