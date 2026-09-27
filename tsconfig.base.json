@@ -60,6 +60,10 @@
       "@sb/webapp-generative-ai/*": [
         "packages/webapp-libs/webapp-generative-ai/src/*"
       ],
+      "@sb/webapp-klarvido": [
+        "packages/webapp-libs/webapp-klarvido/src/index.ts"
+      ],
+      "@sb/webapp-klarvido/*": ["packages/webapp-libs/webapp-klarvido/src/*"],
       "@sb/webapp-notifications": [
         "packages/webapp-libs/webapp-notifications/src/index.ts"
       ],

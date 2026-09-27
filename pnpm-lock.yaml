@@ -702,6 +702,9 @@ importers:
       '@sb/webapp-generative-ai':
         specifier: workspace:*
         version: link:../webapp-libs/webapp-generative-ai
+      '@sb/webapp-klarvido':
+        specifier: workspace:*
+        version: link:../webapp-libs/webapp-klarvido
       '@sb/webapp-notifications':
         specifier: workspace:*
         version: link:../webapp-libs/webapp-notifications
@@ -1128,6 +1131,18 @@ importers:
       typewriter-effect:
         specifier: ^2.21.0
         version: 2.21.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+
+  packages/webapp-libs/webapp-klarvido:
+    dependencies:
+      '@sb/webapp-core':
+        specifier: workspace:*
+        version: link:../webapp-core
+      lucide-react:
+        specifier: ^0.378.0
+        version: 0.378.0(react@19.2.3)
+      react-intl:
+        specifier: ^6.5.5
+        version: 6.8.9(react@19.2.3)(typescript@5.9.3)
 
   packages/webapp-libs/webapp-notifications:
     dependencies:
