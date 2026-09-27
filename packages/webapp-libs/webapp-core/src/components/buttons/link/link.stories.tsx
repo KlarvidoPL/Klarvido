@@ -25,7 +25,7 @@ export const InternalPrimary: Story = {
 };
 
 export const ExternalPrimary: Story = {
-  args: { ...defaultArgs, href: 'https://apptension.com', variant: ButtonVariant.PRIMARY },
+  args: { ...defaultArgs, href: 'https://klarvido.com', variant: ButtonVariant.PRIMARY },
 };
 
 export const InternalSecondary: Story = {
@@ -39,7 +39,7 @@ export const InternalSecondary: Story = {
 export const ExternalSecondary: Story = {
   args: {
     ...defaultArgs,
-    href: 'https://apptension.com',
+    href: 'https://klarvido.com',
     variant: ButtonVariant.SECONDARY,
   },
 };
@@ -55,7 +55,7 @@ export const InternalRaw: Story = {
 export const ExternalRaw: Story = {
   args: {
     ...defaultArgs,
-    href: 'https://apptension.com',
+    href: 'https://klarvido.com',
     variant: ButtonVariant.GHOST,
   },
 };

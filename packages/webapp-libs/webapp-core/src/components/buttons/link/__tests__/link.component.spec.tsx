@@ -7,7 +7,7 @@ import { Link, LinkProps } from '../link.component';
 
 describe('Link: Component', () => {
   const defaultProps: LinkProps = {
-    href: 'https://apptension.com',
+    href: 'https://klarvido.com',
   };
   const placeholder = 'Content mock';
 
@@ -44,7 +44,7 @@ describe('Link: Component', () => {
   describe('with external link', () => {
     it('should display link with correct URL', async () => {
       render(<Component />);
-      expect(await screen.findByRole('link')).toHaveAttribute('href', 'https://apptension.com');
+      expect(await screen.findByRole('link')).toHaveAttribute('href', 'https://klarvido.com');
     });
   });
 

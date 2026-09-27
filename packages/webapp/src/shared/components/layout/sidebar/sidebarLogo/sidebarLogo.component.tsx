@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@sb/webapp-core/compone
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useIntl } from 'react-intl';
 
-import { LogoIcon, SignetIcon } from '../../../../../images/icons';
+import { SignetIcon } from '../../../../../images/icons';
 
 export type SidebarLogoProps = {
   isCollapsed: boolean;
@@ -65,17 +65,15 @@ export const SidebarLogo = ({ isCollapsed, logoColor, to, onLogoClick }: Sidebar
     >
       <div
         className={cn(
-          'flex w-[120px] items-center justify-center',
+          'flex items-center gap-2',
           'transition-opacity duration-200',
           'group-hover:opacity-80'
         )}
       >
-        <LogoIcon
-          color={logoColor}
-          className="h-auto w-full"
-          style={{ maxWidth: '100%' }}
-          preserveAspectRatio="xMidYMid meet"
-        />
+        <SignetIcon color={logoColor} className="h-7 w-7 shrink-0" />
+        <span className="text-lg font-bold tracking-tight" style={{ color: logoColor }}>
+          klarvido
+        </span>
       </div>
     </Link>
   );
