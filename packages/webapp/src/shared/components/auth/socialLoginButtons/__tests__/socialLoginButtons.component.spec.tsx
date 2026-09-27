@@ -29,12 +29,10 @@ describe('SocialLoginButtons: Component', () => {
       });
     });
 
-    describe('Facebook log in button is clicked', () => {
-      it('should trigger facebook oauth flow', async () => {
-        render(<Component variant={SignupButtonsVariant.LOGIN} />);
-        await userEvent.click(await screen.findByText(/Log in with Facebook/i));
-        expect(mockOAuthLogin).toHaveBeenCalledWith(OAuthProvider.Facebook);
-      });
+    it('should not render the Facebook button', async () => {
+      render(<Component variant={SignupButtonsVariant.LOGIN} />);
+      await screen.findByText(/Log in with Google/i);
+      expect(screen.queryByText(/Facebook/i)).not.toBeInTheDocument();
     });
   });
 
@@ -47,12 +45,10 @@ describe('SocialLoginButtons: Component', () => {
       });
     });
 
-    describe('Facebook sign up button is clicked', () => {
-      it('should trigger facebook oauth flow', async () => {
-        render(<Component variant={SignupButtonsVariant.SIGNUP} />);
-        await userEvent.click(await screen.findByText(/Sign up with Facebook/i));
-        expect(mockOAuthLogin).toHaveBeenCalledWith(OAuthProvider.Facebook);
-      });
+    it('should not render the Facebook button', async () => {
+      render(<Component variant={SignupButtonsVariant.SIGNUP} />);
+      await screen.findByText(/Sign up with Google/i);
+      expect(screen.queryByText(/Facebook/i)).not.toBeInTheDocument();
     });
   });
 });

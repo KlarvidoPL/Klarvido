@@ -339,9 +339,13 @@ STATIC_URL = "/static/"
 
 AUTH_USER_MODEL = "users.User"
 
+# Facebook is deliberately not registered here for now (app review/advanced access
+# not done yet) - the /auth/social/{login,complete}/facebook/ endpoints 404 via
+# social_core's MissingBackend without it. Re-add "social_core.backends.facebook.
+# FacebookOAuth2" once Facebook Login is ready; SOCIAL_AUTH_FACEBOOK_* settings are
+# left in place below.
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.google.GoogleOAuth2",
-    "social_core.backends.facebook.FacebookOAuth2",
     "django.contrib.auth.backends.ModelBackend",
 )
 
