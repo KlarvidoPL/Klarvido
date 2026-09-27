@@ -24,8 +24,22 @@ const OAUTH_NEW_SIGNUP_COOKIE = 'new_signup';
 const hasOAuthNewSignupCookie = () =>
   document.cookie.split('; ').some((cookie) => cookie.split('=')[0] === OAUTH_NEW_SIGNUP_COOKIE);
 
+// The backend sets this cookie scoped to the shared parent domain (e.g.
+// .klarvido.com), not just this page's own host, since it's set from a response
+// on the API's subdomain but read here on the webapp's subdomain. Clearing it
+// without matching that same domain would just set an unrelated, host-scoped
+// cookie instead of removing the original - it'd still be visible (and reopen
+// the modal) on a refresh until its own short max-age expires server-side.
+const getCookieClearDomain = () => {
+  const { hostname } = window.location;
+  if (hostname === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return '';
+  const labels = hostname.split('.');
+  return labels.length > 2 ? `.${labels.slice(-2).join('.')}` : `.${hostname}`;
+};
+
 const clearOAuthNewSignupCookie = () => {
-  document.cookie = `${OAUTH_NEW_SIGNUP_COOKIE}=; path=/; max-age=0`;
+  const domain = getCookieClearDomain();
+  document.cookie = `${OAUTH_NEW_SIGNUP_COOKIE}=; path=/; max-age=0${domain ? `; domain=${domain}` : ''}`;
 };
 
 export const WelcomeModal = () => {

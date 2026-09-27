@@ -32,6 +32,16 @@ class DjangoJWTStrategy(DjangoStrategy):
                     },
                 )
                 if self.is_new_signup:
+                    # Unlike the httpOnly auth cookies above (only ever sent
+                    # automatically with requests *to* the API host, so the default
+                    # same-host scoping is fine), this one is read directly via
+                    # document.cookie by frontend JS running on the webapp's own
+                    # host - a different subdomain in production (klarvido.com vs
+                    # api.klarvido.com). Without an explicit shared-parent-domain
+                    # scope, the browser sets it fine but the webapp's JS can never
+                    # see it. PARENT_HOST is empty in local dev (single "localhost"
+                    # host for both, where the default already works).
+                    parent_host = getattr(settings, "PARENT_HOST", "")
                     response.set_cookie(
                         settings.NEW_SIGNUP_COOKIE,
                         "1",
@@ -40,6 +50,7 @@ class DjangoJWTStrategy(DjangoStrategy):
                         secure=getattr(settings, "COOKIE_SECURE", True),
                         samesite=getattr(settings, "COOKIE_SAMESITE", "Lax"),
                         path="/",
+                        domain=f".{parent_host}" if parent_host else None,
                     )
             elif self.otp_auth_token:
                 otp_validate_url = self._construct_otp_validate_url(url)
