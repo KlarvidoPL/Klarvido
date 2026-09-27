@@ -353,7 +353,15 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "apps.users.authentication.JSONWebTokenCookieAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+        # SessionAuthentication deliberately excluded: it authenticates any DRF/GraphQL
+        # request off Django's own sessionid cookie, which is set independently by
+        # the (unrelated) Django admin login. This meant an active admin session in
+        # the same browser silently "authenticated" GraphQL requests too - via a
+        # mechanism the frontend was never built for, so SessionAuthentication's
+        # required CSRF token was never sent, breaking those requests with
+        # "CSRF Failed: CSRF token missing." The app's own two JWT authenticators
+        # above already cover all real authentication - nothing else in the
+        # codebase references SessionAuthentication.
     ),
     # Global throttle classes - applied to all DRF views unless overridden
     # See common/ratelimiting/ for detailed configuration
