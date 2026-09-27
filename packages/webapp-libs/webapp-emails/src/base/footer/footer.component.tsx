@@ -44,7 +44,7 @@ const currentYear = new Date().getFullYear();
  * Email footer component with social links, legal text, and unsubscribe
  */
 export const Footer = ({
-  companyName = 'Your Company',
+  companyName = 'Klarvido',
   address,
   socialLinks,
   unsubscribeUrl,

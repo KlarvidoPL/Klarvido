@@ -41,7 +41,7 @@ export const Template = ({
         />
       }
       footer={{
-        companyName: 'SaaS Boilerplate',
+        companyName: 'Klarvido',
       }}
     >
       <Text>

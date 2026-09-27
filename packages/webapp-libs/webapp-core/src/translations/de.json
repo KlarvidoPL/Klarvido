@@ -3450,10 +3450,10 @@
     "defaultMessage": "Zugriffs-URL"
   },
   "Home / Alert / Call to Action": {
-    "defaultMessage": "Denken Sie daran: Das SaaS Boilerplate ist Ihr Ausgangspunkt – machen Sie es zu Ihrem eigenen!"
+    "defaultMessage": "Denken Sie daran: Klarvido ist Ihr Ausgangspunkt – machen Sie es zu Ihrem eigenen!"
   },
   "Home / Alert / Description": {
-    "defaultMessage": "Jede Funktion, die Sie hier sehen, ist ein Modul, das die Vielseitigkeit und Benutzerfreundlichkeit des SaaS Boilerplate demonstriert. Bitte beachten Sie, dass diese Module nur Beispiele sind. Passen Sie jedes Modul nach Bedarf an, damit es optimal zu den Anforderungen Ihrer Anwendung passt."
+    "defaultMessage": "Jede Funktion, die Sie hier sehen, ist ein Modul, das die Vielseitigkeit und Benutzerfreundlichkeit von Klarvido demonstriert. Bitte beachten Sie, dass diese Module nur Beispiele sind. Passen Sie jedes Modul nach Bedarf an, damit es optimal zu den Anforderungen Ihrer Anwendung passt."
   },
   "Home / Alert / Title": {
     "defaultMessage": "Achtung!"
@@ -3498,7 +3498,7 @@
     "defaultMessage": "Verfügbare Funktionen"
   },
   "Home / Getting Started / Subtitle": {
-    "defaultMessage": "Folgen Sie diesen Schritten, um mit der Entwicklung mit dem SaaS Boilerplate zu beginnen."
+    "defaultMessage": "Folgen Sie diesen Schritten, um mit der Entwicklung mit Klarvido zu beginnen."
   },
   "Home / Getting Started / Title": {
     "defaultMessage": "Erste Schritte"

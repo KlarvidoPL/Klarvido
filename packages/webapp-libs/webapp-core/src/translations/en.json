@@ -323,6 +323,9 @@
   "Add SSO Modal / Help Title": {
     "defaultMessage": "Not sure which to choose?"
   },
+  "Add SSO Modal / Initiate Login URI Label": {
+    "defaultMessage": "Initiate login URI (configure in your IdP):"
+  },
   "Add SSO Modal / Issuer Tip": {
     "defaultMessage": "Tip: Make sure the Issuer URL includes https:// (e.g., https://your-tenant.us.auth0.com/)"
   },
@@ -345,7 +348,7 @@
     "defaultMessage": "Redirect URI"
   },
   "Add SSO Modal / Redirect Warning": {
-    "defaultMessage": "Important: Update the callback URL in your identity provider settings with this exact URL, then activate the connection."
+    "defaultMessage": "Important: Add the Redirect URI (callback URL) and Initiate login URI (login link) in your identity provider settings with the exact URLs below, then activate the connection."
   },
   "Add SSO Modal / SAML Description": {
     "defaultMessage": "Enterprise standard protocol"
@@ -784,6 +787,9 @@
   },
   "Auth / Login / Password required": {
     "defaultMessage": "Please enter your password"
+  },
+  "Auth / Login / SSO button": {
+    "defaultMessage": "Log in with SSO"
   },
   "Auth / Login / description": {
     "defaultMessage": "Sign in to your account to continue"
@@ -1574,6 +1580,102 @@
   "DueDatePicker / Days label": {
     "defaultMessage": "{days}d"
   },
+  "Edit SSO Modal / ACS URL Label": {
+    "defaultMessage": "ACS URL (Assertion Consumer Service):"
+  },
+  "Edit SSO Modal / Add Domain": {
+    "defaultMessage": "Add"
+  },
+  "Edit SSO Modal / Cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "Edit SSO Modal / Certificate": {
+    "defaultMessage": "X.509 Certificate (leave blank to keep current)"
+  },
+  "Edit SSO Modal / Client ID": {
+    "defaultMessage": "Client ID"
+  },
+  "Edit SSO Modal / Client Secret": {
+    "defaultMessage": "Client Secret (leave blank to keep current)"
+  },
+  "Edit SSO Modal / Client Secret Placeholder": {
+    "defaultMessage": "••••••••"
+  },
+  "Edit SSO Modal / Copy Failed": {
+    "defaultMessage": "Failed to copy URL"
+  },
+  "Edit SSO Modal / Domain Placeholder": {
+    "defaultMessage": "e.g., company.com"
+  },
+  "Edit SSO Modal / Domains Help": {
+    "defaultMessage": "Users from these domains can sign in via SSO. New users are automatically provisioned on first sign-in."
+  },
+  "Edit SSO Modal / Domains Label": {
+    "defaultMessage": "Allowed Email Domains"
+  },
+  "Edit SSO Modal / Edit Title": {
+    "defaultMessage": "Connection Settings"
+  },
+  "Edit SSO Modal / Entity ID": {
+    "defaultMessage": "IdP Entity ID / Issuer"
+  },
+  "Edit SSO Modal / Entity ID Label": {
+    "defaultMessage": "Entity ID (SP Identifier):"
+  },
+  "Edit SSO Modal / Error Toast": {
+    "defaultMessage": "Failed to update SSO connection."
+  },
+  "Edit SSO Modal / Initiate Login URI Hint": {
+    "defaultMessage": "URL where your app initiates the OIDC login flow. Add this to your identity provider if required."
+  },
+  "Edit SSO Modal / Initiate Login URI Label": {
+    "defaultMessage": "Initiate login URI (configure in your IdP):"
+  },
+  "Edit SSO Modal / Issuer": {
+    "defaultMessage": "Issuer URL"
+  },
+  "Edit SSO Modal / Name Label": {
+    "defaultMessage": "Connection Name"
+  },
+  "Edit SSO Modal / Redirect Hint": {
+    "defaultMessage": "Update the callback URL in your identity provider settings with this exact URL."
+  },
+  "Edit SSO Modal / Redirect Label": {
+    "defaultMessage": "Redirect URI (update in your IdP):"
+  },
+  "Edit SSO Modal / SAML Instructions": {
+    "defaultMessage": "Copy these values to your identity provider (Google Workspace, Okta, Azure AD, etc.)."
+  },
+  "Edit SSO Modal / SP Config Title": {
+    "defaultMessage": "Service Provider Configuration"
+  },
+  "Edit SSO Modal / SP Metadata Hint": {
+    "defaultMessage": "Some IdPs can auto-import configuration from this URL."
+  },
+  "Edit SSO Modal / SP URL Label": {
+    "defaultMessage": "SP Metadata URL (optional):"
+  },
+  "Edit SSO Modal / SSO URL": {
+    "defaultMessage": "SSO URL (Login URL)"
+  },
+  "Edit SSO Modal / Save": {
+    "defaultMessage": "Save Changes"
+  },
+  "Edit SSO Modal / Saving": {
+    "defaultMessage": "Saving..."
+  },
+  "Edit SSO Modal / Subtitle": {
+    "defaultMessage": "View configuration values and update connection settings"
+  },
+  "Edit SSO Modal / Success Toast": {
+    "defaultMessage": "SSO connection updated successfully!"
+  },
+  "Edit SSO Modal / Title": {
+    "defaultMessage": "Edit SSO Connection"
+  },
+  "Edit SSO Modal / URL Copied": {
+    "defaultMessage": "URL copied to clipboard"
+  },
   "EditCrudDemoItem / Back": {
     "defaultMessage": "Back to items"
   },
@@ -1606,6 +1708,33 @@
   },
   "Email / Account Activation / Title": {
     "defaultMessage": "Welcome! Let's verify your email"
+  },
+  "Email / BackupReady / BackupDate": {
+    "defaultMessage": "Backup Date:"
+  },
+  "Email / BackupReady / DownloadButton": {
+    "defaultMessage": "View Backup"
+  },
+  "Email / BackupReady / FileSize": {
+    "defaultMessage": "File Size:"
+  },
+  "Email / BackupReady / Preheader": {
+    "defaultMessage": "Your backup is ready"
+  },
+  "Email / BackupReady / Subject": {
+    "defaultMessage": "Backup Ready"
+  },
+  "Email / BackupReady / Tenant": {
+    "defaultMessage": "Tenant:"
+  },
+  "Email / BackupReady / Text": {
+    "defaultMessage": "Your periodic backup of tenant data has been completed successfully."
+  },
+  "Email / BackupReady / Title": {
+    "defaultMessage": "Backup Ready"
+  },
+  "Email / BackupReady / TotalRecords": {
+    "defaultMessage": "Total Records:"
   },
   "Email / Footer / Privacy": {
     "defaultMessage": "Privacy Policy"
@@ -1965,10 +2094,10 @@
     "defaultMessage": "Access URL"
   },
   "Home / Alert / Call to Action": {
-    "defaultMessage": "Remember, the SaaS Boilerplate is your starting point - make it your own!"
+    "defaultMessage": "Remember, Klarvido is your starting point - make it your own!"
   },
   "Home / Alert / Description": {
-    "defaultMessage": "Each feature you see here is a module demonstrating the versatility and usability of the SaaS Boilerplate. Please remember, these modules are simply examples. You are encouraged to customize, adjust, and modify each module to best fit your application's needs."
+    "defaultMessage": "Each feature you see here is a module demonstrating the versatility and usability of Klarvido. Please remember, these modules are simply examples. You are encouraged to customize, adjust, and modify each module to best fit your application's needs."
   },
   "Home / Alert / Title": {
     "defaultMessage": "Heads up!"
@@ -2013,7 +2142,7 @@
     "defaultMessage": "Available Features"
   },
   "Home / Getting Started / Subtitle": {
-    "defaultMessage": "Follow these steps to start developing with the SaaS Boilerplate."
+    "defaultMessage": "Follow these steps to start developing with Klarvido."
   },
   "Home / Getting Started / Title": {
     "defaultMessage": "Getting Started"
@@ -2330,6 +2459,24 @@
   "Notifications / Notifications List / Title": {
     "defaultMessage": "Notifications"
   },
+  "Notifications / Passkey Registered / Content": {
+    "defaultMessage": "A new passkey \"{passkey_name}\" was added to your account."
+  },
+  "Notifications / Passkey Registered / Title": {
+    "defaultMessage": "Passkey Registered"
+  },
+  "Notifications / SSO Connection Activated / Content": {
+    "defaultMessage": "{connection_type} connection \"{connection_name}\" for \"{tenant_name}\" is now active."
+  },
+  "Notifications / SSO Connection Activated / Title": {
+    "defaultMessage": "SSO Connection Activated"
+  },
+  "Notifications / SSO Connection Deactivated / Content": {
+    "defaultMessage": "{connection_type} connection \"{connection_name}\" for \"{tenant_name}\" was deactivated."
+  },
+  "Notifications / SSO Connection Deactivated / Title": {
+    "defaultMessage": "SSO Connection Deactivated"
+  },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "Your invitation to \"{tenant_name}\" has been accepted by \"{name}\""
   },
@@ -2343,7 +2490,7 @@
     "defaultMessage": "Add"
   },
   "OIDC Form / Allowed Domains Help": {
-    "defaultMessage": "Users with email addresses from these domains can use this SSO connection to sign in."
+    "defaultMessage": "Users with email addresses from these domains can use this SSO connection to sign in. New users from these domains are automatically provisioned on first sign-in."
   },
   "OIDC Form / Allowed Domains Label": {
     "defaultMessage": "Allowed Email Domains"
@@ -2491,6 +2638,9 @@
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Search by user name or email..."
+  },
+  "Passkeys Card / Tenant Required": {
+    "defaultMessage": "Tenant context is required to delete passkeys."
   },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ characters"
@@ -2825,18 +2975,6 @@
   "SSO / Delete confirm title": {
     "defaultMessage": "Delete SSO Connection?"
   },
-  "SSO / Discovery / Choose organization": {
-    "defaultMessage": "Choose your organization"
-  },
-  "SSO / Discovery / Continue button": {
-    "defaultMessage": "Continue with {provider}"
-  },
-  "SSO / Discovery / SSO available": {
-    "defaultMessage": "SSO available for {domain}"
-  },
-  "SSO / Discovery / SSO required": {
-    "defaultMessage": "Your organization requires SSO for sign in"
-  },
   "SSO / Domains label": {
     "defaultMessage": "Allowed Domains"
   },
@@ -2903,6 +3041,12 @@
   "SSO Card / Add Another Button": {
     "defaultMessage": "Add another connection"
   },
+  "SSO Card / Breakglass Description": {
+    "defaultMessage": "Administrators with the 'Manage SSO' permission can still access this organization via password login as a break-glass mechanism. Each bypass is recorded in the security audit log for compliance review."
+  },
+  "SSO Card / Breakglass Title": {
+    "defaultMessage": "Break-glass access"
+  },
   "SSO Card / Created At": {
     "defaultMessage": "Added {date}"
   },
@@ -2929,6 +3073,33 @@
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "Domains:"
+  },
+  "SSO Card / Edit Connection": {
+    "defaultMessage": "Edit connection"
+  },
+  "SSO Card / Edit Dialog Description": {
+    "defaultMessage": "View and edit SSO connection configuration"
+  },
+  "SSO Card / Edit Dialog Title": {
+    "defaultMessage": "Edit SSO Connection"
+  },
+  "SSO Card / Enforce Info Description": {
+    "defaultMessage": "Users from allowed domains must sign in via SSO to access this organization. Password login will not grant access to this tenant."
+  },
+  "SSO Card / Enforce Info Title": {
+    "defaultMessage": "SSO enforcement is active"
+  },
+  "SSO Card / Enforce SSO Badge": {
+    "defaultMessage": "Enforced"
+  },
+  "SSO Card / Enforce SSO Error": {
+    "defaultMessage": "Failed to update SSO enforcement setting."
+  },
+  "SSO Card / Enforce SSO Label": {
+    "defaultMessage": "Enforce SSO login"
+  },
+  "SSO Card / Enforce SSO Toggle Label": {
+    "defaultMessage": "Enforce SSO login"
   },
   "SSO Card / Inactive Badge": {
     "defaultMessage": "Inactive"
@@ -2991,7 +3162,7 @@
     "defaultMessage": "Add"
   },
   "SSO Form / Allowed Domains Help": {
-    "defaultMessage": "Users with email addresses from these domains can use this SSO connection to sign in."
+    "defaultMessage": "Users with email addresses from these domains can use this SSO connection to sign in. New users from these domains are automatically provisioned on first sign-in."
   },
   "SSO Form / Allowed Domains Label": {
     "defaultMessage": "Allowed Email Domains"
@@ -3016,6 +3187,36 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL (Login URL)"
+  },
+  "SSO Login / Back to login": {
+    "defaultMessage": "Back to login"
+  },
+  "SSO Login / Choose organization": {
+    "defaultMessage": "Choose your organization"
+  },
+  "SSO Login / Email error": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "SSO Login / Email label": {
+    "defaultMessage": "Work email address"
+  },
+  "SSO Login / Email placeholder": {
+    "defaultMessage": "name@company.com"
+  },
+  "SSO Login / No connections": {
+    "defaultMessage": "No SSO connections found for this email domain. Contact your administrator or use a different sign-in method."
+  },
+  "SSO Login / Redirecting button": {
+    "defaultMessage": "Redirecting..."
+  },
+  "SSO Login / Submit button": {
+    "defaultMessage": "Continue with SSO"
+  },
+  "SSO Login / description": {
+    "defaultMessage": "Sign in with your organization's identity provider"
+  },
+  "SSO Login / heading": {
+    "defaultMessage": "SSO Login"
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - SaaS Ideas Generator"
@@ -3413,6 +3614,15 @@
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Security Audit Log"
   },
+  "Tenant Security Settings / JIT Provisioning Description": {
+    "defaultMessage": "When enabled, users with email addresses from your allowed domains are automatically created and added to your organization when they sign in via SSO for the first time. No manual invitation required."
+  },
+  "Tenant Security Settings / JIT Provisioning Hint": {
+    "defaultMessage": "Users from allowed domains are automatically created when they sign in via SSO for the first time."
+  },
+  "Tenant Security Settings / JIT Provisioning Title": {
+    "defaultMessage": "Automatic user provisioning"
+  },
   "Tenant Security Settings / No Audit Events": {
     "defaultMessage": "No security events yet"
   },
@@ -3483,7 +3693,7 @@
     "defaultMessage": "Generate SCIM Token"
   },
   "Tenant Security Settings / SSO Description": {
-    "defaultMessage": "Configure SAML 2.0 or OIDC identity providers for your organization"
+    "defaultMessage": "Configure SAML 2.0 or OIDC identity providers for your organization. Users from allowed domains are automatically provisioned on first sign-in."
   },
   "Tenant Security Settings / SSO Header": {
     "defaultMessage": "Single Sign-On (SSO)"
@@ -3571,6 +3781,9 @@
   },
   "Tenant settings / Activity Logs": {
     "defaultMessage": "Activity Logs"
+  },
+  "Tenant settings / Backups": {
+    "defaultMessage": "Backups"
   },
   "Tenant settings / General": {
     "defaultMessage": "General"

@@ -37,7 +37,7 @@ export const Template = ({ expiryDate }: TrialExpiresSoonProps) => {
         />
       }
       footer={{
-        companyName: 'SaaS Boilerplate',
+        companyName: 'Klarvido',
       }}
     >
       <Button linkTo={url}>

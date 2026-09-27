@@ -36,7 +36,7 @@ export const Template = ({ userId, token }: PasswordResetProps) => {
         />
       }
       footer={{
-        companyName: 'SaaS Boilerplate',
+        companyName: 'Klarvido',
       }}
     >
       <Button linkTo={url}>

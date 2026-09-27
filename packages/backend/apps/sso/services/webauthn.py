@@ -60,7 +60,7 @@ class WebAuthnService:
         """
         self.user = user
         self.rp_id = self._get_rp_id()
-        self.rp_name = getattr(settings, "PROJECT_NAME", "SaaS Boilerplate")
+        self.rp_name = getattr(settings, "PROJECT_NAME", "Klarvido")
 
     def _get_rp_id(self) -> str:
         """Get the Relying Party ID (domain)."""
