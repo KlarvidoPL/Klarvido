@@ -3,3 +3,6 @@ export * from './tenantInvitationAccepted';
 export * from './tenantInvitationDeclined';
 export * from './actionLogExportReady';
 export * from './actionLogExportFailed';
+export * from './ssoConnectionActivated';
+export * from './ssoConnectionDeactivated';
+export * from './passkeyRegistered';
