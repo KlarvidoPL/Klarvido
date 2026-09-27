@@ -205,10 +205,15 @@ services:
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
       - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-}
       - EMAIL_USE_TLS=True
-      
+
+      # AWS SES (if EMAIL_BACKEND=django_ses.SESBackend) - reuses AWS_ACCESS_KEY_ID/
+      # AWS_SECRET_ACCESS_KEY above; AWS_SES_REGION_NAME is Django-specific, separate
+      # from AWS_DEFAULT_REGION (which boto3 reads implicitly)
+      - AWS_SES_REGION_NAME=${AWS_SES_REGION_NAME:-}
+
       # SendGrid (if using)
       - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
-      
+
       # URLs
       - WEB_APP_URL=https://${DOMAIN}
       - API_URL=https://api.${DOMAIN}
@@ -312,6 +317,7 @@ services:
       - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
       - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-}
+      - AWS_SES_REGION_NAME=${AWS_SES_REGION_NAME:-}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
       - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-sk_<CHANGE_ME>}
       - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-sk_test_<CHANGE_ME>}

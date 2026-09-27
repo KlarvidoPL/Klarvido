@@ -251,6 +251,76 @@ automatically by boto3 - only `AWS_STORAGE_BUCKET_NAME` is explicitly read by Dj
 settings. Use an IAM user scoped to just this bucket (`s3:GetObject`/`PutObject`/
 `DeleteObject`/`ListBucket`), not admin credentials.
 
+## Email
+
+`EMAIL_BACKEND` selects the provider - generic SMTP, SendGrid, or AWS SES (see
+`.env.vps.example` for all three). SES setup has the most one-time steps, documented
+here since nothing in the boilerplate automates domain verification:
+
+### AWS SES
+
+1. **Create the domain identity** (generates DKIM tokens):
+   ```bash
+   aws sesv2 create-email-identity --email-identity yourdomain.com --region eu-central-1
+   ```
+   The response includes 3 `DkimAttributes.Tokens` - add each as a CNAME in your DNS:
+   `<token>._domainkey.yourdomain.com` -> `<token>.dkim.amazonses.com`.
+
+2. **Set a custom MAIL FROM domain** (recommended - improves deliverability/DMARC
+   alignment):
+   ```bash
+   aws sesv2 put-email-identity-mail-from-attributes \
+     --email-identity yourdomain.com \
+     --mail-from-domain mail.yourdomain.com \
+     --behavior-on-mx-failure USE_DEFAULT_VALUE \
+     --region eu-central-1
+   ```
+   Add an MX record (`mail.yourdomain.com` -> `feedback-smtp.eu-central-1.amazonses.com`,
+   priority `10`) and a TXT record (`mail.yourdomain.com` -> `v=spf1 include:amazonses.com
+   ~all`).
+
+   If your DNS is behind Cloudflare (or another proxying provider), set these records to
+   **DNS only** - a proxied CNAME breaks SES's ability to see the real verification
+   target.
+
+3. **Check verification status**:
+   ```bash
+   aws sesv2 get-email-identity --email-identity yourdomain.com --region eu-central-1
+   ```
+   Look for `"VerificationStatus": "SUCCESS"` and `"DkimAttributes.Status": "SUCCESS"`.
+   With Cloudflare this is often done within minutes; other providers may take longer.
+
+4. **Request production access** - new accounts start in a sandbox (200 emails/24h,
+   1/sec, verified recipient addresses only):
+   ```bash
+   aws sesv2 put-account-details \
+     --mail-type TRANSACTIONAL \
+     --website-url https://yourdomain.com \
+     --contact-language EN \
+     --use-case-description "Describe what you send and to whom." \
+     --production-access-enabled \
+     --region eu-central-1
+   ```
+   Check status with `aws sesv2 get-account --region eu-central-1` (`ReviewDetails.Status`
+   goes `PENDING` -> `GRANTED`, usually within a few hours).
+
+5. **Grant the sending IAM user permission**, scoped to just this identity:
+   ```json
+   {
+     "Effect": "Allow",
+     "Action": ["ses:SendEmail", "ses:SendRawEmail"],
+     "Resource": "arn:aws:ses:eu-central-1:<account-id>:identity/yourdomain.com"
+   }
+   ```
+
+6. **Set in `.env`**:
+   ```bash
+   EMAIL_BACKEND=django_ses.SESBackend
+   AWS_SES_REGION_NAME=eu-central-1
+   EMAIL_FROM_ADDRESS=noreply@yourdomain.com
+   # AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_DEFAULT_REGION as usual (see Storage Options)
+   ```
+
 ## AI Assistant (MCP Server) - Optional
 
 The MCP Server enables AI assistants to interact with your application's data. It's included in `docker-compose.prod.yml` and will start automatically with your other services.
