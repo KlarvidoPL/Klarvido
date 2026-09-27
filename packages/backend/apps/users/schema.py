@@ -237,6 +237,11 @@ class CurrentUserType(DjangoObjectType):
     roles = graphene.List(of_type=graphene.String)
     tenants = graphene.List(of_type=TenantType)
     avatar = graphene.String()
+    has_usable_password = graphene.Boolean(
+        description="False for an OAuth-only account that has never set a password - "
+        "the frontend uses this to show a "
+        "'Set password' flow instead of 'Change password' (no old password to ask for)."
+    )
 
     class Meta:
         model = models.User
@@ -250,6 +255,7 @@ class CurrentUserType(DjangoObjectType):
             "avatar",
             "otp_enabled",
             "otp_verified",
+            "has_usable_password",
             "tenants",
         )
 
@@ -272,6 +278,10 @@ class CurrentUserType(DjangoObjectType):
     @staticmethod
     def resolve_avatar(parent, info):
         return get_user_avatar_url(get_user_from_resolver(info))
+
+    @staticmethod
+    def resolve_has_usable_password(parent, info):
+        return get_user_from_resolver(info).has_usable_password()
 
     @staticmethod
     def resolve_tenants(parent, info):

@@ -1,5 +1,5 @@
 export type ChangePasswordFormFields = {
-  oldPassword: string;
+  oldPassword?: string;
   newPassword: string;
   confirmNewPassword: string;
 };

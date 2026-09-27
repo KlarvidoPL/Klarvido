@@ -639,6 +639,8 @@ type CurrentUserType {
   language: String
   roles: [String]
   avatar: String
+  "False for an OAuth-only account that has never set a password - the frontend uses this to show a 'Set password' flow instead of 'Change password' (no old password to ask for)."
+  hasUsablePassword: Boolean
 }
 type PermissionConnection {
   "Pagination data for this connection."
@@ -3008,7 +3010,7 @@ input CreateSetupIntentMutationInput {
 }
 input ChangePasswordMutationInput {
   "Old password"
-  oldPassword: String!
+  oldPassword: String
   "New password"
   newPassword: String!
   clientMutationId: String

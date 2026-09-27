@@ -31,7 +31,7 @@ const defaultResult = {
 };
 
 describe('ChangePasswordForm: Component', () => {
-  const Component = () => <ChangePasswordForm />;
+  const Component = () => <ChangePasswordForm hasUsablePassword />;
 
   const fillForm = async (override = {}) => {
     const data = { ...formData, ...override };
@@ -161,5 +161,39 @@ describe('ChangePasswordForm: Component', () => {
     expect(toaster).toBeEmptyDOMElement();
 
     expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
+  });
+
+  describe('when the account has no password yet (OAuth-only signup)', () => {
+    const SetPasswordComponent = () => <ChangePasswordForm hasUsablePassword={false} />;
+
+    it('should not render the old password field', async () => {
+      const { waitForApolloMocks } = render(<SetPasswordComponent />);
+      await waitForApolloMocks();
+
+      expect(screen.queryByLabelText(/old password/i)).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /set password/i })).toBeInTheDocument();
+    });
+
+    it('should submit without an oldPassword variable', async () => {
+      const requestMock = composeMockedQueryResult(authChangePasswordMutation, {
+        variables: { input: { newPassword: formData.newPassword } },
+        data: defaultResult,
+      });
+
+      const { waitForApolloMocks } = render(<SetPasswordComponent />, {
+        apolloMocks: (defaultMocks) => defaultMocks.concat(requestMock),
+      });
+
+      await waitForApolloMocks(0);
+
+      await userEvent.type(screen.getByLabelText(/^new password/i), formData.newPassword);
+      await userEvent.type(screen.getByLabelText(/confirm new password/i), formData.confirmNewPassword);
+      await userEvent.click(screen.getByRole('button', { name: /set password/i }));
+
+      await waitForApolloMocks();
+
+      const toast = await screen.findByTestId('toast-1');
+      expect(toast).toHaveTextContent('Password successfully set.');
+    });
   });
 });

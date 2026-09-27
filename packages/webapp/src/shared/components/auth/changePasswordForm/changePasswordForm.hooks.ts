@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import { authChangePasswordMutation } from './changePasswordForm.graphql';
 import { ChangePasswordFormFields } from './changePasswordForm.types';
 
-export const useChangePasswordForm = () => {
+export const useChangePasswordForm = (hasUsablePassword: boolean) => {
   const intl = useIntl();
   const { toast } = useToast();
 
@@ -59,10 +59,15 @@ export const useChangePasswordForm = () => {
       reset();
 
       toast({
-        description: intl.formatMessage({
-          defaultMessage: 'Password successfully changed.',
-          id: 'Auth / Change password / Success message',
-        }),
+        description: hasUsablePassword
+          ? intl.formatMessage({
+              defaultMessage: 'Password successfully changed.',
+              id: 'Auth / Change password / Success message',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Password successfully set.',
+              id: 'Auth / Change password / Set success message',
+            }),
         variant: 'success',
       });
     },
@@ -80,7 +85,7 @@ export const useChangePasswordForm = () => {
         variables: {
           input: {
             newPassword,
-            oldPassword,
+            ...(hasUsablePassword ? { oldPassword } : {}),
           },
         },
       });

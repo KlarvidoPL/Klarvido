@@ -14,6 +14,7 @@ export const commonQueryCurrentUserFragment = gql(/* GraphQL */ `
     avatar
     otpVerified
     otpEnabled
+    hasUsablePassword
   }
 `);
 
