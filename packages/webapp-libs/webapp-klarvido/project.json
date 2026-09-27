@@ -1,0 +1,8 @@
+{
+  "name": "webapp-klarvido",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/webapp-libs/webapp-klarvido/src",
+  "projectType": "library",
+  "targets": {},
+  "tags": []
+}

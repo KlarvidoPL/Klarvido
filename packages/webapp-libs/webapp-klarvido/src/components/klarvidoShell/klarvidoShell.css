@@ -1,0 +1,15 @@
+.klarvido-shell {
+  --klarvido-primary: #0b2545;
+  --klarvido-primary-strong: #143a66;
+  --klarvido-accent: #f59e0b;
+  --klarvido-background: #f7f9fc;
+  --klarvido-surface: #ffffff;
+  --klarvido-surface-subtle: #fbfcfe;
+  --klarvido-border: #e4eaf1;
+  --klarvido-muted: #6b7c93;
+  --klarvido-success: #13a66a;
+  --klarvido-danger: #e34d59;
+
+  background: var(--klarvido-background);
+  color: var(--klarvido-primary);
+}

@@ -48,6 +48,7 @@
     "@sb/webapp-documents": "workspace:*",
     "@sb/webapp-finances": "workspace:*",
     "@sb/webapp-generative-ai": "workspace:*",
+    "@sb/webapp-klarvido": "workspace:*",
     "@sb/webapp-notifications": "workspace:*",
     "@sb/webapp-tenants": "workspace:*",
     "@storybook/addon-docs": "^10.1.11",
