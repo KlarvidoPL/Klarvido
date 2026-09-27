@@ -86,10 +86,15 @@ def complete(request, backend, *args, **kwargs):
             token = jwt_tokens.RefreshToken.for_user(user)
             backend.strategy.set_jwt(token)
 
+    # Always resolve the account fresh from the chosen social identity (email/uid) -
+    # never from whatever user is already authenticated in this browser. Passing the
+    # ambient request.user here would make "Sign in with Google" silently associate
+    # (and log back into) the *current* session's user regardless of which Google
+    # account was picked, instead of the account that identity actually belongs to.
     return do_complete(
         request.backend,
         _do_login,
-        user=request.user,
+        user=None,
         redirect_name=REDIRECT_FIELD_NAME,
         request=request,
         *args,  # noqa: B026

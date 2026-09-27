@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from config import settings
 from social_django.strategy import DjangoStrategy
 
@@ -58,5 +60,9 @@ class DjangoJWTStrategy(DjangoStrategy):
         return self.refresh_token or self.otp_auth_token
 
     def _construct_otp_validate_url(self, url: str) -> str:
-        locale = self.session_get("locale")
-        return f"{url}/{locale}{settings.OTP_VALIDATE_PATH}"
+        """`url` is the full "next" redirect target (e.g. https://host/pl/auth/login) -
+        build the OTP page from its origin, not by appending onto its existing path,
+        or the result is a malformed, doubled-up URL that matches no frontend route."""
+        locale = self.session_get("locale") or "en"
+        origin = urlsplit(url)
+        return f"{origin.scheme}://{origin.netloc}/{locale}{settings.OTP_VALIDATE_PATH}"

@@ -1,6 +1,8 @@
+from unittest.mock import patch
+
 import pytest
 from django.conf import settings
-from django.http import SimpleCookie
+from django.http import HttpResponse, SimpleCookie
 from django.urls import reverse
 from rest_framework import status
 from rest_framework_simplejwt.settings import api_settings as jwt_api_settings
@@ -164,3 +166,21 @@ class TestLogout:
 
         session.refresh_from_db()
         assert session.is_active is False
+
+
+class TestSocialAuthComplete:
+    """Regression test for a bug where "Sign in with Google/Facebook" passed the
+    ambient request.user into social-core's do_complete(). If the visitor already
+    had a valid session in that browser, this made the flow silently re-associate
+    and log back into that *existing* user regardless of which social account was
+    picked, instead of resolving the account the chosen identity actually belongs
+    to (confirmed in production: three distinct Google accounts all ended up
+    mapped to the same Klarvido user)."""
+
+    def test_complete_view_does_not_pass_ambient_request_user(self, api_client):
+        with patch("apps.users.views.do_complete") as mock_do_complete:
+            mock_do_complete.return_value = HttpResponse()
+            api_client.get(reverse("social:complete", kwargs={"backend": "google-oauth2"}))
+
+        assert mock_do_complete.called
+        assert mock_do_complete.call_args.kwargs["user"] is None
