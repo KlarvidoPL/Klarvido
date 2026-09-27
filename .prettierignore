@@ -6,3 +6,8 @@
 /.nx/cache
 
 /packages/backend/templates
+# Django app-level template overrides (e.g. apps/*/templates/**) - these are Django
+# templates, not HTML/JS assets. Prettier doesn't understand {% %} tag syntax and will
+# wrap lines mid-tag, which breaks Django's template tokenizer (it doesn't match {% %}
+# across a newline) - this silently 500'd the Django admin more than once.
+/packages/backend/apps/**/templates
