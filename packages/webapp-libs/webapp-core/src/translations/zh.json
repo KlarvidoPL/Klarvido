@@ -3450,10 +3450,10 @@
     "defaultMessage": "访问 URL"
   },
   "Home / Alert / Call to Action": {
-    "defaultMessage": "请记住，SaaS Boilerplate 只是你的起点——尽情打造属于你自己的产品！"
+    "defaultMessage": "请记住，Klarvido 只是你的起点——尽情打造属于你自己的产品！"
   },
   "Home / Alert / Description": {
-    "defaultMessage": "你在此看到的每个功能，都是展示 SaaS Boilerplate 灵活性和可用性的模块示例。请注意，这些模块仅为示例，欢迎根据你的应用需求对每个模块进行自定义、调整和修改。"
+    "defaultMessage": "你在此看到的每个功能，都是展示 Klarvido 灵活性和可用性的模块示例。请注意，这些模块仅为示例，欢迎根据你的应用需求对每个模块进行自定义、调整和修改。"
   },
   "Home / Alert / Title": {
     "defaultMessage": "注意！"
@@ -3498,7 +3498,7 @@
     "defaultMessage": "可用功能"
   },
   "Home / Getting Started / Subtitle": {
-    "defaultMessage": "按照以下步骤开始使用 SaaS Boilerplate 进行开发。"
+    "defaultMessage": "按照以下步骤开始使用 Klarvido 进行开发。"
   },
   "Home / Getting Started / Title": {
     "defaultMessage": "快速开始"

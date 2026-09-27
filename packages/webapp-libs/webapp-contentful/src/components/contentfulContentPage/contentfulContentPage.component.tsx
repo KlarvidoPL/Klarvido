@@ -17,7 +17,7 @@ import type { ContentfulContentPageConfig } from './contentfulContentPage.types'
 
 const ENV_FILE_PATH = 'packages/webapp/.env';
 const DOCS_URL =
-  'https://docs.demo.saas.apptension.com/working-with-sb/contentful/configure-contentful-integration';
+  'https://docs.demo.saas.apptoku.com/working-with-sb/contentful/configure-contentful-integration';
 
 const LoadingSkeleton = () => (
   <PageLayout>

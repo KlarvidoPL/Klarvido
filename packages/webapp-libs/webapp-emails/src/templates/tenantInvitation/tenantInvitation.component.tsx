@@ -36,7 +36,7 @@ export const Template = ({ token }: TenantInvitationProps) => {
         />
       }
       footer={{
-        companyName: 'SaaS Boilerplate',
+        companyName: 'Klarvido',
       }}
     >
       <Button linkTo={url}>
