@@ -85,6 +85,10 @@ def complete(request, backend, *args, **kwargs):
         else:
             token = jwt_tokens.RefreshToken.for_user(user)
             backend.strategy.set_jwt(token)
+            # do_complete() sets this in-memory attribute (not persisted) on the
+            # very first signup, before calling this callback - used to show the
+            # welcome modal once, same as the password-signup flow already does.
+            backend.strategy.set_is_new_signup(getattr(user, "is_new", False))
 
     # Always resolve the account fresh from the chosen social identity (email/uid) -
     # never from whatever user is already authenticated in this browser. Passing the

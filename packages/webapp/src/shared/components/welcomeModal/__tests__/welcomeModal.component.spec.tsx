@@ -7,9 +7,17 @@ jest.mock('canvas-confetti');
 import { triggerWelcomeModal, WelcomeModal } from '../welcomeModal.component';
 
 
+const clearAllCookies = () => {
+  document.cookie.split(';').forEach((cookie) => {
+    const name = cookie.split('=')[0].trim();
+    if (name) document.cookie = `${name}=; path=/; max-age=0`;
+  });
+};
+
 describe('WelcomeModal: Component', () => {
   beforeEach(() => {
     sessionStorage.clear();
+    clearAllCookies();
     jest.clearAllMocks();
   });
 
@@ -47,5 +55,20 @@ describe('WelcomeModal: Component', () => {
   it('triggerWelcomeModal should set sessionStorage', () => {
     triggerWelcomeModal();
     expect(sessionStorage.getItem('sb_show_welcome_modal')).toBe('true');
+  });
+
+  it('should render when the OAuth new-signup cookie is present', async () => {
+    document.cookie = 'new_signup=1; path=/';
+    render(<WelcomeModal />);
+
+    expect(await screen.findByText(/welcome aboard/i)).toBeInTheDocument();
+  });
+
+  it('should clear the OAuth new-signup cookie after showing', async () => {
+    document.cookie = 'new_signup=1; path=/';
+    render(<WelcomeModal />);
+
+    await screen.findByText(/welcome aboard/i);
+    expect(document.cookie.includes('new_signup=1')).toBe(false);
   });
 });
