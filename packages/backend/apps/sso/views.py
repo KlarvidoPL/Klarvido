@@ -222,18 +222,20 @@ class SAMLACSView(View):
             )
 
             # Create session and set auth cookies (same as regular login)
-            from apps.users.jwt import create_jwt_tokens
+            from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            # Create SSOSession for tracking
+            tokens = create_jwt_tokens(user, auth_method='sso')
+
+            # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
             try:
-                session, session_id = session_service.create_session(request, sso_link=sso_link)
+                session, session_id = session_service.create_session(
+                    request, sso_link=sso_link, refresh_token_jti=get_jti_from_refresh_token(tokens["refresh"])
+                )
             except Exception:
                 session_id = None
-
-            tokens = create_jwt_tokens(user, auth_method='sso')
 
             # Build redirect URL with open redirect protection
             web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
@@ -415,18 +417,20 @@ class OIDCCallbackView(View):
             )
 
             # Create session and set auth cookies (same as regular login)
-            from apps.users.jwt import create_jwt_tokens
+            from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            # Create SSOSession for tracking
+            tokens = create_jwt_tokens(user, auth_method='sso')
+
+            # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
             try:
-                session, session_id = session_service.create_session(request, sso_link=sso_link)
+                session, session_id = session_service.create_session(
+                    request, sso_link=sso_link, refresh_token_jti=get_jti_from_refresh_token(tokens["refresh"])
+                )
             except Exception:
                 session_id = None
-
-            tokens = create_jwt_tokens(user, auth_method='sso')
 
             # Build redirect URL with open redirect protection
             web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
@@ -765,18 +769,20 @@ class PasskeyAuthenticationVerifyView(APIView):
             )
 
             # Create JWT tokens and set auth cookies (same as regular login)
-            from apps.users.jwt import create_jwt_tokens
+            from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            # Create SSOSession for tracking
+            tokens = create_jwt_tokens(user, auth_method='passkey')
+
+            # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
             try:
-                session, session_id = session_service.create_session(request)
+                session, session_id = session_service.create_session(
+                    request, refresh_token_jti=get_jti_from_refresh_token(tokens["refresh"])
+                )
             except Exception:
                 session_id = None
-
-            tokens = create_jwt_tokens(user, auth_method='passkey')
 
             # Return tokens in body for localStorage (Safari/mobile fallback when cookies blocked)
             response = Response(

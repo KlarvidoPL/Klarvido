@@ -102,6 +102,7 @@ class SessionService:
         request,
         sso_link=None,
         ttl_days: int = None,
+        refresh_token_jti: Optional[str] = None,
     ) -> Tuple[SSOSession, str]:
         """
         Create a new session for the user.
@@ -110,6 +111,8 @@ class SessionService:
             request: The HTTP request object (for user agent and IP)
             sso_link: Optional SSOUserLink if logging in via SSO
             ttl_days: Session TTL in days (default 30)
+            refresh_token_jti: `jti` claim of the refresh token issued alongside
+                this session, so it can later be revoked (see `SSOSession.revoke`)
 
         Returns:
             Tuple of (SSOSession, session_id)
@@ -134,6 +137,7 @@ class SessionService:
             user=self.user,
             sso_link=sso_link,
             session_id=session_id,
+            refresh_token_jti=refresh_token_jti or "",
             device_name=device_info["device_name"],
             device_type=device_info["device_type"],
             browser=device_info["browser"],
@@ -233,14 +237,34 @@ class SessionService:
         if except_session_id:
             sessions = sessions.exclude(session_id=except_session_id)
 
-        count = sessions.count()
-        sessions.update(
-            is_active=False,
-            revoked_at=timezone.now(),
-            revoked_reason="User revoked all sessions",
-        )
+        # Revoke one at a time (not a bulk .update()) so each session's
+        # linked refresh token actually gets blacklisted - see SSOSession.revoke.
+        count = 0
+        for session in sessions:
+            session.revoke(reason="User revoked all sessions")
+            count += 1
 
         return count
+
+    def update_session_token(self, old_jti: str, new_jti: str) -> Optional[SSOSession]:
+        """
+        Re-point a session's linked refresh token after rotation.
+
+        Refresh-token rotation mints a brand new token (new jti) on every
+        call. Without updating the link, a session would only be revocable
+        up until its very first refresh, after which the stored jti would
+        point at an already-rotated (and blacklisted) token.
+
+        Returns the updated session, or None if no session was linked to
+        `old_jti` (e.g. sessions created before this linkage existed).
+        """
+        session = SSOSession.objects.filter(refresh_token_jti=old_jti, is_active=True).first()
+        if not session:
+            return None
+
+        session.refresh_token_jti = new_jti
+        session.save(update_fields=["refresh_token_jti"])
+        return session
 
     @staticmethod
     def cleanup_expired_sessions() -> int:

@@ -4,6 +4,7 @@ JWT token generation utilities.
 
 from typing import Optional
 
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
@@ -70,6 +71,20 @@ def get_session_id_from_token(request) -> Optional[str]:
     except (AttributeError, TypeError):
         pass
     return None
+
+
+def get_jti_from_refresh_token(raw_refresh_token: str) -> Optional[str]:
+    """
+    Decode a raw refresh token string and return its `jti` claim.
+
+    Used to link an `SSOSession` row to the specific outstanding refresh token
+    that was issued alongside it, so the session can later be revoked by
+    blacklisting that exact token (see `SSOSession.revoke`).
+    """
+    try:
+        return RefreshToken(raw_refresh_token).get("jti")
+    except TokenError:
+        return None
 
 
 def blacklist_user_tokens(user):
