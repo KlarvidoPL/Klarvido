@@ -6,6 +6,7 @@ More comprehensive tests will be added as mutations are implemented.
 """
 
 import pytest
+from config import settings
 from graphql_relay import to_global_id
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -198,3 +199,62 @@ class TestRevokeSessionMutation:
         other_session.refresh_from_db()
         assert other_session.is_active is True
         assert not BlacklistedToken.objects.filter(token__jti=other_refresh['jti']).exists()
+
+
+class TestCurrentSessionProtection:
+    """Regression tests for the session_id cookie not being set (fixed alongside
+    the jti-linking fix) - without it, no session was ever marked current, and
+    "sign out all sessions" revoked every session, including the current one."""
+
+    def test_is_current_resolves_from_session_id_cookie(self, graphene_client, user):
+        from django.http import SimpleCookie
+
+        current_session = factories.SSOSessionFactory(user=user)
+        other_session = factories.SSOSessionFactory(user=user)
+
+        query = '''
+            query {
+                mySessions {
+                    edges { node { sessionId isCurrent } }
+                }
+            }
+        '''
+        graphene_client.force_authenticate(user)
+        graphene_client.set_cookies(SimpleCookie({settings.SESSION_ID_COOKIE: current_session.session_id}))
+
+        response = graphene_client.query(query)
+
+        nodes = {
+            edge['node']['sessionId']: edge['node']['isCurrent'] for edge in response['data']['mySessions']['edges']
+        }
+        assert nodes[current_session.session_id] is True
+        assert nodes[other_session.session_id] is False
+
+    def test_revoke_all_sessions_excludes_current_session(self, graphene_client, user):
+        """Without the session_id cookie fix, this would revoke every session,
+        including the one performing the action."""
+        from django.http import SimpleCookie
+
+        current_session = factories.SSOSessionFactory(user=user)
+        other_session = factories.SSOSessionFactory(user=user)
+
+        mutation = '''
+            mutation {
+                revokeAllSessions {
+                    ok
+                    revokedCount
+                }
+            }
+        '''
+        graphene_client.force_authenticate(user)
+        graphene_client.set_cookies(SimpleCookie({settings.SESSION_ID_COOKIE: current_session.session_id}))
+
+        response = graphene_client.mutate(mutation)
+
+        assert response.get('errors') is None
+        assert response['data']['revokeAllSessions']['revokedCount'] == 1
+
+        current_session.refresh_from_db()
+        other_session.refresh_from_db()
+        assert current_session.is_active is True
+        assert other_session.is_active is False
