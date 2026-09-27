@@ -7,7 +7,16 @@ export type KlarvidoShellUser = {
 
 export type KlarvidoShellProps = {
   companyName?: string | null;
-  contentUrl?: string;
   onLogout: () => void;
+  tenantId?: string;
   user: KlarvidoShellUser;
 };
+
+export type KlarvidoProductRoute =
+  | 'today'
+  | 'decisions'
+  | 'analysis'
+  | 'actions'
+  | 'invoices'
+  | 'sources'
+  | 'settings';

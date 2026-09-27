@@ -1134,15 +1134,27 @@ importers:
 
   packages/webapp-libs/webapp-klarvido:
     dependencies:
+      '@apollo/client':
+        specifier: ^4.0.11
+        version: 4.0.11(graphql-ws@5.16.0(graphql@16.12.0))(graphql@16.12.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)(subscriptions-transport-ws@0.11.0(graphql@16.12.0))
+      '@sb/webapp-api-client':
+        specifier: workspace:*
+        version: link:../webapp-api-client
       '@sb/webapp-core':
         specifier: workspace:*
         version: link:../webapp-core
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       lucide-react:
         specifier: ^0.378.0
         version: 0.378.0(react@19.2.3)
       react-intl:
         specifier: ^6.5.5
         version: 6.8.9(react@19.2.3)(typescript@5.9.3)
+      recharts:
+        specifier: ^3.6.0
+        version: 3.6.0(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react-is@18.3.1)(react@19.2.3)(redux@5.0.1)
 
   packages/webapp-libs/webapp-notifications:
     dependencies:
@@ -6538,6 +6550,17 @@ packages:
     resolution: {integrity: sha512-JAMuULej09hrZ14W9+mxoRZ44rR2BuZfCd6oKTQVNfynQxCN3muH3jh3W46gqZNw5ZqY0ZVaS43Imb3dMr6tgw==}
     peerDependencies:
       react: ^19.2.3
+
+  '@tanstack/react-table@8.21.3':
+    resolution: {integrity: sha512-5nNMTSETP4ykGegmVkhjcS8tTLW6Vl4axfEGQN3v0zdHYbK4UfoqfPChclTrJ4EoK9QynqAu9oUf8VEmrpZ5Ww==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: ^19.2.3
+      react-dom: ^19.2.3
+
+  '@tanstack/table-core@8.21.3':
+    resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
+    engines: {node: '>=12'}
 
   '@testing-library/dom@10.1.0':
     resolution: {integrity: sha512-wdsYKy5zupPyLCW2Je5DLHSxSfbIp6h80WoHOQc+RPtmPGA52O9x5MJEkv92Sjonpq+poOAtUKhh1kBGAXBrNA==}
@@ -25237,6 +25260,14 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.90.14
       react: 19.2.3
+
+  '@tanstack/react-table@8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@tanstack/table-core': 8.21.3
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
+  '@tanstack/table-core@8.21.3': {}
 
   '@testing-library/dom@10.1.0':
     dependencies:

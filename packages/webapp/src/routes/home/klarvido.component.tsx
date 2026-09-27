@@ -13,7 +13,12 @@ export const KlarvidoApp = () => {
   return (
     <>
       <Helmet title="Klarvido" />
-      <KlarvidoShell companyName={currentTenant?.name} onLogout={logout} user={currentUser} />
+      <KlarvidoShell
+        companyName={currentTenant?.name}
+        onLogout={logout}
+        tenantId={currentTenant?.id}
+        user={currentUser}
+      />
     </>
   );
 };

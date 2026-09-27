@@ -34,46 +34,16 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
-import { FormEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { KLARVIDO_LOGO_URL, KLARVIDO_SYMBOL_URL } from '../../klarvidoAssets';
+import { KlarvidoWorkspace } from '../klarvidoWorkspace/klarvidoWorkspace.component';
 import './klarvidoShell.css';
-import { KlarvidoShellProps } from './klarvidoShell.types';
-
-type ProductRoute =
-  | 'today'
-  | 'decisions'
-  | 'analysis'
-  | 'actions'
-  | 'invoices'
-  | 'sources'
-  | 'settings';
-
-const MOCKUP_BRIDGE_STYLE_ID = 'klarvido-react-shell-bridge';
-
-const routeFromHash = (hash: string): ProductRoute => {
-  const route = hash.replace(/^#\/?/, '').split(/[/?]/)[0];
-  if (route === 'decisions' || route === 'workspace') return 'decisions';
-  if (
-    [
-      'analysis',
-      'detail',
-      'clients',
-      'suppliers',
-      'costs',
-      'market',
-      'scenarios',
-    ].includes(route)
-  ) {
-    return 'analysis';
-  }
-  if (route === 'actions' || route === 'action') return 'actions';
-  if (route === 'invoices' || route === 'invoice') return 'invoices';
-  if (route === 'sources') return 'sources';
-  if (route === 'settings' || route === 'notifications') return 'settings';
-  return 'today';
-};
+import {
+  KlarvidoProductRoute,
+  KlarvidoShellProps,
+} from './klarvidoShell.types';
 
 const initialsFor = (
   firstName?: string | null,
@@ -89,13 +59,12 @@ const initialsFor = (
 
 export const KlarvidoShell = ({
   companyName,
-  contentUrl = '/klarvido/mockup.html',
   onLogout,
+  tenantId,
   user,
 }: KlarvidoShellProps) => {
   const intl = useIntl();
-  const frameRef = useRef<HTMLIFrameElement>(null);
-  const [activeRoute, setActiveRoute] = useState<ProductRoute>('today');
+  const [activeRoute, setActiveRoute] = useState<KlarvidoProductRoute>('today');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [assistantQuestion, setAssistantQuestion] = useState('');
@@ -176,41 +145,10 @@ export const KlarvidoShell = ({
     [intl],
   );
 
-  const navigateContent = useCallback((route: ProductRoute | string) => {
-    const frameWindow = frameRef.current?.contentWindow;
-    if (frameWindow) frameWindow.location.hash = `#/${route}`;
-    setActiveRoute(routeFromHash(`#/${route}`));
+  const navigateContent = (route: KlarvidoProductRoute | 'notifications') => {
+    setActiveRoute(route === 'notifications' ? 'settings' : route);
     setIsMobileMenuOpen(false);
-  }, []);
-
-  const prepareContentFrame = useCallback(() => {
-    const frameWindow = frameRef.current?.contentWindow;
-    const frameDocument = frameRef.current?.contentDocument;
-    if (!frameWindow || !frameDocument) return;
-
-    if (!frameDocument.getElementById(MOCKUP_BRIDGE_STYLE_ID)) {
-      const style = frameDocument.createElement('style');
-      style.id = MOCKUP_BRIDGE_STYLE_ID;
-      style.textContent = `
-        .sidebar, .topbar, .chat-fab { display: none !important; }
-        .main { margin-left: 0 !important; width: 100% !important; min-height: 100vh !important; }
-        .content { max-width: 1440px !important; padding: 28px 30px 48px !important; }
-        @media (max-width: 767px) {
-          .content { padding: 20px 16px 36px !important; }
-          .page-header { grid-template-columns: 1fr !important; }
-        }
-      `;
-      frameDocument.head.appendChild(style);
-    }
-
-    const syncRoute = () =>
-      setActiveRoute(routeFromHash(frameWindow.location.hash));
-    syncRoute();
-    if (!frameWindow.document.documentElement.dataset.klarvidoReactShell) {
-      frameWindow.document.documentElement.dataset.klarvidoReactShell = 'true';
-      frameWindow.addEventListener('hashchange', syncRoute);
-    }
-  }, []);
+  };
 
   const synchronize = () => {
     setIsSyncing(true);
@@ -320,7 +258,7 @@ export const KlarvidoShell = ({
   return (
     <TooltipProvider delayDuration={300}>
       <div className="klarvido-shell fixed inset-0 z-[70] font-sans">
-        <aside className="fixed inset-y-0 left-0 z-40 hidden w-[84px] flex-col border-r border-[#E4EAF1] bg-[#FBFCFE] md:flex min-[1051px]:w-[232px]">
+        <aside className="klarvido-desktop-sidebar fixed inset-y-0 left-0 z-40 w-[84px] flex-col border-r border-[#E4EAF1] bg-[#FBFCFE] min-[1051px]:w-[232px]">
           {nav}
         </aside>
 
@@ -354,13 +292,13 @@ export const KlarvidoShell = ({
           </div>
         )}
 
-        <div className="flex h-full min-w-0 flex-col md:ml-[84px] min-[1051px]:ml-[232px]">
+        <div className="klarvido-main-column flex h-full min-w-0 flex-col">
           <header className="relative z-30 flex h-[68px] shrink-0 items-center gap-2 border-b border-[#E4EAF1] bg-white/95 px-3 backdrop-blur md:px-5 min-[1051px]:px-[26px]">
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="h-10 w-10 shrink-0 text-[#0B2545] md:hidden"
+              className="klarvido-mobile-menu-button h-10 w-10 shrink-0 text-[#0B2545]"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label={intl.formatMessage({
                 id: 'klarvido.mobileMenu.open',
@@ -541,18 +479,8 @@ export const KlarvidoShell = ({
             </div>
           </header>
 
-          <main className="relative min-h-0 flex-1 overflow-hidden bg-[#F7F9FC]">
-            <iframe
-              ref={frameRef}
-              title={intl.formatMessage({
-                id: 'klarvido.workspace.title',
-                defaultMessage: 'Obszar roboczy Klarvido',
-              })}
-              src={`${contentUrl}#/today`}
-              className="h-full w-full border-0 bg-[#F7F9FC]"
-              allow="clipboard-write"
-              onLoad={prepareContentFrame}
-            />
+          <main className="relative min-h-0 flex-1 overflow-y-auto bg-[#F7F9FC]">
+            <KlarvidoWorkspace activeRoute={activeRoute} tenantId={tenantId} />
 
             {!isAssistantOpen && (
               <Button

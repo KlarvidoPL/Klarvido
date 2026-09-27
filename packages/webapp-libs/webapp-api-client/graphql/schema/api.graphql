@@ -4,6 +4,12 @@ schema {
   subscription: ApiSubscription
 }
 """
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Date
+"""
 The `DateTime` scalar type represents a DateTime
 value as specified by
 [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
@@ -36,6 +42,7 @@ that will be handled by the multipart request spec
 """
 scalar Upload
 type Query {
+  klarvidoOverview(tenantId: ID!, preset: String = "half_year"): KlarvidoOverviewType
   "Get backup configuration for a tenant"
   backupConfig(tenantId: ID!): BackupConfigType
   "Get backup records for a tenant"
@@ -107,6 +114,142 @@ type Query {
     "The ID of the object"
     id: ID!
   ): Node
+}
+type KlarvidoOverviewType {
+  company: CompanyType
+  preset: String!
+  period: PeriodType!
+  comparisonPeriod: PeriodType
+  financialSummary: FinancialSummaryType!
+  monthlySummaries: [MonthlySummaryType!]!
+  customers: PortfolioType!
+  suppliers: PortfolioType!
+  costStructure: CostStructureType!
+  invoices: [InvoiceType!]!
+  readiness: [ReadinessType!]!
+}
+type CompanyType {
+  legalName: String!
+  taxIdentifier: String!
+  regon: String!
+  pkdCode: String!
+  countryCode: String!
+  defaultCurrency: String!
+}
+type PeriodType {
+  startDate: Date!
+  endDate: Date!
+}
+type FinancialSummaryType {
+  revenue: AnalyticalValueType!
+  costs: AnalyticalValueType!
+  preTaxResult: AnalyticalValueType!
+  grossMargin: AnalyticalValueType!
+  incomeTax: AnalyticalValueType
+  netResult: AnalyticalValueType
+  netMargin: AnalyticalValueType
+  revenueChange: AnalyticalValueType
+  costsChange: AnalyticalValueType
+  preTaxResultChange: AnalyticalValueType
+  grossMarginChange: AnalyticalValueType
+  netResultChange: AnalyticalValueType
+  netMarginChange: AnalyticalValueType
+}
+type AnalyticalValueType {
+  value: String
+  unit: String!
+  period: PeriodType!
+  comparisonPeriod: PeriodType
+  sources: [SourceReferenceType!]!
+  calculationVersion: String!
+  calculatedAt: DateTime!
+  quality: DataQualityType!
+  kind: String!
+  limitations: [String!]!
+}
+type SourceReferenceType {
+  sourceSystem: String!
+  externalId: String!
+  sourceRecordId: ID
+}
+type DataQualityType {
+  status: String!
+  score: Float
+  limitations: [String!]!
+}
+type MonthlySummaryType {
+  label: String!
+  period: PeriodType!
+  summary: FinancialSummaryType!
+}
+type PortfolioType {
+  invoiceType: String!
+  total: AnalyticalValueType!
+  topThreeConcentration: AnalyticalValueType!
+  activeCount: AnalyticalValueType!
+  largestParty: PartyType!
+  parties: [PartyType!]!
+}
+type PartyType {
+  id: ID!
+  name: String!
+  taxIdentifier: String!
+  amount: AnalyticalValueType!
+  share: AnalyticalValueType!
+  percentageChange: AnalyticalValueType
+  invoiceCount: AnalyticalValueType!
+  trend: [PartyTrendPointType!]!
+}
+type PartyTrendPointType {
+  label: String!
+  period: PeriodType!
+  amount: AnalyticalValueType
+}
+type CostStructureType {
+  total: AnalyticalValueType!
+  categories: [CategoryType!]!
+}
+type CategoryType {
+  code: String
+  name: String!
+  amount: AnalyticalValueType!
+  share: AnalyticalValueType!
+}
+type InvoiceType {
+  id: ID!
+  documentNumber: String!
+  invoiceType: String!
+  status: String!
+  issueDate: Date!
+  dueDate: Date
+  counterpartyName: String!
+  counterpartyTaxIdentifier: String!
+  currency: String!
+  netAmount: String!
+  taxAmount: String!
+  grossAmount: String!
+  categories: [String!]!
+  sourceSystem: String!
+  sourceExternalId: String!
+  qualityStatus: String!
+}
+type ReadinessType {
+  analysis: String!
+  status: String!
+  score: Float!
+  limitations: [String!]!
+  metrics: [ReadinessMetricType!]!
+  policyVersion: String!
+  checkedAt: DateTime!
+}
+type ReadinessMetricType {
+  code: String!
+  label: String!
+  value: Float!
+  unit: String!
+  status: String!
+  readyThreshold: Float!
+  limitedThreshold: Float!
 }
 "GraphQL type for BackupConfig."
 type BackupConfigType implements Node {

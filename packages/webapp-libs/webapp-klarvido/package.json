@@ -14,8 +14,12 @@
     "type-check": "tsc --noEmit --project tsconfig.lib.json"
   },
   "dependencies": {
+    "@apollo/client": "^4.0.11",
+    "@sb/webapp-api-client": "workspace:*",
     "@sb/webapp-core": "workspace:*",
+    "@tanstack/react-table": "^8.21.3",
     "lucide-react": "^0.378.0",
-    "react-intl": "^6.5.5"
+    "react-intl": "^6.5.5",
+    "recharts": "^3.6.0"
   }
 }
