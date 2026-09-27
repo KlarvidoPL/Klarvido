@@ -124,6 +124,31 @@ class TestObtainToken:
         assert validate_jwt(executed["data"]["tokenAuth"], user)
         assert executed["data"]["tokenAuth"]["otpAuthToken"] is None
 
+    def test_sets_session_id_cookie(self, api_client, user, faker):
+        """Regression test: set_auth_cookie() previously silently dropped
+        session_id, so resolve_is_current() and RevokeAllSessionsMutation's
+        "exclude current session" logic always read None from the cookie -
+        no session was ever marked current, and "sign out all sessions"
+        revoked every session, including the one performing the action."""
+        from apps.sso.models import SSOSession
+
+        password = faker.password()
+        user.set_password(password)
+        user.save()
+
+        response = api_client.post(
+            path=API_GRAPHQL_PATH,
+            data={"query": self.MUTATION, "variables": {"input": {'email': user.email, 'password': password}}},
+            format="json",
+        )
+
+        session_id_cookie = response.cookies.get(settings.SESSION_ID_COOKIE)
+        assert session_id_cookie is not None
+        assert session_id_cookie.value
+
+        session = SSOSession.objects.get(user=user)
+        assert session.session_id == session_id_cookie.value
+
     def test_get_otp_auth_token_if_otp_enabled(self, api_client, user_factory, faker):
         user = user_factory.create(otp_enabled=True, otp_verified=True)
         password = faker.password()

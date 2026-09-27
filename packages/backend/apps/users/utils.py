@@ -45,6 +45,23 @@ def set_auth_cookie(response, data):
             path="/api/",
         )
 
+    # Every login path builds this into the cookie dict, but it was previously
+    # silently dropped here - meaning resolve_is_current() and the "exclude
+    # current session" logic in RevokeAllSessionsMutation always read None,
+    # so no session was ever marked current and "sign out all" revoked every
+    # session including the one performing the action.
+    session_id = data.get(settings.SESSION_ID_COOKIE)
+    if session_id:
+        response.set_cookie(
+            settings.SESSION_ID_COOKIE,
+            session_id,
+            max_age=cookie_max_age,
+            httponly=True,
+            secure=cookie_secure,
+            samesite=cookie_samesite,
+            path="/",
+        )
+
 
 def reset_auth_cookie(response):
     """Clear all auth cookies. Must use the same samesite attribute as when setting cookies."""
@@ -62,6 +79,9 @@ def reset_auth_cookie(response):
     response.delete_cookie(settings.REFRESH_TOKEN_LOGOUT_COOKIE, path="/api/", samesite=cookie_samesite)
     # Also try to delete with old path for backwards compatibility
     response.delete_cookie(settings.REFRESH_TOKEN_LOGOUT_COOKIE, path=reverse("logout"), samesite=cookie_samesite)
+
+    # Delete session tracking cookie (set at root path)
+    response.delete_cookie(settings.SESSION_ID_COOKIE, path="/", samesite=cookie_samesite)
 
 
 def generate_otp_auth_token(user):
