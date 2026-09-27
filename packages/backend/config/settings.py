@@ -464,6 +464,14 @@ REFRESH_TOKEN_LOGOUT_COOKIE = "refresh_token_logout"
 SESSION_ID_COOKIE = "session_id"  # For tracking active sessions
 COOKIE_MAX_AGE = 3600 * 24 * 14  # 14 days
 
+# Short-lived, JS-readable (non-httponly) signal read once by the frontend to show
+# the welcome modal after a brand new OAuth signup - the backend redirect can land
+# on any page depending on the auth-route bounce logic, so a cookie (sent on every
+# request regardless of how many redirect hops happen) is used instead of a query
+# param, which a client-side redirect could easily drop along the way.
+NEW_SIGNUP_COOKIE = "new_signup"
+NEW_SIGNUP_COOKIE_MAX_AGE = 30
+
 # Cookie security settings for cross-origin deployments (Render.com, etc.)
 # For cross-origin (frontend and backend on different domains):
 #   COOKIE_SAMESITE=None and COOKIE_SECURE=True are REQUIRED

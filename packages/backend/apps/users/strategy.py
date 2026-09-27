@@ -10,6 +10,7 @@ class DjangoJWTStrategy(DjangoStrategy):
     def __init__(self, storage, request=None, tpl=None):
         self.refresh_token = None
         self.otp_auth_token = None
+        self.is_new_signup = False
         super(DjangoJWTStrategy, self).__init__(storage, request, tpl)
 
     def redirect(self, url):
@@ -30,6 +31,16 @@ class DjangoJWTStrategy(DjangoStrategy):
                         settings.REFRESH_TOKEN_COOKIE: str(self.refresh_token),
                     },
                 )
+                if self.is_new_signup:
+                    response.set_cookie(
+                        settings.NEW_SIGNUP_COOKIE,
+                        "1",
+                        max_age=settings.NEW_SIGNUP_COOKIE_MAX_AGE,
+                        httponly=False,
+                        secure=getattr(settings, "COOKIE_SECURE", True),
+                        samesite=getattr(settings, "COOKIE_SAMESITE", "Lax"),
+                        path="/",
+                    )
             elif self.otp_auth_token:
                 otp_validate_url = self._construct_otp_validate_url(url)
                 response = super(DjangoJWTStrategy, self).redirect(otp_validate_url)
@@ -55,6 +66,9 @@ class DjangoJWTStrategy(DjangoStrategy):
 
     def set_otp_auth_token(self, token):
         self.otp_auth_token = token
+
+    def set_is_new_signup(self, is_new_signup):
+        self.is_new_signup = is_new_signup
 
     def _user_is_authenticated(self) -> bool:
         return self.refresh_token or self.otp_auth_token

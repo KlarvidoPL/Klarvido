@@ -13,6 +13,20 @@ import { FormattedMessage } from 'react-intl';
 
 const CONFETTI_COLORS = ['#FFFE25', '#42F272', '#71F85D', '#A0FA4B', '#D4F81D'];
 const STORAGE_KEY = 'sb_show_welcome_modal';
+// Matches settings.NEW_SIGNUP_COOKIE - a short-lived, non-httponly cookie set by
+// the backend only on a brand new OAuth signup. Unlike the password-signup flow
+// (a client-side mutation that can call triggerWelcomeModal() directly), OAuth
+// signup is a full backend redirect that can land on any page depending on the
+// auth-route bounce logic, so a cookie is used instead of a query param, which a
+// client-side redirect could easily drop along the way.
+const OAUTH_NEW_SIGNUP_COOKIE = 'new_signup';
+
+const hasOAuthNewSignupCookie = () =>
+  document.cookie.split('; ').some((cookie) => cookie.split('=')[0] === OAUTH_NEW_SIGNUP_COOKIE);
+
+const clearOAuthNewSignupCookie = () => {
+  document.cookie = `${OAUTH_NEW_SIGNUP_COOKIE}=; path=/; max-age=0`;
+};
 
 export const WelcomeModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +34,11 @@ export const WelcomeModal = () => {
 
   // Check if we should show the modal on mount
   useEffect(() => {
-    const shouldShow = sessionStorage.getItem(STORAGE_KEY);
-    if (shouldShow === 'true') {
+    const shouldShow = sessionStorage.getItem(STORAGE_KEY) === 'true' || hasOAuthNewSignupCookie();
+    if (shouldShow) {
       setIsOpen(true);
       sessionStorage.removeItem(STORAGE_KEY);
+      clearOAuthNewSignupCookie();
     }
   }, []);
 
