@@ -217,6 +217,13 @@ services:
       # URLs
       - WEB_APP_URL=https://${DOMAIN}
       - API_URL=https://api.${DOMAIN}
+      # VITE_WEB_APP_URL/VITE_EMAIL_ASSETS_URL: read directly by common/emails.py and
+      # passed to the Node email-renderer subprocess (separate from WEB_APP_URL above,
+      # which is Django's own setting) - without these, email templates render broken
+      # links ("undefined/...") and a broken logo image (relative /email-assets path
+      # with no base URL, which doesn't resolve inside an email client).
+      - VITE_WEB_APP_URL=https://${DOMAIN}
+      - VITE_EMAIL_ASSETS_URL=https://${DOMAIN}/email-assets
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN},https://api.${DOMAIN}
       - CORS_ALLOWED_ORIGINS=https://${DOMAIN}
       - PARENT_HOST=${DOMAIN}
@@ -319,6 +326,11 @@ services:
       - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-}
       - AWS_SES_REGION_NAME=${AWS_SES_REGION_NAME:-}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      # Read directly by common/emails.py and passed to the Node email-renderer
+      # subprocess - this is where send_email actually runs. Without these, email
+      # templates render broken links ("undefined/...") and a broken logo image.
+      - VITE_WEB_APP_URL=https://${DOMAIN}
+      - VITE_EMAIL_ASSETS_URL=https://${DOMAIN}/email-assets
       - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-sk_<CHANGE_ME>}
       - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-sk_test_<CHANGE_ME>}
       - STRIPE_CHECKS_ENABLED=False
