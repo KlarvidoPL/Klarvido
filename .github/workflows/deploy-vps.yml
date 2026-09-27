@@ -73,7 +73,15 @@ jobs:
       - name: Build & push backend image
         uses: docker/build-push-action@v7
         with:
-          context: ./packages/backend
+          # Dockerfile.render (not the plain Dockerfile) - it has an email_builder
+          # stage that builds webapp-emails and copies the compiled renderer into
+          # the image (scripts/runtime/email/renderer/index.umd.js). The plain
+          # Dockerfile's context is scoped to packages/backend/ alone, which can't
+          # reach packages/webapp-libs/webapp-emails at all - transactional emails
+          # (password reset, signup, etc.) fail at render time without this. Same
+          # Dockerfile Render.com already builds from successfully (see render.yaml).
+          context: .
+          file: ./packages/backend/Dockerfile.render
           target: backend
           push: true
           tags: |
