@@ -1,74 +1,63 @@
+import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
+import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { render } from '../../../../tests/utils/rendering';
+import { welcomeModalMarkSeenMutation } from '../welcomeModal.graphql';
 
 jest.mock('canvas-confetti');
-import { triggerWelcomeModal, WelcomeModal } from '../welcomeModal.component';
+import { WelcomeModal } from '../welcomeModal.component';
 
-
-const clearAllCookies = () => {
-  document.cookie.split(';').forEach((cookie) => {
-    const name = cookie.split('=')[0].trim();
-    if (name) document.cookie = `${name}=; path=/; max-age=0`;
+const markSeenMock = () =>
+  composeMockedQueryResult(welcomeModalMarkSeenMutation, {
+    variables: { input: {} },
+    data: { markWelcomeModalSeen: { ok: true } },
   });
-};
 
 describe('WelcomeModal: Component', () => {
-  beforeEach(() => {
-    sessionStorage.clear();
-    clearAllCookies();
-    jest.clearAllMocks();
-  });
+  it('should not render when currentUser.hasSeenWelcomeModal is true', async () => {
+    const currentUser = currentUserFactory({ hasSeenWelcomeModal: true });
+    const apolloMocks = [fillCommonQueryWithUser(currentUser)];
+    const { waitForApolloMocks } = render(<WelcomeModal />, { apolloMocks });
 
-  it('should not render when sessionStorage is empty', () => {
-    render(<WelcomeModal />);
+    await waitForApolloMocks(0);
 
     expect(screen.queryByText(/welcome aboard/i)).not.toBeInTheDocument();
   });
 
-  it('should render when sessionStorage has show flag', async () => {
-    sessionStorage.setItem('sb_show_welcome_modal', 'true');
-    render(<WelcomeModal />);
+  it('should render when currentUser.hasSeenWelcomeModal is false', async () => {
+    const currentUser = currentUserFactory({ hasSeenWelcomeModal: false });
+    const apolloMocks = [fillCommonQueryWithUser(currentUser), markSeenMock()];
+    const { waitForApolloMocks } = render(<WelcomeModal />, { apolloMocks });
+
+    await waitForApolloMocks(0);
 
     expect(await screen.findByText(/welcome aboard/i)).toBeInTheDocument();
   });
 
-  it('should remove sessionStorage flag after showing', async () => {
-    sessionStorage.setItem('sb_show_welcome_modal', 'true');
-    render(<WelcomeModal />);
+  it('should call markWelcomeModalSeen mutation when shown', async () => {
+    const currentUser = currentUserFactory({ hasSeenWelcomeModal: false });
+    const mutationMock = markSeenMock();
+    const apolloMocks = [fillCommonQueryWithUser(currentUser), mutationMock];
+    const { waitForApolloMocks } = render(<WelcomeModal />, { apolloMocks });
 
+    await waitForApolloMocks(0);
     await screen.findByText(/welcome aboard/i);
-    expect(sessionStorage.getItem('sb_show_welcome_modal')).toBeNull();
+    await waitForApolloMocks();
+
+    expect(mutationMock.result).toHaveBeenCalled();
   });
 
   it('should close modal when Start Exploring is clicked', async () => {
-    sessionStorage.setItem('sb_show_welcome_modal', 'true');
-    render(<WelcomeModal />);
+    const currentUser = currentUserFactory({ hasSeenWelcomeModal: false });
+    const apolloMocks = [fillCommonQueryWithUser(currentUser), markSeenMock()];
+    const { waitForApolloMocks } = render(<WelcomeModal />, { apolloMocks });
 
+    await waitForApolloMocks(0);
     await screen.findByText(/welcome aboard/i);
     await userEvent.click(await screen.findByRole('button', { name: /start exploring/i }));
 
     expect(screen.queryByText(/welcome aboard/i)).not.toBeInTheDocument();
-  });
-
-  it('triggerWelcomeModal should set sessionStorage', () => {
-    triggerWelcomeModal();
-    expect(sessionStorage.getItem('sb_show_welcome_modal')).toBe('true');
-  });
-
-  it('should render when the OAuth new-signup cookie is present', async () => {
-    document.cookie = 'new_signup=1; path=/';
-    render(<WelcomeModal />);
-
-    expect(await screen.findByText(/welcome aboard/i)).toBeInTheDocument();
-  });
-
-  it('should clear the OAuth new-signup cookie after showing', async () => {
-    document.cookie = 'new_signup=1; path=/';
-    render(<WelcomeModal />);
-
-    await screen.findByText(/welcome aboard/i);
-    expect(document.cookie.includes('new_signup=1')).toBe(false);
   });
 });

@@ -19,7 +19,7 @@ type Documents = {
     "\n  fragment pageCursorsFragment on PageCursors {\n    around {\n      cursor\n      isCurrent\n      page\n    }\n    first {\n      cursor\n      isCurrent\n      page\n    }\n    last {\n      cursor\n      isCurrent\n      page\n    }\n    next {\n      cursor\n      isCurrent\n      page\n    }\n    previous {\n      cursor\n      isCurrent\n      page\n    }\n  }\n": typeof types.PageCursorsFragmentFragmentDoc,
     "\n  query pagedPaginationListTestQuery($first: Int, $after: String, $last: Int, $before: String) {\n    allCrudDemoItems(first: $first, after: $after, last: $last, before: $before) {\n      edges {\n        node {\n          id\n        }\n      }\n      pageCursors {\n        around {\n          cursor\n          isCurrent\n          page\n        }\n        first {\n          cursor\n          isCurrent\n          page\n        }\n        last {\n          cursor\n          isCurrent\n          page\n        }\n        next {\n          cursor\n          isCurrent\n          page\n        }\n        previous {\n          cursor\n          isCurrent\n          page\n        }\n      }\n    }\n  }\n": typeof types.PagedPaginationListTestQueryDocument,
     "\n  query paginationListTestQuery($first: Int, $after: String, $last: Int, $before: String) {\n    allNotifications(first: $first, after: $after, last: $last, before: $before) {\n      edges {\n        node {\n          id\n        }\n      }\n      pageInfo {\n        startCursor\n        endCursor\n        hasPreviousPage\n        hasNextPage\n      }\n    }\n  }\n": typeof types.PaginationListTestQueryDocument,
-    "\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n  }\n": typeof types.CommonQueryCurrentUserFragmentFragmentDoc,
+    "\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n    hasSeenWelcomeModal\n  }\n": typeof types.CommonQueryCurrentUserFragmentFragmentDoc,
     "\n  fragment commonQueryTenantItemFragment on TenantType {\n    id\n    name\n    type\n    actionLoggingEnabled\n    membership {\n      ...commonQueryMembershipFragment\n    }\n  }\n": typeof types.CommonQueryTenantItemFragmentFragmentDoc,
     "\n  fragment commonQueryMembershipFragment on TenantMembershipType {\n    id\n    role\n    invitationAccepted\n    inviteeEmailAddress\n    invitationToken\n    userId\n    firstName\n    lastName\n    userEmail\n    avatar\n  }\n": typeof types.CommonQueryMembershipFragmentFragmentDoc,
     "\n  query commonQueryCurrentUserQuery {\n    currentUser {\n      ...commonQueryCurrentUserFragment\n      tenants {\n        ...commonQueryTenantItemFragment\n      }\n    }\n  }\n": typeof types.CommonQueryCurrentUserQueryDocument,
@@ -153,6 +153,7 @@ type Documents = {
     "\n  mutation verifyOtp($input: VerifyOTPMutationInput!) {\n    verifyOtp(input: $input) {\n      otpVerified\n    }\n  }\n": typeof types.VerifyOtpDocument,
     "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      access\n      refresh\n    }\n  }\n": typeof types.ValidateOtpDocument,
     "\n  mutation disableOtp($input: DisableOTPMutationInput!) {\n    disableOtp(input: $input) {\n      ok\n    }\n  }\n": typeof types.DisableOtpDocument,
+    "\n  mutation welcomeModalMarkSeenMutation($input: MarkWelcomeModalSeenMutationInput!) {\n    markWelcomeModalSeen(input: $input) {\n      ok\n    }\n  }\n": typeof types.WelcomeModalMarkSeenMutationDocument,
 };
 const documents: Documents = {
     "\n  subscription AiChatSubscription($conversationId: String!) {\n    aiChat(conversationId: $conversationId) {\n      event {\n        eventType\n        message\n        toolName\n        toolDisplayName\n        success\n        hasData\n        text\n        toolsUsed\n        conversationId\n      }\n    }\n  }\n": types.AiChatSubscriptionDocument,
@@ -160,7 +161,7 @@ const documents: Documents = {
     "\n  fragment pageCursorsFragment on PageCursors {\n    around {\n      cursor\n      isCurrent\n      page\n    }\n    first {\n      cursor\n      isCurrent\n      page\n    }\n    last {\n      cursor\n      isCurrent\n      page\n    }\n    next {\n      cursor\n      isCurrent\n      page\n    }\n    previous {\n      cursor\n      isCurrent\n      page\n    }\n  }\n": types.PageCursorsFragmentFragmentDoc,
     "\n  query pagedPaginationListTestQuery($first: Int, $after: String, $last: Int, $before: String) {\n    allCrudDemoItems(first: $first, after: $after, last: $last, before: $before) {\n      edges {\n        node {\n          id\n        }\n      }\n      pageCursors {\n        around {\n          cursor\n          isCurrent\n          page\n        }\n        first {\n          cursor\n          isCurrent\n          page\n        }\n        last {\n          cursor\n          isCurrent\n          page\n        }\n        next {\n          cursor\n          isCurrent\n          page\n        }\n        previous {\n          cursor\n          isCurrent\n          page\n        }\n      }\n    }\n  }\n": types.PagedPaginationListTestQueryDocument,
     "\n  query paginationListTestQuery($first: Int, $after: String, $last: Int, $before: String) {\n    allNotifications(first: $first, after: $after, last: $last, before: $before) {\n      edges {\n        node {\n          id\n        }\n      }\n      pageInfo {\n        startCursor\n        endCursor\n        hasPreviousPage\n        hasNextPage\n      }\n    }\n  }\n": types.PaginationListTestQueryDocument,
-    "\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n  }\n": types.CommonQueryCurrentUserFragmentFragmentDoc,
+    "\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n    hasSeenWelcomeModal\n  }\n": types.CommonQueryCurrentUserFragmentFragmentDoc,
     "\n  fragment commonQueryTenantItemFragment on TenantType {\n    id\n    name\n    type\n    actionLoggingEnabled\n    membership {\n      ...commonQueryMembershipFragment\n    }\n  }\n": types.CommonQueryTenantItemFragmentFragmentDoc,
     "\n  fragment commonQueryMembershipFragment on TenantMembershipType {\n    id\n    role\n    invitationAccepted\n    inviteeEmailAddress\n    invitationToken\n    userId\n    firstName\n    lastName\n    userEmail\n    avatar\n  }\n": types.CommonQueryMembershipFragmentFragmentDoc,
     "\n  query commonQueryCurrentUserQuery {\n    currentUser {\n      ...commonQueryCurrentUserFragment\n      tenants {\n        ...commonQueryTenantItemFragment\n      }\n    }\n  }\n": types.CommonQueryCurrentUserQueryDocument,
@@ -294,6 +295,7 @@ const documents: Documents = {
     "\n  mutation verifyOtp($input: VerifyOTPMutationInput!) {\n    verifyOtp(input: $input) {\n      otpVerified\n    }\n  }\n": types.VerifyOtpDocument,
     "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      access\n      refresh\n    }\n  }\n": types.ValidateOtpDocument,
     "\n  mutation disableOtp($input: DisableOTPMutationInput!) {\n    disableOtp(input: $input) {\n      ok\n    }\n  }\n": types.DisableOtpDocument,
+    "\n  mutation welcomeModalMarkSeenMutation($input: MarkWelcomeModalSeenMutationInput!) {\n    markWelcomeModalSeen(input: $input) {\n      ok\n    }\n  }\n": types.WelcomeModalMarkSeenMutationDocument,
 };
 
 /**
@@ -333,7 +335,7 @@ export function gql(source: "\n  query paginationListTestQuery($first: Int, $aft
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n  }\n"): (typeof documents)["\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n  }\n"];
+export function gql(source: "\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n    hasSeenWelcomeModal\n  }\n"): (typeof documents)["\n  fragment commonQueryCurrentUserFragment on CurrentUserType {\n    id\n    email\n    firstName\n    lastName\n    language\n    roles\n    avatar\n    otpVerified\n    otpEnabled\n    hasUsablePassword\n    hasSeenWelcomeModal\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -866,6 +868,10 @@ export function gql(source: "\n  mutation validateOtp($input: ValidateOTPMutatio
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation disableOtp($input: DisableOTPMutationInput!) {\n    disableOtp(input: $input) {\n      ok\n    }\n  }\n"): (typeof documents)["\n  mutation disableOtp($input: DisableOTPMutationInput!) {\n    disableOtp(input: $input) {\n      ok\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation welcomeModalMarkSeenMutation($input: MarkWelcomeModalSeenMutationInput!) {\n    markWelcomeModalSeen(input: $input) {\n      ok\n    }\n  }\n"): (typeof documents)["\n  mutation welcomeModalMarkSeenMutation($input: MarkWelcomeModalSeenMutationInput!) {\n    markWelcomeModalSeen(input: $input) {\n      ok\n    }\n  }\n"];
 
 export function gql(source: string) {
   const document = (documents as any)[source];
