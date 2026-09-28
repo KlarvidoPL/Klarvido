@@ -333,15 +333,15 @@ export const PasskeysForm = () => {
               {passkeys.map((passkey) => (
                 <div
                   key={passkey.id}
-                  className="flex items-center justify-between rounded-lg border bg-card p-4"
+                  className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                       {getAuthenticatorIcon(passkey.authenticatorType)}
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-medium">{passkey.name}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                         <Badge variant="outline" className="text-xs">
                           {passkey.authenticatorType === 'platform' ? (
                             <FormattedMessage defaultMessage="This device" id="Passkeys / Platform" />
@@ -380,7 +380,7 @@ export const PasskeysForm = () => {
                     size="sm"
                     onClick={() => handleDeletePasskey(passkey.id)}
                     disabled={deleting === passkey.id}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    className="shrink-0 self-end text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400 sm:self-auto"
                   >
                     {deleting === passkey.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
