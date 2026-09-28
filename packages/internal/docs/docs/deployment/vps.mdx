@@ -314,8 +314,8 @@ here since nothing in the boilerplate automates domain verification:
    description is too generic - AWS wants specifics: what the app is, what kind of email
    it sends (transactional vs. marketing), roughly how many/how often, and how recipients
    end up subscribed (e.g. "transactional account/security emails - signup confirmation,
-   password reset, notifications - triggered by user actions on <app>, a B2B SaaS product;
-   no marketing sends"). You can resubmit `put-account-details` with a more detailed
+   password reset, notifications - triggered by user actions on our app, a B2B SaaS
+   product; no marketing sends"). You can resubmit `put-account-details` with a more detailed
    description; there's no cooldown penalty for a prompt, well-explained resubmission.
    Until granted, the account stays sandboxed - verify individual recipient addresses with
    `aws sesv2 create-email-identity --email-identity <address> --region eu-central-1` (a
