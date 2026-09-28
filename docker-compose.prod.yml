@@ -142,21 +142,7 @@ services:
       - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-sk_<CHANGE_ME>}
       - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-sk_test_<CHANGE_ME>}
       - STRIPE_CHECKS_ENABLED=False
-
-      # Storage - must match the backend service: run_migrations.sh runs
-      # publish_translations, which writes the served translation bundles via
-      # STORAGE_BACKEND (defaults to s3 when unset, failing with no bucket)
-      - STORAGE_BACKEND=${STORAGE_BACKEND:-local}
-      - MEDIA_ROOT=/app/media
-      - MEDIA_URL=/media/
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
-      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME:-}
     volumes:
-      # Same media volume as backend, so locally-published translations land where
-      # backend serves them from
-      - media_data:/app/media
       # master.json (message keys) + translations_export.json (pre-translated
       # content for all locales) - run_migrations.sh syncs/imports these if present
       - ./packages/webapp-libs/webapp-core/src/translations:/app/translations:ro
