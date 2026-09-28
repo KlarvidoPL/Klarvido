@@ -274,6 +274,7 @@ class CurrentUserType(DjangoObjectType):
             "otp_verified",
             "has_usable_password",
             "has_seen_welcome_modal",
+            "is_confirmed",
             "tenants",
         )
 

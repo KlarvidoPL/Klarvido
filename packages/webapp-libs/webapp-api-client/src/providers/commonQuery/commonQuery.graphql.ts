@@ -16,6 +16,7 @@ export const commonQueryCurrentUserFragment = gql(/* GraphQL */ `
     otpEnabled
     hasUsablePassword
     hasSeenWelcomeModal
+    isConfirmed
   }
 `);
 

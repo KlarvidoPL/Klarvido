@@ -13,6 +13,7 @@ export const currentUserFactory = createFactory<CurrentUserType>(() => ({
   otpEnabled: false,
   otpVerified: false,
   hasSeenWelcomeModal: true,
+  isConfirmed: true,
   tenants: [
     {
       id: makeId(32),

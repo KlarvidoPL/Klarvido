@@ -3089,29 +3089,17 @@
   "Profile / Email / Label": {
     "defaultMessage": "Email"
   },
-  "Profile / Full access": {
-    "defaultMessage": "Full access to all features"
+  "Profile / Email / Not verified": {
+    "defaultMessage": "Not verified"
   },
   "Profile / Name / Label": {
     "defaultMessage": "Name"
-  },
-  "Profile / No permissions": {
-    "defaultMessage": "No specific permissions assigned."
-  },
-  "Profile / Organization Roles / Label": {
-    "defaultMessage": "Organization Roles"
   },
   "Profile / Overview / Description": {
     "defaultMessage": "Your account information"
   },
   "Profile / Overview / Title": {
     "defaultMessage": "Profile Overview"
-  },
-  "Profile / Owner full access message": {
-    "defaultMessage": "As an Owner, you have unrestricted access to all organization features and settings."
-  },
-  "Profile / View permissions": {
-    "defaultMessage": "View your {count} permissions"
   },
   "Profile / page title": {
     "defaultMessage": "Profile Settings"

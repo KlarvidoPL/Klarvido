@@ -1,7 +1,6 @@
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { screen } from '@testing-library/react';
 
-import { Role } from '../../../modules/auth/auth.types';
 import { render } from '../../../tests/utils/rendering';
 import { Profile } from '../profile.component';
 
@@ -15,7 +14,6 @@ describe('Profile: Component', () => {
           firstName: 'Jack',
           lastName: 'White',
           email: 'jack.white@mail.com',
-          roles: [Role.ADMIN, Role.USER],
         })
       ),
     ];
@@ -23,10 +21,20 @@ describe('Profile: Component', () => {
     expect(await screen.findByDisplayValue('Jack')).toBeInTheDocument();
     expect(screen.getByDisplayValue('White')).toBeInTheDocument();
     expect(screen.getByText(/jack.white@mail.com/i)).toBeInTheDocument();
-    // Roles are now displayed as badges, so we check for individual role text
-    expect(screen.getByText(/admin/i)).toBeInTheDocument();
-    // Check for USER role badge specifically (case-insensitive, but not matching "User profile" heading)
-    const roleBadges = screen.getAllByText(/user/i);
-    expect(roleBadges.length).toBeGreaterThan(0);
+  });
+
+  it('should not show a verification badge when the email is confirmed', async () => {
+    const apolloMocks = [fillCommonQueryWithUser(currentUserFactory({ isConfirmed: true }))];
+    render(<Component />, { apolloMocks });
+
+    await screen.findByText(/profile overview/i);
+    expect(screen.queryByText(/not verified/i)).not.toBeInTheDocument();
+  });
+
+  it('should show a "Not verified" badge when the email is unconfirmed', async () => {
+    const apolloMocks = [fillCommonQueryWithUser(currentUserFactory({ isConfirmed: false }))];
+    render(<Component />, { apolloMocks });
+
+    expect(await screen.findByText(/not verified/i)).toBeInTheDocument();
   });
 });
