@@ -93,6 +93,32 @@ class TestSignup:
 
         assert user.tenants.count()
 
+    def test_sets_profile_language_from_input(self, graphene_client, faker):
+        email = faker.email()
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {'email': email, 'password': faker.password(), 'language': 'pl'}},
+        )
+        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+
+        assert user.profile.language == 'pl'
+
+    def test_falls_back_to_english_for_unrecognized_language(self, graphene_client, faker):
+        email = faker.email()
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {'email': email, 'password': faker.password(), 'language': 'xx'}},
+        )
+        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+
+        assert user.profile.language == models.LanguageChoices.ENGLISH
+
+    def test_defaults_to_english_when_language_omitted(self, graphene_client, faker):
+        executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
+        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+
+        assert user.profile.language == models.LanguageChoices.ENGLISH
+
 
 class TestObtainToken:
     MUTATION = '''

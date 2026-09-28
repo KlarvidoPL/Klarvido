@@ -25,6 +25,7 @@ const mockCredentials = {
   input: {
     email: 'user@mail.com',
     password: 'abcxyz123456',
+    language: 'en',
   },
 };
 const user = currentUserFactory({

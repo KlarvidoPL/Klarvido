@@ -66,21 +66,30 @@ class UserSignupSerializer(serializers.ModelSerializer):
         validators=[validators.UniqueValidator(queryset=dj_auth.get_user_model().objects.all())],
     )
     password = serializers.CharField(write_only=True)
+    # The locale the signup page was rendered in (e.g. from the /pl/auth/signup
+    # URL) - plain CharField rather than a ChoiceField so an unrecognized value
+    # never blocks signup itself; create() falls back to English instead.
+    language = serializers.CharField(write_only=True, required=False, allow_blank=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
 
     class Meta:
         model = dj_auth.get_user_model()
-        fields = ("id", "email", "password", "access", "refresh")
+        fields = ("id", "email", "password", "language", "access", "refresh")
 
     def validate_password(self, password):
         password_validation.validate_password(password)
         return password
 
     def create(self, validated_data):
+        language = validated_data.get("language") or ""
+        if language not in models.LanguageChoices.values:
+            language = models.LanguageChoices.ENGLISH
+
         user = dj_auth.get_user_model().objects.create_user(
             validated_data["email"],
             validated_data["password"],
+            language=language,
         )
 
         refresh = jwt_tokens.RefreshToken.for_user(user)

@@ -89,6 +89,10 @@ export const useSignupForm = (args?: UseApiFormArgs<SignupFormFields>) => {
           input: {
             email: data.email,
             password: data.password,
+            // The locale this signup page is rendering in, so the first
+            // transactional email (account activation) goes out already in
+            // the right language instead of defaulting to English.
+            language: intl.locale,
           },
         },
       });

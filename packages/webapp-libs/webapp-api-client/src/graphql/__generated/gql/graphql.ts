@@ -3671,6 +3671,7 @@ export type SingUpMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<Scalars['String']['input']>;
   password: Scalars['String']['input'];
 };
 
@@ -4878,6 +4879,8 @@ export type UserType = {
 
 /** An enumeration. */
 export enum UsersUserProfileLanguageChoices {
+  /** Arabic */
+  AR = 'AR',
   /** German */
   DE = 'DE',
   /** English */
@@ -4886,8 +4889,12 @@ export enum UsersUserProfileLanguageChoices {
   ES = 'ES',
   /** French */
   FR = 'FR',
+  /** Hindi */
+  HI = 'HI',
   /** Polish */
-  PL = 'PL'
+  PL = 'PL',
+  /** Chinese */
+  ZH = 'ZH'
 }
 
 export type ValidateOtpMutationInput = {

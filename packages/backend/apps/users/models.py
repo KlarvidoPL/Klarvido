@@ -10,7 +10,7 @@ from apps.multitenancy.models import TenantMembership
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, language=None):
         if not email:
             raise ValueError("Users must have an email address")
 
@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
 
         user.groups.add(user_group)
 
-        UserProfile.objects.create(user=user)
+        UserProfile.objects.create(user=user, language=language or LanguageChoices.ENGLISH)
 
         TenantMembership.objects.associate_invitations_with_user(normalized_email, user)
 
@@ -96,6 +96,9 @@ class LanguageChoices(models.TextChoices):
     GERMAN = "de", "German"
     FRENCH = "fr", "French"
     SPANISH = "es", "Spanish"
+    CHINESE = "zh", "Chinese"
+    HINDI = "hi", "Hindi"
+    ARABIC = "ar", "Arabic"
 
 
 class UserProfile(models.Model):
