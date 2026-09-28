@@ -13,7 +13,14 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
     }
 
     return (
-      <p ref={ref} id={formMessageId} className={cn('text-destructive text-sm font-medium', className)} {...props}>
+      <p
+        ref={ref}
+        id={formMessageId}
+        // dark:text-red-400 mirrors the Alert component's destructive variant - see
+        // that component for why --destructive alone reads as low contrast here.
+        className={cn('text-destructive dark:text-red-400 text-sm font-medium', className)}
+        {...props}
+      >
         {body}
       </p>
     );
