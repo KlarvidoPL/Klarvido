@@ -1,3 +1,4 @@
+from email.utils import formataddr
 from unittest.mock import Mock, patch, MagicMock
 import json
 
@@ -35,5 +36,32 @@ class TestSendEmail:
 
         sent_email = mail.outbox[0]
         assert sent_email.to == [to]
-        assert sent_email.from_email == settings.EMAIL_FROM_ADDRESS
+        assert sent_email.from_email == formataddr((settings.EMAIL_FROM_NAME, settings.EMAIL_FROM_ADDRESS))
         assert f"http://localhost:3000/en/auth/confirm/{email_data['user_id']}/{email_data['token']}" in sent_email.body
+
+    @patch('common.emails.subprocess.run')
+    @patch('common.emails.send_email.update_state')
+    def test_from_header_shows_klarvido_display_name_by_default(self, mock_update_state, mock_subprocess):
+        mock_process = Mock()
+        mock_process.stdout = json.dumps({'subject': 'Hello', 'html': '<p>Hi</p>'}).encode('utf-8')
+        mock_subprocess.return_value = mock_process
+
+        send_email.run('test@example.org', 'ACCOUNT_ACTIVATION', {})
+
+        sent_email = mail.outbox[0]
+        assert sent_email.from_email == f"Klarvido <{settings.EMAIL_FROM_ADDRESS}>"
+
+    @patch('common.emails.subprocess.run')
+    @patch('common.emails.send_email.update_state')
+    def test_from_header_falls_back_to_bare_address_when_name_is_blank(
+        self, mock_update_state, mock_subprocess, settings
+    ):
+        settings.EMAIL_FROM_NAME = ""
+        mock_process = Mock()
+        mock_process.stdout = json.dumps({'subject': 'Hello', 'html': '<p>Hi</p>'}).encode('utf-8')
+        mock_subprocess.return_value = mock_process
+
+        send_email.run('test@example.org', 'ACCOUNT_ACTIVATION', {})
+
+        sent_email = mail.outbox[0]
+        assert sent_email.from_email == settings.EMAIL_FROM_ADDRESS

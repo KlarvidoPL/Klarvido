@@ -730,6 +730,9 @@ if TASK_BACKEND == "celery" and CONTENTFUL_SPACE_ID:
 # - django.core.mail.backends.console.EmailBackend (Development/Debug)
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django_ses.SESBackend")
 EMAIL_FROM_ADDRESS = env("EMAIL_FROM_ADDRESS", default=None)
+# Display name shown alongside EMAIL_FROM_ADDRESS in the From header (e.g. "Klarvido
+# <noreply@klarvido.com>" instead of just the bare address).
+EMAIL_FROM_NAME = env("EMAIL_FROM_NAME", default="Klarvido")
 EMAIL_REPLY_ADDRESS = env.list("EMAIL_REPLY_ADDRESS", default=(EMAIL_FROM_ADDRESS,))
 
 # AWS SES settings (used when EMAIL_BACKEND=django_ses.SESBackend)
