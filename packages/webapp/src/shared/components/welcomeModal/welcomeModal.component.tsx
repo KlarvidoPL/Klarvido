@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@sb/webapp-core/components/ui/dialog';
 import confetti from 'canvas-confetti';
-import { ArrowRight, CheckCircle2, Mail, Rocket, User } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Mail, MailCheck, Rocket, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -158,20 +158,32 @@ export const WelcomeModal = () => {
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg shadow-sm"
                 style={{ background: 'linear-gradient(135deg, #FFFE25, #42F272)' }}
               >
-                <Mail className="h-5 w-5 text-gray-900" />
+                {currentUser?.isConfirmed ? (
+                  <MailCheck className="h-5 w-5 text-gray-900" />
+                ) : (
+                  <Mail className="h-5 w-5 text-gray-900" />
+                )}
               </div>
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm text-foreground">
-                  <FormattedMessage
-                    defaultMessage="Verify your email"
-                    id="Welcome Modal / email title"
-                  />
+                  {currentUser?.isConfirmed ? (
+                    <FormattedMessage defaultMessage="Email verified" id="Welcome Modal / email verified title" />
+                  ) : (
+                    <FormattedMessage defaultMessage="Verify your email" id="Welcome Modal / email title" />
+                  )}
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  <FormattedMessage
-                    defaultMessage="Check your inbox for a confirmation link to unlock all features."
-                    id="Welcome Modal / email description"
-                  />
+                  {currentUser?.isConfirmed ? (
+                    <FormattedMessage
+                      defaultMessage="Your email is already verified - you're all set."
+                      id="Welcome Modal / email verified description"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="Check your inbox for a confirmation link to unlock all features."
+                      id="Welcome Modal / email description"
+                    />
+                  )}
                 </p>
               </div>
             </div>

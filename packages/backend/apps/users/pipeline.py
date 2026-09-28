@@ -11,12 +11,19 @@ AVATAR_DOWNLOAD_TIMEOUT_SECONDS = 5
 
 
 def populate_profile_from_social(details, response, user=None, is_new=False, *args, **kwargs):
-    """Fill in name/avatar from the social provider's profile data - deliberately
-    only on the account's very first signup (is_new), not whenever the fields
-    happen to be blank. Otherwise a user who later clears their name/avatar would
-    have it silently re-populated the next time they log in via Google/Facebook."""
+    """Fill in name/avatar from the social provider's profile data, and mark the
+    account's email as confirmed - deliberately only on the account's very first
+    signup (is_new), not whenever the fields happen to be blank. Otherwise a user
+    who later clears their name/avatar would have it silently re-populated the
+    next time they log in via Google/Facebook."""
     if not (user and is_new):
         return
+
+    if not user.is_confirmed:
+        # Google/Facebook already verified ownership of this email address -
+        # unlike password signup, there's nothing left to confirm.
+        user.is_confirmed = True
+        user.save(update_fields=["is_confirmed"])
 
     profile = user.profile
     changed_fields = []

@@ -385,8 +385,8 @@ class ChangePasswordMutation(mutations.SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         mutation = super().mutate_and_get_payload(root, info, **input)
         info.context._request.set_auth_cookie = {
-            "access": mutation.access,
-            "refresh": mutation.refresh,
+            settings.ACCESS_TOKEN_COOKIE: mutation.access,
+            settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
         }
 
         return mutation

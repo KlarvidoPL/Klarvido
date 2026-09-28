@@ -486,6 +486,35 @@ class TestChangePasswordMutation:
         assert executed["errors"][0]["message"] == "GraphQlValidationError"
         assert executed["data"] == {'changePassword': None}
 
+    def test_sets_correct_auth_cookies(self, api_client, user, faker):
+        """Regression test: mutate_and_get_payload() previously built the
+        set_auth_cookie dict with literal "access"/"refresh" keys instead of
+        settings.ACCESS_TOKEN_COOKIE/REFRESH_TOKEN_COOKIE - set_auth_cookie()
+        looked up the wrong keys, got None, and unconditionally overwrote the
+        access-token cookie with the literal string "None", logging the user
+        out on their next hard page load."""
+        old_password = faker.password()
+        new_password = faker.password()
+        user.set_password(old_password)
+        user.save()
+        api_client.force_authenticate(user)
+
+        response = api_client.post(
+            path=API_GRAPHQL_PATH,
+            data={
+                "query": self.MUTATION,
+                "variables": {"input": {"oldPassword": old_password, "newPassword": new_password}},
+            },
+            format="json",
+        )
+
+        access_cookie = response.cookies.get(settings.ACCESS_TOKEN_COOKIE)
+        refresh_cookie = response.cookies.get(settings.REFRESH_TOKEN_COOKIE)
+        assert access_cookie is not None
+        assert access_cookie.value not in ("", "None")
+        assert refresh_cookie is not None
+        assert refresh_cookie.value not in ("", "None")
+
 
 class TestConfirmEmailMutation:
     MUTATION = '''

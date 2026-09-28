@@ -1,14 +1,20 @@
+import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils/fixtures';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { GraphQLError } from 'graphql/error';
 
 import { render } from '../../../../../tests/utils/rendering';
+import { useAuth } from '../../../../hooks';
 import { ChangePasswordForm } from '../changePasswordForm.component';
 import { authChangePasswordMutation } from '../changePasswordForm.graphql';
 
 jest.mock('@sb/webapp-core/services/analytics');
+
+afterEach(() => {
+  localStorage.clear();
+});
 
 const formData = {
   oldPassword: 'old-pass',
@@ -194,6 +200,68 @@ describe('ChangePasswordForm: Component', () => {
 
       const toast = await screen.findByTestId('toast-1');
       expect(toast).toHaveTextContent('Password successfully set.');
+    });
+
+    it('should store fresh auth tokens after successfully setting a password', async () => {
+      const requestMock = composeMockedQueryResult(authChangePasswordMutation, {
+        variables: { input: { newPassword: formData.newPassword } },
+        data: { changePassword: { access: 'new-access-token', refresh: 'new-refresh-token' } },
+      });
+
+      const { waitForApolloMocks } = render(<SetPasswordComponent />, {
+        apolloMocks: (defaultMocks) => defaultMocks.concat(requestMock),
+      });
+
+      await waitForApolloMocks(0);
+
+      await userEvent.type(screen.getByLabelText(/^new password/i), formData.newPassword);
+      await userEvent.type(screen.getByLabelText(/confirm new password/i), formData.confirmNewPassword);
+      await userEvent.click(screen.getByRole('button', { name: /set password/i }));
+
+      await waitForApolloMocks();
+
+      expect(localStorage.getItem('token')).toBe('new-access-token');
+      expect(localStorage.getItem('refresh_token')).toBe('new-refresh-token');
+    });
+
+    it('should refetch currentUser after successfully setting a password', async () => {
+      const requestMock = composeMockedQueryResult(authChangePasswordMutation, {
+        variables: { input: { newPassword: formData.newPassword } },
+        data: defaultResult,
+      });
+      const initialUserMock = fillCommonQueryWithUser(currentUserFactory({ hasUsablePassword: false }));
+      // Refetched after a successful "set password" call so currentUser.hasUsablePassword
+      // (and thus the Old Password field) updates without a manual page refresh.
+      const refetchedUserMock = fillCommonQueryWithUser(currentUserFactory({ hasUsablePassword: true }));
+
+      const Probe = () => {
+        const { currentUser } = useAuth();
+        return <span data-testid="has-usable-password">{String(currentUser?.hasUsablePassword)}</span>;
+      };
+
+      const Wrapper = () => (
+        <>
+          <SetPasswordComponent />
+          <Probe />
+        </>
+      );
+
+      const { waitForApolloMocks } = render(<Wrapper />, {
+        apolloMocks: [initialUserMock, requestMock, refetchedUserMock],
+      });
+
+      await waitForApolloMocks(0);
+      expect(screen.getByTestId('has-usable-password')).toHaveTextContent('false');
+
+      await userEvent.type(screen.getByLabelText(/^new password/i), formData.newPassword);
+      await userEvent.type(screen.getByLabelText(/confirm new password/i), formData.confirmNewPassword);
+      await userEvent.click(screen.getByRole('button', { name: /set password/i }));
+
+      await waitForApolloMocks();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('has-usable-password')).toHaveTextContent('true');
+      });
     });
   });
 });

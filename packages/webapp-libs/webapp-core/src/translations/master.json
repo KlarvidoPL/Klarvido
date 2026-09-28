@@ -4325,6 +4325,12 @@
   "Welcome Modal / email title": {
     "defaultMessage": "Verify your email"
   },
+  "Welcome Modal / email verified description": {
+    "defaultMessage": "Your email is already verified - you're all set."
+  },
+  "Welcome Modal / email verified title": {
+    "defaultMessage": "Email verified"
+  },
   "Welcome Modal / heading": {
     "defaultMessage": "Welcome aboard!"
   },

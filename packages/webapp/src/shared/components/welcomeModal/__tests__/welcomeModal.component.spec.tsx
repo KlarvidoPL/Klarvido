@@ -60,4 +60,26 @@ describe('WelcomeModal: Component', () => {
 
     expect(screen.queryByText(/welcome aboard/i)).not.toBeInTheDocument();
   });
+
+  it('should show "Verify your email" when the account is not yet confirmed', async () => {
+    const currentUser = currentUserFactory({ hasSeenWelcomeModal: false, isConfirmed: false });
+    const apolloMocks = [fillCommonQueryWithUser(currentUser), markSeenMock()];
+    const { waitForApolloMocks } = render(<WelcomeModal />, { apolloMocks });
+
+    await waitForApolloMocks(0);
+
+    expect(await screen.findByText(/verify your email/i)).toBeInTheDocument();
+    expect(screen.queryByText(/email verified/i)).not.toBeInTheDocument();
+  });
+
+  it('should show "Email verified" when the account is already confirmed (e.g. OAuth signup)', async () => {
+    const currentUser = currentUserFactory({ hasSeenWelcomeModal: false, isConfirmed: true });
+    const apolloMocks = [fillCommonQueryWithUser(currentUser), markSeenMock()];
+    const { waitForApolloMocks } = render(<WelcomeModal />, { apolloMocks });
+
+    await waitForApolloMocks(0);
+
+    expect(await screen.findByText(/email verified/i)).toBeInTheDocument();
+    expect(screen.queryByText(/verify your email/i)).not.toBeInTheDocument();
+  });
 });
