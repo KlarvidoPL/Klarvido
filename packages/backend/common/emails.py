@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import subprocess
+from email.utils import formataddr
 
 from celery import shared_task, states
 from celery.exceptions import Ignore
@@ -139,10 +140,16 @@ def send_email(self, to: str | list[str], email_type: str, email_data: dict, lan
         )
         raise
 
+    from_email = (
+        formataddr((settings.EMAIL_FROM_NAME, settings.EMAIL_FROM_ADDRESS))
+        if settings.EMAIL_FROM_NAME
+        else settings.EMAIL_FROM_ADDRESS
+    )
+
     email = EmailMessage(
         rendered_email["subject"],
         rendered_email["html"],
-        settings.EMAIL_FROM_ADDRESS,
+        from_email,
         to,
         reply_to=settings.EMAIL_REPLY_ADDRESS,
     )
