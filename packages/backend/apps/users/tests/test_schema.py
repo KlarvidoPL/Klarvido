@@ -603,6 +603,29 @@ class TestConfirmEmailMutation:
         assert "errors" not in second
         assert second["data"]["confirm"]["ok"] is True
 
+    def test_wrong_token_after_already_confirmed(self, graphene_client, user_factory, faker):
+        # Regression test: confirming already bypassed validation entirely
+        # once is_confirmed was True, so a wrong/mangled token submitted after
+        # the account was confirmed wrongly returned success instead of an
+        # "invalid token" error.
+        user = user_factory(is_confirmed=False)
+        token = tokens.account_activation_token.make_token(user)
+
+        first = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"user": user.pk.hashid, "token": token}},
+        )
+        assert "errors" not in first
+        assert first["data"]["confirm"]["ok"] is True
+
+        second = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"user": user.pk.hashid, "token": "wrong-token-here"}},
+        )
+        assert len(second["errors"]) == 1
+        assert second["errors"][0]["message"] == "GraphQlValidationError"
+        assert second["data"] == {'confirm': None}
+
 
 class TestResendConfirmationEmailMutation:
     MUTATION = '''
