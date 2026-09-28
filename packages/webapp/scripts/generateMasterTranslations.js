@@ -37,20 +37,37 @@ function generateMasterTranslations() {
     // Run formatjs extract with extended format to get descriptions
     // Using explicit file patterns to ensure all webapp-libs are included
     // Glob patterns must NOT have extra quotes when shell expansion is used
+    // .ts (not just .tsx) is required - intl.formatMessage() calls living in plain
+    // hooks files (*.hooks.ts, not components) were being silently skipped, which
+    // meant those strings could never be translated for any locale and always fell
+    // back to the English defaultMessage in production.
     const sourcePatterns = [
-      'src/**/*.tsx',
-      '../webapp-libs/webapp-ai-assistant/src/**/*.tsx',
-      '../webapp-libs/webapp-core/src/**/*.tsx',
-      '../webapp-libs/webapp-api-client/src/**/*.tsx',
-      '../webapp-libs/webapp-contentful/src/**/*.tsx',
-      '../webapp-libs/webapp-crud-demo/src/**/*.tsx',
-      '../webapp-libs/webapp-documents/src/**/*.tsx',
-      '../webapp-libs/webapp-emails/src/**/*.tsx',
-      '../webapp-libs/webapp-finances/src/**/*.tsx',
-      '../webapp-libs/webapp-generative-ai/src/**/*.tsx',
-      '../webapp-libs/webapp-notifications/src/**/*.tsx',
-      '../webapp-libs/webapp-sso/src/**/*.tsx',
-      '../webapp-libs/webapp-tenants/src/**/*.tsx',
+      'src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-ai-assistant/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-core/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-api-client/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-backup/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-contentful/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-crud-demo/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-documents/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-emails/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-finances/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-generative-ai/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-notifications/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-sso/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-tenants/src/**/*.{ts,tsx}',
+    ];
+
+    // formatjs's "**" glob doesn't cross a leading ".." path segment (matched
+    // literally by minimatch, not as a wildcard-traversable one), so a single
+    // '**/*.d.ts' ignore silently fails to match '../webapp-libs/.../env.d.ts' and
+    // formatjs then chokes trying to parse the type-only file. Mirror each source
+    // dir's own prefix instead of relying on a leading "**".
+    const ignorePatterns = [
+      '**/*.spec.tsx',
+      '**/*.spec.ts',
+      '**/tests/mocks/**',
+      ...sourcePatterns.map(p => p.replace(/\*\*\/\*\.\{ts,tsx\}$/, '**/*.d.ts')),
     ];
 
     const command = [
@@ -58,8 +75,7 @@ function generateMasterTranslations() {
       ...sourcePatterns.map(p => `'${p}'`),
       "--id-interpolation-pattern '[sha512:contenthash:base64:6]'",
       `--out-file '${OUTPUT_PATH}'`,
-      "--ignore '**/*.spec.tsx'",
-      "--ignore '**/tests/mocks/**'",
+      ...ignorePatterns.map(p => `--ignore '${p}'`),
     ].join(' ');
 
     execSync(command, {

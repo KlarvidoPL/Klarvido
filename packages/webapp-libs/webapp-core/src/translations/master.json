@@ -695,6 +695,15 @@
   "Auth / Avatar Form / Change photo button": {
     "defaultMessage": "Change profile photo"
   },
+  "Auth / Avatar Form / Error / Too large": {
+    "defaultMessage": "File cannot be larger than {size}"
+  },
+  "Auth / Avatar Form / Error message": {
+    "defaultMessage": "Failed to update avatar. Please try again."
+  },
+  "Auth / Avatar Form / Success message": {
+    "defaultMessage": "Avatar successfully changed."
+  },
   "Auth / Change password / Confirm new password label": {
     "defaultMessage": "Confirm new password"
   },
@@ -731,8 +740,32 @@
   "Auth / Change password / Password too short": {
     "defaultMessage": "Password must be at least 8 characters long"
   },
+  "Auth / Change password / Set submit button": {
+    "defaultMessage": "Set password"
+  },
+  "Auth / Change password / Set success message": {
+    "defaultMessage": "Password successfully set."
+  },
   "Auth / Change password / Submit button": {
     "defaultMessage": "Change password"
+  },
+  "Auth / Change password / Success message": {
+    "defaultMessage": "Password successfully changed."
+  },
+  "Auth / Change password / password entirely numeric": {
+    "defaultMessage": "The password can't be entirely numeric."
+  },
+  "Auth / Change password / password too common": {
+    "defaultMessage": "This password is too common. Please choose a more unique password."
+  },
+  "Auth / Change password / password too short backend": {
+    "defaultMessage": "Password must be at least 8 characters long."
+  },
+  "Auth / Change password / password too similar": {
+    "defaultMessage": "The password is too similar to your personal information."
+  },
+  "Auth / Change password / wrong old password": {
+    "defaultMessage": "The current password is incorrect."
   },
   "Auth / Confirm reset password / description": {
     "defaultMessage": "Please enter your new password below. Make sure it's strong and secure."
@@ -772,9 +805,6 @@
   },
   "Auth / Login / Email required": {
     "defaultMessage": "Please enter your email address"
-  },
-  "Auth / Login / Facebook login button": {
-    "defaultMessage": "Log in with Facebook"
   },
   "Auth / Login / Google login button": {
     "defaultMessage": "Log in with Google"
@@ -908,6 +938,24 @@
   "Auth / Reset password confirm / Submit button loading": {
     "defaultMessage": "Updating password..."
   },
+  "Auth / Reset password confirm / Success message": {
+    "defaultMessage": "Password reset successfully!"
+  },
+  "Auth / Reset password confirm / invalid token": {
+    "defaultMessage": "The password reset link you have used is either expired, has already been used, or is incorrect"
+  },
+  "Auth / Reset password confirm / password entirely numeric": {
+    "defaultMessage": "The password can't be entirely numeric."
+  },
+  "Auth / Reset password confirm / password too common": {
+    "defaultMessage": "This password is too common. Please choose a more unique password."
+  },
+  "Auth / Reset password confirm / password too short backend": {
+    "defaultMessage": "Password must be at least 8 characters long."
+  },
+  "Auth / Reset password confirm / password too similar": {
+    "defaultMessage": "The password is too similar to your personal information."
+  },
   "Auth / Signup / Accept checkbox / Privacy policy link": {
     "defaultMessage": "Privacy Policy"
   },
@@ -928,9 +976,6 @@
   },
   "Auth / Signup / Email required": {
     "defaultMessage": "Please enter your email address"
-  },
-  "Auth / Signup / Facebook signup button": {
-    "defaultMessage": "Sign up with Facebook"
   },
   "Auth / Signup / Google signup button": {
     "defaultMessage": "Sign up with Google"
@@ -959,6 +1004,9 @@
   "Auth / Signup / description": {
     "defaultMessage": "Get started with your free account today"
   },
+  "Auth / Signup / email unique": {
+    "defaultMessage": "The email address is already taken"
+  },
   "Auth / Signup / heading": {
     "defaultMessage": "Create your account"
   },
@@ -970,6 +1018,18 @@
   },
   "Auth / Signup / or": {
     "defaultMessage": "Or continue with email"
+  },
+  "Auth / Signup / password entirely numeric": {
+    "defaultMessage": "The password can't be entirely numeric."
+  },
+  "Auth / Signup / password too common": {
+    "defaultMessage": "This password is too common. Please choose a more unique password."
+  },
+  "Auth / Signup / password too short backend": {
+    "defaultMessage": "Password must be at least 8 characters long."
+  },
+  "Auth / Signup / password too similar": {
+    "defaultMessage": "The password is too similar to your personal information."
   },
   "Auth / Two-factor / Description": {
     "defaultMessage": "Add an extra layer of security to your account by requiring a verification code in addition to your password."
@@ -1034,6 +1094,9 @@
   "Auth / Update profile/ Submit button": {
     "defaultMessage": "Update personal data"
   },
+  "Auth / Update profile/ Success message": {
+    "defaultMessage": "Personal data successfully changed."
+  },
   "Auth / Validate OTP / Auth code required": {
     "defaultMessage": "Please enter the authentication code"
   },
@@ -1081,6 +1144,216 @@
   },
   "Back Button / Go back": {
     "defaultMessage": "Go back"
+  },
+  "Backup Settings / Delete Error": {
+    "defaultMessage": "Failed to delete backup"
+  },
+  "Backup Settings / Delete Success": {
+    "defaultMessage": "Backup deleted successfully"
+  },
+  "Backup Settings / Description": {
+    "defaultMessage": "Configure periodic backups of your tenant data"
+  },
+  "Backup Settings / Download Error": {
+    "defaultMessage": "Failed to download backup"
+  },
+  "Backup Settings / Download Success": {
+    "defaultMessage": "Backup downloaded successfully"
+  },
+  "Backup Settings / Download Tooltip": {
+    "defaultMessage": "Download backup"
+  },
+  "Backup Settings / Email Recipients Description": {
+    "defaultMessage": "Select users to receive email notifications when backups are ready"
+  },
+  "Backup Settings / Email Recipients Label": {
+    "defaultMessage": "Email Recipients"
+  },
+  "Backup Settings / Enable Description": {
+    "defaultMessage": "Automatically backup tenant data"
+  },
+  "Backup Settings / Enable Label": {
+    "defaultMessage": "Enable Backups"
+  },
+  "Backup Settings / Encryption Description": {
+    "defaultMessage": "All backups are encrypted at rest using AES-256-GCM encryption. Each tenant has a unique encryption key stored securely. Backups are automatically encrypted when created and decrypted in-memory when downloaded."
+  },
+  "Backup Settings / Encryption Title": {
+    "defaultMessage": "Encryption at Rest"
+  },
+  "Backup Settings / History Description": {
+    "defaultMessage": "View and manage your backup files"
+  },
+  "Backup Settings / History Title": {
+    "defaultMessage": "Backup History"
+  },
+  "Backup Settings / Interval Description": {
+    "defaultMessage": "How often to create backups (minimum 1 day)"
+  },
+  "Backup Settings / Interval Label": {
+    "defaultMessage": "Backup Interval (days)"
+  },
+  "Backup Settings / Models Subtitle": {
+    "defaultMessage": "Select models to include (uncheck to exclude)"
+  },
+  "Backup Settings / Modules Description": {
+    "defaultMessage": "All modules are included by default. Uncheck modules to exclude them from backups."
+  },
+  "Backup Settings / Modules Label": {
+    "defaultMessage": "Backup Modules"
+  },
+  "Backup Settings / No Backups": {
+    "defaultMessage": "No backups yet"
+  },
+  "Backup Settings / No Modules": {
+    "defaultMessage": "No modules available"
+  },
+  "Backup Settings / No Permission": {
+    "defaultMessage": "You don't have permission to manage backup settings"
+  },
+  "Backup Settings / No Restorations": {
+    "defaultMessage": "No restorations yet"
+  },
+  "Backup Settings / No Users": {
+    "defaultMessage": "No users available"
+  },
+  "Backup Settings / Restore Cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "Backup Settings / Restore Created Count": {
+    "defaultMessage": "{count} created"
+  },
+  "Backup Settings / Restore Dialog Description": {
+    "defaultMessage": "Choose how to handle records that already exist in your data."
+  },
+  "Backup Settings / Restore Dialog Title": {
+    "defaultMessage": "Restore Backup"
+  },
+  "Backup Settings / Restore Error": {
+    "defaultMessage": "Failed to start backup restoration"
+  },
+  "Backup Settings / Restore Failed Count": {
+    "defaultMessage": "{count} failed"
+  },
+  "Backup Settings / Restore History Description": {
+    "defaultMessage": "View the history of backup restorations"
+  },
+  "Backup Settings / Restore History Title": {
+    "defaultMessage": "Restore History"
+  },
+  "Backup Settings / Restore Skipped Count": {
+    "defaultMessage": "{count} skipped"
+  },
+  "Backup Settings / Restore Started": {
+    "defaultMessage": "Backup restoration started. You will be notified when it completes."
+  },
+  "Backup Settings / Restore Table Date": {
+    "defaultMessage": "Date"
+  },
+  "Backup Settings / Restore Table Results": {
+    "defaultMessage": "Results"
+  },
+  "Backup Settings / Restore Table Status": {
+    "defaultMessage": "Status"
+  },
+  "Backup Settings / Restore Table Strategy": {
+    "defaultMessage": "Strategy"
+  },
+  "Backup Settings / Restore Tooltip": {
+    "defaultMessage": "Restore from this backup"
+  },
+  "Backup Settings / Restore Tooltip Created": {
+    "defaultMessage": "• {count, plural, one {# created} other {# created}}"
+  },
+  "Backup Settings / Restore Tooltip Failed": {
+    "defaultMessage": "• {count, plural, one {# failed} other {# failed}}"
+  },
+  "Backup Settings / Restore Tooltip No Data": {
+    "defaultMessage": "No detailed information available"
+  },
+  "Backup Settings / Restore Tooltip Skipped": {
+    "defaultMessage": "• {count, plural, one {# skipped} other {# skipped}}"
+  },
+  "Backup Settings / Restore Tooltip Title": {
+    "defaultMessage": "Detailed Results by Model"
+  },
+  "Backup Settings / Restore Tooltip Updated": {
+    "defaultMessage": "• {count, plural, one {# updated} other {# updated}}"
+  },
+  "Backup Settings / Restore Updated Count": {
+    "defaultMessage": "{count} updated"
+  },
+  "Backup Settings / Restore Warning": {
+    "defaultMessage": "Restoring a backup will modify your data. Make sure you understand the chosen conflict strategy before proceeding."
+  },
+  "Backup Settings / Restoring": {
+    "defaultMessage": "Restoring..."
+  },
+  "Backup Settings / Retention Description": {
+    "defaultMessage": "How long to keep backup files (minimum 1 day)"
+  },
+  "Backup Settings / Retention Label": {
+    "defaultMessage": "Retention Period (days)"
+  },
+  "Backup Settings / Save Button": {
+    "defaultMessage": "Save Settings"
+  },
+  "Backup Settings / Saving": {
+    "defaultMessage": "Saving..."
+  },
+  "Backup Settings / Start Restore Button": {
+    "defaultMessage": "Start Restore"
+  },
+  "Backup Settings / Strategy Fail Description": {
+    "defaultMessage": "If any record already exists, abort the entire restoration. No changes will be made. This is the strictest option."
+  },
+  "Backup Settings / Strategy Fail Label": {
+    "defaultMessage": "Fail on conflicts"
+  },
+  "Backup Settings / Strategy Skip Description": {
+    "defaultMessage": "If a record already exists, keep the current version and skip the backup copy. This is the safest option."
+  },
+  "Backup Settings / Strategy Skip Label": {
+    "defaultMessage": "Skip existing"
+  },
+  "Backup Settings / Strategy Update Description": {
+    "defaultMessage": "If a record already exists, overwrite it with the backup version. New records will also be created."
+  },
+  "Backup Settings / Strategy Update Label": {
+    "defaultMessage": "Update existing"
+  },
+  "Backup Settings / Table Actions": {
+    "defaultMessage": "Actions"
+  },
+  "Backup Settings / Table Date": {
+    "defaultMessage": "Date"
+  },
+  "Backup Settings / Table Size": {
+    "defaultMessage": "Size"
+  },
+  "Backup Settings / Table Status": {
+    "defaultMessage": "Status"
+  },
+  "Backup Settings / Title": {
+    "defaultMessage": "Backup Configuration"
+  },
+  "Backup Settings / Trigger Button": {
+    "defaultMessage": "Trigger Backup"
+  },
+  "Backup Settings / Trigger Error": {
+    "defaultMessage": "Failed to trigger backup"
+  },
+  "Backup Settings / Trigger Success": {
+    "defaultMessage": "Backup triggered successfully"
+  },
+  "Backup Settings / Triggering": {
+    "defaultMessage": "Triggering..."
+  },
+  "Backup Settings / Update Error": {
+    "defaultMessage": "Failed to update backup settings"
+  },
+  "Backup Settings / Update Success": {
+    "defaultMessage": "Backup settings updated successfully"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Active plan:"
@@ -1133,11 +1406,17 @@
   "Cancel subscription / No active subscription title": {
     "defaultMessage": "No Active Subscription"
   },
+  "Cancel subscription / Success message": {
+    "defaultMessage": "You will be moved to free plan with the next billing period"
+  },
   "Cancel subscription / page title": {
     "defaultMessage": "Cancel Subscription"
   },
   "Change plan / Back": {
     "defaultMessage": "Back to subscription"
+  },
+  "Change plan / Fail message": {
+    "defaultMessage": "You need first to add a payment method. Go back and set it there"
   },
   "Change plan / Heading": {
     "defaultMessage": "Plans"
@@ -1147,6 +1426,9 @@
   },
   "Change plan / Subheading": {
     "defaultMessage": "Choose a plan"
+  },
+  "Change plan / Success message": {
+    "defaultMessage": "Plan changed successfully"
   },
   "Change plan / page title": {
     "defaultMessage": "Choose a Plan"
@@ -1577,6 +1859,21 @@
   "Dropzone / Drop active label": {
     "defaultMessage": "Drop your file here"
   },
+  "Dropzone / Error messages / File invalid type": {
+    "defaultMessage": "File {fileName} type cannot be accepted"
+  },
+  "Dropzone / Error messages / File too large": {
+    "defaultMessage": "File {fileName} is larger than {maxSize}"
+  },
+  "Dropzone / Error messages / File too small": {
+    "defaultMessage": "File {fileName} is smaller than {minSize}"
+  },
+  "Dropzone / Error messages / Generic": {
+    "defaultMessage": "File {fileName} cannot be accepted"
+  },
+  "Dropzone / Error messages / Too many files": {
+    "defaultMessage": "Cannot accept more than {maxFiles} file"
+  },
   "DueDatePicker / Days label": {
     "defaultMessage": "{days}d"
   },
@@ -1994,6 +2291,36 @@
   "Email / User Export Admin / Title": {
     "defaultMessage": "Data export completed"
   },
+  "File Size / Bytes": {
+    "defaultMessage": "0 bytes"
+  },
+  "File Size / Units / Bytes": {
+    "defaultMessage": "{size} bytes"
+  },
+  "File Size / Units / EB": {
+    "defaultMessage": "{size} EB"
+  },
+  "File Size / Units / GB": {
+    "defaultMessage": "{size} GB"
+  },
+  "File Size / Units / KB": {
+    "defaultMessage": "{size} KB"
+  },
+  "File Size / Units / MB": {
+    "defaultMessage": "{size} MB"
+  },
+  "File Size / Units / PB": {
+    "defaultMessage": "{size} PB"
+  },
+  "File Size / Units / TB": {
+    "defaultMessage": "{size} TB"
+  },
+  "File Size / Units / YB": {
+    "defaultMessage": "{size} YB"
+  },
+  "File Size / Units / ZB": {
+    "defaultMessage": "{size} ZB"
+  },
   "Finances / Payment methods / Back": {
     "defaultMessage": "Back to payment methods"
   },
@@ -2210,6 +2537,12 @@
   "Home / t&c link": {
     "defaultMessage": "Terms and conditions"
   },
+  "Login form / error / authentication failed": {
+    "defaultMessage": "Incorrect authentication credentials."
+  },
+  "Login form / error / no active account": {
+    "defaultMessage": "Incorrect authentication credentials."
+  },
   "MarkdownEditor / Bold": {
     "defaultMessage": "Bold"
   },
@@ -2260,6 +2593,9 @@
   },
   "Membership Entry / DeleteMembership / Success message": {
     "defaultMessage": "User was removed successfully!"
+  },
+  "Membership Entry / DeleteTenant / Fail message": {
+    "defaultMessage": "Unable to delete the organization."
   },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Select which roles to assign to {name}"
@@ -2438,6 +2774,21 @@
   "Notifications / Action Log Export Ready / Title": {
     "defaultMessage": "Activity Log Export Ready"
   },
+  "Notifications / Backup Failed / Content": {
+    "defaultMessage": "Failed to create backup for \"{tenant_name}\". {error}"
+  },
+  "Notifications / Backup Failed / Title": {
+    "defaultMessage": "Backup Failed"
+  },
+  "Notifications / Backup Ready / Content": {
+    "defaultMessage": "Your backup of \"{tenant_name}\" is ready ({file_size}). {totalRecords, plural, one {# record} other {# records}} backed up."
+  },
+  "Notifications / Backup Ready / Download Note": {
+    "defaultMessage": "You can download it from the backup list in settings."
+  },
+  "Notifications / Backup Ready / Title": {
+    "defaultMessage": "Backup Ready"
+  },
   "Notifications / CrudItemCreated / Content": {
     "defaultMessage": "CRUD item &quot;{name}&quot; has been created"
   },
@@ -2464,6 +2815,36 @@
   },
   "Notifications / Passkey Registered / Title": {
     "defaultMessage": "Passkey Registered"
+  },
+  "Notifications / Restore Completed / Content": {
+    "defaultMessage": "Backup restoration for \"{tenant_name}\" has completed."
+  },
+  "Notifications / Restore Completed / Created": {
+    "defaultMessage": "{count, plural, one {# record created} other {# records created}}"
+  },
+  "Notifications / Restore Completed / Failed": {
+    "defaultMessage": "{count, plural, one {# record failed} other {# records failed}}"
+  },
+  "Notifications / Restore Completed / Partial Title": {
+    "defaultMessage": "Restore Partially Completed"
+  },
+  "Notifications / Restore Completed / Partial Warning": {
+    "defaultMessage": "Some records failed to restore. Check the restore history for details."
+  },
+  "Notifications / Restore Completed / Skipped": {
+    "defaultMessage": "{count, plural, one {# record skipped} other {# records skipped}}"
+  },
+  "Notifications / Restore Completed / Title": {
+    "defaultMessage": "Restore Completed"
+  },
+  "Notifications / Restore Completed / Updated": {
+    "defaultMessage": "{count, plural, one {# record updated} other {# records updated}}"
+  },
+  "Notifications / Restore Failed / Content": {
+    "defaultMessage": "Failed to restore backup for \"{tenant_name}\". {error}"
+  },
+  "Notifications / Restore Failed / Title": {
+    "defaultMessage": "Restore Failed"
   },
   "Notifications / SSO Connection Activated / Content": {
     "defaultMessage": "{connection_type} connection \"{connection_name}\" for \"{tenant_name}\" is now active."
@@ -3401,6 +3782,15 @@
   "Snackbar / Generic error": {
     "defaultMessage": "Something went wrong."
   },
+  "Stripe / Confirm payment / No payment method": {
+    "defaultMessage": "No payment method selected"
+  },
+  "Stripe / Confirm payment / Unknown payment method": {
+    "defaultMessage": "Unknown payment method used"
+  },
+  "Stripe / Confirm payment / Wrong payment method": {
+    "defaultMessage": "Wrong payment method used"
+  },
   "Stripe / Payment / Card CVC is required": {
     "defaultMessage": "Card CVC is required"
   },
@@ -3505,6 +3895,18 @@
   },
   "Subscription / change payment method / submit button": {
     "defaultMessage": "Save"
+  },
+  "Subscription plan display name / Free": {
+    "defaultMessage": "Free"
+  },
+  "Subscription plan display name / Monthly": {
+    "defaultMessage": "Monthly"
+  },
+  "Subscription plan display name / Yearly": {
+    "defaultMessage": "Yearly"
+  },
+  "Subscription plan example feature / Free": {
+    "defaultMessage": "Lorem ipsum dolor sit amet"
   },
   "Table Footer / Rows per page": {
     "defaultMessage": "Rows per page"
@@ -3722,6 +4124,9 @@
   "Tenant form / Cancel button": {
     "defaultMessage": "Cancel"
   },
+  "Tenant form / DeleteTenant / Success message": {
+    "defaultMessage": "Organization deleted successfully!"
+  },
   "Tenant form / Name max length error": {
     "defaultMessage": "Name is too long"
   },
@@ -3778,6 +4183,15 @@
   },
   "Tenant members list / Role": {
     "defaultMessage": "Role"
+  },
+  "Tenant roles / Admin": {
+    "defaultMessage": "Admin"
+  },
+  "Tenant roles / Member": {
+    "defaultMessage": "Member"
+  },
+  "Tenant roles / Owner": {
+    "defaultMessage": "Owner"
   },
   "Tenant settings / Activity Logs": {
     "defaultMessage": "Activity Logs"
