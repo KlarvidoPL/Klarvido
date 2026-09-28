@@ -118,13 +118,13 @@ export const Profile = () => {
                           <FormattedMessage defaultMessage="Not verified" id="Profile / Email / Not verified" />
                         </Badge>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
-                          className="h-6 px-2 text-xs"
+                          className="text-amber-700 hover:bg-amber-500/10 hover:text-amber-800 dark:text-amber-400 dark:hover:bg-amber-500/10 dark:hover:text-amber-300"
                           onClick={resendConfirmationEmail}
                           disabled={resendLoading}
                         >
-                          <RefreshCw className={`h-3 w-3 mr-1 ${resendLoading ? 'animate-spin' : ''}`} />
+                          <RefreshCw className={`h-4 w-4 mr-1.5 ${resendLoading ? 'animate-spin' : ''}`} />
                           <FormattedMessage
                             defaultMessage="Resend verification email"
                             id="Profile / Email / Resend verification"
