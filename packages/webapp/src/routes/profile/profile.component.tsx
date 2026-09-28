@@ -1,9 +1,12 @@
+import { useMutation } from '@apollo/client/react';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Paragraph } from '@sb/webapp-core/components/typography';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
+import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { Separator } from '@sb/webapp-core/components/ui/separator';
-import { AlertTriangle, Fingerprint, Lock, Mail, Monitor, Shield, User, UserCircle } from 'lucide-react';
+import { useToast } from '@sb/webapp-core/toast/useToast';
+import { AlertTriangle, Fingerprint, Lock, Mail, Monitor, RefreshCw, Shield, User, UserCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -14,10 +17,37 @@ import { EditProfileForm } from '../../shared/components/auth/editProfileForm';
 import { PasskeysForm } from '../../shared/components/auth/passkeysForm';
 import { TwoFactorAuthForm } from '../../shared/components/auth/twoFactorAuthForm';
 import { useAuth } from '../../shared/hooks';
+import { profileResendConfirmationEmailMutation } from './profile.graphql';
 
 export const Profile = () => {
   const intl = useIntl();
   const { currentUser } = useAuth();
+  const { toast } = useToast();
+
+  const resendSuccessMessage = intl.formatMessage({
+    defaultMessage: 'Verification email sent. Please check your inbox.',
+    id: 'Profile / Email / Resend success',
+  });
+  const resendErrorMessage = intl.formatMessage({
+    defaultMessage: 'Failed to send verification email. Please try again.',
+    id: 'Profile / Email / Resend error',
+  });
+
+  const [commitResendConfirmationEmail, { loading: resendLoading }] = useMutation(
+    profileResendConfirmationEmailMutation,
+    {
+      onCompleted: () => {
+        toast({ description: resendSuccessMessage, variant: 'success' });
+      },
+      onError: () => {
+        toast({ description: resendErrorMessage, variant: 'destructive' });
+      },
+    }
+  );
+
+  const resendConfirmationEmail = () => {
+    commitResendConfirmationEmail({ variables: { input: {} } });
+  };
 
   return (
     <PageLayout>
@@ -76,16 +106,31 @@ export const Profile = () => {
                     <Mail className="h-4 w-4" />
                     <FormattedMessage defaultMessage="Email" id="Profile / Email / Label" />
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Paragraph className="text-base">{currentUser?.email}</Paragraph>
                     {currentUser && !currentUser.isConfirmed && (
-                      <Badge
-                        variant="outline"
-                        className="gap-1 border-amber-200 bg-amber-100 text-xs font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-                      >
-                        <AlertTriangle className="h-3 w-3" />
-                        <FormattedMessage defaultMessage="Not verified" id="Profile / Email / Not verified" />
-                      </Badge>
+                      <>
+                        <Badge
+                          variant="outline"
+                          className="gap-1 border-amber-500/20 bg-amber-500/15 text-xs font-medium text-amber-700 dark:text-amber-400"
+                        >
+                          <AlertTriangle className="h-3 w-3" />
+                          <FormattedMessage defaultMessage="Not verified" id="Profile / Email / Not verified" />
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={resendConfirmationEmail}
+                          disabled={resendLoading}
+                        >
+                          <RefreshCw className={`h-3 w-3 mr-1 ${resendLoading ? 'animate-spin' : ''}`} />
+                          <FormattedMessage
+                            defaultMessage="Resend verification email"
+                            id="Profile / Email / Resend verification"
+                          />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>

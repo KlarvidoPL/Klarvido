@@ -527,6 +527,65 @@ class TestConfirmEmailMutation:
         assert executed["errors"][0]["message"] == "GraphQlValidationError"
         assert executed["data"] == {'confirm': None}
 
+    def test_reusing_link_after_already_confirmed_succeeds(self, graphene_client, user_factory, faker):
+        # The token hash includes is_confirmed, so re-clicking the same link
+        # after it already succeeded once would otherwise fail with a
+        # confusing "invalid token" error - confirming must be idempotent.
+        user = user_factory(is_confirmed=False)
+        token = tokens.account_activation_token.make_token(user)
+
+        first = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"user": user.pk.hashid, "token": token}},
+        )
+        assert "errors" not in first
+        assert first["data"]["confirm"]["ok"] is True
+
+        second = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"user": user.pk.hashid, "token": token}},
+        )
+        assert "errors" not in second
+        assert second["data"]["confirm"]["ok"] is True
+
+
+class TestResendConfirmationEmailMutation:
+    MUTATION = '''
+        mutation ResendConfirmationEmail($input: ResendConfirmationEmailMutationInput!) {
+          resendConfirmationEmail(input: $input) {
+            ok
+          }
+        }
+    '''
+
+    def test_not_authenticated(self, graphene_client):
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': {}})
+
+        assert len(executed["errors"]) == 1
+        assert executed["data"] == {'resendConfirmationEmail': None}
+
+    def test_sends_email_when_not_confirmed(self, graphene_client, user_factory, mocker):
+        user = user_factory(is_confirmed=False)
+        graphene_client.force_authenticate(user)
+        send_mock = mocker.patch('apps.users.notifications.AccountActivationEmail.send')
+
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': {}})
+
+        assert "errors" not in executed
+        assert executed["data"]["resendConfirmationEmail"]["ok"] is True
+        send_mock.assert_called_once()
+
+    def test_no_op_when_already_confirmed(self, graphene_client, user_factory, mocker):
+        user = user_factory(is_confirmed=True)
+        graphene_client.force_authenticate(user)
+        send_mock = mocker.patch('apps.users.notifications.AccountActivationEmail.send')
+
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': {}})
+
+        assert "errors" not in executed
+        assert executed["data"]["resendConfirmationEmail"]["ok"] is False
+        send_mock.assert_not_called()
+
 
 class TestResetPassword:
     MUTATION = '''

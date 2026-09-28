@@ -11,8 +11,6 @@ Provides endpoints for:
 import logging
 
 from django.http import JsonResponse
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.db import transaction
 from rest_framework import generics, status
@@ -51,21 +49,28 @@ class TranslationsJsonView(APIView):
     """
     GET /api/translations/{locale_code}.json
 
-    Returns translations JSON for a specific locale.
-    Public endpoint, cached.
+    Returns translations JSON for a specific locale. This is the local-dev/
+    same-origin equivalent of the S3-hosted {locale}.json served in production
+    (see TranslationPublisher._upload_json) - used whenever VITE_TRANSLATIONS_URL
+    isn't set to point directly at cloud storage.
     """
 
     permission_classes = (policies.AnyoneFullAccess,)
 
-    @method_decorator(cache_page(60 * 5))  # Cache for 5 minutes
     def get(self, request, locale_code):
+        # get_translations_for_locale() already caches server-side (keyed by
+        # locale, busted by TranslationPublisher.publish() on every republish -
+        # see _clear_cache). Deliberately NOT wrapped in @cache_page here: that
+        # decorator caches the whole HTTP response under its own, separate cache
+        # key that publish() has no way to invalidate, so freshly-published
+        # translations could stay invisible client-side for up to 5 minutes.
         translations = get_translations_for_locale(locale_code)
 
         if translations is None:
             return JsonResponse({"error": f"Locale '{locale_code}' not found"}, status=404)
 
         response = JsonResponse(translations)
-        response["Cache-Control"] = "public, max-age=300"
+        response["Cache-Control"] = "no-cache, must-revalidate"
         return response
 
 

@@ -3092,6 +3092,15 @@
   "Profile / Email / Not verified": {
     "defaultMessage": "Not verified"
   },
+  "Profile / Email / Resend error": {
+    "defaultMessage": "Failed to send verification email. Please try again."
+  },
+  "Profile / Email / Resend success": {
+    "defaultMessage": "Verification email sent. Please check your inbox."
+  },
+  "Profile / Email / Resend verification": {
+    "defaultMessage": "Resend verification email"
+  },
   "Profile / Name / Label": {
     "defaultMessage": "Name"
   },

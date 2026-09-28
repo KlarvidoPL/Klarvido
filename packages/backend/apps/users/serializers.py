@@ -112,6 +112,13 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
         token = attrs["token"]
         user = attrs["user"]
 
+        if user.is_confirmed:
+            # Re-clicking an already-used confirmation link must not show a
+            # scary "invalid token" error - the token generator hashes in
+            # is_confirmed (see tokens.AccountActivationTokenGenerator), so the
+            # same link's token stops matching once already confirmed.
+            return attrs
+
         if not tokens.account_activation_token.check_token(user, token):
             raise exceptions.ValidationError(_("Malformed user account confirmation token"))
 
@@ -121,6 +128,23 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
         user = validated_data.pop("user")
         user.is_confirmed = True
         user.save()
+        return {"ok": True}
+
+
+class ResendConfirmationEmailSerializer(serializers.Serializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ok = serializers.BooleanField(read_only=True)
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+
+        if user.is_confirmed:
+            return {"ok": False}
+
+        notifications.AccountActivationEmail(
+            user=user, data={"user_id": user.id.hashid, "token": tokens.account_activation_token.make_token(user)}
+        ).send()
+
         return {"ok": True}
 
 

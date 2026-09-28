@@ -224,6 +224,16 @@ class MarkWelcomeModalSeenMutation(graphene.ClientIDMutation):
         return MarkWelcomeModalSeenMutation(ok=True)
 
 
+class ResendConfirmationEmailMutation(mutations.SerializerMutation):
+    class Meta:
+        serializer_class = serializers.ResendConfirmationEmailSerializer
+
+    @classmethod
+    @ratelimit.ratelimit(key="ip", rate="10/min")
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
+
 @permission_classes(policies.AnyoneFullAccess)
 class AnyoneMutation(graphene.ObjectType):
     token_auth = ObtainTokenMutation.Field()
@@ -240,6 +250,7 @@ class AuthenticatedMutation(graphene.ObjectType):
     verify_otp = VerifyOTPMutation.Field()
     disable_otp = DisableOTPMutation.Field()
     mark_welcome_modal_seen = MarkWelcomeModalSeenMutation.Field()
+    resend_confirmation_email = ResendConfirmationEmailMutation.Field()
 
 
 class CurrentUserType(DjangoObjectType):
