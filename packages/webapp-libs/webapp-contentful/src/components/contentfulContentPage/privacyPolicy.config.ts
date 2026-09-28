@@ -1,11 +1,15 @@
 import { FileText } from 'lucide-react';
+import { defineMessage } from 'react-intl';
 
 import type { ContentfulContentPageConfig } from './contentfulContentPage.types';
 
 export const privacyPolicyConfig: ContentfulContentPageConfig = {
-  title: { defaultMessage: 'Privacy Policy', id: 'Privacy Policy / Title' },
-  description: { defaultMessage: 'How we handle and protect your data', id: 'Privacy Policy / Description' },
-  pageTitle: { defaultMessage: 'Privacy Policy', id: 'Privacy Policy / Page title' },
+  title: defineMessage({ defaultMessage: 'Privacy Policy', id: 'Privacy Policy / Title' }),
+  description: defineMessage({
+    defaultMessage: 'How we handle and protect your data',
+    id: 'Privacy Policy / Description',
+  }),
+  pageTitle: defineMessage({ defaultMessage: 'Privacy Policy', id: 'Privacy Policy / Page title' }),
   icon: FileText,
   contentField: 'privacyPolicy',
   emptyTitle: { defaultMessage: 'No Content Available', id: 'Privacy Policy / Empty title' },

@@ -3077,6 +3077,15 @@
   "Password Strength / Weak": {
     "defaultMessage": "Weak"
   },
+  "Privacy Policy / Description": {
+    "defaultMessage": "How we handle and protect your data"
+  },
+  "Privacy Policy / Page title": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "Privacy Policy / Title": {
+    "defaultMessage": "Privacy Policy"
+  },
   "Profile / Email / Label": {
     "defaultMessage": "Email"
   },
@@ -4276,6 +4285,15 @@
   },
   "TenantSwitch / Personal account": {
     "defaultMessage": "Personal account"
+  },
+  "Terms And Conditions / Description": {
+    "defaultMessage": "Legal terms for using our service"
+  },
+  "Terms And Conditions / Page title": {
+    "defaultMessage": "Terms and Conditions"
+  },
+  "Terms And Conditions / Title": {
+    "defaultMessage": "Terms and Conditions"
   },
   "Test / Key": {
     "defaultMessage": "Hello"
