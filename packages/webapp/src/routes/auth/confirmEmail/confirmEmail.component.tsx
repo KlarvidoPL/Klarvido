@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client/react';
+import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
@@ -17,6 +18,7 @@ export const ConfirmEmail = () => {
   const generateLocalePath = useGenerateLocalePath();
   const params = useParams<{ token: string; user: string }>();
   const { isLoggedIn } = useAuth();
+  const { reload: reloadCommonQuery } = useCommonQuery();
   const { toast } = useToast();
   const loggedOutSuccessMessage = intl.formatMessage({
     id: 'ConfirmEmail.LoggedOutSuccessMessage',
@@ -36,10 +38,22 @@ export const ConfirmEmail = () => {
   });
 
   const [commitConfirmUserEmailMutation] = useMutation(authConfirmUserEmailMutation, {
-    onCompleted: () => {
+    onCompleted: async () => {
       trackEvent('auth', 'user-email-confirm');
 
       toast({ description: successMessage, variant: 'success' });
+
+      // currentUser.isConfirmed lives in the Apollo cache from before this
+      // mutation ran - the mutation only returns { ok }, so without this the
+      // profile page keeps showing "Not verified" until a manual page refresh.
+      if (isLoggedIn) {
+        try {
+          await reloadCommonQuery();
+        } catch (error) {
+          reportError(error);
+        }
+      }
+
       navigate(generateLocalePath(RoutesConfig.login));
     },
     onError: () => {
