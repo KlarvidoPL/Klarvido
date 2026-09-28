@@ -273,7 +273,7 @@ export const ActiveSessions = () => {
             size="sm"
             onClick={handleSignOutAllSessions}
             disabled={revokingAll}
-            className="dark:bg-red-600 dark:hover:bg-red-600/90"
+            className="dark:bg-red-400 dark:hover:bg-red-400/90"
           >
             {revokingAll && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <XCircle className="mr-2 h-4 w-4" />
