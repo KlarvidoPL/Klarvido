@@ -11,6 +11,7 @@ class DjangoJWTStrategy(DjangoStrategy):
         self.refresh_token = None
         self.otp_auth_token = None
         self.is_new_signup = False
+        self.session_id = None
         super(DjangoJWTStrategy, self).__init__(storage, request, tpl)
 
     def redirect(self, url):
@@ -24,13 +25,13 @@ class DjangoJWTStrategy(DjangoStrategy):
 
         if self._user_is_authenticated():
             if self.refresh_token:
-                utils.set_auth_cookie(
-                    response,
-                    {
-                        settings.ACCESS_TOKEN_COOKIE: str(self.refresh_token.access_token),
-                        settings.REFRESH_TOKEN_COOKIE: str(self.refresh_token),
-                    },
-                )
+                auth_cookies = {
+                    settings.ACCESS_TOKEN_COOKIE: str(self.refresh_token.access_token),
+                    settings.REFRESH_TOKEN_COOKIE: str(self.refresh_token),
+                }
+                if self.session_id:
+                    auth_cookies[settings.SESSION_ID_COOKIE] = self.session_id
+                utils.set_auth_cookie(response, auth_cookies)
                 if self.is_new_signup:
                     # Unlike the httpOnly auth cookies above (only ever sent
                     # automatically with requests *to* the API host, so the default
@@ -77,6 +78,9 @@ class DjangoJWTStrategy(DjangoStrategy):
 
     def set_otp_auth_token(self, token):
         self.otp_auth_token = token
+
+    def set_session_id(self, session_id):
+        self.session_id = session_id
 
     def set_is_new_signup(self, is_new_signup):
         self.is_new_signup = is_new_signup
