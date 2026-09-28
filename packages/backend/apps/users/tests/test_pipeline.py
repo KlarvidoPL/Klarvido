@@ -17,13 +17,20 @@ def _tiny_jpeg_bytes():
 
 
 class TestPopulateProfileFromSocial:
-    """Regression coverage for a one-time-only fill: name/avatar should be copied
-    from the social provider on the account's first signup, but never re-applied
-    on a later login - even if the user has since cleared those fields."""
+    """Name and email-confirmation are backfilled whenever they're still blank -
+    on the account's first signup, or when an existing password-signup account
+    is later linked (by email) to a Google/Facebook login - but never overwrite
+    a name the user has already set. Avatar remains first-signup-only (is_new):
+    unlike name/confirmation, silently re-downloading it on every later login
+    could clobber one the user set themselves."""
 
-    def test_does_nothing_when_not_a_new_user(self, user):
+    def test_confirms_email_and_fills_blank_name_for_existing_account_on_later_login(self, user):
+        """E.g. signed up with email+password, later uses "Sign in with Google"
+        with the same address - is_new is False (no new user is created, just
+        linked by email), but the fields should still be backfilled."""
         user.profile.first_name = ""
-        user.profile.save(update_fields=["first_name"])
+        user.profile.last_name = ""
+        user.profile.save(update_fields=["first_name", "last_name"])
         user.is_confirmed = False
         user.save(update_fields=["is_confirmed"])
 
@@ -33,8 +40,22 @@ class TestPopulateProfileFromSocial:
 
         user.profile.refresh_from_db()
         user.refresh_from_db()
-        assert user.profile.first_name == ""
-        assert user.is_confirmed is False
+        assert user.profile.first_name == "Jan"
+        assert user.profile.last_name == "Kowalski"
+        assert user.is_confirmed is True
+
+    def test_does_not_overwrite_an_existing_name_on_later_login(self, user):
+        user.profile.first_name = "Existing"
+        user.profile.last_name = ""
+        user.profile.save(update_fields=["first_name", "last_name"])
+
+        populate_profile_from_social(
+            details={"first_name": "Jan", "last_name": "Kowalski"}, response={}, user=user, is_new=False
+        )
+
+        user.profile.refresh_from_db()
+        assert user.profile.first_name == "Existing"
+        assert user.profile.last_name == ""
 
     def test_confirms_email_on_first_social_signup(self, user):
         user.is_confirmed = False
@@ -100,13 +121,16 @@ class TestPopulateProfileFromSocial:
         assert user.profile.avatar is None
         assert user.profile.first_name == "Jan"
 
-    def test_does_not_refill_after_user_clears_fields_on_a_later_login(self, user):
-        """The core guarantee: is_new gates this, not "is the field currently
-        blank" - otherwise deleting a synced name/avatar would just bring it back
-        on the next Google/Facebook login."""
-        user.profile.first_name = ""
+    def test_does_not_redownload_avatar_after_user_clears_it_on_a_later_login(self, user):
+        """Avatar keeps the old guarantee: is_new gates it, not "is it currently
+        blank" - otherwise deleting a synced avatar would just bring it back on
+        the next Google/Facebook login. (Name has no such guarantee - see
+        test_confirms_email_and_fills_blank_name_for_existing_account_on_later_login
+        above - only avatar is signup-gated.)"""
+        user.profile.first_name = "Existing"
+        user.profile.last_name = "Name"
         user.profile.avatar = None
-        user.profile.save(update_fields=["first_name", "avatar"])
+        user.profile.save(update_fields=["first_name", "last_name", "avatar"])
 
         populate_profile_from_social(
             details={"first_name": "Jan"},
@@ -116,5 +140,4 @@ class TestPopulateProfileFromSocial:
         )
 
         user.profile.refresh_from_db()
-        assert user.profile.first_name == ""
         assert user.profile.avatar is None
