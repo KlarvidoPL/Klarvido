@@ -24,13 +24,26 @@ class TestPopulateProfileFromSocial:
     def test_does_nothing_when_not_a_new_user(self, user):
         user.profile.first_name = ""
         user.profile.save(update_fields=["first_name"])
+        user.is_confirmed = False
+        user.save(update_fields=["is_confirmed"])
 
         populate_profile_from_social(
             details={"first_name": "Jan", "last_name": "Kowalski"}, response={}, user=user, is_new=False
         )
 
         user.profile.refresh_from_db()
+        user.refresh_from_db()
         assert user.profile.first_name == ""
+        assert user.is_confirmed is False
+
+    def test_confirms_email_on_first_social_signup(self, user):
+        user.is_confirmed = False
+        user.save(update_fields=["is_confirmed"])
+
+        populate_profile_from_social(details={}, response={}, user=user, is_new=True)
+
+        user.refresh_from_db()
+        assert user.is_confirmed is True
 
     def test_does_nothing_without_a_user(self):
         # Should not raise even though there's nothing to fill.

@@ -52,8 +52,8 @@ export const SSOCallback = () => {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="rounded-lg bg-destructive/10 p-6 text-center">
-          <h2 className="mb-2 text-lg font-semibold text-destructive">
+        <div className="rounded-lg bg-destructive/10 p-6 text-center dark:bg-red-950/40">
+          <h2 className="mb-2 text-lg font-semibold text-destructive dark:text-red-400">
             <FormattedMessage defaultMessage="Authentication Failed" id="SSO / Callback / Error title" />
           </h2>
           <p className="text-sm text-muted-foreground">{error}</p>

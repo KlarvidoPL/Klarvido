@@ -124,12 +124,16 @@ class TranslationPublisher:
         backend = os.environ.get("STORAGE_BACKEND", "s3")
         logger.info(f"Publishing translations for {locale.code} using {backend} storage backend")
 
-        # Upload versioned file (for history/rollback)
-        self._upload_json(versioned_path, translations)
+        # Upload versioned file (for history/rollback) - immutable, safe to cache forever
+        self._upload_json(versioned_path, translations, cache_control="public, max-age=31536000, immutable")
         logger.info(f"  Uploaded versioned file: {versioned_path}")
 
-        # Upload current file (served to clients)
-        self._upload_json(current_path, translations)
+        # Upload current file (served to clients) - same URL across every publish,
+        # so it must never be cached without revalidation or a republish can go
+        # live in storage while browsers that fetched it before keep serving their
+        # own stale copy indefinitely (no Cache-Control means browsers fall back to
+        # heuristic caching based on Last-Modified).
+        self._upload_json(current_path, translations, cache_control="no-cache, must-revalidate")
         logger.info(f"  Uploaded current file: {current_path}")
 
         logger.info(f"Published {len(translations)} translations for {locale.code}")
@@ -184,23 +188,35 @@ class TranslationPublisher:
 
         # Upload as current
         current_path = f"{version.locale.code}.json"
-        self._upload_json(current_path, translations)
+        self._upload_json(current_path, translations, cache_control="no-cache, must-revalidate")
 
         self.activate_version(version)
         self._clear_cache(version.locale)
 
         logger.info(f"Rolled back {version.locale.code} to version {version.version}")
 
-    def _upload_json(self, path: str, data: Dict[str, Any]):
-        """Upload JSON to storage."""
+    def _upload_json(self, path: str, data: Dict[str, Any], cache_control: Optional[str] = None):
+        """Upload JSON to storage, optionally overriding the object's Cache-Control header.
+
+        Only django-storages' S3Boto3Storage (s3/r2/b2/minio backends) reads
+        `object_parameters` - the local filesystem backend has no equivalent concept,
+        so the override is skipped there rather than erroring.
+        """
         content = json.dumps(data, ensure_ascii=False, indent=2)
 
         # Delete existing file if it exists (for overwrite)
         if self.storage.exists(path):
             self.storage.delete(path)
 
-        # Save new content
-        self.storage.save(path, ContentFile(content.encode("utf-8")))
+        original_params = getattr(self.storage, "object_parameters", None)
+        override_applied = cache_control is not None and hasattr(self.storage, "object_parameters")
+        if override_applied:
+            self.storage.object_parameters = {**(original_params or {}), "CacheControl": cache_control}
+        try:
+            self.storage.save(path, ContentFile(content.encode("utf-8")))
+        finally:
+            if override_applied:
+                self.storage.object_parameters = original_params
 
     def _clear_cache(self, locale: Locale):
         """Clear local cache for a locale."""

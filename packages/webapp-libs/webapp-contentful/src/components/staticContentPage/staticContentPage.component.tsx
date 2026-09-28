@@ -12,6 +12,11 @@ export type StaticContentPageProps = {
   title: MessageDescriptor;
   description: MessageDescriptor;
   pageTitle: MessageDescriptor;
+  // A plain string, already resolved to the current locale by the caller (see
+  // localizedContent.util.ts) - NOT run through intl.formatMessage(). ICU
+  // MessageFormat parsing collapses blank lines, which silently destroys markdown's
+  // block structure (headings/paragraphs/lists all merge into one block). That's
+  // fine for short UI strings but breaks on multi-paragraph content like this.
   markdown: string;
 };
 

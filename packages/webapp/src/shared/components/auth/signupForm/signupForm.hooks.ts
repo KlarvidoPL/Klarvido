@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react';
-import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
+import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
 import { UseApiFormArgs, useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
@@ -8,7 +8,6 @@ import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../app/config/routes';
-import { triggerWelcomeModal } from '../../welcomeModal';
 import { authSingupMutation } from './signUpForm.graphql';
 import { SignupFormFields } from './signupForm.types';
 
@@ -50,13 +49,29 @@ export const useSignupForm = (args?: UseApiFormArgs<SignupFormFields>) => {
 
   const { handleSubmit, setApolloGraphQLResponseErrors } = form;
   const [commitSignupMutation, { loading }] = useMutation(authSingupMutation, {
-    onCompleted: () => {
+    onCompleted: async ({ signUp }) => {
+      // Unlike login/OTP/passkey/SSO, signup relied solely on the auth cookie the
+      // backend sets on this response - with no Authorization-header fallback, the
+      // immediate refetch below can fail in any cross-site/cookie-blocked setup.
+      if (signUp?.access) {
+        storeAuthTokens(signUp.access, signUp.refresh ?? undefined);
+      }
+
       trackEvent('auth', 'sign-up');
 
-      // Trigger the welcome modal to show on dashboard
-      triggerWelcomeModal();
-
-      reloadCommonQuery();
+      // Await the refetch so AuthRoute sees a fresh isLoggedIn state before we
+      // navigate - otherwise it can briefly redirect back to /auth/login off a
+      // stale cache. WelcomeModal itself now shows based on the freshly-loaded
+      // currentUser.hasSeenWelcomeModal (a DB-backed, per-account flag) once we
+      // land on the home route, rather than a one-shot client-side flag.
+      // A failed refetch must never block navigation - reload() rethrows non-Abort
+      // errors, and AuthRoute/CommonQuery will still resolve auth state correctly
+      // once we're on the home route.
+      try {
+        await reloadCommonQuery();
+      } catch (error) {
+        console.error('Failed to refresh current user after signup:', error);
+      }
       navigate(generateLocalePath(RoutesConfig.home));
     },
     onError: (error) => {
@@ -74,6 +89,10 @@ export const useSignupForm = (args?: UseApiFormArgs<SignupFormFields>) => {
           input: {
             email: data.email,
             password: data.password,
+            // The locale this signup page is rendering in, so the first
+            // transactional email (account activation) goes out already in
+            // the right language instead of defaulting to English.
+            language: intl.locale,
           },
         },
       });

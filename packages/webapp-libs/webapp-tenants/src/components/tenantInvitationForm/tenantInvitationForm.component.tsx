@@ -154,7 +154,7 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
         <Form {...form}>
           <form className="flex flex-col gap-6" onSubmit={handleFormSubmit}>
             {hasGenericErrorOnly && (
-              <div className="text-sm text-destructive">
+              <div className="text-sm text-destructive dark:text-red-400">
                 <span>{genericError}</span>
               </div>
             )}

@@ -15,7 +15,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {label && (
             <p
               className={cn(`order-first mb-1.5 text-sm font-medium`, {
-                'text-destructive': !!error,
+                'text-destructive dark:text-red-400': !!error,
                 'text-foreground': !error,
               })}
             >
@@ -25,19 +25,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             className={cn(
-              `border-input text-primary ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-10 w-full rounded-md border 
-              bg-transparent px-3 py-2 text-sm transition-all duration-200 ease-in file:border-0 
-              file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none 
-              focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`,
-              {
-                'border-destructive focus-visible:ring-destructive': !!error,
-              }
+              `border-input text-primary ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-10 w-full rounded-md border
+              bg-transparent px-3 py-2 text-sm transition-all duration-200 ease-in file:border-0
+              file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none
+              focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`
             )}
             ref={ref}
             {...props}
           />
         </label>
-        {error && <p className="text-destructive mt-1.5 text-sm leading-tight">{error}</p>}
+        {error && <p className="text-destructive dark:text-red-400 mt-1.5 text-sm leading-tight">{error}</p>}
       </div>
     );
   }

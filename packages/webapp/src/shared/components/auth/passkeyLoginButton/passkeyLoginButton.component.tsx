@@ -4,8 +4,20 @@ import { ENV } from '@sb/webapp-core/config/env';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { Fingerprint } from 'lucide-react';
 import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useLocation } from 'react-router-dom';
+
+// Carries a stable error code through the catch block instead of a raw English
+// message, so the UI can always show a translated string - the backend's own
+// exception text (via PASSKEY_AUTH_ERROR_CODES) is for logs/debugging only.
+class PasskeyLoginError extends Error {
+  code: string;
+
+  constructor(code: string) {
+    super(code);
+    this.code = code;
+  }
+}
 
 // Helper to decode base64url to Uint8Array
 const base64UrlToUint8Array = (base64url: string): Uint8Array => {
@@ -40,9 +52,52 @@ const uint8ArrayToBase64Url = (bytes: Uint8Array): string => {
  * Only shown if ENABLE_PASSKEYS feature flag is enabled.
  */
 export const PasskeyLoginButton = () => {
+  const intl = useIntl();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { search } = useLocation();
+
+  // Keyed by the backend's PASSKEY_AUTH_ERROR_CODES codes, plus a few
+  // frontend-only cases (options request failing, no credential returned, the
+  // browser's own cancellation, and a generic fallback for anything unmapped).
+  const errorMessages: Record<string, string> = {
+    options_failed: intl.formatMessage({
+      defaultMessage: 'Failed to start passkey sign-in. Please try again.',
+      id: 'Auth / Passkey / error options failed',
+    }),
+    no_credential: intl.formatMessage({
+      defaultMessage: 'No passkey was selected.',
+      id: 'Auth / Passkey / error no credential',
+    }),
+    cancelled: intl.formatMessage({
+      defaultMessage: 'Authentication was cancelled or timed out.',
+      id: 'Auth / Passkey / error cancelled',
+    }),
+    passkey_not_found: intl.formatMessage({
+      defaultMessage: 'Passkey not found.',
+      id: 'Auth / Passkey / error not found',
+    }),
+    challenge_not_found: intl.formatMessage({
+      defaultMessage: 'This sign-in attempt has expired. Please try again.',
+      id: 'Auth / Passkey / error challenge not found',
+    }),
+    challenge_expired: intl.formatMessage({
+      defaultMessage: 'This sign-in attempt has expired. Please try again.',
+      id: 'Auth / Passkey / error challenge expired',
+    }),
+    challenge_mismatch: intl.formatMessage({
+      defaultMessage: 'This sign-in attempt has expired. Please try again.',
+      id: 'Auth / Passkey / error challenge mismatch',
+    }),
+    invalid_client_data: intl.formatMessage({
+      defaultMessage: 'This sign-in attempt has expired. Please try again.',
+      id: 'Auth / Passkey / error invalid client data',
+    }),
+    verification_failed: intl.formatMessage({
+      defaultMessage: 'Failed to authenticate with passkey. Please try again.',
+      id: 'Auth / Passkey / error verification failed',
+    }),
+  };
 
   // Check if passkeys feature is enabled
   if (!ENV.ENABLE_PASSKEYS) {
@@ -68,7 +123,7 @@ export const PasskeyLoginButton = () => {
       });
 
       if (!optionsResponse.ok) {
-        throw new Error('Failed to get authentication options');
+        throw new PasskeyLoginError('options_failed');
       }
 
       const options = await optionsResponse.json();
@@ -92,7 +147,7 @@ export const PasskeyLoginButton = () => {
       }) as PublicKeyCredential;
 
       if (!credential) {
-        throw new Error('No credential returned');
+        throw new PasskeyLoginError('no_credential');
       }
 
       const response = credential.response as AuthenticatorAssertionResponse;
@@ -116,7 +171,7 @@ export const PasskeyLoginButton = () => {
 
       if (!verifyResponse.ok) {
         const errorData = await verifyResponse.json();
-        throw new Error(errorData.error || 'Authentication failed');
+        throw new PasskeyLoginError(errorData.code || 'verification_failed');
       }
 
       const verifyData = await verifyResponse.json();
@@ -142,15 +197,13 @@ export const PasskeyLoginButton = () => {
 
     } catch (err) {
       console.error('Passkey login error:', err);
-      if (err instanceof Error) {
-        if (err.name === 'NotAllowedError') {
-          setError('Authentication was cancelled or timed out.');
-        } else {
-          setError(err.message);
-        }
-      } else {
-        setError('Failed to authenticate with passkey.');
+      let code = 'verification_failed';
+      if (err instanceof PasskeyLoginError) {
+        code = err.code;
+      } else if (err instanceof Error && err.name === 'NotAllowedError') {
+        code = 'cancelled';
       }
+      setError(errorMessages[code] ?? errorMessages.verification_failed);
     } finally {
       setLoading(false);
     }
@@ -173,7 +226,7 @@ export const PasskeyLoginButton = () => {
         )}
       </Button>
       {error && (
-        <p className="text-center text-sm text-destructive">{error}</p>
+        <p className="text-center text-sm text-destructive dark:text-red-400">{error}</p>
       )}
     </div>
   );

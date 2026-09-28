@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client/react';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import {
   Dialog,
@@ -7,54 +8,43 @@ import {
   DialogTitle,
 } from '@sb/webapp-core/components/ui/dialog';
 import confetti from 'canvas-confetti';
-import { ArrowRight, CheckCircle2, Mail, Rocket, User } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Mail, MailCheck, Rocket, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { useAuth } from '../../hooks';
+import { welcomeModalMarkSeenMutation } from './welcomeModal.graphql';
+
 const CONFETTI_COLORS = ['#FFFE25', '#42F272', '#71F85D', '#A0FA4B', '#D4F81D'];
-const STORAGE_KEY = 'sb_show_welcome_modal';
-// Matches settings.NEW_SIGNUP_COOKIE - a short-lived, non-httponly cookie set by
-// the backend only on a brand new OAuth signup. Unlike the password-signup flow
-// (a client-side mutation that can call triggerWelcomeModal() directly), OAuth
-// signup is a full backend redirect that can land on any page depending on the
-// auth-route bounce logic, so a cookie is used instead of a query param, which a
-// client-side redirect could easily drop along the way.
-const OAUTH_NEW_SIGNUP_COOKIE = 'new_signup';
-
-const hasOAuthNewSignupCookie = () =>
-  document.cookie.split('; ').some((cookie) => cookie.split('=')[0] === OAUTH_NEW_SIGNUP_COOKIE);
-
-// The backend sets this cookie scoped to the shared parent domain (e.g.
-// .klarvido.com), not just this page's own host, since it's set from a response
-// on the API's subdomain but read here on the webapp's subdomain. Clearing it
-// without matching that same domain would just set an unrelated, host-scoped
-// cookie instead of removing the original - it'd still be visible (and reopen
-// the modal) on a refresh until its own short max-age expires server-side.
-const getCookieClearDomain = () => {
-  const { hostname } = window.location;
-  if (hostname === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return '';
-  const labels = hostname.split('.');
-  return labels.length > 2 ? `.${labels.slice(-2).join('.')}` : `.${hostname}`;
-};
-
-const clearOAuthNewSignupCookie = () => {
-  const domain = getCookieClearDomain();
-  document.cookie = `${OAUTH_NEW_SIGNUP_COOKIE}=; path=/; max-age=0${domain ? `; domain=${domain}` : ''}`;
-};
 
 export const WelcomeModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const hasPlayedConfetti = useRef(false);
+  const hasTriggered = useRef(false);
+  const { currentUser } = useAuth();
+  const [commitMarkSeenMutation] = useMutation(welcomeModalMarkSeenMutation);
 
-  // Check if we should show the modal on mount
+  // Show the modal exactly once per account, driven by durable per-account state
+  // (currentUser.hasSeenWelcomeModal) instead of client-side sessionStorage/cookie
+  // flags - those raced with navigation/auth timing and broke across browser
+  // storage differences (private vs regular windows, OAuth vs password signup).
   useEffect(() => {
-    const shouldShow = sessionStorage.getItem(STORAGE_KEY) === 'true' || hasOAuthNewSignupCookie();
-    if (shouldShow) {
-      setIsOpen(true);
-      sessionStorage.removeItem(STORAGE_KEY);
-      clearOAuthNewSignupCookie();
-    }
-  }, []);
+    if (!currentUser || currentUser.hasSeenWelcomeModal || hasTriggered.current) return;
+    hasTriggered.current = true;
+    setIsOpen(true);
+
+    commitMarkSeenMutation({
+      variables: { input: {} },
+      update(cache) {
+        const id = cache.identify({ __typename: 'CurrentUserType', id: currentUser.id });
+        if (id) {
+          cache.modify({ id, fields: { hasSeenWelcomeModal: () => true } });
+        }
+      },
+    }).catch((error) => {
+      console.error('Failed to mark welcome modal as seen:', error);
+    });
+  }, [currentUser, commitMarkSeenMutation]);
 
   // Play confetti when modal opens
   useEffect(() => {
@@ -160,7 +150,7 @@ export const WelcomeModal = () => {
         </div>
 
         {/* Content */}
-        <div className="px-6 pb-6 space-y-5">
+        <div className="px-6 pt-6 pb-6 space-y-5">
           {/* Email verification notice */}
           <div className="rounded-lg border bg-card p-4">
             <div className="flex gap-3">
@@ -168,20 +158,32 @@ export const WelcomeModal = () => {
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg shadow-sm"
                 style={{ background: 'linear-gradient(135deg, #FFFE25, #42F272)' }}
               >
-                <Mail className="h-5 w-5 text-gray-900" />
+                {currentUser?.isConfirmed ? (
+                  <MailCheck className="h-5 w-5 text-gray-900" />
+                ) : (
+                  <Mail className="h-5 w-5 text-gray-900" />
+                )}
               </div>
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm text-foreground">
-                  <FormattedMessage
-                    defaultMessage="Verify your email"
-                    id="Welcome Modal / email title"
-                  />
+                  {currentUser?.isConfirmed ? (
+                    <FormattedMessage defaultMessage="Email verified" id="Welcome Modal / email verified title" />
+                  ) : (
+                    <FormattedMessage defaultMessage="Verify your email" id="Welcome Modal / email title" />
+                  )}
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  <FormattedMessage
-                    defaultMessage="Check your inbox for a confirmation link to unlock all features."
-                    id="Welcome Modal / email description"
-                  />
+                  {currentUser?.isConfirmed ? (
+                    <FormattedMessage
+                      defaultMessage="Your email is already verified - you're all set."
+                      id="Welcome Modal / email verified description"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="Check your inbox for a confirmation link to unlock all features."
+                      id="Welcome Modal / email description"
+                    />
+                  )}
                 </p>
               </div>
             </div>
@@ -237,9 +239,4 @@ export const WelcomeModal = () => {
       </DialogContent>
     </Dialog>
   );
-};
-
-// Helper function to trigger the modal (call after signup)
-export const triggerWelcomeModal = () => {
-  sessionStorage.setItem(STORAGE_KEY, 'true');
 };

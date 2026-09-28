@@ -631,6 +631,7 @@ type ActionLogType implements Node {
 type CurrentUserType {
   id: ID!
   email: String!
+  isConfirmed: Boolean!
   otpEnabled: Boolean!
   otpVerified: Boolean!
   tenants: [TenantType]
@@ -641,6 +642,8 @@ type CurrentUserType {
   avatar: String
   "False for an OAuth-only account that has never set a password - the frontend uses this to show a 'Set password' flow instead of 'Change password' (no old password to ask for)."
   hasUsablePassword: Boolean
+  "False until markWelcomeModalSeen is called once for this account - the frontend uses this instead of client-side storage so the modal is driven by durable, per-account state rather than a one-shot sessionStorage/cookie flag."
+  hasSeenWelcomeModal: Boolean
 }
 type PermissionConnection {
   "Pagination data for this connection."
@@ -1462,6 +1465,8 @@ type ApiMutation {
   generateOtp(input: GenerateOTPMutationInput!): GenerateOTPMutationPayload
   verifyOtp(input: VerifyOTPMutationInput!): VerifyOTPMutationPayload
   disableOtp(input: DisableOTPMutationInput!): DisableOTPMutationPayload
+  markWelcomeModalSeen(input: MarkWelcomeModalSeenMutationInput!): MarkWelcomeModalSeenMutationPayload
+  resendConfirmationEmail(input: ResendConfirmationEmailMutationInput!): ResendConfirmationEmailMutationPayload
   tokenAuth(input: ObtainTokenMutationInput!): ObtainTokenMutationPayload
   signUp(input: SingUpMutationInput!): SingUpMutationPayload
   confirm(input: ConfirmEmailMutationInput!): ConfirmEmailMutationPayload
@@ -1955,6 +1960,7 @@ type UserProfileType implements Node {
   "User's preferred language for emails and notifications"
   language: UsersUserProfileLanguageChoices!
   avatar: String
+  hasSeenWelcomeModal: Boolean!
   email: String
   "The hashid of the associated user"
   userId: String
@@ -1976,6 +1982,14 @@ type VerifyOTPMutationPayload {
   clientMutationId: String
 }
 type DisableOTPMutationPayload {
+  ok: Boolean
+  clientMutationId: String
+}
+type MarkWelcomeModalSeenMutationPayload {
+  ok: Boolean
+  clientMutationId: String
+}
+type ResendConfirmationEmailMutationPayload {
   ok: Boolean
   clientMutationId: String
 }
@@ -2789,6 +2803,12 @@ enum UsersUserProfileLanguageChoices {
   FR
   "Spanish"
   ES
+  "Chinese"
+  ZH
+  "Hindi"
+  HI
+  "Arabic"
+  AR
 }
 "Input type for backup configuration."
 input BackupConfigInput {
@@ -3032,6 +3052,12 @@ input VerifyOTPMutationInput {
 input DisableOTPMutationInput {
   clientMutationId: String
 }
+input MarkWelcomeModalSeenMutationInput {
+  clientMutationId: String
+}
+input ResendConfirmationEmailMutationInput {
+  clientMutationId: String
+}
 input ObtainTokenMutationInput {
   email: String!
   password: String!
@@ -3041,6 +3067,7 @@ input SingUpMutationInput {
   id: String
   email: String!
   password: String!
+  language: String
   clientMutationId: String
 }
 input ConfirmEmailMutationInput {

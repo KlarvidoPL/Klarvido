@@ -108,7 +108,7 @@ export const EditProfileForm = () => {
           </div>
 
           {hasGenericErrorOnly && (
-            <div className="text-sm text-destructive">
+            <div className="text-sm text-destructive dark:text-red-400">
               <Small>{genericError}</Small>
             </div>
           )}

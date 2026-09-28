@@ -1,1 +1,1 @@
-export { WelcomeModal, triggerWelcomeModal } from './welcomeModal.component';
+export { WelcomeModal } from './welcomeModal.component';

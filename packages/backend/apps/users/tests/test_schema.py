@@ -93,6 +93,32 @@ class TestSignup:
 
         assert user.tenants.count()
 
+    def test_sets_profile_language_from_input(self, graphene_client, faker):
+        email = faker.email()
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {'email': email, 'password': faker.password(), 'language': 'pl'}},
+        )
+        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+
+        assert user.profile.language == 'pl'
+
+    def test_falls_back_to_english_for_unrecognized_language(self, graphene_client, faker):
+        email = faker.email()
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {'email': email, 'password': faker.password(), 'language': 'xx'}},
+        )
+        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+
+        assert user.profile.language == models.LanguageChoices.ENGLISH
+
+    def test_defaults_to_english_when_language_omitted(self, graphene_client, faker):
+        executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
+        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+
+        assert user.profile.language == models.LanguageChoices.ENGLISH
+
 
 class TestObtainToken:
     MUTATION = '''
@@ -460,6 +486,35 @@ class TestChangePasswordMutation:
         assert executed["errors"][0]["message"] == "GraphQlValidationError"
         assert executed["data"] == {'changePassword': None}
 
+    def test_sets_correct_auth_cookies(self, api_client, user, faker):
+        """Regression test: mutate_and_get_payload() previously built the
+        set_auth_cookie dict with literal "access"/"refresh" keys instead of
+        settings.ACCESS_TOKEN_COOKIE/REFRESH_TOKEN_COOKIE - set_auth_cookie()
+        looked up the wrong keys, got None, and unconditionally overwrote the
+        access-token cookie with the literal string "None", logging the user
+        out on their next hard page load."""
+        old_password = faker.password()
+        new_password = faker.password()
+        user.set_password(old_password)
+        user.save()
+        api_client.force_authenticate(user)
+
+        response = api_client.post(
+            path=API_GRAPHQL_PATH,
+            data={
+                "query": self.MUTATION,
+                "variables": {"input": {"oldPassword": old_password, "newPassword": new_password}},
+            },
+            format="json",
+        )
+
+        access_cookie = response.cookies.get(settings.ACCESS_TOKEN_COOKIE)
+        refresh_cookie = response.cookies.get(settings.REFRESH_TOKEN_COOKIE)
+        assert access_cookie is not None
+        assert access_cookie.value not in ("", "None")
+        assert refresh_cookie is not None
+        assert refresh_cookie.value not in ("", "None")
+
 
 class TestConfirmEmailMutation:
     MUTATION = '''
@@ -526,6 +581,65 @@ class TestConfirmEmailMutation:
         assert len(executed["errors"]) == 1
         assert executed["errors"][0]["message"] == "GraphQlValidationError"
         assert executed["data"] == {'confirm': None}
+
+    def test_reusing_link_after_already_confirmed_succeeds(self, graphene_client, user_factory, faker):
+        # The token hash includes is_confirmed, so re-clicking the same link
+        # after it already succeeded once would otherwise fail with a
+        # confusing "invalid token" error - confirming must be idempotent.
+        user = user_factory(is_confirmed=False)
+        token = tokens.account_activation_token.make_token(user)
+
+        first = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"user": user.pk.hashid, "token": token}},
+        )
+        assert "errors" not in first
+        assert first["data"]["confirm"]["ok"] is True
+
+        second = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={'input': {"user": user.pk.hashid, "token": token}},
+        )
+        assert "errors" not in second
+        assert second["data"]["confirm"]["ok"] is True
+
+
+class TestResendConfirmationEmailMutation:
+    MUTATION = '''
+        mutation ResendConfirmationEmail($input: ResendConfirmationEmailMutationInput!) {
+          resendConfirmationEmail(input: $input) {
+            ok
+          }
+        }
+    '''
+
+    def test_not_authenticated(self, graphene_client):
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': {}})
+
+        assert len(executed["errors"]) == 1
+        assert executed["data"] == {'resendConfirmationEmail': None}
+
+    def test_sends_email_when_not_confirmed(self, graphene_client, user_factory, mocker):
+        user = user_factory(is_confirmed=False)
+        graphene_client.force_authenticate(user)
+        send_mock = mocker.patch('apps.users.notifications.AccountActivationEmail.send')
+
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': {}})
+
+        assert "errors" not in executed
+        assert executed["data"]["resendConfirmationEmail"]["ok"] is True
+        send_mock.assert_called_once()
+
+    def test_no_op_when_already_confirmed(self, graphene_client, user_factory, mocker):
+        user = user_factory(is_confirmed=True)
+        graphene_client.force_authenticate(user)
+        send_mock = mocker.patch('apps.users.notifications.AccountActivationEmail.send')
+
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': {}})
+
+        assert "errors" not in executed
+        assert executed["data"]["resendConfirmationEmail"]["ok"] is False
+        send_mock.assert_not_called()
 
 
 class TestResetPassword:

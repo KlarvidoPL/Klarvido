@@ -25,10 +25,17 @@ export const RestoreCompleted = ({
       icon={<RotateCcw className="h-4 w-4 text-emerald-600" />}
       iconClassName="bg-emerald-100"
       title={
-        <FormattedMessage
-          defaultMessage={isPartiallyCompleted ? 'Restore Partially Completed' : 'Restore Completed'}
-          id="Notifications / Restore Completed / Title"
-        />
+        isPartiallyCompleted ? (
+          <FormattedMessage
+            defaultMessage="Restore Partially Completed"
+            id="Notifications / Restore Completed / Partial Title"
+          />
+        ) : (
+          <FormattedMessage
+            defaultMessage="Restore Completed"
+            id="Notifications / Restore Completed / Title"
+          />
+        )
       }
       content={
         <>

@@ -9,7 +9,12 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: 'bg-background text-foreground',
-        destructive: 'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
+        // The --destructive token itself is quite dark in dark mode (tuned to sit
+        // behind white text on a filled destructive button), so it reads as low
+        // contrast when used as body text or a border on a near-black background.
+        // Light mode is unaffected; dark mode gets a brighter, legible red instead.
+        destructive:
+          'border-destructive/50 bg-destructive/10 text-destructive [&>svg]:text-destructive dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400 dark:[&>svg]:text-red-400',
         info: 'text-blue-700 border-blue-700/50 dark:border-blue-700 [&>svg]:text-blue-700',
       },
     },

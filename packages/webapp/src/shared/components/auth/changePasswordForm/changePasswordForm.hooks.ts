@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client/react';
-import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
+import { useCommonQuery } from '@sb/webapp-api-client/providers';
+import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
@@ -11,6 +12,7 @@ import { ChangePasswordFormFields } from './changePasswordForm.types';
 export const useChangePasswordForm = (hasUsablePassword: boolean) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const { reload: reloadCommonQuery } = useCommonQuery();
 
   const form = useApiForm<ChangePasswordFormFields>({
     defaultValues: {
@@ -53,8 +55,23 @@ export const useChangePasswordForm = (hasUsablePassword: boolean) => {
   } = form;
 
   const [commitChangePasswordMutation, { loading }] = useMutation(authChangePasswordMutation, {
-    onCompleted: () => {
+    onCompleted: async (data) => {
       trackEvent('profile', 'password-update');
+
+      if (data.changePassword?.access) {
+        storeAuthTokens(data.changePassword.access, data.changePassword.refresh ?? undefined);
+      }
+
+      // A successful call without oldPassword means this was a first-time "set
+      // password" for an OAuth-only account - refetch so currentUser.hasUsablePassword
+      // (and thus the Old Password field) updates without a manual page refresh.
+      if (!hasUsablePassword) {
+        try {
+          await reloadCommonQuery();
+        } catch (error) {
+          console.error('Failed to refresh current user after setting password:', error);
+        }
+      }
 
       reset();
 

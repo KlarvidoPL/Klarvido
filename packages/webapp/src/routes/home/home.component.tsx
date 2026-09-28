@@ -472,7 +472,7 @@ export const Home = () => {
               <CardContent>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <a
-                    href="https://github.com/OrdigitaPL/Klarvido"
+                    href="https://github.com/KlarvidoPL/Klarvido"
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:no-underline [&]:no-underline"

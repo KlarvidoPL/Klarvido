@@ -213,6 +213,27 @@ class DisableOTPMutation(mutations.SerializerMutation):
         serializer_class = serializers.DisableOTPSerializer
 
 
+class MarkWelcomeModalSeenMutation(graphene.ClientIDMutation):
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **kwargs):
+        profile = get_user_from_resolver(info).profile
+        profile.has_seen_welcome_modal = True
+        profile.save(update_fields=["has_seen_welcome_modal"])
+        return MarkWelcomeModalSeenMutation(ok=True)
+
+
+class ResendConfirmationEmailMutation(mutations.SerializerMutation):
+    class Meta:
+        serializer_class = serializers.ResendConfirmationEmailSerializer
+
+    @classmethod
+    @ratelimit.ratelimit(key="ip", rate="10/min")
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
+
 @permission_classes(policies.AnyoneFullAccess)
 class AnyoneMutation(graphene.ObjectType):
     token_auth = ObtainTokenMutation.Field()
@@ -228,6 +249,8 @@ class AuthenticatedMutation(graphene.ObjectType):
     generate_otp = GenerateOTPMutation.Field()
     verify_otp = VerifyOTPMutation.Field()
     disable_otp = DisableOTPMutation.Field()
+    mark_welcome_modal_seen = MarkWelcomeModalSeenMutation.Field()
+    resend_confirmation_email = ResendConfirmationEmailMutation.Field()
 
 
 class CurrentUserType(DjangoObjectType):
@@ -241,6 +264,11 @@ class CurrentUserType(DjangoObjectType):
         description="False for an OAuth-only account that has never set a password - "
         "the frontend uses this to show a "
         "'Set password' flow instead of 'Change password' (no old password to ask for)."
+    )
+    has_seen_welcome_modal = graphene.Boolean(
+        description="False until markWelcomeModalSeen is called once for this account - "
+        "the frontend uses this instead of client-side storage so the modal is driven "
+        "by durable, per-account state rather than a one-shot sessionStorage/cookie flag."
     )
 
     class Meta:
@@ -256,6 +284,8 @@ class CurrentUserType(DjangoObjectType):
             "otp_enabled",
             "otp_verified",
             "has_usable_password",
+            "has_seen_welcome_modal",
+            "is_confirmed",
             "tenants",
         )
 
@@ -282,6 +312,10 @@ class CurrentUserType(DjangoObjectType):
     @staticmethod
     def resolve_has_usable_password(parent, info):
         return get_user_from_resolver(info).has_usable_password()
+
+    @staticmethod
+    def resolve_has_seen_welcome_modal(parent, info):
+        return get_user_from_resolver(info).profile.has_seen_welcome_modal
 
     @staticmethod
     def resolve_tenants(parent, info):
@@ -351,8 +385,8 @@ class ChangePasswordMutation(mutations.SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         mutation = super().mutate_and_get_payload(root, info, **input)
         info.context._request.set_auth_cookie = {
-            "access": mutation.access,
-            "refresh": mutation.refresh,
+            settings.ACCESS_TOKEN_COOKIE: mutation.access,
+            settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
         }
 
         return mutation

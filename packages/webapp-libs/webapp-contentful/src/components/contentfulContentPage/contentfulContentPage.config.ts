@@ -1,11 +1,15 @@
 import { Scale } from 'lucide-react';
+import { defineMessage } from 'react-intl';
 
 import type { ContentfulContentPageConfig } from './contentfulContentPage.types';
 
 export const termsAndConditionsConfig: ContentfulContentPageConfig = {
-  title: { defaultMessage: 'Terms and Conditions', id: 'Terms And Conditions / Title' },
-  description: { defaultMessage: 'Legal terms for using our service', id: 'Terms And Conditions / Description' },
-  pageTitle: { defaultMessage: 'Terms and Conditions', id: 'Terms And Conditions / Page title' },
+  title: defineMessage({ defaultMessage: 'Terms and Conditions', id: 'Terms And Conditions / Title' }),
+  description: defineMessage({
+    defaultMessage: 'Legal terms for using our service',
+    id: 'Terms And Conditions / Description',
+  }),
+  pageTitle: defineMessage({ defaultMessage: 'Terms and Conditions', id: 'Terms And Conditions / Page title' }),
   icon: Scale,
   contentField: 'termsAndConditions',
   emptyTitle: { defaultMessage: 'No Content Available', id: 'Terms And Conditions / Empty title' },

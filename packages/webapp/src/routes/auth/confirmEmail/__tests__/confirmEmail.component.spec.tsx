@@ -111,6 +111,14 @@ describe('ConfirmEmail: Component', () => {
               },
             },
           }),
+          // Refetched after a successful confirm so currentUser.isConfirmed is
+          // fresh (see confirmEmail.component.tsx's reloadCommonQuery() call).
+          fillCommonQueryWithUser(
+            currentUserFactory({
+              roles: [Role.ADMIN],
+              isConfirmed: true,
+            })
+          ),
         ];
       });
 
