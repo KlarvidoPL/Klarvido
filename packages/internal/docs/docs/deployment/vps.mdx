@@ -187,6 +187,12 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py migrate
 docker compose -f docker-compose.prod.yml exec backend python manage.py createsuperuser
 ```
 
+This account is created with its email unconfirmed (`is_confirmed=False`) - expected, not
+a bug: nothing checks that flag for Django admin login or the global `Admin`/`Support`
+group permissions, it only gates tenant-facing "confirm your email" flows. It flips to
+confirmed automatically the first time this account logs into the webapp via Google/
+Facebook (or leave it as-is if you only ever use it for `/admin/`).
+
 </Step>
 </Steps>
 
@@ -304,6 +310,18 @@ here since nothing in the boilerplate automates domain verification:
    Check status with `aws sesv2 get-account --region eu-central-1` (`ReviewDetails.Status`
    goes `PENDING` -> `GRANTED`, usually within a few hours).
 
+   A first request can come back `DENIED` (seen on this project) if the use-case
+   description is too generic - AWS wants specifics: what the app is, what kind of email
+   it sends (transactional vs. marketing), roughly how many/how often, and how recipients
+   end up subscribed (e.g. "transactional account/security emails - signup confirmation,
+   password reset, notifications - triggered by user actions on <app>, a B2B SaaS product;
+   no marketing sends"). You can resubmit `put-account-details` with a more detailed
+   description; there's no cooldown penalty for a prompt, well-explained resubmission.
+   Until granted, the account stays sandboxed - verify individual recipient addresses with
+   `aws sesv2 create-email-identity --email-identity <address> --region eu-central-1` (a
+   confirmation link is emailed to that address) so you can test end-to-end in the
+   meantime.
+
 5. **Grant the sending IAM user permission**, scoped to just this identity:
    ```json
    {
@@ -320,6 +338,48 @@ here since nothing in the boilerplate automates domain verification:
    EMAIL_FROM_ADDRESS=noreply@yourdomain.com
    # AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_DEFAULT_REGION as usual (see Storage Options)
    ```
+
+## OAuth / Social Login
+
+Google/Facebook login needs an OAuth client created in each provider's developer console
+before the buttons work - nothing in the boilerplate automates this (same category of
+one-time external setup as the SES steps above).
+
+### Google
+
+1. **Create the OAuth client under the organization's own Google account, never a
+   developer's personal Gmail.** A personal-account-owned client puts a business-critical
+   login path - and the only way to rotate/revoke its secret or see who's used it - under
+   one person's personal account, with no team access if they leave and none of Google
+   Workspace's org-level controls (admin recovery, audit logs, app verification as the
+   org). Sign in with an org Google Workspace account at
+   [Google Cloud Console](https://console.cloud.google.com/) -> APIs & Services ->
+   Credentials, in a project owned by the organization (not a personal project).
+2. Configure the OAuth consent screen - app name/logo, and a support email that's an org
+   mailbox, not a personal address - requesting only the default `email`/`profile` scopes
+   (no sensitive-scope verification needed for those).
+3. Create an **OAuth 2.0 Client ID** (Web application type) with:
+   - Authorized redirect URI: `https://api.DOMAIN/auth/social/complete/google-oauth2/`
+4. Set in `.env.prod`:
+   ```bash
+   SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=<client id>
+   SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=<client secret>
+   ```
+   `SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS` does **not** need to be set separately - unlike the
+   two vars above, `docker-compose.prod.yml` already derives it from `DOMAIN`
+   (`SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS=${DOMAIN}`), which is what lets the post-login
+   redirect land back on the webapp host (`DOMAIN`) instead of the API host
+   (`api.DOMAIN`) the OAuth flow itself runs on.
+5. If the consent screen is left in "Testing" mode, only explicitly-added test users can
+   log in - publish it to Production once ready (no Google app verification step is
+   required for the default, non-sensitive scopes used here).
+
+### Facebook
+
+Same shape, via [Meta for Developers](https://developers.facebook.com/) - create the app
+under the organization's Business Manager, not a developer's personal Facebook account,
+for the same ownership reason as Google above. Redirect URI:
+`https://api.DOMAIN/auth/social/complete/facebook/`.
 
 ## AI Assistant (MCP Server) - Optional
 
@@ -474,6 +534,21 @@ services:
       - WATCHTOWER_POLL_INTERVAL=300
     restart: unless-stopped
 ```
+
+### Publishing Translations
+
+`deploy-vps.yml` already syncs translation keys and imports translated content on every
+deploy (non-destructively, new/changed keys only - via `run_migrations.sh`), and the
+webapp serves them live from the backend's own `/api/translations/{locale}.json` by
+default, so translations work out of the box with no extra step. The separate,
+manually-triggered **"Publish Translations to VPS"** GitHub Actions workflow
+(`.github/workflows/publish-translations.yml`) additionally snapshots a
+`TranslationVersion` and pushes a JSON bundle straight to the configured storage backend
+(S3/R2/etc, see [Storage Options](#storage-options)) - only needed if you've set
+`VITE_TRANSLATIONS_URL` to serve translations directly from cloud storage/CDN instead of
+through the API, or want to force a fresh published snapshot without a full redeploy. Run
+it from the Actions tab after merging translation content changes you want live
+immediately in that mode.
 
 ## Monitoring
 
