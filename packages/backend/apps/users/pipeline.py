@@ -15,13 +15,11 @@ def populate_profile_from_social(details, response, user=None, is_new=False, *ar
     account's email as confirmed - Google/Facebook already verified it, so
     there's nothing left to confirm, whether this is a brand new signup or a
     Google login later linked (by email) to an existing password-signup
-    account. Name is filled unconditionally on first signup (is_new - fields
-    are blank there by definition), and additionally backfilled on a later
-    login only when currently blank (both first *and* last name) - never
-    overwrites a name the user has already set or deliberately cleared. Avatar
-    stays first-signup-only (is_new) - unlike name/confirmation, silently
-    re-downloading it on every later login could clobber one the user set
-    themselves."""
+    account. Name and avatar are filled unconditionally on first signup
+    (is_new - fields are blank there by definition), and additionally
+    backfilled on a later login only when currently blank (both first *and*
+    last name; no avatar set) - never overwrites a name/avatar the user has
+    already set or deliberately cleared."""
     if not user:
         return
 
@@ -40,7 +38,7 @@ def populate_profile_from_social(details, response, user=None, is_new=False, *ar
             profile.last_name = last_name
             changed_fields += ["first_name", "last_name"]
 
-    if is_new:
+    if is_new or not profile.avatar:
         picture_url = _get_picture_url(response)
         if picture_url:
             avatar = _download_avatar(picture_url)

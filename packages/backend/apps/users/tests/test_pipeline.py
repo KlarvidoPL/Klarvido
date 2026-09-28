@@ -17,12 +17,10 @@ def _tiny_jpeg_bytes():
 
 
 class TestPopulateProfileFromSocial:
-    """Name and email-confirmation are backfilled whenever they're still blank -
-    on the account's first signup, or when an existing password-signup account
-    is later linked (by email) to a Google/Facebook login - but never overwrite
-    a name the user has already set. Avatar remains first-signup-only (is_new):
-    unlike name/confirmation, silently re-downloading it on every later login
-    could clobber one the user set themselves."""
+    """Name, avatar, and email-confirmation are backfilled whenever they're
+    still blank - on the account's first signup, or when an existing
+    password-signup account is later linked (by email) to a Google/Facebook
+    login - but never overwrite a name/avatar the user has already set."""
 
     def test_confirms_email_and_fills_blank_name_for_existing_account_on_later_login(self, user):
         """E.g. signed up with email+password, later uses "Sign in with Google"
@@ -121,12 +119,12 @@ class TestPopulateProfileFromSocial:
         assert user.profile.avatar is None
         assert user.profile.first_name == "Jan"
 
-    def test_does_not_redownload_avatar_after_user_clears_it_on_a_later_login(self, user):
-        """Avatar keeps the old guarantee: is_new gates it, not "is it currently
-        blank" - otherwise deleting a synced avatar would just bring it back on
-        the next Google/Facebook login. (Name has no such guarantee - see
-        test_confirms_email_and_fills_blank_name_for_existing_account_on_later_login
-        above - only avatar is signup-gated.)"""
+    @patch("apps.users.pipeline.requests.get")
+    def test_downloads_blank_avatar_for_existing_account_on_later_login(self, mock_get, user):
+        """E.g. signed up with email+password (no avatar set), later uses "Sign
+        in with Google" with the same address - is_new is False, but a blank
+        avatar should still be backfilled, same as name/confirmation."""
+        mock_get.return_value = Mock(status_code=200, content=_tiny_jpeg_bytes(), raise_for_status=Mock())
         user.profile.first_name = "Existing"
         user.profile.last_name = "Name"
         user.profile.avatar = None
@@ -140,4 +138,21 @@ class TestPopulateProfileFromSocial:
         )
 
         user.profile.refresh_from_db()
-        assert user.profile.avatar is None
+        assert user.profile.avatar is not None
+
+    @patch("apps.users.pipeline.requests.get")
+    def test_does_not_overwrite_an_existing_avatar_on_later_login(self, mock_get, user_factory):
+        mock_get.return_value = Mock(status_code=200, content=_tiny_jpeg_bytes(), raise_for_status=Mock())
+        user = user_factory(has_avatar=True)
+        existing_avatar = user.profile.avatar
+
+        populate_profile_from_social(
+            details={},
+            response={"picture": "https://example.com/photo.jpg"},
+            user=user,
+            is_new=False,
+        )
+
+        user.profile.refresh_from_db()
+        assert user.profile.avatar_id == existing_avatar.id
+        mock_get.assert_not_called()
