@@ -1,0 +1,72 @@
+# =============================================================================
+# Publish Translations to VPS
+# =============================================================================
+#
+# Manually-triggered only. Syncs translation keys, imports pre-translated
+# content, and publishes the served JSON bundle to S3/CDN on the VPS - without
+# needing a full image rebuild/redeploy, since translations aren't baked into
+# the Docker image (they're bind-mounted from packages/webapp-libs/webapp-core/
+# src/translations, see docker-compose.prod.yml's backend-migrations service).
+#
+# Run this after merging translation content changes (new/edited strings in
+# master.json or translations_export.json) that you want live without waiting
+# for - or forcing - a full deploy. A normal deploy already runs sync+import
+# (non-destructively, new keys only) via run_migrations.sh, but never runs
+# publish - deliberately not automatic on every deploy, since publish has no
+# no-op-when-unchanged path (it always creates a new TranslationVersion + S3
+# file per locale). This job is the deliberate, on-demand replacement for
+# manually running:
+#   docker compose exec backend uv run python manage.py publish_translations --all
+#
+# Required repository secrets (same ones deploy-vps.yml already uses):
+# - VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_PORT (optional), VPS_DEPLOY_PATH
+#
+# Assumes the stack is already up on the VPS (runs against the live `backend`
+# service via `docker compose exec`, not a fresh migrations container) - this
+# job never touches DB migrations or restarts anything.
+# =============================================================================
+
+name: "Publish Translations to VPS"
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: publish-translations-vps
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: "Sync, Import & Publish Translations"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload latest translations
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: "packages/webapp-libs/webapp-core/src/translations"
+          target: ${{ secrets.VPS_DEPLOY_PATH }}
+          strip_components: 0
+          rm: false
+
+      - name: Sync, import, and publish
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            cd ${{ secrets.VPS_DEPLOY_PATH }}
+            echo "Syncing translation keys..."
+            docker compose exec -T backend uv run python manage.py sync_translations /app/translations/master.json
+            echo "Importing translated content (overwriting existing values)..."
+            docker compose exec -T backend uv run python manage.py import_translations /app/translations/translations_export.json --overwrite
+            echo "Publishing to S3/CDN..."
+            docker compose exec -T backend uv run python manage.py publish_translations --all
