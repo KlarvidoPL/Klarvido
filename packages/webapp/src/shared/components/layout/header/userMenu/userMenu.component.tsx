@@ -105,12 +105,12 @@ export const UserMenu = (props: UserMenuProps) => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             asChild
-            className="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
+            className="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive dark:text-red-400 dark:focus:text-red-400"
           >
             <ButtonLink
               to={generateLocalePath(RoutesConfig.logout)}
               variant={ButtonVariant.GHOST}
-              className="w-full justify-start text-destructive hover:text-destructive"
+              className="w-full justify-start text-destructive hover:text-destructive dark:text-red-400 dark:hover:text-red-400"
             >
               <LogOut className="h-4 w-4 shrink-0" />
               <span>
