@@ -99,7 +99,7 @@ export const TenantForm = ({
         />
 
         {hasGenericErrorOnly && (
-          <div className="mt-4 text-sm text-destructive">
+          <div className="mt-4 text-sm text-destructive dark:text-red-400">
             <span>{genericError}</span>
           </div>
         )}

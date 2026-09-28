@@ -82,7 +82,7 @@ export const EditPaymentMethodForm = ({ onSuccess }: EditPaymentMethodFormProps)
         />
 
         {hasGenericErrorOnly && (
-          <div className="text-sm text-destructive">
+          <div className="text-sm text-destructive dark:text-red-400">
             <span>{genericError}</span>
           </div>
         )}

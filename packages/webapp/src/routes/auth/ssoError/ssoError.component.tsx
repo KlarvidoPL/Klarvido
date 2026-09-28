@@ -88,10 +88,10 @@ export const SSOError = () => {
             <div className="flex justify-center">
               <AuthLogo />
             </div>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 dark:bg-red-950/40">
+              <AlertTriangle className="h-6 w-6 text-destructive dark:text-red-400" />
             </div>
-            <CardTitle className="text-2xl font-semibold tracking-tight text-destructive">
+            <CardTitle className="text-2xl font-semibold tracking-tight text-destructive dark:text-red-400">
               <FormattedMessage defaultMessage="Sign in failed" id="SSO / Error / heading" />
             </CardTitle>
             <CardDescription className="text-muted-foreground">

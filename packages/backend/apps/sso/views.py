@@ -748,6 +748,19 @@ class PasskeyAuthenticationOptionsView(APIView):
         return Response(options)
 
 
+# Maps the WebAuthnService's static ValueError messages to a stable machine-readable
+# code the frontend can translate. Messages not in this map (including the ones that
+# interpolate the underlying library exception, e.g. "Invalid client data: {e}") fall
+# back to a generic code - their raw text is never shown to the user, only logged.
+PASSKEY_AUTH_ERROR_CODES = {
+    "Passkey not found": "passkey_not_found",
+    "Challenge not found": "challenge_not_found",
+    "Challenge expired or already used": "challenge_expired",
+    "Challenge mismatch": "challenge_mismatch",
+    "Invalid client data type": "invalid_client_data",
+}
+
+
 class PasskeyAuthenticationVerifyView(APIView):
     """Verify passkey authentication with rate limiting."""
 
@@ -802,7 +815,11 @@ class PasskeyAuthenticationVerifyView(APIView):
             return response
 
         except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            message = str(e)
+            code = PASSKEY_AUTH_ERROR_CODES.get(message, "verification_failed")
+            if code == "verification_failed":
+                logger.warning("Unrecognized passkey verification error: %s", message)
+            return Response({"error": message, "code": code}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasskeyListView(APIView):

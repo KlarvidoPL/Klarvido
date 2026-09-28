@@ -131,14 +131,14 @@ describe('PasskeyLoginButton: Component', () => {
       });
     });
 
-    it('should show error when options fetch fails', async () => {
+    it('should show translated error when options fetch fails', async () => {
       mockFetch.mockResolvedValueOnce({ ok: false });
 
       render(<PasskeyLoginButton />);
 
       await userEvent.click(await screen.findByRole('button', { name: /sign in with passkey/i }));
 
-      expect(await screen.findByText(/failed to get authentication options/i)).toBeInTheDocument();
+      expect(await screen.findByText(/failed to start passkey sign-in/i)).toBeInTheDocument();
     });
 
     it('should show error when user cancels authentication', async () => {
@@ -162,7 +162,7 @@ describe('PasskeyLoginButton: Component', () => {
       expect(await screen.findByText(/authentication was cancelled or timed out/i)).toBeInTheDocument();
     });
 
-    it('should show error when verify request fails', async () => {
+    it('should show a generic translated error when verify request fails without a recognized code', async () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
@@ -175,7 +175,7 @@ describe('PasskeyLoginButton: Component', () => {
         })
         .mockResolvedValueOnce({
           ok: false,
-          json: () => Promise.resolve({ error: 'Invalid credential' }),
+          json: () => Promise.resolve({ error: 'Invalid client data: boom' }),
         });
       mockCredentialsGet.mockResolvedValue(mockPublicKeyCredential());
 
@@ -183,7 +183,31 @@ describe('PasskeyLoginButton: Component', () => {
 
       await userEvent.click(await screen.findByRole('button', { name: /sign in with passkey/i }));
 
-      expect(await screen.findByText(/invalid credential/i)).toBeInTheDocument();
+      expect(await screen.findByText(/failed to authenticate with passkey/i)).toBeInTheDocument();
+    });
+
+    it('should show the translated message matching the backend error code', async () => {
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              challenge: 'dGVzdC1jaGFsbGVuZ2U',
+              timeout: 60000,
+              rpId: 'localhost',
+            }),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          json: () => Promise.resolve({ error: 'Passkey not found', code: 'passkey_not_found' }),
+        });
+      mockCredentialsGet.mockResolvedValue(mockPublicKeyCredential());
+
+      render(<PasskeyLoginButton />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /sign in with passkey/i }));
+
+      expect(await screen.findByText(/^passkey not found\.$/i)).toBeInTheDocument();
     });
 
     it('should track event and redirect on successful authentication', async () => {

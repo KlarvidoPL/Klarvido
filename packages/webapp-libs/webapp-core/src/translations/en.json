@@ -839,6 +839,33 @@
   "Auth / Passkey / button": {
     "defaultMessage": "Sign in with Passkey"
   },
+  "Auth / Passkey / error cancelled": {
+    "defaultMessage": "Authentication was cancelled or timed out."
+  },
+  "Auth / Passkey / error challenge expired": {
+    "defaultMessage": "This sign-in attempt has expired. Please try again."
+  },
+  "Auth / Passkey / error challenge mismatch": {
+    "defaultMessage": "This sign-in attempt has expired. Please try again."
+  },
+  "Auth / Passkey / error challenge not found": {
+    "defaultMessage": "This sign-in attempt has expired. Please try again."
+  },
+  "Auth / Passkey / error invalid client data": {
+    "defaultMessage": "This sign-in attempt has expired. Please try again."
+  },
+  "Auth / Passkey / error no credential": {
+    "defaultMessage": "No passkey was selected."
+  },
+  "Auth / Passkey / error not found": {
+    "defaultMessage": "Passkey not found."
+  },
+  "Auth / Passkey / error options failed": {
+    "defaultMessage": "Failed to start passkey sign-in. Please try again."
+  },
+  "Auth / Passkey / error verification failed": {
+    "defaultMessage": "Failed to authenticate with passkey. Please try again."
+  },
   "Auth / Passkey / loading": {
     "defaultMessage": "Authenticating..."
   },

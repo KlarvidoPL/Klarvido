@@ -122,7 +122,7 @@ export const SSOLogin = () => {
                   }}
                   disabled={loading}
                 />
-                {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+                {emailError && <p className="text-sm text-destructive dark:text-red-400">{emailError}</p>}
               </div>
 
               {noConnections && (
