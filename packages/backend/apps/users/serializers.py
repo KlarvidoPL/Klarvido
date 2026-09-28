@@ -1,3 +1,5 @@
+import copy
+
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.conf import settings
@@ -121,14 +123,20 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
         token = attrs["token"]
         user = attrs["user"]
 
+        # The token hash mixes in is_confirmed (see
+        # tokens.AccountActivationTokenGenerator), so once an account is
+        # confirmed the *original* token would otherwise stop matching
+        # (Django's standard invalidate-after-use pattern) and even the
+        # correct link would wrongly show "invalid token" on a re-click.
+        # Check against the pre-confirmation state instead of bypassing
+        # validation entirely - a wrong/mangled token must still be rejected
+        # even after the account is already confirmed.
+        check_user = user
         if user.is_confirmed:
-            # Re-clicking an already-used confirmation link must not show a
-            # scary "invalid token" error - the token generator hashes in
-            # is_confirmed (see tokens.AccountActivationTokenGenerator), so the
-            # same link's token stops matching once already confirmed.
-            return attrs
+            check_user = copy.copy(user)
+            check_user.is_confirmed = False
 
-        if not tokens.account_activation_token.check_token(user, token):
+        if not tokens.account_activation_token.check_token(check_user, token):
             raise exceptions.ValidationError(_("Malformed user account confirmation token"))
 
         return attrs
