@@ -85,6 +85,22 @@ def complete(request, backend, *args, **kwargs):
         else:
             token = jwt_tokens.RefreshToken.for_user(user)
             backend.strategy.set_jwt(token)
+
+            try:
+                from apps.sso.services import SessionService
+
+                from .jwt import get_jti_from_refresh_token
+
+                session_service = SessionService(user)
+                _, session_id = session_service.create_session(
+                    request, refresh_token_jti=get_jti_from_refresh_token(str(token))
+                )
+                backend.strategy.set_session_id(session_id)
+            except Exception:
+                # Don't fail login if session creation fails (mirrors
+                # apps/users/schema.py::_create_session_for_user).
+                pass
+
             # do_complete() sets this in-memory attribute (not persisted) on the
             # very first signup, before calling this callback - used to show the
             # welcome modal once, same as the password-signup flow already does.

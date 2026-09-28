@@ -19,7 +19,7 @@ from .utils import generate_otp_auth_token
 
 from apps.multitenancy.models import Tenant
 
-UPLOADED_AVATAR_SIZE_LIMIT = 1 * 1024 * 1024
+UPLOADED_AVATAR_SIZE_LIMIT = 5 * 1024 * 1024
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

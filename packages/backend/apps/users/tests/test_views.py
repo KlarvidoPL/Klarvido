@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.conf import settings
@@ -184,3 +184,42 @@ class TestSocialAuthComplete:
 
         assert mock_do_complete.called
         assert mock_do_complete.call_args.kwargs["user"] is None
+
+
+class TestSocialAuthCreatesSession:
+    """Regression test for a bug where signing in with Google/Facebook never
+    created an SSOSession, so "Active Sessions" in Profile > Security stayed
+    empty after an OAuth login even though it correctly showed a session for
+    password login and SAML SSO login."""
+
+    def _get_do_login_callback(self, api_client):
+        with patch("apps.users.views.do_complete") as mock_do_complete:
+            mock_do_complete.return_value = HttpResponse()
+            api_client.get(reverse("social:complete", kwargs={"backend": "google-oauth2"}))
+        # `complete()` calls do_complete(request.backend, _do_login, user=None, ...) -
+        # the login callback is the 2nd positional arg.
+        return mock_do_complete.call_args.args[1]
+
+    def test_do_login_creates_session_for_completed_oauth_login(self, api_client, user_factory):
+        from apps.sso.models import SSOSession
+
+        user = user_factory(otp_enabled=False)
+        do_login = self._get_do_login_callback(api_client)
+        mock_backend = MagicMock()
+
+        do_login(mock_backend, user, social_user=None)
+
+        session = SSOSession.objects.get(user=user)
+        mock_backend.strategy.set_session_id.assert_called_once_with(session.session_id)
+
+    def test_do_login_does_not_create_session_when_otp_step_is_pending(self, api_client, user_factory):
+        from apps.sso.models import SSOSession
+
+        user = user_factory(otp_enabled=True, otp_verified=True)
+        do_login = self._get_do_login_callback(api_client)
+        mock_backend = MagicMock()
+
+        do_login(mock_backend, user, social_user=None)
+
+        assert not SSOSession.objects.filter(user=user).exists()
+        mock_backend.strategy.set_session_id.assert_not_called()
