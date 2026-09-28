@@ -18,6 +18,7 @@ def _strategy(session=None):
     strategy.refresh_token = None
     strategy.otp_auth_token = None
     strategy.is_new_signup = False
+    strategy.session_id = None
     return strategy
 
 
