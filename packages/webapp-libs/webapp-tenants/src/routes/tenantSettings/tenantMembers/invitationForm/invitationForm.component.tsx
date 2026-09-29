@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client/react';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast';
 import { useIntl } from 'react-intl';
@@ -17,6 +18,10 @@ export const InvitationForm = () => {
     id: 'Tenant Members / Invitation form / Success message',
     defaultMessage: 'User invited successfully!',
   });
+  const fallbackErrorMessage = intl.formatMessage({
+    id: 'Tenant Members / Invitation form / Error message',
+    defaultMessage: 'Failed to invite user. Please try again.',
+  });
 
   const [commitTenantInvitationMutation, { error, loading: loadingMutation }] = useMutation(createTenantInvitation, {
     refetchQueries: () => [
@@ -31,18 +36,31 @@ export const InvitationForm = () => {
       trackEvent('tenantInvitation', 'invite', currentTenant.data?.id);
       toast({ description: successMessage, variant: 'success' });
     },
+    onError: (mutationError) => {
+      const graphQLErrors = extractGraphQLErrors(mutationError) ?? [];
+      const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
+      const nonFieldErrors = validationError?.extensions?.['non_field_errors'] as
+        | { message?: string; code?: string }[]
+        | undefined;
+      toast({ description: nonFieldErrors?.[0]?.message ?? fallbackErrorMessage, variant: 'destructive' });
+    },
   });
 
   const onInvitationFormSubmit = async (formData: TenantInvitationFormFields) => {
-    await commitTenantInvitationMutation({
-      variables: {
-        input: {
-          email: formData.email,
-          organizationRoleIds: formData.organizationRoleIds,
-          tenantId: currentTenant.data!.id,
+    try {
+      await commitTenantInvitationMutation({
+        variables: {
+          input: {
+            email: formData.email,
+            organizationRoleIds: formData.organizationRoleIds,
+            tenantId: currentTenant.data!.id,
+          },
         },
-      },
-    });
+      });
+    } catch {
+      // Already surfaced to the user via onError (toast) and the inline form error
+      // (error prop below) - swallow here so the rejection doesn't propagate further.
+    }
   };
 
   return <TenantInvitationForm onSubmit={onInvitationFormSubmit} loading={loadingMutation} error={error} />;

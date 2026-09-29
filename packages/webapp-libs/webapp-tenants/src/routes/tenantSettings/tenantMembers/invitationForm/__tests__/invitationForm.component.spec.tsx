@@ -137,4 +137,60 @@ describe('InvitationForm: Component', () => {
       expect(trackEvent).toHaveBeenCalledWith('tenantInvitation', 'invite', tenantId);
     });
   });
+
+  describe('action fails validation', () => {
+    it('should show the server validation message in a toast when inviting a superuser', async () => {
+      const tenants = [tenantFactory({ membership: { role: TenantUserRole.MEMBER } })];
+      const currentUser = currentUserFactory({ tenants });
+      const tenantId = tenants[0].id;
+
+      const emailValue = 'superuser@example.com';
+      const roleIds = ['role-1'];
+
+      const rolesMock = createRolesMock(tenantId);
+
+      const variables = {
+        input: {
+          email: emailValue,
+          organizationRoleIds: roleIds,
+          tenantId,
+        },
+      };
+
+      const requestMock = composeMockedQueryResult(createTenantInvitation, {
+        variables,
+        data: null,
+        errors: [
+          {
+            message: 'GraphQlValidationError',
+            extensions: {
+              non_field_errors: [
+                { message: 'This user already has full access to every organization.', code: 'invalid' },
+              ],
+            },
+          },
+        ],
+      });
+
+      const apolloMocks = [fillCommonQueryWithUser(currentUser), rolesMock, requestMock];
+      const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.general, { tenantId });
+
+      const { waitForApolloMocks } = render(<Component />, { apolloMocks, routerProps });
+
+      await waitForApolloMocks(1);
+
+      await userEvent.type(await screen.findByLabelText(/email/i), emailValue);
+
+      const rolesButton = await screen.findByText(/Select roles/i);
+      await userEvent.click(rolesButton);
+
+      const memberRole = await screen.findByText('Member');
+      await userEvent.click(memberRole);
+
+      await userEvent.click(screen.getByRole('button', { name: /invite/i }));
+
+      const toast = await screen.findByTestId('toast-1');
+      expect(toast).toHaveTextContent('This user already has full access to every organization.');
+    });
+  });
 });

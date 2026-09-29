@@ -182,6 +182,13 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
         ):
             raise serializers.ValidationError(_("Invitation already exists"))
 
+        # A superuser already has owner-equivalent access to every tenant via the
+        # cross-tenant bypass (see apps.multitenancy.models.is_superuser_bypass_eligible)
+        # - inviting them as a real, role-scoped member would only ever narrow their
+        # access, which defeats the point of an invitation and would be confusing.
+        if get_user_model().objects.filter(email=email, is_superuser=True).exists():
+            raise serializers.ValidationError(_("This user already has full access to every organization."))
+
         # Validate and decode organization role IDs if provided
         org_role_ids = attrs.get("organization_role_ids", [])
         if org_role_ids:

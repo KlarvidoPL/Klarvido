@@ -348,6 +348,32 @@ class TestCreateTenantInvitationMutation:
         )
         assert executed["errors"][0]["message"] == "permission_denied"
 
+    def test_invite_superuser_is_rejected(
+        self, graphene_client, user, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """A superuser already has owner-equivalent access to every tenant via the
+        cross-tenant bypass, so inviting them as a real, role-scoped member would
+        only ever narrow their access - reject it with a clear message instead."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        superuser = user_factory(is_superuser=True)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "email": superuser.email,
+                "role": TenantUserRole.MEMBER,
+            },
+        )
+
+        assert executed["errors"][0]["message"] == "GraphQlValidationError"
+        non_field_errors = executed["errors"][0]["extensions"]["non_field_errors"]
+        assert non_field_errors[0]["message"] == "This user already has full access to every organization."
+        assert not TenantMembership.objects.filter(tenant=tenant, user=superuser).exists()
+
     @classmethod
     def mutate(cls, graphene_client, data):
         return graphene_client.mutate(cls.MUTATION, variable_values={'input': data})
