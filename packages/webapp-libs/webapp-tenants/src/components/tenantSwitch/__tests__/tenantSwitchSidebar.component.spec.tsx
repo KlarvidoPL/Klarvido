@@ -123,11 +123,13 @@ describe('TenantSwitchSidebar: Component', () => {
     });
 
     it('should narrow the list to organizations matching the search text', async () => {
+      // Two real organizations and nothing explicitly selected, so neither name is
+      // also duplicated in the trigger button (which would otherwise make
+      // `getByText` match twice for the currently-selected tenant).
       const multiOrgUser = currentUserFactory({ tenants: [orgTenant, secondOrgTenant] });
       const apolloMocks = [fillCommonQueryWithUser(multiOrgUser)];
-      const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: orgTenant.id });
 
-      render(<Component />, { apolloMocks, routerProps });
+      render(<Component />, { apolloMocks });
 
       const trigger = await screen.findByRole('button');
       await userEvent.click(trigger);
@@ -145,9 +147,8 @@ describe('TenantSwitchSidebar: Component', () => {
     it('should show an empty state when no organization matches the search text', async () => {
       const multiOrgUser = currentUserFactory({ tenants: [orgTenant, secondOrgTenant] });
       const apolloMocks = [fillCommonQueryWithUser(multiOrgUser)];
-      const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: orgTenant.id });
 
-      render(<Component />, { apolloMocks, routerProps });
+      render(<Component />, { apolloMocks });
 
       const trigger = await screen.findByRole('button');
       await userEvent.click(trigger);
