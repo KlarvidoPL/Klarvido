@@ -186,8 +186,13 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
         # cross-tenant bypass (see apps.multitenancy.models.is_superuser_bypass_eligible)
         # - inviting them as a real, role-scoped member would only ever narrow their
         # access, which defeats the point of an invitation and would be confusing.
+        # NOTE: deliberately don't reveal *why* in the message/code - just that they
+        # can't be invited - so a tenant owner can't use this as a way to fingerprint
+        # which email addresses belong to platform superusers.
         if get_user_model().objects.filter(email=email, is_superuser=True).exists():
-            raise serializers.ValidationError(_("This user already has full access to every organization."))
+            raise serializers.ValidationError(
+                _("This user cannot be a member of this organization."), code="user_cannot_be_invited"
+            )
 
         # Validate and decode organization role IDs if provided
         org_role_ids = attrs.get("organization_role_ids", [])

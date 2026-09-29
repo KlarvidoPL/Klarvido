@@ -4004,8 +4004,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Members"
   },
+  "Tenant Members / Invitation form / Error message": {
+    "defaultMessage": "Failed to invite user. Please try again."
+  },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "User invited successfully!"
+  },
+  "Tenant Members / Invitation form / User cannot be invited": {
+    "defaultMessage": "This user cannot be a member of this organization."
   },
   "Tenant Members / Subheader": {
     "defaultMessage": "View and manage organization members"

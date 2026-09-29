@@ -139,12 +139,12 @@ describe('InvitationForm: Component', () => {
   });
 
   describe('action fails validation', () => {
-    it('should show the server validation message in a toast when inviting a superuser', async () => {
+    const setupErrorTest = async (errorExtensions: Record<string, unknown>) => {
       const tenants = [tenantFactory({ membership: { role: TenantUserRole.MEMBER } })];
       const currentUser = currentUserFactory({ tenants });
       const tenantId = tenants[0].id;
 
-      const emailValue = 'superuser@example.com';
+      const emailValue = 'someone@example.com';
       const roleIds = ['role-1'];
 
       const rolesMock = createRolesMock(tenantId);
@@ -160,16 +160,7 @@ describe('InvitationForm: Component', () => {
       const requestMock = composeMockedQueryResult(createTenantInvitation, {
         variables,
         data: null,
-        errors: [
-          {
-            message: 'GraphQlValidationError',
-            extensions: {
-              non_field_errors: [
-                { message: 'This user already has full access to every organization.', code: 'invalid' },
-              ],
-            },
-          },
-        ],
+        errors: [{ message: 'GraphQlValidationError', extensions: errorExtensions }],
       });
 
       const apolloMocks = [fillCommonQueryWithUser(currentUser), rolesMock, requestMock];
@@ -189,8 +180,27 @@ describe('InvitationForm: Component', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /invite/i }));
 
-      const toast = await screen.findByTestId('toast-1');
-      expect(toast).toHaveTextContent('This user already has full access to every organization.');
+      return screen.findByTestId('toast-1');
+    };
+
+    it('should show a translated, frontend-owned message for a known error code - never the raw server text', async () => {
+      // Backend text is deliberately different from the frontend copy here to prove
+      // the toast is driven by the `code`, not by echoing the server's message.
+      const toast = await setupErrorTest({
+        non_field_errors: [{ message: 'raw backend text that must never reach the UI', code: 'user_cannot_be_invited' }],
+      });
+
+      expect(toast).toHaveTextContent('This user cannot be a member of this organization.');
+      expect(toast).not.toHaveTextContent('raw backend text');
+    });
+
+    it('should fall back to a generic translated message for an unrecognized error code', async () => {
+      const toast = await setupErrorTest({
+        non_field_errors: [{ message: 'Invitation already exists', code: 'invalid' }],
+      });
+
+      expect(toast).toHaveTextContent('Failed to invite user. Please try again.');
+      expect(toast).not.toHaveTextContent('Invitation already exists');
     });
   });
 });

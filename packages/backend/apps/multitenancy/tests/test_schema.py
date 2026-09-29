@@ -371,7 +371,9 @@ class TestCreateTenantInvitationMutation:
 
         assert executed["errors"][0]["message"] == "GraphQlValidationError"
         non_field_errors = executed["errors"][0]["extensions"]["non_field_errors"]
-        assert non_field_errors[0]["message"] == "This user already has full access to every organization."
+        # Deliberately generic - must not reveal that the target user is a superuser.
+        assert non_field_errors[0]["message"] == "This user cannot be a member of this organization."
+        assert non_field_errors[0]["code"] == "user_cannot_be_invited"
         assert not TenantMembership.objects.filter(tenant=tenant, user=superuser).exists()
 
     @classmethod
