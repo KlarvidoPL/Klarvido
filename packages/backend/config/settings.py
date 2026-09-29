@@ -90,6 +90,7 @@ LOCAL_APPS = [
     "apps.sso",
     "apps.translations",
     "apps.backup",
+    "apps.klarvido",
 ]
 
 INSTALLED_APPS = (
