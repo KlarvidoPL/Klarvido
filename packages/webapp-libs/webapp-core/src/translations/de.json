@@ -4002,13 +4002,13 @@
     "defaultMessage": "Mitglieder"
   },
   "Tenant Members / Invitation form / Error message": {
-    "defaultMessage": "Failed to invite user. Please try again."
+    "defaultMessage": "Einladung des Nutzers fehlgeschlagen. Bitte versuchen Sie es erneut."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "Benutzer erfolgreich eingeladen!"
   },
   "Tenant Members / Invitation form / User cannot be invited": {
-    "defaultMessage": "This user cannot be a member of this organization."
+    "defaultMessage": "Dieser Nutzer kann kein Mitglied dieser Organisation sein."
   },
   "Tenant Members / Subheader": {
     "defaultMessage": "Organisationsmitglieder anzeigen und verwalten"
