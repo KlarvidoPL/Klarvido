@@ -501,7 +501,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
                   'flex justify-center': isSidebarCollapsed && isDesktop,
                 })}
               >
-                <TenantSwitchSidebar collapsed={isSidebarCollapsed && isDesktop} />
+                <TenantSwitchSidebar collapsed={isSidebarCollapsed && isDesktop} onNavigate={closeSidebar} />
               </div>
             )}
           </div>

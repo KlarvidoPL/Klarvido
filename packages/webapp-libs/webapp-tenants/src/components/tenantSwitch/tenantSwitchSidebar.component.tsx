@@ -28,9 +28,12 @@ import { useCurrentTenant } from '../../providers';
 
 export type TenantSwitchSidebarProps = {
   collapsed?: boolean;
+  // Lets the mobile sidebar overlay close itself after a click here navigates
+  // away, matching every other nav item in the sidebar.
+  onNavigate?: () => void;
 };
 
-export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarProps = {}) => {
+export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwitchSidebarProps = {}) => {
   const intl = useIntl();
   const { data: currentTenant } = useCurrentTenant();
   const tenants = useTenants();
@@ -62,16 +65,19 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
   const handleTenantChange = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
     if (!tenant) return;
     navigate(generateTenantPath(RoutesConfig.home, { tenantId: tenant.id }));
+    onNavigate?.();
   };
 
   const handleInvitationClick = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
     const token = getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationToken;
     if (!token) return;
     navigate(generateLocalePath(RoutesConfig.tenantInvitation, { token }));
+    onNavigate?.();
   };
 
   const handleNewTenantClick = () => {
     navigate(generateLocalePath(RoutesConfig.addTenant));
+    onNavigate?.();
   };
 
   const hasPendingInvitations = (organizationTenants?.invitations?.length ?? 0) > 0;
