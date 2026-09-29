@@ -287,6 +287,7 @@ class CurrentUserType(DjangoObjectType):
             "has_seen_welcome_modal",
             "is_confirmed",
             "tenants",
+            "is_superuser",
         )
 
     @staticmethod
@@ -319,7 +320,15 @@ class CurrentUserType(DjangoObjectType):
 
     @staticmethod
     def resolve_tenants(parent, info):
+        from apps.multitenancy.models import get_visible_tenants_for_user, is_superuser_bypass_eligible
+
         user = get_user_from_resolver(info)
+        if is_superuser_bypass_eligible(user):
+            # SUPERUSER BYPASS: owner-equivalent access to every tenant in the system,
+            # without a real TenantMembership row - see apps.multitenancy.models.
+            tenants = get_visible_tenants_for_user(user)
+            return filter_tenants_for_password_session(info.context, tenants)
+
         tenants = user.tenants.all()
         if not len(tenants):
             Tenant.objects.get_or_create_user_default_tenant(user)

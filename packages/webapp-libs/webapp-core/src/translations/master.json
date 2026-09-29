@@ -3104,6 +3104,9 @@
   "Profile / Name / Label": {
     "defaultMessage": "Name"
   },
+  "Profile / Name / Superuser badge": {
+    "defaultMessage": "Superuser"
+  },
   "Profile / Overview / Description": {
     "defaultMessage": "Your account information"
   },

@@ -6,7 +6,7 @@ import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { Separator } from '@sb/webapp-core/components/ui/separator';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { AlertTriangle, Fingerprint, Lock, Mail, Monitor, RefreshCw, Shield, User, UserCircle } from 'lucide-react';
+import { AlertTriangle, Crown, Fingerprint, Lock, Mail, Monitor, RefreshCw, Shield, User, UserCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -96,9 +96,20 @@ export const Profile = () => {
                   <div className="text-sm font-medium text-muted-foreground">
                     <FormattedMessage defaultMessage="Name" id="Profile / Name / Label" />
                   </div>
-                  <Paragraph className="text-base">
-                    {currentUser?.firstName} {currentUser?.lastName}
-                  </Paragraph>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Paragraph className="text-base">
+                      {currentUser?.firstName} {currentUser?.lastName}
+                    </Paragraph>
+                    {currentUser?.isSuperuser && (
+                      <Badge
+                        variant="outline"
+                        className="gap-1 border-violet-500/20 bg-violet-500/15 text-xs font-medium text-violet-700 dark:text-violet-400"
+                      >
+                        <Crown className="h-3 w-3" />
+                        <FormattedMessage defaultMessage="Superuser" id="Profile / Name / Superuser badge" />
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 <Separator />
                 <div className="space-y-1">

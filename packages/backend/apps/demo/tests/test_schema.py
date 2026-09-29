@@ -521,6 +521,19 @@ class TestCreateCrudDemoItemMutation:
         assert executed["errors"]
         assert executed["errors"][0]["message"] == "permission_denied"
 
+    def test_create_new_item_superuser_without_membership(self, graphene_client, user_factory, tenant):
+        """Superuser bypass: owner-equivalent access without a real membership row."""
+        superuser = user_factory(is_superuser=True)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+        executed = graphene_client.mutate(
+            self.CREATE_MUTATION,
+            variable_values={"input": {"name": "Item name", "tenantId": to_global_id("TenantType", tenant.id)}},
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["createCrudDemoItem"]["crudDemoItem"]["name"] == "Item name"
+
     def test_create_new_item_sends_notification(self, graphene_client, user_factory, tenant, tenant_membership_factory):
         owner = user_factory()
         tenant_membership_factory(tenant=tenant, user=owner, role=TenantUserRole.OWNER)
@@ -623,6 +636,22 @@ class TestUpdateCrudDemoItemMutation:
 
         assert executed["errors"]
         assert executed["errors"][0]["message"] == "permission_denied"
+
+    def test_update_existing_item_superuser_without_membership(
+        self, graphene_client, user_factory, tenant, crud_demo_item, input_data_factory
+    ):
+        """Superuser bypass: owner-equivalent access without a real membership row."""
+        superuser = user_factory(is_superuser=True)
+        input_data = input_data_factory(crud_demo_item)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+        executed = graphene_client.mutate(
+            self.UPDATE_MUTATION,
+            variable_values={"input": input_data},
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["updateCrudDemoItem"]["crudDemoItem"]["name"] == input_data["name"]
 
     def test_update_existing_item_sends_notification_to_admins_and_creator(
         self,
@@ -733,6 +762,24 @@ class TestDeleteCrudDemoItemMutation:
         assert executed["errors"][0]["path"] == ["deleteCrudDemoItem"]
         assert executed["data"] == {"deleteCrudDemoItem": None}
         assert models.CrudDemoItem.objects.filter(id=crud_demo_item.id).exists()
+
+    def test_deleting_item_superuser_without_membership(self, graphene_client, crud_demo_item, user_factory):
+        """Superuser bypass: owner-equivalent access without a real membership row."""
+        item_global_id = to_global_id("CrudDemoItemType", str(crud_demo_item.id))
+        tenant = crud_demo_item.tenant
+        superuser = user_factory(is_superuser=True)
+
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+
+        executed = graphene_client.mutate(
+            self.DELETE_MUTATION,
+            variable_values={"input": {"id": item_global_id, "tenantId": to_global_id("TenantType", tenant.id)}},
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["deleteCrudDemoItem"]["deletedIds"] == [item_global_id]
+        assert not models.CrudDemoItem.objects.filter(id=crud_demo_item.id).exists()
 
     def test_deleting_item_by_not_authorized_user(self, graphene_client, crud_demo_item):
         item_global_id = to_global_id("CrudDemoItemType", str(crud_demo_item.id))

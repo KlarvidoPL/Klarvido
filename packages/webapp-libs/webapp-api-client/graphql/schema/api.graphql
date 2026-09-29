@@ -188,7 +188,7 @@ type TenantType implements Node {
   billingEmail: String
   actionLoggingEnabled: Boolean
   userMemberships: [TenantMembershipType]
-  membership: TenantMembershipType!
+  membership: TenantMembershipType
 }
 type TenantMembershipType implements Node {
   id: ID!
@@ -632,6 +632,7 @@ type CurrentUserType {
   id: ID!
   email: String!
   isConfirmed: Boolean!
+  isSuperuser: Boolean!
   otpEnabled: Boolean!
   otpVerified: Boolean!
   tenants: [TenantType]
@@ -2291,6 +2292,8 @@ enum MultitenancyActionLogActorTypeChoices {
   USER
   "AI Agent"
   AI_AGENT
+  "Superuser"
+  SUPERUSER
   "System (Sync)"
   SYSTEM_SYNC
   "System (Import)"

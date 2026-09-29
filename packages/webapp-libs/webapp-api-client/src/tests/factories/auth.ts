@@ -14,6 +14,7 @@ export const currentUserFactory = createFactory<CurrentUserType>(() => ({
   otpVerified: false,
   hasSeenWelcomeModal: true,
   isConfirmed: true,
+  isSuperuser: false,
   tenants: [
     {
       id: makeId(32),

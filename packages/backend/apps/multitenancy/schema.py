@@ -245,7 +245,7 @@ class TenantType(DjangoObjectType):
     type = graphene.String()
     billing_email = graphene.String()
     action_logging_enabled = graphene.Boolean()
-    membership = graphene.NonNull(of_type=TenantMembershipType)
+    membership = graphene.Field(TenantMembershipType)
     user_memberships = graphene.List(of_type=TenantMembershipType)
 
     class Meta:
@@ -264,6 +264,9 @@ class TenantType(DjangoObjectType):
 
     @staticmethod
     def resolve_membership(parent, info):
+        # None here is a valid response, e.g. for a superuser viewing a tenant they
+        # have no real membership row in (owner-equivalent access is granted via the
+        # superuser bypass regardless - see apps.multitenancy.models.has_tenant_access).
         user = get_user_from_resolver(info)
         return models.TenantMembership.objects.get_all().filter(user=user, tenant=parent).first()
 
@@ -1250,14 +1253,17 @@ class Query(graphene.ObjectType):
     @permission_classes(policies.AnyoneFullAccess)
     def resolve_all_tenants(root, info, **kwargs):
         if info.context.user.is_authenticated:
-            qs = models.Tenant.objects.filter(user_memberships__user=info.context.user).order_by("id")
+            qs = models.get_visible_tenants_for_user(info.context.user)
             return filter_tenants_for_password_session(info.context, qs)
         return []
 
     @staticmethod
     def resolve_tenant(root, info, id):
         _, pk = from_global_id(id)
-        return models.Tenant.objects.filter(pk=pk, user_memberships__user=info.context.user).first()
+        user = info.context.user
+        if models.is_superuser_bypass_eligible(user):
+            return models.Tenant.objects.filter(pk=pk).first()
+        return models.Tenant.objects.filter(pk=pk, user_memberships__user=user).first()
 
     @staticmethod
     @permission_classes(policies.IsTenantMemberAccess, requires("security.logs.view"))

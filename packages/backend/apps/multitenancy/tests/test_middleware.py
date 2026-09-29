@@ -151,6 +151,31 @@ class TestGetCurrentTenantWithMembershipCheck:
         result_b = get_current_tenant_with_membership_check(str(tenant_b.pk), user)
         assert result_b is None
 
+    def test_superuser_gets_tenant_without_membership(self, tenant, user_factory):
+        """Superuser bypass: owner-equivalent access without a real membership row."""
+        superuser = user_factory(is_superuser=True)
+        result = get_current_tenant_with_membership_check(str(tenant.pk), superuser)
+        assert result == tenant
+
+    def test_superuser_sets_cross_tenant_flag_on_request(self, tenant, user_factory):
+        superuser = user_factory(is_superuser=True)
+        request = Mock()
+        get_current_tenant_with_membership_check(str(tenant.pk), superuser, request)
+        assert request.is_superuser_cross_tenant_access is True
+
+    def test_superuser_flag_false_when_real_member(self, tenant, user_factory, tenant_membership_factory):
+        superuser = user_factory(is_superuser=True)
+        tenant_membership_factory(user=superuser, tenant=tenant, is_accepted=True)
+        request = Mock()
+        get_current_tenant_with_membership_check(str(tenant.pk), superuser, request)
+        assert request.is_superuser_cross_tenant_access is False
+
+    def test_non_superuser_still_denied_without_membership(self, tenant, user_factory):
+        """Regression guard: the bypass must not accidentally widen for regular users."""
+        regular_user = user_factory(is_superuser=False)
+        result = get_current_tenant_with_membership_check(str(tenant.pk), regular_user)
+        assert result is None
+
 
 class TestTenantUserRoleMiddlewareGetCurrentUserRole:
     def test_get_current_user_role_authenticated_user(self, graphene_client, tenant, user, tenant_membership_factory):
@@ -183,3 +208,20 @@ class TestTenantUserRoleMiddlewareGetCurrentUserRole:
         graphene_client.force_authenticate(user)
         result = get_current_user_role(info.context.tenant, info.context.user)
         assert result is None
+
+    def test_get_current_user_role_superuser_without_membership_returns_owner(self, tenant, user_factory):
+        from apps.multitenancy.constants import TenantUserRole
+
+        superuser = user_factory(is_superuser=True)
+        result = get_current_user_role(tenant, superuser)
+        assert result == TenantUserRole.OWNER
+
+    def test_get_current_user_role_superuser_with_real_membership_uses_real_role(
+        self, tenant, user_factory, tenant_membership_factory
+    ):
+        from apps.multitenancy.constants import TenantUserRole
+
+        superuser = user_factory(is_superuser=True)
+        tenant_membership_factory(user=superuser, tenant=tenant, role=TenantUserRole.MEMBER)
+        result = get_current_user_role(tenant, superuser)
+        assert result == TenantUserRole.MEMBER

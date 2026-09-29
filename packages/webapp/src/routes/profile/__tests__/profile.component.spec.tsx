@@ -44,6 +44,21 @@ describe('Profile: Component', () => {
     expect(await screen.findByRole('button', { name: /resend verification email/i })).toBeInTheDocument();
   });
 
+  it('should not show a superuser badge for a regular user', async () => {
+    const apolloMocks = [fillCommonQueryWithUser(currentUserFactory({ isSuperuser: false }))];
+    render(<Component />, { apolloMocks });
+
+    await screen.findByText(/profile overview/i);
+    expect(screen.queryByText(/superuser/i)).not.toBeInTheDocument();
+  });
+
+  it('should show a superuser badge when the account is a superuser', async () => {
+    const apolloMocks = [fillCommonQueryWithUser(currentUserFactory({ isSuperuser: true }))];
+    render(<Component />, { apolloMocks });
+
+    expect(await screen.findByText(/superuser/i)).toBeInTheDocument();
+  });
+
   it('should show a success toast when resending the confirmation email', async () => {
     const requestMock = composeMockedQueryResult(profileResendConfirmationEmailMutation, {
       variables: { input: {} },

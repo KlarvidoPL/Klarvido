@@ -6,6 +6,7 @@ import pytest
 from common.acl.helpers import CommonGroups
 from config import settings
 from graphene_file_upload.django.testing import file_graphql_query
+from graphql_relay import to_global_id
 from rest_framework_simplejwt.settings import api_settings as jwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken, BlacklistedToken, AccessToken
 from .. import models, tokens
@@ -209,6 +210,7 @@ class TestCurrentUserQuery:
                 otpEnabled
                 otpVerified
                 hasUsablePassword
+                isSuperuser
                 tenants {
                   id
                   name
@@ -245,11 +247,48 @@ class TestCurrentUserQuery:
         assert data["otpEnabled"] == user.otp_enabled
         assert data["otpVerified"] == user.otp_verified
         assert data["hasUsablePassword"] is True
+        assert data["isSuperuser"] is False
         assert len(data["tenants"]) > 0
         assert data["tenants"][0]["name"] == "test@example.com"
         assert data["tenants"][0]["membership"]["role"] == "OWNER"
         assert data["tenants"][0]["type"] == "default"
         assert data["tenants"][0]["membership"]["invitationToken"] is None
+
+    def test_is_superuser_true_for_superuser_account(self, graphene_client, user_factory):
+        user = user_factory(is_superuser=True)
+        graphene_client.force_authenticate(user)
+
+        executed = graphene_client.query("query { currentUser { isSuperuser } }")
+
+        assert executed["data"]["currentUser"]["isSuperuser"] is True
+
+    def test_current_user_tenants_returns_all_tenants_for_superuser(
+        self, graphene_client, user_factory, tenant_factory
+    ):
+        """Superuser bypass: sees every tenant in the system, not just ones they're a member of."""
+        superuser = user_factory(is_superuser=True)
+        other_tenants = tenant_factory.create_batch(3)
+        graphene_client.force_authenticate(superuser)
+
+        executed = graphene_client.query("query { currentUser { tenants { id } } }")
+
+        returned_ids = {t["id"] for t in executed["data"]["currentUser"]["tenants"]}
+        expected_ids = {to_global_id("TenantType", str(t.id)) for t in other_tenants}
+        assert expected_ids <= returned_ids
+
+    def test_current_user_tenants_returns_only_own_tenants_for_regular_user(
+        self, graphene_client, user_factory, tenant_factory
+    ):
+        """Regression guard: the bypass must not accidentally widen for regular users."""
+        user = user_factory()
+        other_tenants = tenant_factory.create_batch(3)
+        graphene_client.force_authenticate(user)
+
+        executed = graphene_client.query("query { currentUser { tenants { id } } }")
+
+        returned_ids = {t["id"] for t in executed["data"]["currentUser"]["tenants"]}
+        other_ids = {to_global_id("TenantType", str(t.id)) for t in other_tenants}
+        assert returned_ids.isdisjoint(other_ids)
 
     def test_has_usable_password_false_for_oauth_only_account(self, graphene_client, user):
         """The frontend uses this to show a "Set password" flow instead of

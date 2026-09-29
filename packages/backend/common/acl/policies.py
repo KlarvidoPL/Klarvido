@@ -153,6 +153,10 @@ class TenantDependentAccess(AccessPolicy):
         3. RBAC: User has a role with is_owner_role=True
         4. Permissions: User has owner-equivalent permissions (org.roles.manage, org.delete)
         """
+        # 0. Superuser bypass: owner-equivalent access to every tenant.
+        if getattr(getattr(request, "user", None), "is_superuser", False):
+            return True
+
         # 1. Check legacy role first (fast path)
         if request.user_role in TenantRoles.Owner:
             return True
@@ -184,6 +188,10 @@ class TenantDependentAccess(AccessPolicy):
         3. RBAC: User has a role with is_owner_role=True
         4. Permissions: User has admin-equivalent permissions
         """
+        # 0. Superuser bypass: owner-equivalent access to every tenant.
+        if getattr(getattr(request, "user", None), "is_superuser", False):
+            return True
+
         # 1. Check legacy role first (fast path)
         if request.user_role in TenantRoles.Admin:
             return True
@@ -211,6 +219,10 @@ class TenantDependentAccess(AccessPolicy):
         1. Legacy: request.user_role is OWNER, ADMIN, or MEMBER
         2. RBAC: User has any role assignment in the tenant
         """
+        # 0. Superuser bypass: owner-equivalent access to every tenant.
+        if getattr(getattr(request, "user", None), "is_superuser", False):
+            return True
+
         # 1. Check legacy role first (fast path)
         if request.user_role in TenantRoles.Member:
             return True
