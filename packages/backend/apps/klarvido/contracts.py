@@ -58,6 +58,7 @@ class AnalyticalValue(Generic[ValueT]):
     quality: DataQuality
     kind: ValueKind
     limitations: tuple[str, ...] = ()
+    comparison_period: PeriodReference | None = None
 
     def __post_init__(self):
         if not self.unit:
