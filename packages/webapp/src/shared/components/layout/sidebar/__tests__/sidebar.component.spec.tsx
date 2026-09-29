@@ -1,6 +1,10 @@
+import { TenantUserRole } from '@sb/webapp-api-client';
+import { TenantType } from '@sb/webapp-api-client/constants';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { useMediaQuery } from '@sb/webapp-core/hooks';
 import { getLocalePath } from '@sb/webapp-core/utils';
+import { CurrentTenantProvider } from '@sb/webapp-tenants/providers';
+import { createPermissionsMock, tenantFactory } from '@sb/webapp-tenants/tests/factories/tenant';
 import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Route, Routes } from 'react-router-dom';
@@ -45,10 +49,13 @@ describe('Sidebar: Component', () => {
         toggleSidebar: () => null,
       }}
     >
-      <Routes>
-        <Route path="/" element={<Sidebar />} />
-        <Route path={getLocalePath(RoutesConfig.home)} element={<span>Home mock route</span>} />
-      </Routes>
+      <CurrentTenantProvider>
+        <Routes>
+          <Route path="/" element={<Sidebar />} />
+          <Route path={getLocalePath(RoutesConfig.home)} element={<span>Home mock route</span>} />
+          <Route path={getLocalePath(`:tenantId/${RoutesConfig.home}`)} element={<span>Home mock route</span>} />
+        </Routes>
+      </CurrentTenantProvider>
     </LayoutContext.Provider>
   );
   describe('user is logged out', () => {
@@ -128,6 +135,63 @@ describe('Sidebar: Component', () => {
         const apolloMocks = getApolloMocks(Role.ADMIN);
         render(<Component />, { apolloMocks });
         expect(await screen.findByText(/admin panel/i)).toBeInTheDocument();
+      });
+    });
+
+    describe('with no organization selected', () => {
+      const getNoOrgApolloMocks = (role: Role = Role.USER) => [
+        fillCommonQueryWithUser(
+          currentUserFactory({
+            roles: [role],
+            tenants: [tenantFactory({ type: TenantType.PERSONAL, membership: { role: TenantUserRole.OWNER } })],
+          })
+        ),
+      ];
+
+      it('should hide the Billing, Features, and Organization nav entries', async () => {
+        const { waitForApolloMocks } = render(<Component />, { apolloMocks: getNoOrgApolloMocks() });
+        await waitForApolloMocks();
+
+        expect(screen.queryByText(/billing/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/^features$/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/^organization$/i)).not.toBeInTheDocument();
+      });
+
+      it('should still show Panel and Legal', async () => {
+        render(<Component />, { apolloMocks: getNoOrgApolloMocks() });
+
+        expect(await screen.findByText(/dashboard/i)).toBeInTheDocument();
+        expect(await screen.findByText(/privacy policy/i)).toBeInTheDocument();
+      });
+
+      it('should still show Admin panel for an admin, independent of org selection', async () => {
+        render(<Component />, { apolloMocks: getNoOrgApolloMocks(Role.ADMIN) });
+
+        expect(await screen.findByText(/admin panel/i)).toBeInTheDocument();
+        expect(screen.queryByText(/^organization$/i)).not.toBeInTheDocument();
+      });
+    });
+
+    describe('with a real organization selected', () => {
+      it('should show the Billing, Features, and Organization nav entries', async () => {
+        const orgTenant = tenantFactory({ membership: { role: TenantUserRole.OWNER, invitationAccepted: true } });
+        const apolloMocks = [
+          fillCommonQueryWithUser(currentUserFactory({ roles: [Role.USER], tenants: [orgTenant] })),
+          createPermissionsMock(orgTenant.id, [
+            'billing.view',
+            'features.ai.use',
+            'features.content.view',
+            'features.documents.view',
+            'features.crud.view',
+            'org.settings.view',
+            'members.view',
+          ]),
+        ];
+        render(<Component />, { apolloMocks });
+
+        expect(await screen.findByText(/billing/i)).toBeInTheDocument();
+        expect(await screen.findByText(/^features$/i)).toBeInTheDocument();
+        expect(await screen.findByText(/^organization$/i)).toBeInTheDocument();
       });
     });
   });

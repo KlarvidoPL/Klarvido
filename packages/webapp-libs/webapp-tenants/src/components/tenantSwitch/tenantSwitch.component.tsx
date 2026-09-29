@@ -106,7 +106,7 @@ export const TenantSwitch = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="relative overflow-hidden">
+          <Button data-testid="tenant-switch-trigger-btn" variant="outline" className="relative overflow-hidden">
             <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-full">{currentTenant?.name}</div>
             <ChevronDown className="ml-2 mr--2" />
             {hasPendingInvitations && (

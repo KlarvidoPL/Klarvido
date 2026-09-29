@@ -514,7 +514,6 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.create_user",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
-    "apps.multitenancy.pipeline.create_default_tenant",
     "apps.users.pipeline.populate_profile_from_social",
     "social_core.pipeline.user.user_details",
 )

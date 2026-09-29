@@ -54,7 +54,11 @@ describe('useCurrentTenantRole: Hook', () => {
     ];
 
     it('should return the proper role for the owned tenant', async () => {
-      const { result, waitForApolloMocks } = render({ tenants });
+      const mockedRouterParams = useParams as jest.Mock;
+      mockedRouterParams.mockReturnValue({ tenantId: tenants[0].id });
+
+      const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: tenants[0].id });
+      const { result, waitForApolloMocks } = render({ tenants }, { routerProps });
       await waitForApolloMocks();
       expect(result.current).toEqual(TenantUserRole.OWNER);
     });

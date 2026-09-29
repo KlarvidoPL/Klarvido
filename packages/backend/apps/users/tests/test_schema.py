@@ -88,11 +88,14 @@ class TestSignup:
 
         assert user.has_group(CommonGroups.User)
 
-    def test_add_user_signup_tenant(self, graphene_client, faker):
+    def test_does_not_create_a_default_tenant(self, graphene_client, faker):
+        """A user with no organization membership is a first-class, intentional
+        state (see the org-scoped nav/route-guard changes) - signup must not
+        silently create a personal tenant just to satisfy "everyone has ≥1 tenant"."""
         executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
         user = models.User.objects.get(id=executed['data']['signUp']["id"])
 
-        assert user.tenants.count()
+        assert user.tenants.count() == 0
 
     def test_sets_profile_language_from_input(self, graphene_client, faker):
         email = faker.email()

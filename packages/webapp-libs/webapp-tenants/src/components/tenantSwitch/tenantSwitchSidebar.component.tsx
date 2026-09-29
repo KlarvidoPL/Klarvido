@@ -85,7 +85,14 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
             <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" />
           )}
         </div>
-        <span className="truncate">{currentTenant?.name}</span>
+        <span className="truncate">
+          {currentTenant?.name ?? (
+            <FormattedMessage
+              defaultMessage="Select organization"
+              id="TenantSwitch / Select organization placeholder"
+            />
+          )}
+        </span>
       </div>
       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
     </Button>

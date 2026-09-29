@@ -1,4 +1,5 @@
 import { Role } from '../../api/auth';
+import { TenantType } from '../../constants/tenant.types';
 import { CurrentUserType, TenantUserRole } from '../../graphql';
 import { createFactory, makeId } from '../utils';
 
@@ -19,7 +20,10 @@ export const currentUserFactory = createFactory<CurrentUserType>(() => ({
     {
       id: makeId(32),
       name: 'Tenant Name',
-      type: 'default',
+      // Real organization by default - a working org context is the normal/happy-path
+      // scenario most tests want; specifically testing the personal/no-org state
+      // should opt in explicitly (e.g. `tenants: [{ ...  type: TenantType.PERSONAL }]`).
+      type: TenantType.ORGANIZATION,
       __typename: 'TenantType',
       membership: {
         id: makeId(32),

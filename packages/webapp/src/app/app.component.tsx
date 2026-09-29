@@ -61,7 +61,7 @@ export const App = () => {
           <Route path={TENANT_PREFIX} element={<AuthRoute />}>
             <Route index element={<Home />} />
             {/* Organization Settings - each sub-route has its own permission check */}
-            <Route element={<PermissionAuthRoute permissions={['org.settings.view', 'members.view', 'org.roles.view', 'security.view', 'security.logs.view']} mode="any" />}>
+            <Route element={<PermissionAuthRoute permissions={['org.settings.view', 'members.view', 'org.roles.view', 'security.view', 'security.logs.view']} mode="any" requiresOrganization />}>
               <Route element={<TenantSettings />}>
                 {/* Members route - requires members.view */}
                 <Route element={<PermissionAuthRoute permissions="members.view" />}>
@@ -90,7 +90,7 @@ export const App = () => {
               </Route>
             </Route>
             {/* Billing/Subscriptions - requires billing.view */}
-            <Route element={<PermissionAuthRoute permissions="billing.view" />}>
+            <Route element={<PermissionAuthRoute permissions="billing.view" requiresOrganization />}>
               <Route element={<ActiveSubscriptionContext />}>
                 <Route element={<Subscriptions />}>
                   <Route index path={RoutesConfig.subscriptions.index} element={<CurrentSubscriptionContent />} />
@@ -108,20 +108,20 @@ export const App = () => {
               <Route path={RoutesConfig.subscriptions.transactionHistory.history} element={<TransactionHistory />} />
             </Route>
             {/* Content Items - protected by features.content.view */}
-            <Route element={<PermissionAuthRoute permissions="features.content.view" />}>
+            <Route element={<PermissionAuthRoute permissions="features.content.view" requiresOrganization />}>
               <Route path={RoutesConfig.demoItems} element={<DemoItems />} />
               <Route path={RoutesConfig.demoItem} element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />} />
             </Route>
             {/* CRUD Demo - protected by features.crud.view */}
-            <Route element={<PermissionAuthRoute permissions="features.crud.view" />}>
+            <Route element={<PermissionAuthRoute permissions="features.crud.view" requiresOrganization />}>
               <Route path={RoutesConfig.crudDemoItem.index} element={<CrudDemoItem routesConfig={RoutesConfig} />} />
             </Route>
             {/* Documents - protected by features.documents.view */}
-            <Route element={<PermissionAuthRoute permissions="features.documents.view" />}>
+            <Route element={<PermissionAuthRoute permissions="features.documents.view" requiresOrganization />}>
               <Route path={RoutesConfig.documents} element={<Documents />} />
             </Route>
             {/* OpenAI Integration - protected by features.ai.use */}
-            <Route element={<PermissionAuthRoute permissions="features.ai.use" />}>
+            <Route element={<PermissionAuthRoute permissions="features.ai.use" requiresOrganization />}>
               <Route path={RoutesConfig.saasIdeas} element={<SaasIdeas />} />
             </Route>
             <Route path={RoutesConfig.tenant.accessDenied} element={<AccessDenied />} />

@@ -4,7 +4,6 @@ import {
   BackupRestoreRecordStatusChoices,
   ConflictStrategyEnum,
 } from '@sb/webapp-api-client/graphql';
-import { TenantType } from '@sb/webapp-api-client/constants';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Alert, AlertDescription, AlertTitle } from '@sb/webapp-core/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
@@ -199,9 +198,7 @@ export const BackupSettings = () => {
   const { data: currentTenant } = useCurrentTenant();
   const generateTenantPath = useGenerateTenantPath();
   const tenantId = currentTenant?.id ?? '';
-  const isPersonal = currentTenant?.type === TenantType.PERSONAL;
-  const { hasPermission: canManage } = usePermissionCheck('backup.manage');
-  const canAccess = canManage || isPersonal;
+  const { hasPermission: canAccess } = usePermissionCheck('backup.manage');
 
   const [enabled, setEnabled] = useState(false);
   const [backupIntervalDays, setBackupIntervalDays] = useState(1);

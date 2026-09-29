@@ -49,7 +49,11 @@ describe('useCurrentTenantMembership: Hook', () => {
     ];
 
     it('should return the membership for the owned tenant', async () => {
-      const { result, waitForApolloMocks } = render({ tenants });
+      const mockedRouterParams = useParams as jest.Mock;
+      mockedRouterParams.mockReturnValue({ tenantId: tenants[0].id });
+
+      const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: tenants[0].id });
+      const { result, waitForApolloMocks } = render({ tenants }, { routerProps });
       await waitForApolloMocks();
       expect(result.current).toEqual({ currentMembership: tenants[0].membership });
     });
