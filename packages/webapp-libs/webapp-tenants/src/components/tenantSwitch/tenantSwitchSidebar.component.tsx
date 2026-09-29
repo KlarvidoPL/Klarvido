@@ -11,13 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@sb/webapp-core/components/ui/dropdown-menu';
+import { Input } from '@sb/webapp-core/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@sb/webapp-core/components/ui/tooltip';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { cn } from '@sb/webapp-core/lib/utils';
-import { Building2, ChevronDown, Plus, User, UserPlus } from 'lucide-react';
+import { Building2, ChevronDown, Plus, Search, User, UserPlus } from 'lucide-react';
 import { groupBy, head, prop } from 'ramda';
-import { FormattedMessage } from 'react-intl';
+import { useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
@@ -29,6 +31,7 @@ export type TenantSwitchSidebarProps = {
 };
 
 export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarProps = {}) => {
+  const intl = useIntl();
   const { data: currentTenant } = useCurrentTenant();
   const tenants = useTenants();
   const navigate = useNavigate();
@@ -37,6 +40,7 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
   const { data: commonQueryData } = useCommonQuery();
   const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonQueryData?.currentUser);
   const isSuperuser = !!currentUser?.isSuperuser;
+  const [searchQuery, setSearchQuery] = useState('');
 
   const tenantsGrouped = groupBy(prop<string>('type'), tenants);
   const personalTenant = head(tenantsGrouped[TenantType.PERSONAL] ?? []);
@@ -50,6 +54,9 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
       return membership.invitationAccepted ? 'organizations' : 'invitations';
     },
     tenantsGrouped[TenantType.ORGANIZATION] ?? []
+  );
+  const filteredOrganizations = (organizationTenants?.organizations ?? []).filter((tenant) =>
+    (tenant?.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleTenantChange = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
@@ -99,7 +106,11 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
   );
 
   const content = (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (!open) setSearchQuery('');
+      }}
+    >
       <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
       <DropdownMenuContent
         align={collapsed ? 'end' : 'start'}
@@ -121,19 +132,49 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
             <DropdownMenuLabel>
               <FormattedMessage defaultMessage="Organizations" id="TenantSwitch / Organizations" />
             </DropdownMenuLabel>
+            <div className="px-2 pb-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Don't let Radix's menu type-ahead/roving-focus keyboard
+                    // handling hijack normal typing in this field.
+                    if (e.key !== 'Escape') e.stopPropagation();
+                  }}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Search organizations…',
+                    id: 'TenantSwitch / Search organizations placeholder',
+                  })}
+                  className="h-8 pl-8 text-sm"
+                />
+              </div>
+            </div>
+            <div className="max-h-60 overflow-y-auto">
+              {filteredOrganizations.length === 0 ? (
+                <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="No organizations found"
+                    id="TenantSwitch / No organizations found"
+                  />
+                </div>
+              ) : (
+                filteredOrganizations.map((tenant) => (
+                  <DropdownMenuCheckboxItem
+                    checked={tenant?.id === currentTenant?.id}
+                    key={tenant?.id}
+                    onClick={handleTenantChange(tenant)}
+                    className="gap-2"
+                  >
+                    <Building2 className="h-4 w-4" />
+                    {tenant?.name}
+                  </DropdownMenuCheckboxItem>
+                ))
+              )}
+            </div>
           </>
         )}
-        {organizationTenants?.organizations?.map((tenant) => (
-          <DropdownMenuCheckboxItem
-            checked={tenant?.id === currentTenant?.id}
-            key={tenant?.id}
-            onClick={handleTenantChange(tenant)}
-            className="gap-2"
-          >
-            <Building2 className="h-4 w-4" />
-            {tenant?.name}
-          </DropdownMenuCheckboxItem>
-        ))}
         {organizationTenants?.invitations?.length > 0 && (
           <>
             <DropdownMenuSeparator />

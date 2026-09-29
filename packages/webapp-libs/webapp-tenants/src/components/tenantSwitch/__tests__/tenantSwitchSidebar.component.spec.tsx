@@ -111,4 +111,53 @@ describe('TenantSwitchSidebar: Component', () => {
       expect(screen.getByText(/invitations/i)).toBeInTheDocument();
     });
   });
+
+  describe('organization search filter', () => {
+    // A superuser can have dozens of organizations via the cross-tenant access
+    // bypass - the list must be filterable rather than an unbounded dump.
+    const secondOrgTenant = tenantFactory({
+      id: 'org-4',
+      name: 'Second Organization',
+      type: TenantType.ORGANIZATION,
+      membership: { role: 'MEMBER', invitationAccepted: true, invitationToken: 'token2', id: 'm4' },
+    });
+
+    it('should narrow the list to organizations matching the search text', async () => {
+      const multiOrgUser = currentUserFactory({ tenants: [orgTenant, secondOrgTenant] });
+      const apolloMocks = [fillCommonQueryWithUser(multiOrgUser)];
+      const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: orgTenant.id });
+
+      render(<Component />, { apolloMocks, routerProps });
+
+      const trigger = await screen.findByRole('button');
+      await userEvent.click(trigger);
+
+      expect(screen.getByText('Org One')).toBeInTheDocument();
+      expect(screen.getByText('Second Organization')).toBeInTheDocument();
+
+      const searchInput = screen.getByPlaceholderText(/search organizations/i);
+      await userEvent.type(searchInput, 'Second');
+
+      expect(screen.queryByText('Org One')).not.toBeInTheDocument();
+      expect(screen.getByText('Second Organization')).toBeInTheDocument();
+    });
+
+    it('should show an empty state when no organization matches the search text', async () => {
+      const multiOrgUser = currentUserFactory({ tenants: [orgTenant, secondOrgTenant] });
+      const apolloMocks = [fillCommonQueryWithUser(multiOrgUser)];
+      const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: orgTenant.id });
+
+      render(<Component />, { apolloMocks, routerProps });
+
+      const trigger = await screen.findByRole('button');
+      await userEvent.click(trigger);
+
+      const searchInput = screen.getByPlaceholderText(/search organizations/i);
+      await userEvent.type(searchInput, 'no such organization');
+
+      expect(screen.queryByText('Org One')).not.toBeInTheDocument();
+      expect(screen.queryByText('Second Organization')).not.toBeInTheDocument();
+      expect(screen.getByText(/no organizations found/i)).toBeInTheDocument();
+    });
+  });
 });
