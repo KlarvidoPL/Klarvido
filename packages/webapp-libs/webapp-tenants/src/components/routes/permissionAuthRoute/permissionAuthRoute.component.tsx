@@ -4,6 +4,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { usePermissionCheck, PermissionCode } from '../../../hooks/usePermissionCheck';
 import { useGenerateTenantPath } from '../../../hooks/useGenerateTenantPath';
 import { RoutesConfig } from '../../../config/routes';
+import { useCurrentTenant } from '../../../providers';
 
 export type PermissionAuthRouteProps = {
   /**
@@ -23,6 +24,13 @@ export type PermissionAuthRouteProps = {
    * - Custom path: Redirect to specific path
    */
   fallback?: 'accessDenied' | 'home' | string;
+  /**
+   * When true, also requires the current tenant to be a real organization (not the
+   * personal/no-selection state) - redirects home regardless of `fallback`, since
+   * "access denied" is the wrong message when there's no org context to check
+   * permissions against at all.
+   */
+  requiresOrganization?: boolean;
 };
 
 /**
@@ -45,13 +53,21 @@ export const PermissionAuthRoute = ({
   permissions,
   mode = 'any',
   fallback = 'accessDenied',
+  requiresOrganization = false,
 }: PermissionAuthRouteProps) => {
   const { hasPermission, hasAnyPermission, hasAllPermissions, loading } = usePermissionCheck(permissions);
   const generateTenantPath = useGenerateTenantPath();
+  const { data: currentTenant } = useCurrentTenant();
 
   // Show nothing while loading permissions
   if (loading) {
     return null;
+  }
+
+  // No org context to even check permissions against - always send home, regardless
+  // of `fallback`.
+  if (requiresOrganization && currentTenant?.type !== TenantType.ORGANIZATION) {
+    return <Navigate to={generateTenantPath(RoutesConfig.home)} replace />;
   }
 
   const permissionsArray = Array.isArray(permissions) ? permissions : [permissions];

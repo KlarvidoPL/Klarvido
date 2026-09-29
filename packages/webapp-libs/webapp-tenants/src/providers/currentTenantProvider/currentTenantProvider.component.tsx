@@ -35,7 +35,7 @@ export const CurrentTenantProvider = ({ children }: CurrentTenantProviderProps) 
 
   const { parsedStoredState, storedTenantId } = parseStoredState(storedState, userId);
 
-  const currentTenant = getCurrentTenant(params.tenantId, storedTenantId, tenants);
+  const currentTenant = getCurrentTenant(params.tenantId, storedTenantId, tenants, !!profile?.isSuperuser);
   const currentMembership = getFragmentData(commonQueryMembershipFragment, currentTenant?.membership);
 
   useEffect(() => {

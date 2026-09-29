@@ -1,4 +1,5 @@
 import { TenantUserRole } from '@sb/webapp-api-client';
+import { TenantType } from '@sb/webapp-api-client/constants';
 import { Link } from '@sb/webapp-core/components/buttons';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { Separator } from '@sb/webapp-core/components/ui/separator';
@@ -12,6 +13,7 @@ import { PermissionGate } from '@sb/webapp-tenants/components/permissionGate';
 import { TenantRoleAccess } from '@sb/webapp-tenants/components/tenantRoleAccess';
 import { TenantSwitchSidebar } from '@sb/webapp-tenants/components/tenantSwitch';
 import { useCurrentTenantRole, useGenerateTenantPath, usePermissionCheck, PermissionCode } from '@sb/webapp-tenants/hooks';
+import { useCurrentTenant } from '@sb/webapp-tenants/providers';
 import {
   Building2,
   ChevronLeft,
@@ -78,6 +80,8 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
   const { isLoggedIn, currentUser } = useAuth();
   const { theme } = useTheme();
   const currentTenantRole = useCurrentTenantRole();
+  const { data: currentTenant } = useCurrentTenant();
+  const hasOrganizationSelected = currentTenant?.type === TenantType.ORGANIZATION;
   const userRoles = currentUser?.roles || [];
 
   // Get user's permissions for permission-based menu items
@@ -257,15 +261,22 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
           tenantRoles: [],
           generatePath: () => generateLocalePath(RoutesConfig.admin),
         },
-        {
-          path: RoutesConfig.tenant.settings.members,
-          label: intl.formatMessage({ defaultMessage: 'Organization', id: 'Home / organization settings' }),
-          icon: Building2,
-          roles: [],
-          tenantRoles: [],
-          permissions: ['org.settings.view', 'members.view'],
-          generatePath: () => generateTenantPath(RoutesConfig.tenant.settings.members),
-        },
+        // "Organization" only makes sense with a real organization selected - Admin
+        // panel above is a separate, global axis (Role.ADMIN) and must stay visible
+        // regardless, so this can't be a whole-section gate.
+        ...(hasOrganizationSelected
+          ? [
+              {
+                path: RoutesConfig.tenant.settings.members,
+                label: intl.formatMessage({ defaultMessage: 'Organization', id: 'Home / organization settings' }),
+                icon: Building2,
+                roles: [],
+                tenantRoles: [],
+                permissions: ['org.settings.view', 'members.view'] as PermissionCode[],
+                generatePath: () => generateTenantPath(RoutesConfig.tenant.settings.members),
+              },
+            ]
+          : []),
       ],
     },
     {
@@ -490,7 +501,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
                   'flex justify-center': isSidebarCollapsed && isDesktop,
                 })}
               >
-                <TenantSwitchSidebar collapsed={isSidebarCollapsed && isDesktop} />
+                <TenantSwitchSidebar collapsed={isSidebarCollapsed && isDesktop} onNavigate={closeSidebar} />
               </div>
             )}
           </div>
@@ -508,6 +519,12 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
                     return result;
                   }
                   if (!isLoggedIn) return null;
+                  // Billing and Features are entirely org-scoped - hide both until a
+                  // real organization is selected, rather than showing them backed by
+                  // permissions that were never meant to apply outside an org context.
+                  if ((section.id === 'billing' || section.id === 'features') && !hasOrganizationSelected) {
+                    return null;
+                  }
                   const result = renderSection(section, index, visibleIndex);
                   if (result) visibleIndex++;
                   return result;

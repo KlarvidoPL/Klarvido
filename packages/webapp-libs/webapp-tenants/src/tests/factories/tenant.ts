@@ -16,7 +16,10 @@ export const tenantFactory = createDeepFactory<TenantType>(() => ({
   id: makeId(32),
   name: 'Tenant Name',
   membership: membershipFactory(),
-  type: TenantTypeField.PERSONAL,
+  // Real organization by default - a working org context is the normal/happy-path
+  // scenario most tests want; specifically testing the personal/no-org state should
+  // opt in explicitly via `tenantFactory({ type: TenantTypeField.PERSONAL, ... })`.
+  type: TenantTypeField.ORGANIZATION,
   __typename: 'TenantType',
 }));
 

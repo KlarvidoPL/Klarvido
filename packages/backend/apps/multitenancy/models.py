@@ -571,6 +571,40 @@ class TenantMembershipRole(models.Model):
 # ============ Helper Functions for Permission Checking ============
 
 
+def is_superuser_bypass_eligible(user) -> bool:
+    """Single source of truth for the superuser cross-tenant bypass condition."""
+    return bool(user and getattr(user, "is_authenticated", False) and getattr(user, "is_superuser", False))
+
+
+def has_real_tenant_membership(user, tenant) -> bool:
+    if not user or not tenant:
+        return False
+    return TenantMembership.objects.filter(user=user, tenant=tenant, is_accepted=True).exists()
+
+
+def has_tenant_access(user, tenant) -> bool:
+    """Coarse-grained tenant access gate: real accepted membership OR superuser bypass."""
+    return is_superuser_bypass_eligible(user) or has_real_tenant_membership(user, tenant)
+
+
+def is_cross_tenant_superuser_access(user, tenant) -> bool:
+    """
+    True only when access is happening BECAUSE of the superuser bypass (no real
+    membership row) - used solely to pick the audit actor_type. A superuser who is
+    also a real member of the tenant logs as a normal USER action, not SUPERUSER.
+    """
+    return is_superuser_bypass_eligible(user) and not has_real_tenant_membership(user, tenant)
+
+
+def get_visible_tenants_for_user(user):
+    """Every tenant a superuser can see (all of them), or a regular user's own tenants."""
+    if not user or not getattr(user, "is_authenticated", False):
+        return Tenant.objects.none()
+    if is_superuser_bypass_eligible(user):
+        return Tenant.objects.all().order_by("id")
+    return Tenant.objects.filter(user_memberships__user=user).order_by("id")
+
+
 def get_user_permissions_for_tenant(user, tenant):
     """
     Get all permission codes for a user in a specific tenant.
@@ -593,6 +627,11 @@ def get_user_permissions_for_tenant(user, tenant):
     ).first()
 
     if not membership:
+        if is_superuser_bypass_eligible(user):
+            # SUPERUSER BYPASS: owner-equivalent access without a real membership row.
+            permissions = set(Permission.objects.values_list("code", flat=True))
+            cache.set(cache_key, permissions, 300)
+            return permissions
         return set()
 
     # Check if user has owner role (has all permissions)

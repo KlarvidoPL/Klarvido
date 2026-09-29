@@ -50,9 +50,25 @@ def get_current_tenant_with_membership_check(tenant_id, user, request=None):
     except (Tenant.DoesNotExist, TypeError):
         return None
 
-    # SECURITY: Verify user has accepted membership in this tenant
-    if not TenantMembership.objects.filter(user=user, tenant=tenant, is_accepted=True).exists():
-        return None
+    # SECURITY: Verify user has accepted membership in this tenant, OR is a Django
+    # superuser (owner-equivalent bypass across every tenant, without a real
+    # TenantMembership row - see apps.multitenancy.models.is_superuser_bypass_eligible).
+    from .models import has_real_tenant_membership, is_superuser_bypass_eligible
+
+    has_membership = has_real_tenant_membership(user, tenant)
+    if not has_membership:
+        if not is_superuser_bypass_eligible(user):
+            return None
+        # SUPERUSER BYPASS: flagged for action-logging (apps.multitenancy.constants
+        # ActionActorType.SUPERUSER) so tenant owners can see support/superuser staff
+        # touched their org. NOTE: SSO enforcement below still naturally allows this -
+        # get_sso_enforced_tenant_ids() only enforces against tenants the user already
+        # has a REAL membership row in, so a superuser with no membership is never
+        # blocked by it.
+        if request is not None:
+            request.is_superuser_cross_tenant_access = True
+    elif request is not None:
+        request.is_superuser_cross_tenant_access = False
 
     # SECURITY: Block password sessions from accessing SSO-enforced tenants
     if request is not None:
@@ -84,6 +100,10 @@ def get_current_user_role(tenant, user):
             membership = TenantMembership.objects.get(user=user, tenant=tenant)
             return membership.role
         except TenantMembership.DoesNotExist:
+            if getattr(user, "is_superuser", False):
+                from .constants import TenantUserRole
+
+                return TenantUserRole.OWNER
             return None
 
     return None

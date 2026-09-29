@@ -82,10 +82,6 @@ def action_logged(
             if user and not user.is_authenticated:
                 user = None
 
-            # Determine actor type - check if this is an AI Agent request
-            is_ai_agent = getattr(info.context, "is_ai_agent_request", False)
-            actor_type = ActionActorType.AI_AGENT if is_ai_agent else ActionActorType.USER
-
             # For UPDATE and DELETE, capture old state
             old_instance = None
             if action_type in (ActionType.UPDATE, ActionType.DELETE):
@@ -97,6 +93,20 @@ def action_logged(
             # Skip logging if tenant_id couldn't be determined
             if not tenant_id:
                 return result
+
+            # Determine actor type - check superuser cross-tenant bypass, then AI Agent.
+            # Force resolution of the lazy `info.context.tenant` first: the bypass flag
+            # is only set as a side effect of that resolution (see
+            # apps.multitenancy.middleware.get_current_tenant_with_membership_check).
+            _ = info.context.tenant
+            is_superuser_cross_tenant = getattr(info.context, "is_superuser_cross_tenant_access", False)
+            is_ai_agent = getattr(info.context, "is_ai_agent_request", False)
+            if is_superuser_cross_tenant:
+                actor_type = ActionActorType.SUPERUSER
+            elif is_ai_agent:
+                actor_type = ActionActorType.AI_AGENT
+            else:
+                actor_type = ActionActorType.USER
 
             # Get the new instance from the result
             new_instance = _extract_instance_from_result(result, cls_inner)
@@ -336,9 +346,19 @@ def log_mutation_action(
     if user and not user.is_authenticated:
         user = None
 
-    # Determine actor type - check if this is an AI Agent request
+    # Determine actor type - check superuser cross-tenant bypass, then AI Agent.
+    # Force resolution of the lazy `info.context.tenant` first: the bypass flag is
+    # only set as a side effect of that resolution (see apps.multitenancy.middleware
+    # .get_current_tenant_with_membership_check).
+    _ = info.context.tenant
+    is_superuser_cross_tenant = getattr(info.context, "is_superuser_cross_tenant_access", False)
     is_ai_agent = getattr(info.context, "is_ai_agent_request", False)
-    actor_type = ActionActorType.AI_AGENT if is_ai_agent else ActionActorType.USER
+    if is_superuser_cross_tenant:
+        actor_type = ActionActorType.SUPERUSER
+    elif is_ai_agent:
+        actor_type = ActionActorType.AI_AGENT
+    else:
+        actor_type = ActionActorType.USER
 
     return log_action(
         tenant_id=decoded_tenant_id,

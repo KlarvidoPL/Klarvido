@@ -17,6 +17,7 @@ export const commonQueryCurrentUserFragment = gql(/* GraphQL */ `
     hasUsablePassword
     hasSeenWelcomeModal
     isConfirmed
+    isSuperuser
   }
 `);
 

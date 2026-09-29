@@ -1,6 +1,6 @@
 import { TenantType } from '@sb/webapp-api-client/constants';
 import { CommonQueryTenantItemFragmentFragment, TenantUserRole, getFragmentData } from '@sb/webapp-api-client/graphql';
-import { commonQueryMembershipFragment } from '@sb/webapp-api-client/providers';
+import { commonQueryCurrentUserFragment, commonQueryMembershipFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import {
   DropdownMenu,
@@ -11,13 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@sb/webapp-core/components/ui/dropdown-menu';
+import { Input } from '@sb/webapp-core/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@sb/webapp-core/components/ui/tooltip';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { cn } from '@sb/webapp-core/lib/utils';
-import { Building2, ChevronDown, Plus, User, UserPlus } from 'lucide-react';
+import { Building2, ChevronDown, Plus, Search, User, UserPlus } from 'lucide-react';
 import { groupBy, head, prop } from 'ramda';
-import { FormattedMessage } from 'react-intl';
+import { useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
@@ -26,38 +28,56 @@ import { useCurrentTenant } from '../../providers';
 
 export type TenantSwitchSidebarProps = {
   collapsed?: boolean;
+  // Lets the mobile sidebar overlay close itself after a click here navigates
+  // away, matching every other nav item in the sidebar.
+  onNavigate?: () => void;
 };
 
-export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarProps = {}) => {
+export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwitchSidebarProps = {}) => {
+  const intl = useIntl();
   const { data: currentTenant } = useCurrentTenant();
   const tenants = useTenants();
   const navigate = useNavigate();
   const generateTenantPath = useGenerateTenantPath();
   const generateLocalePath = useGenerateLocalePath();
+  const { data: commonQueryData } = useCommonQuery();
+  const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonQueryData?.currentUser);
+  const isSuperuser = !!currentUser?.isSuperuser;
+  const [searchQuery, setSearchQuery] = useState('');
 
   const tenantsGrouped = groupBy(prop<string>('type'), tenants);
   const personalTenant = head(tenantsGrouped[TenantType.PERSONAL] ?? []);
   const organizationTenants = groupBy(
-    (tenant) =>
-      getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationAccepted
-        ? 'organizations'
-        : 'invitations',
+    (tenant) => {
+      const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+      // A superuser sees every organization via an owner-equivalent access bypass that
+      // creates no real membership row - `membership` is then null, not a pending
+      // invitation, so it must not be bucketed with genuine unaccepted invitations.
+      if (!membership) return isSuperuser ? 'organizations' : 'invitations';
+      return membership.invitationAccepted ? 'organizations' : 'invitations';
+    },
     tenantsGrouped[TenantType.ORGANIZATION] ?? []
+  );
+  const filteredOrganizations = (organizationTenants?.organizations ?? []).filter((tenant) =>
+    (tenant?.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleTenantChange = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
     if (!tenant) return;
     navigate(generateTenantPath(RoutesConfig.home, { tenantId: tenant.id }));
+    onNavigate?.();
   };
 
   const handleInvitationClick = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
     const token = getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationToken;
     if (!token) return;
     navigate(generateLocalePath(RoutesConfig.tenantInvitation, { token }));
+    onNavigate?.();
   };
 
   const handleNewTenantClick = () => {
     navigate(generateLocalePath(RoutesConfig.addTenant));
+    onNavigate?.();
   };
 
   const hasPendingInvitations = (organizationTenants?.invitations?.length ?? 0) > 0;
@@ -78,14 +98,25 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
             <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" />
           )}
         </div>
-        <span className="truncate">{currentTenant?.name}</span>
+        <span className="truncate">
+          {currentTenant?.name ?? (
+            <FormattedMessage
+              defaultMessage="Select organization"
+              id="TenantSwitch / Select organization placeholder"
+            />
+          )}
+        </span>
       </div>
       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
     </Button>
   );
 
   const content = (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (!open) setSearchQuery('');
+      }}
+    >
       <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
       <DropdownMenuContent
         align={collapsed ? 'end' : 'start'}
@@ -107,19 +138,49 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
             <DropdownMenuLabel>
               <FormattedMessage defaultMessage="Organizations" id="TenantSwitch / Organizations" />
             </DropdownMenuLabel>
+            <div className="px-2 pb-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Don't let Radix's menu type-ahead/roving-focus keyboard
+                    // handling hijack normal typing in this field.
+                    if (e.key !== 'Escape') e.stopPropagation();
+                  }}
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Search organizations…',
+                    id: 'TenantSwitch / Search organizations placeholder',
+                  })}
+                  className="h-8 pl-8 text-sm"
+                />
+              </div>
+            </div>
+            <div className="max-h-60 overflow-y-auto">
+              {filteredOrganizations.length === 0 ? (
+                <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="No organizations found"
+                    id="TenantSwitch / No organizations found"
+                  />
+                </div>
+              ) : (
+                filteredOrganizations.map((tenant) => (
+                  <DropdownMenuCheckboxItem
+                    checked={tenant?.id === currentTenant?.id}
+                    key={tenant?.id}
+                    onClick={handleTenantChange(tenant)}
+                    className="gap-2"
+                  >
+                    <Building2 className="h-4 w-4" />
+                    {tenant?.name}
+                  </DropdownMenuCheckboxItem>
+                ))
+              )}
+            </div>
           </>
         )}
-        {organizationTenants?.organizations?.map((tenant) => (
-          <DropdownMenuCheckboxItem
-            checked={tenant?.id === currentTenant?.id}
-            key={tenant?.id}
-            onClick={handleTenantChange(tenant)}
-            className="gap-2"
-          >
-            <Building2 className="h-4 w-4" />
-            {tenant?.name}
-          </DropdownMenuCheckboxItem>
-        ))}
         {organizationTenants?.invitations?.length > 0 && (
           <>
             <DropdownMenuSeparator />

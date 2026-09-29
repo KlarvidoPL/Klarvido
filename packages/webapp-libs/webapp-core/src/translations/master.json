@@ -3104,6 +3104,9 @@
   "Profile / Name / Label": {
     "defaultMessage": "Name"
   },
+  "Profile / Name / Superuser badge": {
+    "defaultMessage": "Superuser"
+  },
   "Profile / Overview / Description": {
     "defaultMessage": "Your account information"
   },
@@ -3995,14 +3998,17 @@
   "Tenant Invitation / Page headline": {
     "defaultMessage": "Organization Invitation"
   },
-  "Tenant Members / Alert": {
-    "defaultMessage": "If you wish to invite people, you need to create an organization."
-  },
   "Tenant Members / Header": {
     "defaultMessage": "Members"
   },
+  "Tenant Members / Invitation form / Error message": {
+    "defaultMessage": "Failed to invite user. Please try again."
+  },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "User invited successfully!"
+  },
+  "Tenant Members / Invitation form / User cannot be invited": {
+    "defaultMessage": "This user cannot be a member of this organization."
   },
   "Tenant Members / Subheader": {
     "defaultMessage": "View and manage organization members"
@@ -4274,6 +4280,9 @@
   "TenantSwitch / Invitations Badge": {
     "defaultMessage": "{invitationsCount, plural, =1 {# invitation} other {# invitations}}"
   },
+  "TenantSwitch / No organizations found": {
+    "defaultMessage": "No organizations found"
+  },
   "TenantSwitch / Organization settings": {
     "defaultMessage": "Organization settings"
   },
@@ -4282,6 +4291,12 @@
   },
   "TenantSwitch / Personal account": {
     "defaultMessage": "Personal account"
+  },
+  "TenantSwitch / Search organizations placeholder": {
+    "defaultMessage": "Search organizations…"
+  },
+  "TenantSwitch / Select organization placeholder": {
+    "defaultMessage": "Select organization"
   },
   "Terms And Conditions / Description": {
     "defaultMessage": "Legal terms for using our service"

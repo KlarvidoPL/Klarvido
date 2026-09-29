@@ -227,9 +227,9 @@ def permission_required(permission_code: Union[str, List[str]], mode: str = "any
 
                 # Check permissions
                 if mode == "all":
-                    has_permission = all(user_has_permission(user.id, tenant.pk, perm) for perm in permissions_list)
+                    has_permission = all(user_has_permission(user, tenant, perm) for perm in permissions_list)
                 else:  # 'any' mode
-                    has_permission = any(user_has_permission(user.id, tenant.pk, perm) for perm in permissions_list)
+                    has_permission = any(user_has_permission(user, tenant, perm) for perm in permissions_list)
 
                 if not has_permission:
                     raise GraphQLError(PERMISSION_REQUIRED_MESSAGE)
@@ -255,13 +255,9 @@ def permission_required(permission_code: Union[str, List[str]], mode: str = "any
                     if tenant:
                         # Check permissions
                         if mode == "all":
-                            has_permission = all(
-                                user_has_permission(user.id, tenant.pk, perm) for perm in permissions_list
-                            )
+                            has_permission = all(user_has_permission(user, tenant, perm) for perm in permissions_list)
                         else:  # 'any' mode
-                            has_permission = any(
-                                user_has_permission(user.id, tenant.pk, perm) for perm in permissions_list
-                            )
+                            has_permission = any(user_has_permission(user, tenant, perm) for perm in permissions_list)
 
                         if not has_permission:
                             raise GraphQLError(PERMISSION_REQUIRED_MESSAGE)

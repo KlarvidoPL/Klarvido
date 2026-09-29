@@ -75,6 +75,7 @@ class ActionActorType(models.TextChoices):
 
     USER = "USER", "User"
     AI_AGENT = "AI_AGENT", "AI Agent"
+    SUPERUSER = "SUPERUSER", "Superuser"
     SYSTEM_SYNC = "SYSTEM:sync", "System (Sync)"
     SYSTEM_IMPORT = "SYSTEM:import", "System (Import)"
     SYSTEM_SCHEDULED = "SYSTEM:scheduled_task", "System (Scheduled Task)"

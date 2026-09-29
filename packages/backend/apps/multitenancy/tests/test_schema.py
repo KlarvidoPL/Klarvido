@@ -3,8 +3,14 @@ import os
 from graphql_relay import to_global_id
 
 from apps.notifications.models import Notification
-from ..constants import TenantType, TenantUserRole, Notification as NotificationConstant, SystemRoleType
-from ..models import TenantMembership, TenantMembershipRole, OrganizationRole
+from ..constants import (
+    TenantType,
+    TenantUserRole,
+    ActionActorType,
+    Notification as NotificationConstant,
+    SystemRoleType,
+)
+from ..models import ActionLog, TenantMembership, TenantMembershipRole, OrganizationRole
 from ..permissions import create_system_roles_for_tenant
 
 
@@ -124,6 +130,16 @@ class TestUpdateTenantMutation:
         tenant = tenant_factory(name="Tenant 1")
         executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
         assert executed["errors"][0]["message"] == "permission_denied"
+
+    def test_superuser_without_membership_can_update(self, graphene_client, user_factory, tenant_factory):
+        """Superuser bypass: owner-equivalent access without a real membership row."""
+        superuser = user_factory(is_superuser=True)
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["updateTenant"]["tenant"]["name"] == "Tenant 2"
 
     @classmethod
     def mutate(cls, graphene_client, data):
@@ -331,6 +347,34 @@ class TestCreateTenantInvitationMutation:
             },
         )
         assert executed["errors"][0]["message"] == "permission_denied"
+
+    def test_invite_superuser_is_rejected(
+        self, graphene_client, user, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """A superuser already has owner-equivalent access to every tenant via the
+        cross-tenant bypass, so inviting them as a real, role-scoped member would
+        only ever narrow their access - reject it with a clear message instead."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        superuser = user_factory(is_superuser=True)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "email": superuser.email,
+                "role": TenantUserRole.MEMBER,
+            },
+        )
+
+        assert executed["errors"][0]["message"] == "GraphQlValidationError"
+        non_field_errors = executed["errors"][0]["extensions"]["non_field_errors"]
+        # Deliberately generic - must not reveal that the target user is a superuser.
+        assert non_field_errors[0]["message"] == "This user cannot be a member of this organization."
+        assert non_field_errors[0]["code"] == "user_cannot_be_invited"
+        assert not TenantMembership.objects.filter(tenant=tenant, user=superuser).exists()
 
     @classmethod
     def mutate(cls, graphene_client, data):
@@ -751,6 +795,109 @@ class TestUpdateTenantMembershipMutation:
         )
         assert executed["errors"][0]["message"] == "permission_denied"
 
+    def test_superuser_without_membership_can_update(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """Superuser bypass: owner-equivalent access without a real membership row."""
+        superuser = user_factory(is_superuser=True)
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership = tenant_membership_factory(tenant=tenant, role=TenantUserRole.MEMBER)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", tenant_membership.id),
+                "role": "ADMIN",
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["updateTenantMembership"]["tenantMembership"]["role"] == TenantUserRole.ADMIN
+
+    def test_superuser_cross_tenant_access_logged_as_superuser_actor(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """Action logging must distinguish a superuser's cross-tenant bypass access
+        from a normal member action, so tenant owners can see support staff touched
+        their org."""
+        superuser = user_factory(is_superuser=True)
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION, action_logging_enabled=True)
+        tenant_membership = tenant_membership_factory(tenant=tenant, role=TenantUserRole.MEMBER)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+        # Simulate what TenantUserRoleMiddleware would have set for a superuser with
+        # no real membership row (the test client bypasses real middleware execution).
+        graphene_client.execute_options["context_value"].is_superuser_cross_tenant_access = True
+
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", tenant_membership.id),
+                "role": "ADMIN",
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        action_log = ActionLog.objects.filter(tenant=tenant, entity_type="tenant_membership").first()
+        assert action_log is not None
+        assert action_log.actor_type == ActionActorType.SUPERUSER
+
+    def test_superuser_real_member_access_logged_as_user_actor(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """A superuser acting within a tenant they're actually a member of logs as a
+        normal USER action, not SUPERUSER - the bypass flag only fires for actual
+        cross-tenant access."""
+        superuser = user_factory(is_superuser=True)
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION, action_logging_enabled=True)
+        tenant_membership_factory(tenant=tenant, user=superuser, role=TenantUserRole.OWNER)
+        tenant_membership = tenant_membership_factory(tenant=tenant, role=TenantUserRole.MEMBER)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        graphene_client.execute_options["context_value"].is_superuser_cross_tenant_access = False
+
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", tenant_membership.id),
+                "role": "ADMIN",
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        action_log = ActionLog.objects.filter(tenant=tenant, entity_type="tenant_membership").first()
+        assert action_log is not None
+        assert action_log.actor_type == ActionActorType.USER
+
+    def test_regular_user_access_logged_as_user_actor(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        """Regression guard: normal member actions keep logging as USER."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION, action_logging_enabled=True)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        tenant_membership = tenant_membership_factory(tenant=tenant, role=TenantUserRole.MEMBER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", tenant_membership.id),
+                "role": "ADMIN",
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        action_log = ActionLog.objects.filter(tenant=tenant, entity_type="tenant_membership").first()
+        assert action_log is not None
+        assert action_log.actor_type == ActionActorType.USER
+
     @classmethod
     def mutate(cls, graphene_client, data):
         return graphene_client.mutate(cls.MUTATION, variable_values={'input': data})
@@ -1035,6 +1182,45 @@ class TestAllTenantsQuery:
         executed_tenants = executed["data"]["allTenants"]["edges"]
         assert executed_tenants == []
 
+    def test_all_tenants_query_superuser_sees_tenants_without_membership(
+        self, graphene_client, user_factory, tenant_factory
+    ):
+        """Superuser bypass: sees every tenant, including ones with no real membership row,
+        and does not crash on the (now nullable) `membership` field for those tenants."""
+        query = """
+        query getAllTenants {
+            allTenants {
+                edges {
+                    node {
+                        id
+                        membership {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        """
+        superuser = user_factory(is_superuser=True)
+        other_tenants = tenant_factory.create_batch(3)
+
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(None, None)
+        executed = graphene_client.query(query)
+
+        assert "errors" not in executed, executed.get("errors")
+        executed_ids = {edge["node"]["id"] for edge in executed["data"]["allTenants"]["edges"]}
+        expected_ids = {to_global_id("TenantType", str(t.id)) for t in other_tenants}
+        assert expected_ids <= executed_ids
+
+        # No real membership in any of these tenants, so `membership` must be null,
+        # not a GraphQL error (regression test for TenantType.membership NonNull -> nullable).
+        memberships_by_id = {
+            edge["node"]["id"]: edge["node"]["membership"] for edge in executed["data"]["allTenants"]["edges"]
+        }
+        for tenant_id in expected_ids:
+            assert memberships_by_id[tenant_id] is None
+
 
 class TestTenantQuery:
     def test_tenant_query(self, graphene_client, user_factory, tenant_factory, tenant_membership_factory):
@@ -1276,3 +1462,51 @@ class TestTenantQuery:
             tenant_membership_factory(tenant=tenant, role=TenantUserRole.MEMBER, user=tenant_user)
         executed = graphene_client.query(query, variable_values={"id": to_global_id("TenantType", tenant.pk)})
         assert executed["errors"][0]["message"] == "permission_denied"
+
+    def test_tenant_query_superuser_without_membership_returns_tenant_with_null_membership(
+        self, graphene_client, user_factory, tenant_factory
+    ):
+        """Superuser bypass: gets the tenant even with no real membership row, and the
+        (now nullable) `membership` field resolves to null instead of a GraphQL error
+        (regression test for TenantType.membership NonNull -> nullable)."""
+        query = """
+        query getTenant($id: ID!) {
+          tenant(id: $id) {
+            id
+            name
+            membership {
+              id
+            }
+          }
+        }
+        """
+        superuser = user_factory(is_superuser=True)
+        tenant = tenant_factory(name="Test tenant", type=TenantType.ORGANIZATION)
+
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(None, None)
+        executed = graphene_client.query(query, variable_values={"id": to_global_id("TenantType", tenant.pk)})
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["tenant"]["id"] == to_global_id("TenantType", str(tenant.id))
+        assert executed["data"]["tenant"]["membership"] is None
+
+    def test_tenant_query_regular_user_without_membership_still_denied(
+        self, graphene_client, user_factory, tenant_factory
+    ):
+        """Regression guard: the bypass must not accidentally widen for regular users."""
+        query = """
+        query getTenant($id: ID!) {
+          tenant(id: $id) {
+            id
+          }
+        }
+        """
+        regular_user = user_factory(is_superuser=False)
+        tenant = tenant_factory(name="Test tenant", type=TenantType.ORGANIZATION)
+
+        graphene_client.force_authenticate(regular_user)
+        graphene_client.set_tenant_dependent_context(None, None)
+        executed = graphene_client.query(query, variable_values={"id": to_global_id("TenantType", tenant.pk)})
+
+        assert executed["data"]["tenant"] is None

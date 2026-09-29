@@ -1,3 +1,4 @@
+import { TenantType } from '@sb/webapp-api-client/constants';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { screen } from '@testing-library/react';
@@ -24,15 +25,24 @@ const createTestRoutes = ({
   permissions,
   mode = 'any',
   fallback = 'accessDenied',
+  requiresOrganization = false,
 }: {
   permissions: string | string[];
   mode?: 'any' | 'all';
   fallback?: 'accessDenied' | 'home' | string;
+  requiresOrganization?: boolean;
 }) => (
   <Routes>
     <Route
       path={RoutesConfig.tenant.settings.general}
-      element={<PermissionAuthRoute permissions={permissions} mode={mode} fallback={fallback} />}
+      element={
+        <PermissionAuthRoute
+          permissions={permissions}
+          mode={mode}
+          fallback={fallback}
+          requiresOrganization={requiresOrganization}
+        />
+      }
     >
       <Route index element={PLACEHOLDER_CONTENT} />
     </Route>
@@ -151,5 +161,54 @@ describe('PermissionAuthRoute: Component', () => {
 
     expect(await screen.findByTestId('home')).toBeInTheDocument();
     expect(screen.queryByTestId(PLACEHOLDER_TEST_ID)).not.toBeInTheDocument();
+  });
+
+  describe('requiresOrganization', () => {
+    it('should redirect to home when the current tenant is personal, even with full permissions', async () => {
+      const tenant = tenantFactory({
+        id: TENANT_ID,
+        type: TenantType.PERSONAL,
+        membership: { role: 'OWNER', invitationAccepted: true },
+      });
+      const user = currentUserFactory({ tenants: [tenant] });
+      const permissionsMock = composeMockedQueryResult(currentUserPermissionsQuery, {
+        variables: { tenantId: TENANT_ID },
+        data: { currentUserPermissions: ['org.settings.view'] },
+      });
+      const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.general, { tenantId: TENANT_ID });
+
+      render(createTestRoutes({ permissions: 'org.settings.view', requiresOrganization: true }), {
+        apolloMocks: [fillCommonQueryWithUser(user), permissionsMock],
+        routerProps,
+        TenantWrapper,
+      });
+
+      expect(await screen.findByTestId('home')).toBeInTheDocument();
+      expect(screen.queryByTestId(PLACEHOLDER_TEST_ID)).not.toBeInTheDocument();
+      // Not "access denied" - there's no org context to check permissions against at all.
+      expect(screen.queryByRole('heading', { name: /access denied/i })).not.toBeInTheDocument();
+    });
+
+    it('should render content when the current tenant is a real organization and permissions are met', async () => {
+      const tenant = tenantFactory({
+        id: TENANT_ID,
+        type: TenantType.ORGANIZATION,
+        membership: { role: 'OWNER', invitationAccepted: true },
+      });
+      const user = currentUserFactory({ tenants: [tenant] });
+      const permissionsMock = composeMockedQueryResult(currentUserPermissionsQuery, {
+        variables: { tenantId: TENANT_ID },
+        data: { currentUserPermissions: ['org.settings.view'] },
+      });
+      const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.general, { tenantId: TENANT_ID });
+
+      render(createTestRoutes({ permissions: 'org.settings.view', requiresOrganization: true }), {
+        apolloMocks: [fillCommonQueryWithUser(user), permissionsMock],
+        routerProps,
+        TenantWrapper,
+      });
+
+      expect(await screen.findByTestId(PLACEHOLDER_TEST_ID)).toBeInTheDocument();
+    });
   });
 });

@@ -696,7 +696,7 @@ class DeleteTenantDependentModelMutation(DeleteModelMutation):
         # SECURITY: Verify user has access to this tenant
         context_tenant = getattr(info.context, "tenant", None)
         if context_tenant is None or str(context_tenant.pk) != str(tenant_id):
-            from apps.multitenancy.models import Tenant, TenantMembership
+            from apps.multitenancy.models import Tenant, has_tenant_access
 
             user = info.context.user
             if not user or not user.is_authenticated:
@@ -707,7 +707,7 @@ class DeleteTenantDependentModelMutation(DeleteModelMutation):
             except Tenant.DoesNotExist:
                 raise PermissionDenied("You don't have access to this tenant")
 
-            if not TenantMembership.objects.filter(user=user, tenant=tenant, is_accepted=True).exists():
+            if not has_tenant_access(user, tenant):
                 raise PermissionDenied("You don't have access to this tenant")
 
         # Get the object with tenant scoping
@@ -773,7 +773,7 @@ class UpdateTenantDependentModelMutation(UpdateModelMutation):
         # SECURITY: Verify user has access to this tenant
         context_tenant = getattr(info.context, "tenant", None)
         if context_tenant is None or str(context_tenant.pk) != str(tenant_id):
-            from apps.multitenancy.models import Tenant, TenantMembership
+            from apps.multitenancy.models import Tenant, has_tenant_access
 
             user = info.context.user
             if not user or not user.is_authenticated:
@@ -784,7 +784,7 @@ class UpdateTenantDependentModelMutation(UpdateModelMutation):
             except Tenant.DoesNotExist:
                 raise PermissionDenied("You don't have access to this tenant")
 
-            if not TenantMembership.objects.filter(user=user, tenant=tenant, is_accepted=True).exists():
+            if not has_tenant_access(user, tenant):
                 raise PermissionDenied("You don't have access to this tenant")
 
         return super().mutate_and_get_payload(root, info, **input)
@@ -835,7 +835,7 @@ class CreateTenantDependentModelMutation(CreateModelMutation):
         # SECURITY: Verify user has access to this tenant
         context_tenant = getattr(info.context, "tenant", None)
         if context_tenant is None or str(context_tenant.pk) != str(tenant_id):
-            from apps.multitenancy.models import Tenant, TenantMembership
+            from apps.multitenancy.models import Tenant, has_tenant_access
 
             user = info.context.user
             if not user or not user.is_authenticated:
@@ -846,7 +846,7 @@ class CreateTenantDependentModelMutation(CreateModelMutation):
             except Tenant.DoesNotExist:
                 raise PermissionDenied("You don't have access to this tenant")
 
-            if not TenantMembership.objects.filter(user=user, tenant=tenant, is_accepted=True).exists():
+            if not has_tenant_access(user, tenant):
                 raise PermissionDenied("You don't have access to this tenant")
 
         return super().mutate_and_get_payload(root, info, **input)
