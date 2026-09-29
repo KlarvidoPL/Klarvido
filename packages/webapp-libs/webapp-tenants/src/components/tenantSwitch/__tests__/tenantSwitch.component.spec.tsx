@@ -137,4 +137,45 @@ describe('TenantSwitch: Component', () => {
       `/en/tenant-invitation/${organizationPendingTenant.membership.invitationToken}`
     );
   });
+
+  describe('superuser cross-tenant access', () => {
+    // A superuser sees a tenant they have no real membership in (owner-equivalent
+    // access bypass) - the backend returns `membership: null` for it, which must not
+    // be mistaken for a genuine unaccepted invitation (previously this both showed
+    // up under "Invitations" and did nothing on click, since there's no real
+    // invitationToken to navigate with).
+    const bypassTenantName = 'Bypass Org';
+    const bypassTenant = tenantFactory({
+      name: bypassTenantName,
+      type: TenantType.ORGANIZATION,
+      membership: null,
+    });
+    const superuserTenants = [personalTenant, bypassTenant];
+    const getSuperuserApolloMocks = () => [
+      fillCommonQueryWithUser(currentUserFactory({ tenants: superuserTenants, isSuperuser: true })),
+    ];
+
+    it('should list the bypass tenant under Organizations, not Invitations', async () => {
+      render(<Component />, { apolloMocks: getSuperuserApolloMocks(), TenantWrapper });
+
+      const currentTenantButton = await screen.findByText(personalTenantName);
+      await userEvent.click(currentTenantButton);
+
+      expect(await screen.findByText(/organizations/i)).toBeInTheDocument();
+      expect(screen.getByText(bypassTenantName)).toBeInTheDocument();
+      expect(screen.queryByText(/invitations/i)).not.toBeInTheDocument();
+    });
+
+    it('should actually navigate when clicking the bypass tenant, not silently no-op', async () => {
+      render(<Component />, { apolloMocks: getSuperuserApolloMocks(), TenantWrapper });
+
+      const currentTenantButton = await screen.findByText(personalTenantName);
+      await userEvent.click(currentTenantButton);
+
+      const bypassTenantButton = await screen.findByText(bypassTenantName);
+      await userEvent.click(bypassTenantButton);
+
+      expect(mockNavigate).toHaveBeenCalledWith(`/en/${bypassTenant.id}`);
+    });
+  });
 });

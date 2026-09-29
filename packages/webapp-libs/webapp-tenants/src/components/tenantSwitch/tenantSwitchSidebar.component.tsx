@@ -1,6 +1,6 @@
 import { TenantType } from '@sb/webapp-api-client/constants';
 import { CommonQueryTenantItemFragmentFragment, TenantUserRole, getFragmentData } from '@sb/webapp-api-client/graphql';
-import { commonQueryMembershipFragment } from '@sb/webapp-api-client/providers';
+import { commonQueryCurrentUserFragment, commonQueryMembershipFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import {
   DropdownMenu,
@@ -34,14 +34,21 @@ export const TenantSwitchSidebar = ({ collapsed = false }: TenantSwitchSidebarPr
   const navigate = useNavigate();
   const generateTenantPath = useGenerateTenantPath();
   const generateLocalePath = useGenerateLocalePath();
+  const { data: commonQueryData } = useCommonQuery();
+  const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonQueryData?.currentUser);
+  const isSuperuser = !!currentUser?.isSuperuser;
 
   const tenantsGrouped = groupBy(prop<string>('type'), tenants);
   const personalTenant = head(tenantsGrouped[TenantType.PERSONAL] ?? []);
   const organizationTenants = groupBy(
-    (tenant) =>
-      getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationAccepted
-        ? 'organizations'
-        : 'invitations',
+    (tenant) => {
+      const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+      // A superuser sees every organization via an owner-equivalent access bypass that
+      // creates no real membership row - `membership` is then null, not a pending
+      // invitation, so it must not be bucketed with genuine unaccepted invitations.
+      if (!membership) return isSuperuser ? 'organizations' : 'invitations';
+      return membership.invitationAccepted ? 'organizations' : 'invitations';
+    },
     tenantsGrouped[TenantType.ORGANIZATION] ?? []
   );
 
