@@ -36,13 +36,20 @@ const getTenantId = (
 export const getCurrentTenant = (
   paramsTenantId = '',
   storedTenantId: string | null,
-  tenants: (CommonQueryTenantItemFragmentFragment | null | undefined)[]
+  tenants: (CommonQueryTenantItemFragmentFragment | null | undefined)[],
+  isSuperuser = false
 ) => {
   const tenantId = getTenantId(paramsTenantId, storedTenantId, tenants);
 
-  const currentTenant = tenants.find(
-    (t) => t?.id === tenantId && getFragmentData(commonQueryMembershipFragment, t.membership)?.invitationAccepted
-  );
+  const currentTenant = tenants.find((t) => {
+    if (t?.id !== tenantId) return false;
+    const membership = getFragmentData(commonQueryMembershipFragment, t.membership);
+    // A superuser can have no real membership row for a tenant they can still fully
+    // access via the owner-equivalent bypass - that's not a pending invitation, so it
+    // must still resolve as the current tenant instead of falling back below.
+    if (!membership) return isSuperuser;
+    return !!membership.invitationAccepted;
+  });
   if (currentTenant) return currentTenant;
 
   const firstDefaultTenant = tenants.find((t) => t?.type === TenantType.PERSONAL);
