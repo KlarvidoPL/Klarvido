@@ -18,10 +18,10 @@
     "defaultMessage": "What recent activity do we have?"
   },
   "AI Assistant / Footer hint": {
-    "defaultMessage": "Real-time financial insights · Press Esc to close"
+    "defaultMessage": "AI-powered workspace assistant · Press Esc to close"
   },
   "AI Assistant / Input placeholder": {
-    "defaultMessage": "Ask about revenue, projects, costs, forecasts..."
+    "defaultMessage": "Ask about items, documents, activity..."
   },
   "AI Assistant / New Chat": {
     "defaultMessage": "New Chat"
@@ -36,7 +36,7 @@
     "defaultMessage": "SaaS Navigator"
   },
   "AI Assistant / Welcome message": {
-    "defaultMessage": "I can analyze your financial data, provide insights on project profitability, forecast trends, and help with strategic decisions."
+    "defaultMessage": "I can help you navigate your workspace, list and manage items, show documents, search activity logs, and answer questions about your data."
   },
   "AI Assistant / Welcome title": {
     "defaultMessage": "How can I help you today?"
@@ -348,7 +348,7 @@
     "defaultMessage": "Redirect URI"
   },
   "Add SSO Modal / Redirect Warning": {
-    "defaultMessage": "Important: Add the Redirect URI (callback URL) and Initiate login URI (login link) in your identity provider settings with the exact URLs below, then activate the connection."
+    "defaultMessage": "Important: Update the callback URL in your identity provider settings with this exact URL, then activate the connection."
   },
   "Add SSO Modal / SAML Description": {
     "defaultMessage": "Enterprise standard protocol"
@@ -366,7 +366,7 @@
     "defaultMessage": "Service Provider Metadata"
   },
   "Add SSO Modal / SP URL Label": {
-    "defaultMessage": "SP Metadata URL (optional):"
+    "defaultMessage": "SP Metadata URL:"
   },
   "Add SSO Modal / Step 1 Title": {
     "defaultMessage": "Connection Details"
@@ -2817,10 +2817,10 @@
     "defaultMessage": "Backup Ready"
   },
   "Notifications / CrudItemCreated / Content": {
-    "defaultMessage": "CRUD item &quot;{name}&quot; has been created"
+    "defaultMessage": "CRUD item \"{name}\" has been created"
   },
   "Notifications / CrudItemUpdated / Content": {
-    "defaultMessage": "CRUD item &quot;{name}&quot; has been updated"
+    "defaultMessage": "CRUD item \"{name}\" has been updated"
   },
   "Notifications / Notifications Button / Label": {
     "defaultMessage": "Open notifications"
@@ -3702,7 +3702,7 @@
     "defaultMessage": "Active now"
   },
   "Sessions / All Sessions Revoked": {
-    "defaultMessage": "{count, plural, =0 {No sessions} =1 {1 session} other {# sessions}} signed out."
+    "defaultMessage": "All other sessions have been signed out."
   },
   "Sessions / Current": {
     "defaultMessage": "Current"
@@ -4134,7 +4134,7 @@
     "defaultMessage": "Generate SCIM Token"
   },
   "Tenant Security Settings / SSO Description": {
-    "defaultMessage": "Configure SAML 2.0 or OIDC identity providers for your organization. Users from allowed domains are automatically provisioned on first sign-in."
+    "defaultMessage": "Configure SAML 2.0 or OIDC identity providers for your organization"
   },
   "Tenant Security Settings / SSO Header": {
     "defaultMessage": "Single Sign-On (SSO)"
