@@ -3003,7 +3003,7 @@
     "defaultMessage": "Token demonstracyjny zapisany. Wpisz nową wartość o długości 40 znaków, aby go zastąpić."
   },
   "Onboarding / KSeF title": {
-    "defaultMessage": "Demo KSeF"
+    "defaultMessage": "KSeF"
   },
   "Onboarding / KSeF token label": {
     "defaultMessage": "Token demonstracyjny (dokładnie 40 znaków)"

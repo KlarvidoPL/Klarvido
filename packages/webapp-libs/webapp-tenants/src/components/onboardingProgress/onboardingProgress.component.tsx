@@ -10,13 +10,13 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
     intl.formatMessage({ defaultMessage: 'Revenue', id: 'Onboarding / Step revenue' }),
     intl.formatMessage({ defaultMessage: 'Costs', id: 'Onboarding / Step costs' }),
     intl.formatMessage({ defaultMessage: 'Pricing & goal', id: 'Onboarding / Step pricing goal' }),
-    intl.formatMessage({ defaultMessage: 'KSeF demo', id: 'Onboarding / KSeF title' }),
+    intl.formatMessage({ defaultMessage: 'KSeF', id: 'Onboarding / KSeF title' }),
     intl.formatMessage({ defaultMessage: 'Summary', id: 'Onboarding / Step summary' }),
   ];
 
   return (
     <ol
-      className="grid grid-cols-2 gap-2 pt-4 sm:grid-cols-4 xl:grid-cols-8"
+      className="grid auto-rows-fr grid-cols-2 gap-2 pt-4 md:grid-cols-4 2xl:grid-cols-8"
       aria-label={intl.formatMessage({ defaultMessage: 'Onboarding steps', id: 'Onboarding / Steps label' })}
     >
       {steps.map((label, index) => {
@@ -26,7 +26,7 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
             key={number}
             aria-current={number === step ? 'step' : undefined}
             className={cn(
-              'flex min-h-11 items-center gap-2 rounded-lg border px-3 py-2 text-sm',
+              'flex min-h-14 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-sm',
               number === step
                 ? 'border-primary bg-primary text-primary-foreground'
                 : number < step
@@ -34,8 +34,8 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
                   : 'text-muted-foreground'
             )}
           >
-            <span className="font-semibold">{number}.</span>
-            <span>{label}</span>
+            <span className="shrink-0 font-semibold">{number}.</span>
+            <span className="min-w-0 break-words leading-tight">{label}</span>
           </li>
         );
       })}

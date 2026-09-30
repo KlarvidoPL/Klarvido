@@ -52,7 +52,7 @@ describe('AddTenantForm: Component', () => {
     const progress = screen.getByRole('list', { name: 'Onboarding steps' });
     expect(within(progress).getAllByRole('listitem')).toHaveLength(8);
     expect(within(progress).getByText('Organization').closest('li')).toHaveAttribute('aria-current', 'step');
-    expect(within(progress).getByText('KSeF demo')).toBeInTheDocument();
+    expect(within(progress).getByText('KSeF')).toBeInTheDocument();
   });
 
   it('should preselect the only supported country and prefix the NIP with its code', async () => {

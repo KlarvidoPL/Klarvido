@@ -90,7 +90,7 @@ describe('OrganizationOnboarding', () => {
     expect(screen.getByRole('button', { name: 'Mostly businesses (B2B)' })).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('resumes at the saved step and requires exactly 40 characters for the KSeF demo', async () => {
+  it('resumes at the saved step and requires exactly 40 characters for KSeF', async () => {
     const token = 'x'.repeat(40);
     const saveMock = composeMockedQueryResult(saveOrganizationOnboardingStepMutation, {
       variables: { tenantId, step: 6, ksefToken: token },
@@ -101,7 +101,7 @@ describe('OrganizationOnboarding', () => {
       apolloMocks: (mocks) => [...mocks, profileMock(), saveMock, profileMock(7, true)],
     });
 
-    expect(await screen.findByRole('heading', { name: 'KSeF demo' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
     const next = screen.getByRole('button', { name: /next/i });
     expect(next).toBeDisabled();
     await userEvent.type(screen.getByLabelText(/demo token/i), token.slice(0, 39));

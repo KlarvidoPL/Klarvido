@@ -162,7 +162,7 @@ export const AddTenantForm = () => {
 
   return (
     <PageLayout>
-      <Card>
+      <Card className="mx-auto w-full max-w-screen-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />

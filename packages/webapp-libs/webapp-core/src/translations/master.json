@@ -3003,7 +3003,7 @@
     "defaultMessage": "Demo token saved. Enter a new 40-character value to replace it."
   },
   "Onboarding / KSeF title": {
-    "defaultMessage": "KSeF demo"
+    "defaultMessage": "KSeF"
   },
   "Onboarding / KSeF token label": {
     "defaultMessage": "Demo token (exactly 40 characters)"

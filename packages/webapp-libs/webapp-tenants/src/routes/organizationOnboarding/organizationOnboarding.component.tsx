@@ -365,7 +365,7 @@ export const OrganizationOnboarding = () => {
 
   return (
     <PageLayout>
-      <Card className="mx-auto w-full max-w-5xl">
+      <Card className="mx-auto w-full max-w-screen-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
@@ -491,7 +491,7 @@ export const OrganizationOnboarding = () => {
             <>
               <div>
                 <h2 className="text-xl font-semibold">
-                  <FormattedMessage defaultMessage="KSeF demo" id="Onboarding / KSeF title" />
+                  <FormattedMessage defaultMessage="KSeF" id="Onboarding / KSeF title" />
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   <FormattedMessage
