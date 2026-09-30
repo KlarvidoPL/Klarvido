@@ -227,6 +227,17 @@ class BackupEncryptionService:
             logger.error(f"Failed to decrypt backup for tenant {tenant_id}: {e}", exc_info=True)
             return None
 
+    def delete_tenant_key(self, tenant_id: str) -> bool:
+        """
+        Delete a deleted tenant's key from AWS Secrets Manager, where it's kept when BACKUP_MASTER_KEY isn't set.
+
+        The DB-stored key (BackupTenantEncryptionKey) is removed together with the tenant, but a Secrets Manager key
+        would outlive it. Deleted without a recovery window: the backups it protected are deleted too.
+        """
+        if not self.secrets_service.client:
+            return False
+        return self.secrets_service.delete_secret_by_name(tenant_id, 'encryption_key', force=True)
+
 
 # Singleton instance
 _encryption_service: Optional[BackupEncryptionService] = None

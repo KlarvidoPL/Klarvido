@@ -16,6 +16,7 @@ from celery import shared_task
 from django.core.files.base import ContentFile
 from django.utils import timezone
 
+from apps.backup.encryption import get_backup_encryption_service
 from common.storages import get_exports_storage
 
 logger = logging.getLogger(__name__)
@@ -228,3 +229,24 @@ def export_action_logs(self, export_id: str):
         )
 
         raise self.retry(exc=exc)
+
+
+@shared_task(ignore_result=True)
+def delete_tenant_files(file_paths: list[str], tenant_id: str):
+    """
+    Remove a deleted organization's files from storage: its backups and activity log exports. The database only stored
+    their paths, so they'd otherwise stay in S3 / local storage forever (and the exports aren't encrypted).
+    Also removes its backup encryption key from AWS Secrets Manager, if one was kept there.
+    """
+    storage = get_exports_storage()
+    for file_path in file_paths:
+        try:
+            if storage.exists(file_path):
+                storage.delete(file_path)
+        except Exception as e:
+            logger.warning(f"Failed to delete file {file_path} of deleted tenant {tenant_id}: {e}")
+
+    try:
+        get_backup_encryption_service().delete_tenant_key(str(tenant_id))
+    except Exception as e:
+        logger.warning(f"Failed to delete the backup encryption key of deleted tenant {tenant_id}: {e}")
