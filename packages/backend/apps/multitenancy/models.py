@@ -124,6 +124,25 @@ class Tenant(TimestampedMixin, models.Model):
         return self.members.filter(tenant_memberships__role=constants.TenantUserRole.OWNER).all()
 
 
+class OrganizationOnboardingProfile(TimestampedMixin, models.Model):
+    """Answers supplied during organization onboarding, kept separate from registry data."""
+
+    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, related_name="onboarding_profile")
+    respondent_role = models.CharField(max_length=40, blank=True, default="")
+    customer_type = models.CharField(max_length=40, blank=True, default="")
+    revenue_models = models.JSONField(default=list, blank=True)
+    cost_drivers = models.JSONField(default=list, blank=True)
+    pricing = models.CharField(max_length=80, blank=True, default="")
+    main_goal = models.CharField(max_length=120, blank=True, default="")
+    current_step = models.PositiveSmallIntegerField(default=2)
+    ksef_demo_token_encrypted = models.TextField(blank=True, default="")
+    ksef_status = models.CharField(max_length=20, default="not_connected")
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Onboarding profile for {self.tenant}"
+
+
 class TenantMembership(TimestampedMixin, models.Model):
     """
     Represents the membership of a user in a tenant. As well accepted as not accepted (invitations).

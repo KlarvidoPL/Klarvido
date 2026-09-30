@@ -6,7 +6,6 @@ import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
-import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
@@ -23,6 +22,7 @@ import {
   NipField,
 } from '../../components/companyDetailsFields';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
+import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
 import { useGenerateTenantPath } from '../../hooks';
 import {
   CompanyDetails,
@@ -41,6 +41,8 @@ enum Step {
 
 const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
+type AddTenantFormFields = TenantFormFields & { respondentRole: string };
+
 export const AddTenantForm = () => {
   const generateTenantPath = useGenerateTenantPath();
   const { toast } = useToast();
@@ -57,7 +59,7 @@ export const AddTenantForm = () => {
   const [missingFields, setMissingFields] = useState<Array<keyof CompanyDetails>>([]);
 
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
-    useApiForm<TenantFormFields>({
+    useApiForm<AddTenantFormFields>({
       mode: 'onChange',
       defaultValues: {
         name: '',
@@ -67,6 +69,7 @@ export const AddTenantForm = () => {
         regon: '',
         address: '',
         vatStatus: '',
+        respondentRole: 'OWNER_MANAGEMENT',
       },
     });
   const {
@@ -95,15 +98,15 @@ export const AddTenantForm = () => {
   });
 
   const [commitTenantFormMutation, { loading: loadingMutation }] = useMutation(addTenantMutation, {
-    onCompleted: (data) => {
+    onCompleted: async (data) => {
       const id = data?.createTenant?.tenantEdge?.node?.id;
-      reloadCommonQuery();
+      await reloadCommonQuery();
 
       trackEvent('tenant', 'add', id);
 
       toast({ description: successMessage, variant: 'success' });
 
-      navigate(generateTenantPath(RoutesConfig.home, { tenantId: id! }));
+      navigate(generateTenantPath(TenantRoutesConfig.tenant.onboarding, { tenantId: id! }));
     },
     onError: (error) => {
       const graphQLErrors = extractGraphQLErrors(error);
@@ -139,7 +142,7 @@ export const AddTenantForm = () => {
     setStep(Step.COMPANY_DETAILS);
   };
 
-  const onSubmit = handleSubmit((formData: TenantFormFields) => {
+  const onSubmit = handleSubmit((formData: AddTenantFormFields) => {
     commitTenantFormMutation({
       variables: {
         input: {
@@ -150,6 +153,7 @@ export const AddTenantForm = () => {
           regon: normalizeDigits(formData.regon),
           address: formData.address,
           vatStatus: formData.vatStatus,
+          respondentRole: formData.respondentRole,
         },
       },
     });
@@ -190,6 +194,41 @@ export const AddTenantForm = () => {
                   <DisplayNameField />
                   <CountryField />
                   <NipField />
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="respondent-role" className="text-sm font-medium">
+                      <FormattedMessage
+                        defaultMessage="Your role in the company"
+                        id="Onboarding / Respondent role label"
+                      />
+                    </label>
+                    <select
+                      id="respondent-role"
+                      className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      {...form.register('respondentRole')}
+                    >
+                      <option value="OWNER_MANAGEMENT">
+                        {intl.formatMessage({
+                          defaultMessage: 'Owner / management',
+                          id: 'Onboarding / Role owner management',
+                        })}
+                      </option>
+                      <option value="ACCOUNTING">
+                        {intl.formatMessage({ defaultMessage: 'Accounting', id: 'Onboarding / Role accounting' })}
+                      </option>
+                      <option value="ADVISOR">
+                        {intl.formatMessage({ defaultMessage: 'Advisor', id: 'Onboarding / Role advisor' })}
+                      </option>
+                      <option value="EMPLOYEE">
+                        {intl.formatMessage({ defaultMessage: 'Employee', id: 'Onboarding / Role employee' })}
+                      </option>
+                    </select>
+                    <p className="text-sm text-muted-foreground">
+                      <FormattedMessage
+                        defaultMessage="This answer describes your work. Your organization access remains Owner."
+                        id="Onboarding / Respondent role hint"
+                      />
+                    </p>
+                  </div>
                 </>
               )}
 
@@ -292,7 +331,7 @@ const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFie
           <FormattedMessage
             defaultMessage="We found your company in the Ministry of Finance register, but it has no {fields} for it. Please check the details below and fill in what's missing."
             id="Tenant form / AddTenant / Lookup found partial"
-            values={{ fields: <strong>{formatCompanyFields(missingFields)}</strong> }}
+            values={{ fields: <strong key="missing-fields">{formatCompanyFields(missingFields)}</strong> }}
           />
         </span>
       </div>

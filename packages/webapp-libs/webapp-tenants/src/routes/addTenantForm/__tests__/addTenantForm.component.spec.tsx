@@ -54,7 +54,7 @@ describe('AddTenantForm: Component', () => {
   it('should preselect the only supported country and prefix the NIP with its code', async () => {
     render(<Component />);
 
-    expect(await screen.findByRole('combobox')).toHaveTextContent('Poland');
+    expect((await screen.findAllByRole('combobox'))[0]).toHaveTextContent('Poland');
     expect(screen.getByText(/currently supported: poland/i)).toBeInTheDocument();
     // The "PL" prefix sits inside the NIP input, as part of its label
     expect(screen.getByLabelText(/nip/i).closest('label')).toHaveTextContent('PL');
@@ -178,6 +178,7 @@ describe('AddTenantForm: Component', () => {
           regon: '123456785',
           address: 'UL. PRZYKŁADOWA 1, 00-001 WARSZAWA',
           vatStatus: 'ACTIVE',
+          respondentRole: 'OWNER_MANAGEMENT',
         },
       };
       const data = {

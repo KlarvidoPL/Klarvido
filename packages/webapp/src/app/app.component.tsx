@@ -1,3 +1,4 @@
+import { TenantBackupSettings } from '@sb/webapp-backup';
 import { DemoItem, DemoItems, PrivacyPolicy, TermsAndConditions } from '@sb/webapp-contentful/routes';
 import { DEFAULT_LOCALE } from '@sb/webapp-core/config/i18n';
 import { DynamicIntlProvider } from '@sb/webapp-core/providers';
@@ -17,10 +18,10 @@ import {
 } from '@sb/webapp-finances/routes';
 import { SaasIdeas } from '@sb/webapp-generative-ai/routes';
 import { PermissionAuthRoute } from '@sb/webapp-tenants/components/routes/permissionAuthRoute';
-import { TenantBackupSettings } from '@sb/webapp-backup';
 import {
   AccessDenied,
   AddTenantForm,
+  OrganizationOnboarding,
   TenantActivityLogs,
   TenantGeneralSettings,
   TenantInvitation,
@@ -36,7 +37,19 @@ import { Admin } from '../routes/admin';
 import { PasswordReset } from '../routes/auth/passwordReset';
 import ValidateOtp from '../routes/auth/validateOtp';
 import { AnonymousRoute, AuthRoute } from '../shared/components/routes';
-import { ConfirmEmail, Home, Login, Logout, NotFound, OAuthCallback, Profile, Signup, SSOCallback, SSOError, SSOLogin } from './asyncComponents';
+import {
+  ConfirmEmail,
+  Home,
+  Login,
+  Logout,
+  NotFound,
+  OAuthCallback,
+  Profile,
+  SSOCallback,
+  SSOError,
+  SSOLogin,
+  Signup,
+} from './asyncComponents';
 import { LANG_PREFIX, RoutesConfig, TENANT_PREFIX } from './config/routes';
 import { ValidRoutesProviders } from './providers';
 
@@ -66,8 +79,25 @@ export const App = () => {
 
           <Route path={TENANT_PREFIX} element={<AuthRoute />}>
             <Route index element={<Home />} />
+            <Route element={<PermissionAuthRoute permissions="org.settings.edit" requiresOrganization />}>
+              <Route path={RoutesConfig.tenant.onboarding} element={<OrganizationOnboarding />} />
+            </Route>
             {/* Organization Settings - each sub-route has its own permission check */}
-            <Route element={<PermissionAuthRoute permissions={['org.settings.view', 'members.view', 'org.roles.view', 'security.view', 'security.logs.view']} mode="any" requiresOrganization />}>
+            <Route
+              element={
+                <PermissionAuthRoute
+                  permissions={[
+                    'org.settings.view',
+                    'members.view',
+                    'org.roles.view',
+                    'security.view',
+                    'security.logs.view',
+                  ]}
+                  mode="any"
+                  requiresOrganization
+                />
+              }
+            >
               <Route element={<TenantSettings />}>
                 {/* Members route - requires members.view */}
                 <Route element={<PermissionAuthRoute permissions="members.view" />}>
@@ -116,7 +146,10 @@ export const App = () => {
             {/* Content Items - protected by features.content.view */}
             <Route element={<PermissionAuthRoute permissions="features.content.view" requiresOrganization />}>
               <Route path={RoutesConfig.demoItems} element={<DemoItems />} />
-              <Route path={RoutesConfig.demoItem} element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />} />
+              <Route
+                path={RoutesConfig.demoItem}
+                element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />}
+              />
             </Route>
             {/* CRUD Demo - protected by features.crud.view */}
             <Route element={<PermissionAuthRoute permissions="features.crud.view" requiresOrganization />}>

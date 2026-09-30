@@ -12,7 +12,7 @@ from ..constants import (
     SystemRoleType,
     VatStatus,
 )
-from ..models import ActionLog, TenantMembership, TenantMembershipRole, OrganizationRole
+from ..models import ActionLog, TenantMembership, TenantMembershipRole, OrganizationRole, OrganizationOnboardingProfile
 from ..permissions import create_system_roles_for_tenant
 from ..services.mf_whitelist import CompanyDetails
 
@@ -153,6 +153,15 @@ class TestCreateTenantMutation:
         assert response_data["billingEmail"] == "test@example.com"
         assert response_data["nip"] == VALID_NIP
         assert response_data["membership"]["role"] == TenantUserRole.OWNER
+
+    def test_descriptive_role_does_not_change_owner_access(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(
+            graphene_client, {"name": "Advisor's business", "respondentRole": "ADVISOR", **COMPANY_DETAILS}
+        )
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["createTenant"]["tenant"]["membership"]["role"] == TenantUserRole.OWNER
+        assert OrganizationOnboardingProfile.objects.get(tenant__name="Advisor's business").respondent_role == "ADVISOR"
 
     def test_create_new_tenant_with_company_details(self, graphene_client, user):
         graphene_client.force_authenticate(user)

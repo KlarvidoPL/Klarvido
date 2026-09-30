@@ -24,6 +24,7 @@ from . import models
 from . import serializers
 from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
+from .services.onboarding import save_onboarding_step
 from .validators import validate_tax_id
 from .constants import (
     CompanyCountry as ConstantsCompanyCountry,
@@ -364,6 +365,47 @@ class CreateTenantMutation(mutations.CreateModelMutation):
     class Meta:
         serializer_class = serializers.TenantSerializer
         edge_class = TenantConnection.Edge
+
+
+class OrganizationOnboardingProfileType(graphene.ObjectType):
+    respondent_role = graphene.String()
+    customer_type = graphene.String()
+    revenue_models = graphene.List(graphene.String)
+    cost_drivers = graphene.List(graphene.String)
+    pricing = graphene.String()
+    main_goal = graphene.String()
+    current_step = graphene.Int()
+    ksef_status = graphene.String()
+    completed_at = graphene.DateTime()
+
+
+class SaveOrganizationOnboardingStepMutation(graphene.Mutation):
+    class Arguments:
+        tenant_id = graphene.ID(required=True)
+        step = graphene.Int(required=True)
+        respondent_role = graphene.String()
+        customer_type = graphene.String()
+        revenue_models = graphene.List(graphene.String)
+        cost_drivers = graphene.List(graphene.String)
+        pricing = graphene.String()
+        main_goal = graphene.String()
+        ksef_token = graphene.String()
+
+    profile = graphene.Field(OrganizationOnboardingProfileType)
+
+    @classmethod
+    def mutate(cls, root, info, tenant_id, step, **answers):
+        _, pk = from_global_id(tenant_id)
+        tenant = get_object_or_404(models.Tenant, pk=pk)
+        if not models.has_tenant_access(info.context.user, tenant) or not models.user_has_permission(
+            info.context.user, tenant, "org.settings.edit"
+        ):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            profile = save_onboarding_step(tenant, step, **answers)
+        except DRFValidationError as error:
+            raise exceptions.GraphQlValidationError(error.detail)
+        return cls(profile=profile)
 
 
 @action_logged(entity_type="tenant", action_type=ActionType.UPDATE)
@@ -1255,6 +1297,19 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
 class Query(graphene.ObjectType):
     all_tenants = graphene.relay.ConnectionField(TenantConnection)
     tenant = graphene.Field(TenantType, id=graphene.ID())
+    organization_onboarding_profile = graphene.Field(
+        OrganizationOnboardingProfileType, tenant_id=graphene.ID(required=True)
+    )
+
+    @staticmethod
+    def resolve_organization_onboarding_profile(root, info, tenant_id):
+        _, pk = from_global_id(tenant_id)
+        tenant = get_object_or_404(models.Tenant, pk=pk)
+        if not models.has_tenant_access(info.context.user, tenant) or not models.user_has_permission(
+            info.context.user, tenant, "org.settings.view"
+        ):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return models.OrganizationOnboardingProfile.objects.filter(tenant_id=pk).first()
 
     # Action Logs
     all_action_logs = graphene.relay.ConnectionField(
@@ -1432,6 +1487,9 @@ class TenantOwnerMutation(graphene.ObjectType):
 
     # Organization settings - org.settings.edit
     update_tenant = permission_classes(requires("org.settings.edit"))(UpdateTenantMutation.Field())
+    save_organization_onboarding_step = permission_classes(requires("org.settings.edit"))(
+        SaveOrganizationOnboardingStepMutation.Field()
+    )
 
     # Delete organization - org.delete (owner-only)
     delete_tenant = permission_classes(

@@ -67,6 +67,7 @@ type Query {
   ssoDiscover(email: String!): SSODiscoveryResultType
   allTenants(before: String, after: String, first: Int, last: Int): TenantConnection
   tenant(id: ID): TenantType
+  organizationOnboardingProfile(tenantId: ID!): OrganizationOnboardingProfileType
   allActionLogs(tenantId: ID!, 
     "Filter by entity type"
     entityType: String,
@@ -596,6 +597,17 @@ type TenantEdge {
   node: TenantType
   "A cursor for use in pagination"
   cursor: String!
+}
+type OrganizationOnboardingProfileType {
+  respondentRole: String
+  customerType: String
+  revenueModels: [String]
+  costDrivers: [String]
+  pricing: String
+  mainGoal: String
+  currentStep: Int
+  ksefStatus: String
+  completedAt: DateTime
 }
 "Connection class for paginated ActionLog lists."
 type ActionLogConnection {
@@ -1390,6 +1402,7 @@ type ApiMutation {
   "Delete a passkey."
   deletePasskey(input: DeletePasskeyMutationInput!): DeletePasskeyMutationPayload
   updateTenant(input: UpdateTenantMutationInput!): UpdateTenantMutationPayload
+  saveOrganizationOnboardingStep(costDrivers: [String], customerType: String, ksefToken: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!, tenantId: ID!): SaveOrganizationOnboardingStepMutation
   "Mutation to delete a tenant from the system."
   deleteTenant(input: DeleteTenantMutationInput!): DeleteTenantMutationPayload
   createTenantInvitation(input: CreateTenantInvitationMutationInput!): CreateTenantInvitationMutationPayload
@@ -1731,6 +1744,9 @@ type UpdateTenantMutationPayload {
   tenant: TenantType
   tenantEdge: TenantEdge
   clientMutationId: String
+}
+type SaveOrganizationOnboardingStepMutation {
+  profile: OrganizationOnboardingProfileType
 }
 "Mutation to delete a tenant from the system."
 type DeleteTenantMutationPayload {
@@ -3003,6 +3019,7 @@ input CreateTenantMutationInput {
   regon: String
   address: String
   vatStatus: String
+  respondentRole: String
   clientMutationId: String
 }
 input AcceptTenantInvitationMutationInput {
