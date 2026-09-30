@@ -3710,20 +3710,14 @@
   "Sessions / Current Session": {
     "defaultMessage": "当前会话"
   },
-  "Sessions / Days ago": {
-    "defaultMessage": "{days} 天前"
-  },
   "Sessions / Description": {
     "defaultMessage": "管理你在各设备上的活动登录会话"
-  },
-  "Sessions / Hours ago": {
-    "defaultMessage": "{hours} 小时前"
   },
   "Sessions / Last active": {
     "defaultMessage": "上次活动时间：{time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "{minutes} 分钟前"
+  "Sessions / Last active relative": {
+    "defaultMessage": "最后活动：{time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "没有其他活动会话。你只在此设备上登录。"
@@ -3775,6 +3769,9 @@
   },
   "Sessions / Sign out all": {
     "defaultMessage": "退出所有设备"
+  },
+  "Sessions / Signed in date": {
+    "defaultMessage": "登录于 {date}"
   },
   "Sessions / This Device Badge": {
     "defaultMessage": "此设备"

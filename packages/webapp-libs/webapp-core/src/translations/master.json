@@ -2894,6 +2894,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "Your invitation to \"{tenant_name}\" has been declined by \"{name}\""
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "Add"
   },
@@ -3710,20 +3719,14 @@
   "Sessions / Current Session": {
     "defaultMessage": "Current Session"
   },
-  "Sessions / Days ago": {
-    "defaultMessage": "{days} days ago"
-  },
   "Sessions / Description": {
     "defaultMessage": "Manage your active sign-in sessions across devices"
-  },
-  "Sessions / Hours ago": {
-    "defaultMessage": "{hours} hours ago"
   },
   "Sessions / Last active": {
     "defaultMessage": "Active {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "{minutes} minutes ago"
+  "Sessions / Last active relative": {
+    "defaultMessage": "Last active {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "No other active sessions. You're only signed in on this device."
@@ -3775,6 +3778,9 @@
   },
   "Sessions / Sign out all": {
     "defaultMessage": "Sign out all devices"
+  },
+  "Sessions / Signed in date": {
+    "defaultMessage": "Signed in {date}"
   },
   "Sessions / This Device Badge": {
     "defaultMessage": "This device"

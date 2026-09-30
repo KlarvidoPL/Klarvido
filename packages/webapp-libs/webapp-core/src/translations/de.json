@@ -3710,20 +3710,14 @@
   "Sessions / Current Session": {
     "defaultMessage": "Aktuelle Sitzung"
   },
-  "Sessions / Days ago": {
-    "defaultMessage": "vor {days} Tagen"
-  },
   "Sessions / Description": {
     "defaultMessage": "Verwalte deine aktiven Anmeldesitzungen auf allen Geräten"
-  },
-  "Sessions / Hours ago": {
-    "defaultMessage": "vor {hours} Stunden"
   },
   "Sessions / Last active": {
     "defaultMessage": "Aktiv vor {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "vor {minutes} Minuten"
+  "Sessions / Last active relative": {
+    "defaultMessage": "Zuletzt aktiv {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "Keine weiteren aktiven Sitzungen. Du bist nur auf diesem Gerät angemeldet."
@@ -3775,6 +3769,9 @@
   },
   "Sessions / Sign out all": {
     "defaultMessage": "Von allen Geräten abmelden"
+  },
+  "Sessions / Signed in date": {
+    "defaultMessage": "Angemeldet am {date}"
   },
   "Sessions / This Device Badge": {
     "defaultMessage": "Dieses Gerät"

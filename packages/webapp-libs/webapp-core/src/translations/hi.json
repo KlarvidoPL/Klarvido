@@ -3710,20 +3710,14 @@
   "Sessions / Current Session": {
     "defaultMessage": "वर्तमान सेशन"
   },
-  "Sessions / Days ago": {
-    "defaultMessage": "{days} दिन पहले"
-  },
   "Sessions / Description": {
     "defaultMessage": "डिवाइसों पर अपने सक्रिय साइन-इन सेशन प्रबंधित करें"
-  },
-  "Sessions / Hours ago": {
-    "defaultMessage": "{hours} घंटे पहले"
   },
   "Sessions / Last active": {
     "defaultMessage": "सक्रिय {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "{minutes} मिनट पहले"
+  "Sessions / Last active relative": {
+    "defaultMessage": "अंतिम बार सक्रिय {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "कोई अन्य सक्रिय सेशन नहीं। आप केवल इस डिवाइस पर साइन इन हैं।"
@@ -3775,6 +3769,9 @@
   },
   "Sessions / Sign out all": {
     "defaultMessage": "सभी डिवाइसों से साइन आउट करें"
+  },
+  "Sessions / Signed in date": {
+    "defaultMessage": "{date} को साइन इन किया"
   },
   "Sessions / This Device Badge": {
     "defaultMessage": "यह डिवाइस"

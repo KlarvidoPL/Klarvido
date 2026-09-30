@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 // GraphQL queries and mutations
-const SESSIONS_QUERY = gql(`
+export const activeSessionsQuery = gql(`
   query ActiveSessionsQuery {
     mySessions(first: 50) {
       edges {
@@ -77,31 +77,59 @@ const getDeviceIcon = (deviceType: string) => {
 };
 
 const formatLastActive = (dateStr: string, intl: ReturnType<typeof useIntl>) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffMinutes = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60));
 
   if (diffMinutes < 1) {
     return intl.formatMessage({ defaultMessage: 'Active now', id: 'Sessions / Active now' });
-  } else if (diffMinutes < 60) {
-    return intl.formatMessage(
-      { defaultMessage: '{minutes} minutes ago', id: 'Sessions / Minutes ago' },
-      { minutes: diffMinutes }
-    );
-  } else if (diffHours < 24) {
-    return intl.formatMessage(
-      { defaultMessage: '{hours} hours ago', id: 'Sessions / Hours ago' },
-      { hours: diffHours }
-    );
-  } else {
-    return intl.formatMessage(
-      { defaultMessage: '{days} days ago', id: 'Sessions / Days ago' },
-      { days: diffDays }
-    );
   }
+  // Intl.RelativeTimeFormat handles each language's plural forms ("1 minutę temu", "4 minuty temu", "5 minut temu")
+  let time: string;
+  if (diffMinutes < 60) {
+    time = intl.formatRelativeTime(-diffMinutes, 'minute');
+  } else if (diffMinutes < 60 * 24) {
+    time = intl.formatRelativeTime(-Math.floor(diffMinutes / 60), 'hour');
+  } else {
+    time = intl.formatRelativeTime(-Math.floor(diffMinutes / (60 * 24)), 'day');
+  }
+  return intl.formatMessage({ defaultMessage: 'Last active {time}', id: 'Sessions / Last active relative' }, { time });
+};
+
+const SessionDetails = ({ session }: { session: SessionNode }) => {
+  const intl = useIntl();
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+      {session.ipAddress && (
+        <>
+          <span>{session.ipAddress}</span>
+          <span>•</span>
+        </>
+      )}
+      {session.location && (
+        <>
+          <span>{session.location}</span>
+          <span>•</span>
+        </>
+      )}
+      <span>
+        <FormattedMessage
+          defaultMessage="Signed in {date}"
+          id="Sessions / Signed in date"
+          values={{
+            date: intl.formatDate(session.createdAt, {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+          }}
+        />
+      </span>
+      <span>•</span>
+      <span>{formatLastActive(session.lastActivityAt, intl)}</span>
+    </div>
+  );
 };
 
 export const ActiveSessions = () => {
@@ -110,7 +138,7 @@ export const ActiveSessions = () => {
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
   // Fetch sessions from backend
-  const { data, loading, refetch } = useQuery(SESSIONS_QUERY, {
+  const { data, loading, refetch } = useQuery(activeSessionsQuery, {
     fetchPolicy: 'cache-and-network',
   });
 
@@ -214,9 +242,7 @@ export const ActiveSessions = () => {
                   <FormattedMessage defaultMessage="This device" id="Sessions / This Device Badge" />
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {formatLastActive(currentSession.lastActivityAt, intl)}
-              </p>
+              <SessionDetails session={currentSession} />
             </div>
           </div>
         </div>
@@ -239,12 +265,7 @@ export const ActiveSessions = () => {
                     <p className="text-sm font-medium">
                       {session.deviceName || `${session.browser} on ${session.operatingSystem}`}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {session.ipAddress}
-                      {session.location && ` • ${session.location}`}
-                      {' • '}
-                      {formatLastActive(session.lastActivityAt, intl)}
-                    </p>
+                    <SessionDetails session={session} />
                   </div>
                 </div>
                 <Button
