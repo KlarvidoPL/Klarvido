@@ -30,6 +30,11 @@ export const commonQueryTenantItemFragment = gql(/* GraphQL */ `
     name
     type
     actionLoggingEnabled
+    nip
+    companyName
+    regon
+    address
+    vatStatus
     membership {
       ...commonQueryMembershipFragment
     }

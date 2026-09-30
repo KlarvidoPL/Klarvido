@@ -13,6 +13,16 @@ class TenantType(models.TextChoices):
     ORGANIZATION = "organization", "Organization"
 
 
+class VatStatus(models.TextChoices):
+    """
+    VAT taxpayer status as reported by the Polish Ministry of Finance White List ("statusVat").
+    """
+
+    ACTIVE = "ACTIVE", "Active"
+    EXEMPT = "EXEMPT", "Exempt"
+    NOT_REGISTERED = "NOT_REGISTERED", "Not registered"
+
+
 class TenantUserRole(models.TextChoices):
     """
     Predefined tenant user roles:

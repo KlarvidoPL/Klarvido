@@ -10,6 +10,7 @@ export * from './useTenantRoleAccessCheck';
 export * from './useCurrentTenantRole';
 export * from './useCurrentTenantMembership';
 export * from './usePermissionCheck';
+export * from './useCompanyLookup';
 
 // Re-export PermissionGate from components for convenience
 export { PermissionGate } from '../components/permissionGate';

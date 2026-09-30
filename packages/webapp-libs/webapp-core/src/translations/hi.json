@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "यह कार्रवाई वापस नहीं ली जा सकती। इससे आपका संगठन हमारे सर्वरों से स्थायी रूप से हट जाएगा।"
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "नाम:"
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "क्या आप पूरी तरह से सुनिश्चित हैं?"
   },
@@ -4148,11 +4145,32 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "सपोर्टेड Identity Providers"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "वापस"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "अपनी नई organization के विवरण दर्ज करें"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "Organization जोड़ें"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "हमें वित्त मंत्रालय के रजिस्टर में आपकी कंपनी मिल गई और हमने नीचे दिए गए विवरण भर दिए हैं। आगे बढ़ने से पहले कृपया उन्हें जाँच लें।"
+  },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "हमें वित्त मंत्रालय के रजिस्टर में आपकी कंपनी मिल गई, लेकिन उसमें {fields} नहीं है। कृपया नीचे दिए गए विवरण जाँचें और जो कमी है उसे भरें।"
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "हमें वित्त मंत्रालय के रजिस्टर में यह NIP नहीं मिला। कृपया कंपनी का विवरण स्वयं भरें।"
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "आगे"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "संगठन"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "कंपनी का विवरण"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "Organization बनाएँ"
@@ -4160,26 +4178,125 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "Organization सफलतापूर्वक जोड़ी गई!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "पता:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "पता बहुत लंबा है"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "सड़क, पिन कोड, शहर"
+  },
+  "Tenant form / Address required": {
+    "defaultMessage": "पता आवश्यक है"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "रद्द करें"
+  },
+  "Tenant form / Company name label": {
+    "defaultMessage": "कंपनी का नाम:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "कंपनी का नाम बहुत लंबा है"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "पंजीकृत कंपनी का नाम"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "कंपनी का नाम आवश्यक है"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "संगठन सफलतापूर्वक हटा दिया गया!"
   },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "नाम बहुत लंबा है"
+  "Tenant form / Display name hint": {
+    "defaultMessage": "ऐप में दिखाया जाता है, जैसे संगठन स्विचर में। इसका पंजीकृत कंपनी नाम से मेल खाना ज़रूरी नहीं है।"
   },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "नाम"
+  "Tenant form / Display name label": {
+    "defaultMessage": "प्रदर्शित नाम:"
   },
-  "Tenant form / Name required": {
-    "defaultMessage": "नाम आवश्यक है"
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "प्रदर्शित नाम बहुत लंबा है"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "प्रदर्शित नाम"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "प्रदर्शित नाम आवश्यक है"
+  },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "पता"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "कंपनी का नाम"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "VAT स्थिति"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "सहेजने के बाद NIP और REGON बदले नहीं जा सकते।"
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "अमान्य NIP नंबर"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "10 अंकों की कर पहचान संख्या"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "NIP आवश्यक है"
+  },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "अमान्य REGON नंबर"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 या 14 अंक"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON आवश्यक है"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "वित्त मंत्रालय के रजिस्टर में इस NIP के लिए कोई कंपनी नहीं मिली।"
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "कंपनी का विवरण रीफ़्रेश हो गया, लेकिन रजिस्टर में इस कंपनी के लिए {fields} नहीं है। जो कमी है उसे भरें और परिवर्तन सहेजें।"
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "कंपनी का विवरण रीफ़्रेश हो गया। इन्हें बनाए रखने के लिए परिवर्तन सहेजें।"
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "MF से रीफ़्रेश करें"
   },
   "Tenant form / Submit button": {
     "defaultMessage": "परिवर्तन सहेजें"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "Organization सफलतापूर्वक अपडेट की गई!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "सक्रिय VAT करदाता"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "VAT से छूट प्राप्त"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "VAT स्थिति:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "VAT के लिए पंजीकृत नहीं"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "VAT स्थिति चुनें"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "VAT स्थिति आवश्यक है"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "अपने संगठन में शामिल होने के लिए आमंत्रण भेजें"

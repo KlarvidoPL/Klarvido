@@ -1,5 +1,6 @@
 import pytest
 import os
+from unittest.mock import patch
 from graphql_relay import to_global_id
 
 from apps.notifications.models import Notification
@@ -9,12 +10,85 @@ from ..constants import (
     ActionActorType,
     Notification as NotificationConstant,
     SystemRoleType,
+    VatStatus,
 )
 from ..models import ActionLog, TenantMembership, TenantMembershipRole, OrganizationRole
 from ..permissions import create_system_roles_for_tenant
+from ..services.mf_whitelist import CompanyDetails
 
 
 pytestmark = pytest.mark.django_db
+
+VALID_NIP = "9721382373"
+# Complete company details - every one is required when creating an organization
+COMPANY_DETAILS = {
+    "nip": VALID_NIP,
+    "companyName": "ACME SP. Z O.O.",
+    "regon": "123456785",
+    "address": "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+    "vatStatus": VatStatus.ACTIVE,
+}
+
+
+class TestCompanyLookupByNipQuery:
+    QUERY = '''
+        query CompanyLookupByNip($nip: String!) {
+          companyLookupByNip(nip: $nip) {
+            found
+            nip
+            companyName
+            regon
+            address
+            vatStatus
+          }
+        }
+    '''
+
+    @patch("apps.multitenancy.schema.lookup_company_by_nip")
+    def test_found(self, mock_lookup, graphene_client, user):
+        mock_lookup.return_value = CompanyDetails(
+            company_name="ACME SP. Z O.O.",
+            regon="123456785",
+            address="UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+            vat_status=VatStatus.ACTIVE,
+        )
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.query(self.QUERY, variable_values={"nip": "972-138-23-73"})
+
+        assert executed["data"]["companyLookupByNip"] == {
+            "found": True,
+            "nip": VALID_NIP,
+            "companyName": "ACME SP. Z O.O.",
+            "regon": "123456785",
+            "address": "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+            "vatStatus": VatStatus.ACTIVE,
+        }
+        mock_lookup.assert_called_once_with(VALID_NIP)
+
+    @patch("apps.multitenancy.schema.lookup_company_by_nip", return_value=None)
+    def test_not_found(self, mock_lookup, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.query(self.QUERY, variable_values={"nip": VALID_NIP})
+
+        result = executed["data"]["companyLookupByNip"]
+        assert result["found"] is False
+        assert result["nip"] == VALID_NIP
+        assert result["companyName"] is None
+
+    @patch("apps.multitenancy.schema.lookup_company_by_nip")
+    def test_invalid_nip(self, mock_lookup, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.query(self.QUERY, variable_values={"nip": "1234567890"})
+
+        assert "nip" in executed["errors"][0]["extensions"]
+        mock_lookup.assert_not_called()
+
+    @patch("apps.multitenancy.schema.lookup_company_by_nip")
+    def test_unauthenticated_user(self, mock_lookup, graphene_client):
+        executed = graphene_client.query(self.QUERY, variable_values={"nip": VALID_NIP})
+
+        assert executed["errors"][0]["message"] == "permission_denied"
+        mock_lookup.assert_not_called()
 
 
 class TestCreateTenantMutation:
@@ -27,6 +101,11 @@ class TestCreateTenantMutation:
               slug
               type
               billingEmail
+              nip
+              companyName
+              regon
+              address
+              vatStatus
               membership {
                 role
                 invitationAccepted
@@ -38,18 +117,65 @@ class TestCreateTenantMutation:
 
     def test_create_new_tenant(self, graphene_client, user):
         graphene_client.force_authenticate(user)
-        executed = self.mutate(graphene_client, {"name": "Test", "billingEmail": "test@example.com"})
+        executed = self.mutate(graphene_client, {"name": "Test", "billingEmail": "test@example.com", **COMPANY_DETAILS})
         response_data = executed["data"]["createTenant"]["tenant"]
         assert response_data["name"] == "Test"
         assert response_data["slug"] == "test"
         assert response_data["type"] == TenantType.ORGANIZATION
         assert response_data["billingEmail"] == "test@example.com"
+        assert response_data["nip"] == VALID_NIP
         assert response_data["membership"]["role"] == TenantUserRole.OWNER
+
+    def test_create_new_tenant_with_company_details(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "name": "Acme",
+                "nip": "972-138-23-73",
+                "companyName": "ACME SP. Z O.O.",
+                "regon": "123456785",
+                "address": "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+                "vatStatus": VatStatus.ACTIVE,
+            },
+        )
+        assert "errors" not in executed, executed.get("errors")
+        response_data = executed["data"]["createTenant"]["tenant"]
+        assert response_data["nip"] == VALID_NIP
+        assert response_data["companyName"] == "ACME SP. Z O.O."
+        assert response_data["regon"] == "123456785"
+        assert response_data["address"] == "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA"
+        assert response_data["vatStatus"] == VatStatus.ACTIVE
+
+    def test_create_new_tenant_without_company_details(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test"})
+        extensions = executed["errors"][0]["extensions"]
+        # Every missing field is reported at once, so the form can mark all of them
+        for field in ("nip", "company_name", "regon", "address", "vat_status"):
+            assert extensions[field][0]["code"] == "required", field
+
+    @pytest.mark.parametrize("field", ["companyName", "regon", "address", "vatStatus"])
+    def test_create_new_tenant_with_blank_company_field(self, graphene_client, user, field):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, field: ""})
+        assert "errors" in executed, executed
+        assert TenantMembership.objects.filter(user=user, tenant__name="Test").exists() is False
+
+    def test_create_new_tenant_with_invalid_nip(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, "nip": "1234567890"})
+        assert executed["errors"][0]["extensions"]["nip"][0]["code"] == "invalid_nip"
+
+    def test_create_new_tenant_with_invalid_regon(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, "regon": "123456789"})
+        assert executed["errors"][0]["extensions"]["regon"][0]["code"] == "invalid_regon"
 
     def test_create_new_tenant_with_same_name(self, graphene_client, user, tenant_factory):
         tenant_factory(name="Test", slug="test")
         graphene_client.force_authenticate(user)
-        executed = self.mutate(graphene_client, {"name": "Test"})
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS})
         response_data = executed["data"]["createTenant"]["tenant"]
         assert response_data["name"] == "Test"
         assert response_data["slug"] == "test-1"
@@ -57,7 +183,7 @@ class TestCreateTenantMutation:
         assert response_data["membership"]["role"] == TenantUserRole.OWNER
 
     def test_unauthenticated_user(self, graphene_client):
-        executed = self.mutate(graphene_client, {"name": "Test"})
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS})
         assert executed["errors"][0]["message"] == "permission_denied"
 
     @classmethod
@@ -91,7 +217,12 @@ class TestUpdateTenantMutation:
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
         executed = self.mutate(
             graphene_client,
-            {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2", "billingEmail": "test@example.com"},
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+                "billingEmail": "test@example.com",
+            },
         )
         response_data = executed["data"]["updateTenant"]["tenant"]
         assert response_data["name"] == "Tenant 2"
@@ -100,11 +231,160 @@ class TestUpdateTenantMutation:
         assert response_data["billingEmail"] == "test@example.com"
         assert response_data["membership"]["role"] == TenantUserRole.OWNER
 
+    def test_update_company_details(self, graphene_client, user, tenant_factory, tenant_membership_factory):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 1",
+                "nip": VALID_NIP,
+                "companyName": "ACME SP. Z O.O.",
+                "regon": "123456785",
+                "address": "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+                "vatStatus": VatStatus.EXEMPT,
+            },
+        )
+        assert "errors" not in executed, executed.get("errors")
+        tenant.refresh_from_db()
+        assert tenant.nip == VALID_NIP
+        assert tenant.company_name == "ACME SP. Z O.O."
+        assert tenant.regon == "123456785"
+        assert tenant.vat_status == VatStatus.EXEMPT
+
+    def test_update_without_resolved_tenant(self, graphene_client, user, tenant_factory, tenant_membership_factory):
+        """No tenant in context (e.g. tenantId missing/invalid) must be refused, not crash on None."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(None, None)
+        executed = self.mutate(
+            graphene_client,
+            {"id": to_global_id("TenantType", tenant.id), "tenantId": "invalid", "name": "Tenant 2"},
+        )
+        assert executed["errors"][0]["message"] == "permission_denied"
+        tenant.refresh_from_db()
+        assert tenant.name == "Tenant 1"
+
+    def test_update_id_must_match_checked_tenant(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        other_tenant = tenant_factory(name="Other", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", other_tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Hijacked",
+            },
+        )
+        assert executed["errors"][0]["message"] == "permission_denied"
+        other_tenant.refresh_from_db()
+        assert other_tenant.name == "Other"
+
+    def test_update_legacy_tenant_without_nip(self, graphene_client, user, tenant_factory, tenant_membership_factory):
+        """Organizations created before NIP existed can still be renamed without providing one."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+            },
+        )
+        assert "errors" not in executed, executed.get("errors")
+
+    @pytest.fixture
+    def company_tenant(self, graphene_client, user, tenant_factory, tenant_membership_factory):
+        tenant = tenant_factory(
+            name="Tenant 1",
+            type=TenantType.ORGANIZATION,
+            nip=VALID_NIP,
+            company_name="ACME SP. Z O.O.",
+            regon="123456785",
+            address="UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+            vat_status=VatStatus.ACTIVE,
+        )
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        return tenant
+
+    @classmethod
+    def update_input(cls, tenant, **fields):
+        return {
+            "id": to_global_id("TenantType", tenant.id),
+            "tenantId": to_global_id("TenantType", tenant.id),
+            "name": tenant.name,
+            **COMPANY_DETAILS,
+            **fields,
+        }
+
+    def test_update_keeps_locked_nip_and_regon(self, graphene_client, company_tenant):
+        """Re-sending the stored NIP/REGON (what the General tab does) is fine; other fields still update."""
+        executed = self.mutate(
+            graphene_client, self.update_input(company_tenant, address="UL. NOWA 5, 00-002 WARSZAWA")
+        )
+        assert "errors" not in executed, executed.get("errors")
+        company_tenant.refresh_from_db()
+        assert company_tenant.address == "UL. NOWA 5, 00-002 WARSZAWA"
+
+    @pytest.mark.parametrize("field, value", [("nip", "1234563218"), ("regon", "12345678512347")])
+    def test_update_cannot_change_locked_nip_or_regon(self, graphene_client, company_tenant, field, value):
+        executed = self.mutate(graphene_client, self.update_input(company_tenant, **{field: value}))
+        assert executed["errors"][0]["extensions"][field][0]["code"] == "immutable"
+        company_tenant.refresh_from_db()
+        assert company_tenant.nip == VALID_NIP
+        assert company_tenant.regon == "123456785"
+
+    @pytest.mark.parametrize(
+        "field, error_key",
+        [("companyName", "company_name"), ("regon", "regon"), ("address", "address"), ("vatStatus", "vat_status")],
+    )
+    def test_update_cannot_blank_company_field(self, graphene_client, company_tenant, field, error_key):
+        executed = self.mutate(graphene_client, self.update_input(company_tenant, **{field: ""}))
+        assert executed["errors"][0]["extensions"][error_key][0]["code"] == "required"
+
+    def test_update_with_invalid_nip(self, graphene_client, user, tenant_factory, tenant_membership_factory):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 1",
+                "nip": "9721382374",
+            },
+        )
+        assert executed["errors"][0]["extensions"]["nip"][0]["code"] == "invalid_nip"
+
     def test_user_without_membership(self, graphene_client, user, tenant_factory):
         tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, None)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+            },
+        )
         assert "errors" in executed, f"Expected permission_denied, got: {executed}"
         assert executed["errors"][0]["message"] == "permission_denied"
 
@@ -113,7 +393,14 @@ class TestUpdateTenantMutation:
         tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.ADMIN)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.ADMIN)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+            },
+        )
         assert "errors" not in executed, f"Admin has org.settings.edit, expected success: {executed.get('errors')}"
         response_data = executed["data"]["updateTenant"]["tenant"]
         assert response_data["name"] == "Tenant 2"
@@ -123,12 +410,26 @@ class TestUpdateTenantMutation:
         tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.MEMBER)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.MEMBER)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+            },
+        )
         assert executed["errors"][0]["message"] == "permission_denied"
 
     def test_unauthenticated_user(self, graphene_client, tenant_factory):
         tenant = tenant_factory(name="Tenant 1")
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+            },
+        )
         assert executed["errors"][0]["message"] == "permission_denied"
 
     def test_superuser_without_membership_can_update(self, graphene_client, user_factory, tenant_factory):
@@ -137,7 +438,14 @@ class TestUpdateTenantMutation:
         tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
         graphene_client.force_authenticate(superuser)
         graphene_client.set_tenant_dependent_context(tenant, None)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id), "name": "Tenant 2"})
+        executed = self.mutate(
+            graphene_client,
+            {
+                "id": to_global_id("TenantType", tenant.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Tenant 2",
+            },
+        )
         assert "errors" not in executed, executed.get("errors")
         assert executed["data"]["updateTenant"]["tenant"]["name"] == "Tenant 2"
 

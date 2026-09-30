@@ -12,6 +12,7 @@ from . import models, notifications
 from .constants import TenantType, TenantUserRole, SystemRoleType
 from .services.membership import create_tenant_membership
 from .tokens import tenant_invitation_token
+from .validators import normalize_digits, validate_nip, validate_regon
 
 
 def decode_role_id(role_id: str) -> str:
@@ -32,6 +33,47 @@ def decode_role_id(role_id: str) -> str:
 
 class TenantSerializer(serializers.ModelSerializer):
     id = hidrest.HashidSerializerCharField(source_field="multitenancy.Tenant.id", read_only=True)
+    # Looser than the model's max_length: input may contain separators ("972-138-23-73") that validate_* strips
+    nip = serializers.CharField(required=False, allow_blank=True, max_length=20)
+    regon = serializers.CharField(required=False, allow_blank=True, max_length=20)
+
+    REQUIRED_COMPANY_FIELDS = {
+        "nip": _("NIP is required"),
+        "company_name": _("Company name is required"),
+        "regon": _("REGON is required"),
+        "address": _("Address is required"),
+        "vat_status": _("VAT status is required"),
+    }
+    IMMUTABLE_COMPANY_FIELDS = ("nip", "regon")
+
+    def validate_nip(self, value):
+        # Empty is allowed on update (organizations created before NIP existed); validate() requires it on create.
+        return validate_nip(value) if normalize_digits(value) else ""
+
+    def validate_regon(self, value):
+        return validate_regon(value)
+
+    def validate(self, attrs):
+        errors = {}
+        for field, message in self.REQUIRED_COMPANY_FIELDS.items():
+            # Create: every company field is required. Update: fields left out stay as they are (e.g. renaming the
+            # personal default tenant), but one that's sent can't be blanked.
+            if (self.instance is None or field in attrs) and not attrs.get(field):
+                errors[field] = [serializers.ErrorDetail(message, code="required")]
+
+        # NIP and REGON never change for a company: once stored they're locked (a wrong one is fixed by a superuser in
+        # Django admin). Still empty - organizations created before these fields existed - they can be set once.
+        if self.instance is not None:
+            for field in self.IMMUTABLE_COMPANY_FIELDS:
+                stored = getattr(self.instance, field)
+                if field in attrs and field not in errors and stored and attrs[field] != stored:
+                    errors[field] = [
+                        serializers.ErrorDetail(_("This value can't be changed once set"), code="immutable")
+                    ]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
 
     def create(self, validated_data):
         from .permissions import create_system_roles_for_tenant
@@ -61,7 +103,20 @@ class TenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tenant
-        fields = ("id", "name", "billing_email")
+        fields = ("id", "name", "billing_email", "nip", "company_name", "regon", "address", "vat_status")
+
+
+class UpdateTenantSerializer(TenantSerializer):
+    # Not stored - only here so TenantUserRoleMiddleware resolves (and membership/RBAC-checks) the tenant being
+    # updated. The middleware deliberately never treats a generic `id` input as a tenant id.
+    tenant_id = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        attrs.pop("tenant_id", None)
+        return super().validate(attrs)
+
+    class Meta(TenantSerializer.Meta):
+        fields = TenantSerializer.Meta.fields + ("tenant_id",)
 
 
 class TenantInvitationActionSerializer(serializers.Serializer):

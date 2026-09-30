@@ -48,14 +48,18 @@ export const TenantGeneralSettings = () => {
     },
   });
 
-  const onFormSubmit = (formData: TenantFormFields) => {
+  const onFormSubmit = ({ name, ...companyDetails }: TenantFormFields) => {
     if (!currentTenant) return;
 
     commitUpdateMutation({
       variables: {
         input: {
           id: currentTenant.id,
-          name: formData.name,
+          // Lets the backend resolve and permission-check the tenant being updated
+          tenantId: currentTenant.id,
+          name,
+          // The personal default tenant has no company details
+          ...(isOrganizationType ? companyDetails : {}),
         },
       },
     });
@@ -87,11 +91,26 @@ export const TenantGeneralSettings = () => {
         </CardHeader>
         <CardContent>
           <TenantForm
+            // Remount when the tenant loads/changes - or a NIP/REGON gets saved for the first time, so the form's
+            // defaults (and which of those two are locked) follow it
+            key={`${currentTenant?.id}-${currentTenant?.nip}-${currentTenant?.regon}`}
             loading={loading}
             error={error}
             onSubmit={onFormSubmit}
-            initialData={currentTenant?.name ? { name: currentTenant.name } : undefined}
+            initialData={
+              currentTenant
+                ? {
+                    name: currentTenant.name ?? '',
+                    nip: currentTenant.nip ?? '',
+                    companyName: currentTenant.companyName ?? '',
+                    regon: currentTenant.regon ?? '',
+                    address: currentTenant.address ?? '',
+                    vatStatus: currentTenant.vatStatus ?? '',
+                  }
+                : undefined
+            }
             disabled={!canEditSettings}
+            showCompanyDetails={isOrganizationType}
           />
         </CardContent>
       </Card>

@@ -24,6 +24,7 @@ class Tenant(TimestampedMixin, models.Model):
     - billing_email: Address used for billing purposes and it is provided to Stripe
     - members: Many-to-many relationship with users through TenantMembership.
     - action_logging_enabled: Whether action logging is enabled for this tenant.
+    - nip, company_name, regon, address, vat_status: Company details, prefilled from the MF White List API.
 
     Methods:
     - save: Overrides the default save method to ensure unique slug generation based on the name field.
@@ -60,6 +61,14 @@ class Tenant(TimestampedMixin, models.Model):
         default=False,
         help_text="Enable action logging for this organization",
     )
+
+    # Company details (Polish business registry data). Blank for the personal DEFAULT tenant and for
+    # organizations created before these fields existed - NIP is only enforced when creating an organization.
+    nip = models.CharField(max_length=10, blank=True, default="", verbose_name="NIP")
+    company_name = models.CharField(max_length=255, blank=True, default="")
+    regon = models.CharField(max_length=14, blank=True, default="", verbose_name="REGON")
+    address = models.CharField(max_length=500, blank=True, default="")
+    vat_status = models.CharField(max_length=20, choices=constants.VatStatus.choices, blank=True, default="")
 
     objects = TenantManager()
 

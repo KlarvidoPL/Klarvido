@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
@@ -6,20 +8,24 @@ from graphene_django import DjangoObjectType
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db import close_old_connections
-from rest_framework.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 
 from apps.users.services.users import get_user_from_resolver, get_user_avatar_url
 from common.acl import policies
 from common.graphql import mutations, exceptions
-from common.graphql.acl.decorators import permission_classes, requires
+from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE, permission_classes, requires
 from common.action_logging.decorators import action_logged
 from common.action_logging.service import log_action, log_delete
+from common.ratelimiting import graphql_ratelimit, RateLimitKey
 from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from apps.sso.enforcement import filter_tenants_for_password_session
 from . import models
 from . import serializers
 from .tokens import tenant_invitation_token
+from .services.mf_whitelist import lookup_company_by_nip
+from .validators import validate_nip
 from .constants import (
     TenantUserRole,
     TenantType as ConstantsTenantType,
@@ -245,6 +251,12 @@ class TenantType(DjangoObjectType):
     type = graphene.String()
     billing_email = graphene.String()
     action_logging_enabled = graphene.Boolean()
+    nip = graphene.String()
+    company_name = graphene.String()
+    regon = graphene.String()
+    address = graphene.String()
+    # Plain String (not the auto-generated choices enum): legacy rows store "" which isn't a VatStatus member
+    vat_status = graphene.String()
     membership = graphene.Field(TenantMembershipType)
     user_memberships = graphene.List(of_type=TenantMembershipType)
 
@@ -257,6 +269,11 @@ class TenantType(DjangoObjectType):
             "billing_email",
             "type",
             "action_logging_enabled",
+            "nip",
+            "company_name",
+            "regon",
+            "address",
+            "vat_status",
             "membership",
             "user_memberships",
         )
@@ -294,6 +311,17 @@ class TenantType(DjangoObjectType):
 class TenantConnection(graphene.Connection):
     class Meta:
         node = TenantType
+
+
+class CompanyLookupType(graphene.ObjectType):
+    """Company details found in the MF White List for a NIP; `found` is False when there's nothing to prefill."""
+
+    found = graphene.Boolean(required=True)
+    nip = graphene.String(required=True)
+    company_name = graphene.String()
+    regon = graphene.String()
+    address = graphene.String()
+    vat_status = graphene.String()
 
 
 # ============ Action Log Types ============
@@ -338,12 +366,24 @@ class CreateTenantMutation(mutations.CreateModelMutation):
 @action_logged(entity_type="tenant", action_type=ActionType.UPDATE)
 class UpdateTenantMutation(mutations.UpdateModelMutation):
     class Meta:
-        serializer_class = serializers.TenantSerializer
+        serializer_class = serializers.UpdateTenantSerializer
         edge_class = TenantConnection.Edge
 
     @classmethod
     def get_object(cls, model_class, root, info, **input):
-        return info.context.tenant
+        # info.context.tenant is resolved by TenantUserRoleMiddleware from input.tenantId, with the membership check
+        # applied. Without it the requires("org.settings.edit") check has no tenant to evaluate against, so refuse
+        # instead of updating nothing (or crashing on None); and never update a tenant other than the checked one.
+        tenant = info.context.tenant
+        if not tenant:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            _, pk = from_global_id(input.get("id") or "")
+        except (TypeError, ValueError):
+            pk = None
+        if pk and str(pk) != str(tenant.pk):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return tenant
 
 
 class DeleteTenantMutation(mutations.DeleteModelMutation):
@@ -1248,6 +1288,24 @@ class Query(graphene.ObjectType):
         tenant_id=graphene.ID(required=True),
         description="Get all organization roles for the current user in a tenant",
     )
+    company_lookup_by_nip = graphene.Field(
+        CompanyLookupType,
+        nip=graphene.String(required=True),
+        description="Look up company details (name, REGON, address, VAT status) in the MF White List by NIP",
+    )
+
+    @staticmethod
+    @graphql_ratelimit(rate="20/min", key=RateLimitKey.USER_OR_IP)
+    def resolve_company_lookup_by_nip(root, info, nip):
+        try:
+            normalized_nip = validate_nip(nip)
+        except DRFValidationError:
+            raise exceptions.GraphQlValidationError({"nip": [_("Invalid NIP number")]})
+
+        company = lookup_company_by_nip(normalized_nip)
+        if company is None:
+            return CompanyLookupType(found=False, nip=normalized_nip)
+        return CompanyLookupType(found=True, nip=normalized_nip, **asdict(company))
 
     @staticmethod
     @permission_classes(policies.AnyoneFullAccess)

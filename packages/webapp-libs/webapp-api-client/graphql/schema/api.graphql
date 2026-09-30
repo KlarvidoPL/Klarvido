@@ -89,6 +89,8 @@ type Query {
   currentUserPermissions(tenantId: ID!): [String]
   "Get all organization roles for the current user in a tenant"
   currentUserOrganizationRoles(tenantId: ID!): [OrganizationRoleType]
+  "Look up company details (name, REGON, address, VAT status) in the MF White List by NIP"
+  companyLookupByNip(nip: String!): CompanyLookupType
   allSubscriptionPlans(before: String, after: String, first: Int, last: Int): StripePriceConnection
   activeSubscription(tenantId: ID): SubscriptionScheduleType
   allPaymentMethods(tenantId: ID, before: String, after: String, first: Int, last: Int): PaymentMethodConnection
@@ -187,6 +189,11 @@ type TenantType implements Node {
   type: String
   billingEmail: String
   actionLoggingEnabled: Boolean
+  nip: String
+  companyName: String
+  regon: String
+  address: String
+  vatStatus: String
   userMemberships: [TenantMembershipType]
   membership: TenantMembershipType
 }
@@ -671,6 +678,15 @@ type OrganizationRoleEdge {
   node: OrganizationRoleType
   "A cursor for use in pagination"
   cursor: String!
+}
+"Company details found in the MF White List for a NIP; `found` is False when there's nothing to prefill."
+type CompanyLookupType {
+  found: Boolean!
+  nip: String!
+  companyName: String
+  regon: String
+  address: String
+  vatStatus: String
 }
 type StripePriceConnection {
   "Pagination data for this connection."
@@ -2943,6 +2959,12 @@ input DeletePasskeyMutationInput {
 input UpdateTenantMutationInput {
   name: String!
   billingEmail: String
+  nip: String
+  companyName: String
+  regon: String
+  address: String
+  vatStatus: String
+  tenantId: String!
   id: ID!
   clientMutationId: String
 }
@@ -2972,6 +2994,11 @@ input UpdateTenantMembershipMutationInput {
 input CreateTenantMutationInput {
   name: String!
   billingEmail: String
+  nip: String
+  companyName: String
+  regon: String
+  address: String
+  vatStatus: String
   clientMutationId: String
 }
 input AcceptTenantInvitationMutationInput {

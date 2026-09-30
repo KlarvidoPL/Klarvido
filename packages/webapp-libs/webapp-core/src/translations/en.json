@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "This action cannot be undone. This will permanently delete your organization from our servers."
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "Name:"
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "Are you absolutely sure?"
   },
@@ -4148,11 +4145,32 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "Supported Identity Providers"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "Back"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "Enter the details for your new organization"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "Add Organization"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
+  },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "We found your company in the Ministry of Finance register, but it has no {fields} for it. Please check the details below and fill in what's missing."
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "Next"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "Organization"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "Company details"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "Create organization"
@@ -4160,26 +4178,125 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "Organization added successfully!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "Address:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "Address is too long"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "Street, postal code, city"
+  },
+  "Tenant form / Address required": {
+    "defaultMessage": "Address is required"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Cancel"
+  },
+  "Tenant form / Company name label": {
+    "defaultMessage": "Company name:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "Company name is too long"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "Registered company name"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "Company name is required"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organization deleted successfully!"
   },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "Name is too long"
+  "Tenant form / Display name hint": {
+    "defaultMessage": "Shown in the app, e.g. in the organization switcher. It doesn't have to match the registered company name."
   },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "Name"
+  "Tenant form / Display name label": {
+    "defaultMessage": "Display name:"
   },
-  "Tenant form / Name required": {
-    "defaultMessage": "Name is required"
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "Display name is too long"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "Display name"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "Display name is required"
+  },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "address"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "company name"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "VAT status"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "NIP and REGON can't be changed once saved."
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "Invalid NIP number"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "10-digit tax ID"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "NIP is required"
+  },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "Invalid REGON number"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 or 14 digits"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON is required"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "No company found for this NIP in the Ministry of Finance register."
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "Company details refreshed, but the register has no {fields} for this company. Fill in what's missing and save changes."
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "Company details refreshed. Save changes to keep them."
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "Refresh from MF"
   },
   "Tenant form / Submit button": {
     "defaultMessage": "Save changes"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "Organization updated successfully!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "Active VAT payer"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "Exempt from VAT"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "VAT status:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "Not registered for VAT"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "Select VAT status"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "VAT status is required"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Send an invitation to join your organization"

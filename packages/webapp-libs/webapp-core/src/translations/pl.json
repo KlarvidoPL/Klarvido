@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "Tej operacji nie można cofnąć. Spowoduje to trwałe usunięcie Twojej organizacji z naszych serwerów."
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "Nazwa:"
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "Czy na pewno chcesz kontynuować?"
   },
@@ -4148,11 +4145,32 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "Obsługiwani dostawcy tożsamości"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "Wstecz"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "Wprowadź dane nowej organizacji"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "Dodaj organizację"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "Znaleźliśmy Twoją firmę w wykazie Ministerstwa Finansów i uzupełniliśmy poniższe dane. Sprawdź je przed kontynuacją."
+  },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "Znaleźliśmy Twoją firmę w wykazie Ministerstwa Finansów, ale brakuje w nim {fields}. Sprawdź poniższe dane i uzupełnij brakujące."
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "Nie znaleźliśmy tego NIP-u w wykazie Ministerstwa Finansów. Uzupełnij dane firmy samodzielnie."
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "Dalej"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "Organizacja"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "Dane firmy"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "Utwórz organizację"
@@ -4160,26 +4178,125 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "Pomyślnie dodano organizację!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "Adres:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "Adres jest za długi"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "Ulica, kod pocztowy, miejscowość"
+  },
+  "Tenant form / Address required": {
+    "defaultMessage": "Adres jest wymagany"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Anuluj"
+  },
+  "Tenant form / Company name label": {
+    "defaultMessage": "Nazwa firmy:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "Nazwa firmy jest za długa"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "Zarejestrowana nazwa firmy"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "Nazwa firmy jest wymagana"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organizacja została pomyślnie usunięta!"
   },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "Nazwa jest za długa"
+  "Tenant form / Display name hint": {
+    "defaultMessage": "Widoczna w aplikacji, np. w przełączniku organizacji. Nie musi być taka sama jak zarejestrowana nazwa firmy."
   },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "Nazwa"
+  "Tenant form / Display name label": {
+    "defaultMessage": "Nazwa wyświetlana:"
   },
-  "Tenant form / Name required": {
-    "defaultMessage": "Nazwa jest wymagana"
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "Nazwa wyświetlana jest za długa"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "Nazwa wyświetlana"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "Nazwa wyświetlana jest wymagana"
+  },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "adresu"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "nazwy firmy"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "numeru REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "statusu VAT"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "Po zapisaniu NIP i REGON nie mogą zostać zmienione."
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "Nieprawidłowy numer NIP"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "10-cyfrowy numer NIP"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "NIP jest wymagany"
+  },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "Nieprawidłowy numer REGON"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 lub 14 cyfr"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON jest wymagany"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "Nie znaleziono firmy o tym NIP-ie w wykazie Ministerstwa Finansów."
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "Dane firmy zostały odświeżone, ale w wykazie brakuje {fields} tej firmy. Uzupełnij brakujące dane i zapisz zmiany."
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "Dane firmy zostały odświeżone. Zapisz zmiany, aby je zachować."
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "Odśwież z MF"
   },
   "Tenant form / Submit button": {
     "defaultMessage": "Zapisz zmiany"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "Pomyślnie zaktualizowano organizację!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "Czynny podatnik VAT"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "Zwolniony z VAT"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "Status VAT:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "Niezarejestrowany jako podatnik VAT"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "Wybierz status VAT"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "Status VAT jest wymagany"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Wyślij zaproszenie do dołączenia do Twojej organizacji"

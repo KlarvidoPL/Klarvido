@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "此操作无法撤销。这将从我们的服务器中永久删除您的组织。"
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "名称："
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "您确定要执行此操作吗？"
   },
@@ -4148,11 +4145,32 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "支持的身份提供商"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "返回"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "输入新组织的详细信息"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "添加组织"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "我们已在财政部登记册中找到您的公司，并填写了以下信息。请在继续之前核对。"
+  },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "我们已在财政部登记册中找到您的公司，但其中缺少{fields}。请核对以下信息并补充缺失的内容。"
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "我们未能在财政部登记册中找到此 NIP。请自行填写公司信息。"
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "下一步"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "组织"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "公司信息"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "创建组织"
@@ -4160,26 +4178,125 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "组织添加成功！"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "地址："
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "地址过长"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "街道、邮政编码、城市"
+  },
+  "Tenant form / Address required": {
+    "defaultMessage": "地址为必填项"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "取消"
+  },
+  "Tenant form / Company name label": {
+    "defaultMessage": "公司名称："
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "公司名称过长"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "注册公司名称"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "公司名称为必填项"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "组织删除成功!"
   },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "名称过长"
+  "Tenant form / Display name hint": {
+    "defaultMessage": "在应用内显示，例如在组织切换器中。无需与公司注册名称一致。"
   },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "名称"
+  "Tenant form / Display name label": {
+    "defaultMessage": "显示名称："
   },
-  "Tenant form / Name required": {
-    "defaultMessage": "名称为必填项"
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "显示名称过长"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "显示名称"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "显示名称为必填项"
+  },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "地址"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "公司名称"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "增值税状态"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "NIP 和 REGON 保存后无法更改。"
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "NIP 号码无效"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP："
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "10 位税号"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "NIP 为必填项"
+  },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "REGON 号码无效"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON："
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 位或 14 位数字"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON 为必填项"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "在财政部登记册中未找到此 NIP 对应的公司。"
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "公司信息已刷新，但登记册中缺少该公司的{fields}。请补充缺失的信息并保存更改。"
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "公司信息已刷新。请保存更改以保留这些信息。"
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "从财政部刷新"
   },
   "Tenant form / Submit button": {
     "defaultMessage": "保存更改"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "组织更新成功！"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "增值税纳税人（有效）"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "免征增值税"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "增值税状态："
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "未进行增值税登记"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "选择增值税状态"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "增值税状态为必填项"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "发送邀请以加入您的组织"
