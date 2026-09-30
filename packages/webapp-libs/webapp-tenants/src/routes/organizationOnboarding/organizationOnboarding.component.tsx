@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
 
+import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
 import { useGenerateTenantPath } from '../../hooks';
 import { useCurrentTenant } from '../../providers';
@@ -101,16 +102,6 @@ export const OrganizationOnboarding = () => {
   });
   const [saveStep, { loading: saving }] = useMutation(saveOrganizationOnboardingStepMutation);
   const profile = data?.organizationOnboardingProfile;
-  const steps = [
-    intl.formatMessage({ defaultMessage: 'Company', id: 'Onboarding / Step company' }),
-    intl.formatMessage({ defaultMessage: 'Customers', id: 'Onboarding / Step customers' }),
-    intl.formatMessage({ defaultMessage: 'Revenue', id: 'Onboarding / Step revenue' }),
-    intl.formatMessage({ defaultMessage: 'Costs', id: 'Onboarding / Step costs' }),
-    intl.formatMessage({ defaultMessage: 'Pricing & goal', id: 'Onboarding / Step pricing goal' }),
-    intl.formatMessage({ defaultMessage: 'Data', id: 'Onboarding / Step data' }),
-    intl.formatMessage({ defaultMessage: 'Summary', id: 'Onboarding / Step summary' }),
-  ];
-
   useEffect(() => {
     if (!data || loaded) return;
     let customerDraft: Pick<Answers, 'respondentRole' | 'customerType'> | null = null;
@@ -386,22 +377,7 @@ export const OrganizationOnboarding = () => {
               id="Onboarding / Description"
             />
           </CardDescription>
-          <div
-            className="flex flex-wrap gap-2 pt-4"
-            aria-label={intl.formatMessage({ defaultMessage: 'Onboarding steps', id: 'Onboarding / Steps label' })}
-          >
-            {steps.map((label, index) => (
-              <span
-                key={label}
-                className={cn(
-                  'rounded-full border px-3 py-1 text-xs',
-                  index + 1 === step ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
-                )}
-              >
-                {index + 1}. {label}
-              </span>
-            ))}
-          </div>
+          <OnboardingProgress step={step + 1} />
         </CardHeader>
         <CardContent className="space-y-6">
           {step === 2 && (
@@ -566,15 +542,18 @@ export const OrganizationOnboarding = () => {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  [steps[1], customerOptions.find((option) => option.value === answers.customerType)?.label],
                   [
-                    steps[2],
+                    intl.formatMessage({ defaultMessage: 'Customers', id: 'Onboarding / Step customers' }),
+                    customerOptions.find((option) => option.value === answers.customerType)?.label,
+                  ],
+                  [
+                    intl.formatMessage({ defaultMessage: 'Revenue', id: 'Onboarding / Step revenue' }),
                     answers.revenueModels
                       .map((value) => revenueOptions.find((option) => option.value === value)?.label)
                       .join(', '),
                   ],
                   [
-                    steps[3],
+                    intl.formatMessage({ defaultMessage: 'Costs', id: 'Onboarding / Step costs' }),
                     answers.costDrivers
                       .map((value) => costOptions.find((option) => option.value === value)?.label)
                       .join(', '),

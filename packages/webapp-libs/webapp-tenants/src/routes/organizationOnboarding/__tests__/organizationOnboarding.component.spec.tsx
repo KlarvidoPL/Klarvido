@@ -1,5 +1,5 @@
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { PropsWithChildren } from 'react';
 import { useLocation } from 'react-router';
@@ -63,6 +63,9 @@ describe('OrganizationOnboarding', () => {
     );
 
     expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+    const progress = screen.getByRole('list', { name: 'Onboarding steps' });
+    expect(within(progress).getAllByRole('listitem')).toHaveLength(8);
+    expect(within(progress).getByText('Customers').closest('li')).toHaveAttribute('aria-current', 'step');
     await userEvent.click(screen.getByRole('button', { name: 'Mostly consumers (B2C)' }));
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByTestId('location')).toHaveTextContent('/en/tenant-1/tenant/settings/general');
@@ -98,7 +101,7 @@ describe('OrganizationOnboarding', () => {
       apolloMocks: (mocks) => [...mocks, profileMock(), saveMock, profileMock(7, true)],
     });
 
-    expect(await screen.findByText('KSeF demo')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'KSeF demo' })).toBeInTheDocument();
     const next = screen.getByRole('button', { name: /next/i });
     expect(next).toBeDisabled();
     await userEvent.type(screen.getByLabelText(/demo token/i), token.slice(0, 39));

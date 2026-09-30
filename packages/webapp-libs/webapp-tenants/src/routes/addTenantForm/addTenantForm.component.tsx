@@ -21,6 +21,7 @@ import {
   DisplayNameField,
   NipField,
 } from '../../components/companyDetailsFields';
+import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
 import { useGenerateTenantPath } from '../../hooks';
@@ -173,7 +174,7 @@ export const AddTenantForm = () => {
               id="Tenant form / AddTenant / Card description"
             />
           </CardDescription>
-          <StepIndicator step={step} />
+          <OnboardingProgress step={step} />
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -293,31 +294,6 @@ export const AddTenantForm = () => {
     </PageLayout>
   );
 };
-
-const StepIndicator = ({ step }: { step: Step }) => (
-  <div className="flex items-center gap-3 pt-4 text-sm">
-    {[Step.BASICS, Step.COMPANY_DETAILS].map((current, index) => (
-      <div key={current} className="flex items-center gap-3">
-        {index > 0 && <div className="h-px w-6 bg-border sm:w-10" />}
-        <div className={cn('flex items-center gap-2', current === step ? 'text-foreground' : 'text-muted-foreground')}>
-          <span
-            className={cn(
-              'flex h-6 w-6 items-center justify-center rounded-full border text-xs font-medium',
-              current === step ? 'border-primary bg-primary text-primary-foreground' : 'border-border'
-            )}
-          >
-            {current}
-          </span>
-          {current === Step.BASICS ? (
-            <FormattedMessage defaultMessage="Organization" id="Tenant form / AddTenant / Step basics" />
-          ) : (
-            <FormattedMessage defaultMessage="Company details" id="Tenant form / AddTenant / Step company details" />
-          )}
-        </div>
-      </div>
-    ))}
-  </div>
-);
 
 const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFields: Array<keyof CompanyDetails> }) => {
   const formatCompanyFields = useFormatCompanyFields();

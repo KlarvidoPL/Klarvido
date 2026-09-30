@@ -4,7 +4,7 @@ import { commonQueryCurrentUserQuery } from '@sb/webapp-api-client/providers';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
@@ -49,6 +49,10 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/nip/i)).toHaveValue('');
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
+    const progress = screen.getByRole('list', { name: 'Onboarding steps' });
+    expect(within(progress).getAllByRole('listitem')).toHaveLength(8);
+    expect(within(progress).getByText('Organization').closest('li')).toHaveAttribute('aria-current', 'step');
+    expect(within(progress).getByText('KSeF demo')).toBeInTheDocument();
   });
 
   it('should preselect the only supported country and prefix the NIP with its code', async () => {
@@ -93,6 +97,7 @@ describe('AddTenantForm: Component', () => {
     await fillStepOne();
 
     expect(await screen.findByDisplayValue('ACME SP. Z O.O.')).toBeInTheDocument();
+    expect(screen.getByText('Company details').closest('li')).toHaveAttribute('aria-current', 'step');
     expect(screen.getByDisplayValue('123456785')).toBeInTheDocument();
     expect(screen.getByDisplayValue('UL. PRZYKŁADOWA 1, 00-001 WARSZAWA')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveTextContent('Active VAT payer');
