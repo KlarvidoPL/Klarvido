@@ -4205,6 +4205,21 @@
   "Tenant form / Company name required": {
     "defaultMessage": "कंपनी का नाम आवश्यक है"
   },
+  "Tenant form / Country NIP and REGON locked hint": {
+    "defaultMessage": "सहेजने के बाद देश, NIP और REGON बदले नहीं जा सकते।"
+  },
+  "Tenant form / Country hint": {
+    "defaultMessage": "वह देश चुनें जहाँ कंपनी पंजीकृत है। अभी समर्थित: {countries}।"
+  },
+  "Tenant form / Country label": {
+    "defaultMessage": "पंजीकरण का देश:"
+  },
+  "Tenant form / Country placeholder": {
+    "defaultMessage": "देश चुनें"
+  },
+  "Tenant form / Country required": {
+    "defaultMessage": "देश आवश्यक है"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "संगठन सफलतापूर्वक हटा दिया गया!"
   },
@@ -4234,9 +4249,6 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "VAT स्थिति"
-  },
-  "Tenant form / NIP and REGON locked hint": {
-    "defaultMessage": "सहेजने के बाद NIP और REGON बदले नहीं जा सकते।"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "अमान्य NIP नंबर"

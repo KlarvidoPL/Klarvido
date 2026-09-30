@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router';
 import {
   COMPANY_DETAILS_FIELDS,
   CompanyDetailsFields,
+  CountryField,
   DisplayNameField,
   NipField,
 } from '../../components/companyDetailsFields';
@@ -29,6 +30,7 @@ import {
   useCompanyLookup,
   useFormatCompanyFields,
 } from '../../hooks/useCompanyLookup';
+import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
 import { addTenantMutation } from './addTenantForm.graphql';
 
@@ -37,7 +39,7 @@ enum Step {
   COMPANY_DETAILS = 2,
 }
 
-const STEP_1_FIELDS = ['name', 'nip'] as const;
+const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
 export const AddTenantForm = () => {
   const generateTenantPath = useGenerateTenantPath();
@@ -57,7 +59,15 @@ export const AddTenantForm = () => {
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
     useApiForm<TenantFormFields>({
       mode: 'onChange',
-      defaultValues: { name: '', nip: '', companyName: '', regon: '', address: '', vatStatus: '' },
+      defaultValues: {
+        name: '',
+        country: DEFAULT_COMPANY_COUNTRY,
+        nip: '',
+        companyName: '',
+        regon: '',
+        address: '',
+        vatStatus: '',
+      },
     });
   const {
     formState: { errors },
@@ -112,17 +122,19 @@ export const AddTenantForm = () => {
   const handleNext = async () => {
     if (!(await trigger([...STEP_1_FIELDS]))) return;
 
-    const nip = normalizeDigits(getValues('nip'));
-    // Only (re)query MF when the NIP changed, so going Back/Next doesn't wipe the user's manual edits
-    if (nip !== lookedUpNip) {
-      const company = await lookup(nip);
+    const country = getValues('country');
+    const nip = normalizeTaxId(getValues('nip'), country);
+    const lookupKey = `${country}:${nip}`;
+    // Only (re)query the registry when the country/NIP changed, so going Back/Next doesn't wipe the user's manual edits
+    if (lookupKey !== lookedUpNip) {
+      const company = await lookup(nip, country);
       setValue('companyName', company?.companyName ?? '');
       setValue('regon', company?.regon ?? '');
       setValue('address', company?.address ?? '');
       setValue('vatStatus', company?.vatStatus ?? '');
       setCompanyFound(!!company);
       setMissingFields(company ? getMissingCompanyFields(company) : []);
-      setLookedUpNip(nip);
+      setLookedUpNip(lookupKey);
     }
     setStep(Step.COMPANY_DETAILS);
   };
@@ -132,7 +144,8 @@ export const AddTenantForm = () => {
       variables: {
         input: {
           name: formData.name,
-          nip: normalizeDigits(formData.nip),
+          country: formData.country,
+          nip: normalizeTaxId(formData.nip, formData.country),
           companyName: formData.companyName,
           regon: normalizeDigits(formData.regon),
           address: formData.address,
@@ -175,6 +188,7 @@ export const AddTenantForm = () => {
               {step === Step.BASICS && (
                 <>
                   <DisplayNameField />
+                  <CountryField />
                   <NipField />
                 </>
               )}

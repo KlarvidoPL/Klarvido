@@ -1,6 +1,7 @@
 export {
   COMPANY_DETAILS_FIELDS,
   CompanyDetailsFields,
+  CountryField,
   DisplayNameField,
   NipField,
   VatStatus,

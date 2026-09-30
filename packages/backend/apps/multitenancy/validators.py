@@ -3,6 +3,8 @@ import re
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from .constants import CompanyCountry
+
 NIP_WEIGHTS = (6, 5, 7, 2, 3, 4, 5, 6, 7)
 REGON_9_WEIGHTS = (8, 9, 2, 3, 4, 5, 6, 7)
 REGON_14_WEIGHTS = (2, 4, 8, 5, 0, 9, 7, 3, 6, 1, 2, 4, 8)
@@ -33,6 +35,35 @@ def is_valid_regon(value: str) -> bool:
     if re.fullmatch(r"\d{14}", regon):
         return _regon_checksum_matches(regon, REGON_14_WEIGHTS)
     return False
+
+
+def normalize_tax_id(value: str, country: str) -> str:
+    """
+    Strips separators and an optional leading country code - people often paste the EU VAT number form, which for
+    Poland is just "PL" + NIP (e.g. "PL 972-138-23-73").
+    """
+    tax_id = normalize_digits(value)
+    if country and tax_id[: len(country)].upper() == country.upper():
+        tax_id = tax_id[len(country) :]
+    return tax_id
+
+
+# The national part of the tax ID differs per country (length, format, checksum) - only the "country prefix + national
+# number" shape of EU VAT numbers is shared - so each supported country brings its own check.
+TAX_ID_VALIDATORS = {
+    CompanyCountry.POLAND: is_valid_nip,
+}
+
+
+def validate_tax_id(value: str, country: str) -> str:
+    """DRF-style validator: returns the normalized tax ID (no country prefix) or raises ValidationError."""
+    is_valid = TAX_ID_VALIDATORS.get(country)
+    if is_valid is None:
+        raise serializers.ValidationError(_("Unsupported country"), code="unsupported_country")
+    tax_id = normalize_tax_id(value, country)
+    if not is_valid(tax_id):
+        raise serializers.ValidationError(_("Invalid NIP number"), code="invalid_nip")
+    return tax_id
 
 
 def validate_nip(value: str) -> str:

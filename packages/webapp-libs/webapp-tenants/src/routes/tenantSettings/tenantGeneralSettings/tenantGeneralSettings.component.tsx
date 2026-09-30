@@ -101,6 +101,7 @@ export const TenantGeneralSettings = () => {
               currentTenant
                 ? {
                     name: currentTenant.name ?? '',
+                    country: currentTenant.country ?? '',
                     nip: currentTenant.nip ?? '',
                     companyName: currentTenant.companyName ?? '',
                     regon: currentTenant.regon ?? '',

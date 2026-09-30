@@ -30,6 +30,7 @@ export const commonQueryTenantItemFragment = gql(/* GraphQL */ `
     name
     type
     actionLoggingEnabled
+    country
     nip
     companyName
     regon

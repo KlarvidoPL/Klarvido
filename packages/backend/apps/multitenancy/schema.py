@@ -8,7 +8,6 @@ from graphene_django import DjangoObjectType
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db import close_old_connections
-from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 
 from apps.users.services.users import get_user_from_resolver, get_user_avatar_url
@@ -24,9 +23,10 @@ from apps.sso.enforcement import filter_tenants_for_password_session
 from . import models
 from . import serializers
 from .tokens import tenant_invitation_token
-from .services.mf_whitelist import lookup_company_by_nip
-from .validators import validate_nip
+from .services.company_registry import lookup_company
+from .validators import validate_tax_id
 from .constants import (
+    CompanyCountry as ConstantsCompanyCountry,
     TenantUserRole,
     TenantType as ConstantsTenantType,
     ActionType,
@@ -251,6 +251,7 @@ class TenantType(DjangoObjectType):
     type = graphene.String()
     billing_email = graphene.String()
     action_logging_enabled = graphene.Boolean()
+    country = graphene.String()
     nip = graphene.String()
     company_name = graphene.String()
     regon = graphene.String()
@@ -269,6 +270,7 @@ class TenantType(DjangoObjectType):
             "billing_email",
             "type",
             "action_logging_enabled",
+            "country",
             "nip",
             "company_name",
             "regon",
@@ -317,6 +319,7 @@ class CompanyLookupType(graphene.ObjectType):
     """Company details found in the MF White List for a NIP; `found` is False when there's nothing to prefill."""
 
     found = graphene.Boolean(required=True)
+    country = graphene.String(required=True)
     nip = graphene.String(required=True)
     company_name = graphene.String()
     regon = graphene.String()
@@ -1291,21 +1294,25 @@ class Query(graphene.ObjectType):
     company_lookup_by_nip = graphene.Field(
         CompanyLookupType,
         nip=graphene.String(required=True),
-        description="Look up company details (name, REGON, address, VAT status) in the MF White List by NIP",
+        country=graphene.String(default_value=ConstantsCompanyCountry.POLAND),
+        description=(
+            "Look up company details (name, REGON, address, VAT status) by tax ID in the country's company registry "
+            "(Poland: MF White List)"
+        ),
     )
 
     @staticmethod
     @graphql_ratelimit(rate="20/min", key=RateLimitKey.USER_OR_IP)
-    def resolve_company_lookup_by_nip(root, info, nip):
+    def resolve_company_lookup_by_nip(root, info, nip, country=ConstantsCompanyCountry.POLAND):
         try:
-            normalized_nip = validate_nip(nip)
-        except DRFValidationError:
-            raise exceptions.GraphQlValidationError({"nip": [_("Invalid NIP number")]})
+            normalized_nip = validate_tax_id(nip, country)
+        except DRFValidationError as e:
+            raise exceptions.GraphQlValidationError({"nip": e.detail})
 
-        company = lookup_company_by_nip(normalized_nip)
+        company = lookup_company(country, normalized_nip)
         if company is None:
-            return CompanyLookupType(found=False, nip=normalized_nip)
-        return CompanyLookupType(found=True, nip=normalized_nip, **asdict(company))
+            return CompanyLookupType(found=False, country=country, nip=normalized_nip)
+        return CompanyLookupType(found=True, country=country, nip=normalized_nip, **asdict(company))
 
     @staticmethod
     @permission_classes(policies.AnyoneFullAccess)

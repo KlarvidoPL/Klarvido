@@ -24,6 +24,7 @@ class Tenant(TimestampedMixin, models.Model):
     - billing_email: Address used for billing purposes and it is provided to Stripe
     - members: Many-to-many relationship with users through TenantMembership.
     - action_logging_enabled: Whether action logging is enabled for this tenant.
+    - country: Country the company is registered in (ISO 3166-1 alpha-2); decides tax-ID validation and registry.
     - nip, company_name, regon, address, vat_status: Company details, prefilled from the MF White List API.
 
     Methods:
@@ -64,6 +65,11 @@ class Tenant(TimestampedMixin, models.Model):
 
     # Company details (Polish business registry data). Blank for the personal DEFAULT tenant and for
     # organizations created before these fields existed - NIP is only enforced when creating an organization.
+    # Country the company is registered in - decides how its tax ID (NIP for Poland) is validated and which registry
+    # prefills its details. Existing rows are all Polish, hence the default.
+    country = models.CharField(
+        max_length=2, choices=constants.CompanyCountry.choices, default=constants.CompanyCountry.POLAND
+    )
     nip = models.CharField(max_length=10, blank=True, default="", verbose_name="NIP")
     company_name = models.CharField(max_length=255, blank=True, default="")
     regon = models.CharField(max_length=14, blank=True, default="", verbose_name="REGON")

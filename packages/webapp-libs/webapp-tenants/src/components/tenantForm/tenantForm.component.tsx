@@ -8,8 +8,14 @@ import { ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getMissingCompanyFields, useCompanyLookup, useFormatCompanyFields } from '../../hooks/useCompanyLookup';
-import { isValidNip } from '../../utils/nip';
-import { CompanyDetailsFields, CompanyDetailsFormFields, DisplayNameField, NipField } from '../companyDetailsFields';
+import { isValidTaxId } from '../../utils/companyCountries';
+import {
+  CompanyDetailsFields,
+  CompanyDetailsFormFields,
+  CountryField,
+  DisplayNameField,
+  NipField,
+} from '../companyDetailsFields';
 import { useTenantForm } from './tenantForm.hook';
 
 export type TenantFormFields = CompanyDetailsFormFields & {
@@ -63,12 +69,14 @@ export const TenantForm = ({
   // NIP/REGON never change for a company: read-only once the organization has them saved. Still empty (organizations
   // created before these fields existed) they can be filled in once.
   const nipLocked = !!initialData?.nip;
+  // The country goes with the tax ID: locked together with it
+  const countryLocked = nipLocked;
   const regonLocked = !!initialData?.regon;
 
   const handleRefreshFromMF = async () => {
-    if (!(await trigger('nip')) || !isValidNip(getValues('nip'))) return;
+    if (!(await trigger(['country', 'nip'])) || !isValidTaxId(getValues('nip'), getValues('country'))) return;
 
-    const company = await lookup(getValues('nip'));
+    const company = await lookup(getValues('nip'), getValues('country'));
     if (!company) {
       toast({
         description: intl.formatMessage({
@@ -118,6 +126,7 @@ export const TenantForm = ({
 
         {showCompanyDetails && (
           <>
+            <CountryField disabled={disabled} locked={countryLocked} />
             <NipField
               disabled={disabled}
               locked={nipLocked}
@@ -141,7 +150,7 @@ export const TenantForm = ({
             <CompanyDetailsFields
               disabled={disabled}
               regonLocked={regonLocked}
-              showLockHint={nipLocked || regonLocked}
+              showLockHint={countryLocked || nipLocked || regonLocked}
             />
           </>
         )}

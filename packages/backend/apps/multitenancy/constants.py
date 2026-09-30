@@ -13,6 +13,16 @@ class TenantType(models.TextChoices):
     ORGANIZATION = "organization", "Organization"
 
 
+class CompanyCountry(models.TextChoices):
+    """
+    Countries an organization's company can be registered in (ISO 3166-1 alpha-2) - the ones we can validate a tax ID
+    for. Supporting a new one means adding its tax-ID validator (validators.TAX_ID_VALIDATORS) and, optionally, a
+    company registry for prefilling details (services.company_registry.COMPANY_REGISTRIES).
+    """
+
+    POLAND = "PL", "Poland"
+
+
 class VatStatus(models.TextChoices):
     """
     VAT taxpayer status as reported by the Polish Ministry of Finance White List ("statusVat").
