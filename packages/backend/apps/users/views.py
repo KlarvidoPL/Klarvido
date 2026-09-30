@@ -85,8 +85,10 @@ def complete(request, backend, *args, **kwargs):
         else:
             token = jwt_tokens.RefreshToken.for_user(user)
             # Without this, get_auth_method_from_token() defaults missing claims
-            # to 'password', which lets an OAuth login silently bypass SSO
-            # enforcement (is_password_session() would wrongly consider it exempt).
+            # to 'password', which would misclassify this session to
+            # should_enforce_sso_for_session() (apps/sso/enforcement.py) -
+            # harmless there (still enforced) but wrong for any future check
+            # that treats 'password' and 'oauth' differently.
             token['auth_method'] = 'oauth'
             token.access_token['auth_method'] = 'oauth'
             backend.strategy.set_jwt(token)

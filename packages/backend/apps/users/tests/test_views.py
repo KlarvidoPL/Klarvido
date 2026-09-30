@@ -228,11 +228,15 @@ class TestSocialAuthCreatesSession:
 class TestSocialAuthSetsAuthMethodClaim:
     """Regression test for a bug where the OAuth-issued JWT never got an
     `auth_method` claim (it was minted via a raw RefreshToken.for_user() instead
-    of the create_jwt_tokens() helper every other login path uses). Since
-    get_auth_method_from_token() defaults a missing claim to 'password', this
-    silently let a "Sign in with Google" login bypass SSO enforcement for
-    tenants that require it (is_password_session() wrongly treated it as
-    exempt)."""
+    of the create_jwt_tokens() helper every other login path uses). It isn't a
+    live bypass on its own - get_auth_method_from_token() defaults a missing
+    claim to 'password', and should_enforce_sso_for_session() (see
+    apps/sso/enforcement.py) enforces against 'password' the same as any other
+    non-'sso' method - but it does mean OAuth sessions are indistinguishable
+    from password ones to any code that inspects auth_method, and it's exactly
+    the kind of gap that would silently become a real SSO-enforcement bypass
+    if that check were ever narrowed to literally `== 'password'` instead of
+    `!= 'sso'`."""
 
     def _get_do_login_callback(self, api_client):
         with patch("apps.users.views.do_complete") as mock_do_complete:
