@@ -462,6 +462,12 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
+    # Stamp every token with a fingerprint of the user's password hash (random for passwordless/social accounts) and
+    # reject it once that no longer matches. A token then only works for the exact account it was issued to: not for a
+    # different account that later got the same user ID (e.g. after the database was wiped and IDs started over - with
+    # an unchanged signing key those old tokens would otherwise log a device into someone else's account), nor after the
+    # password was changed or reset.
+    "CHECK_REVOKE_TOKEN": True,
 }
 ACCESS_TOKEN_COOKIE = "token"
 REFRESH_TOKEN_COOKIE = "refresh_token"

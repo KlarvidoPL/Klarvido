@@ -15,6 +15,9 @@ __wrapped_field_names = threading.local()
 
 
 def check_permissions(perms: types.PermissionsClasses, request: Request | dict, root):
+    # WebSocket (channels) requests have no DRF request to evaluate permissions against. That's only safe because the
+    # WebSocket consumer (apps/websockets/consumers.py) refuses everything but subscriptions - queries and mutations
+    # must go over HTTP, where these checks run.
     if hasattr(request, "channels_scope"):
         return
 

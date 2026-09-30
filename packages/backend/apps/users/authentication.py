@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import parse_cookie
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework_simplejwt import authentication
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 
@@ -47,9 +48,10 @@ class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
         """
         try:
             return super().authenticate(request)
-        except (InvalidToken, TokenError):
-            # Token is expired or invalid - treat as unauthenticated
-            # rather than raising a 401 error
+        except (InvalidToken, TokenError, AuthenticationFailed):
+            # Token is expired, invalid, or no longer matches its account (user gone/inactive, password changed,
+            # see CHECK_REVOKE_TOKEN) - treat as unauthenticated rather than raising a 401 error, so a valid
+            # Authorization header can still authenticate the request
             return None
 
 
@@ -90,8 +92,8 @@ class JSONWebTokenChannelsAuthentication(authentication.JWTAuthentication):
         """
         try:
             return super().authenticate(scope)
-        except (InvalidToken, TokenError):
-            # Token is expired or invalid - treat as unauthenticated
+        except (InvalidToken, TokenError, AuthenticationFailed):
+            # Token is expired, invalid, or no longer matches its account - treat as unauthenticated
             return None
 
 
@@ -108,7 +110,7 @@ class JSONWebTokenCookieMiddleware:
         auth_backend = JSONWebTokenChannelsAuthentication()
         try:
             return auth_backend.authenticate(scope)
-        except (InvalidToken, TokenError):
+        except (InvalidToken, TokenError, AuthenticationFailed):
             # Token is expired or invalid - proceed without user
             return None
 
