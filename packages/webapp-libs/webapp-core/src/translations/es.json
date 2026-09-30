@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "Esta acción no se puede deshacer. Esto eliminará permanentemente tu organización de nuestros servidores."
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "Nombre:"
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "¿Estás completamente seguro?"
   },
@@ -4211,6 +4208,21 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "¡Organización eliminada correctamente!"
   },
+  "Tenant form / Display name hint": {
+    "defaultMessage": "Se muestra en la aplicación, p. ej., en el selector de organizaciones. No tiene que coincidir con el nombre registrado de la empresa."
+  },
+  "Tenant form / Display name label": {
+    "defaultMessage": "Nombre visible:"
+  },
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "El nombre visible es demasiado largo"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "Nombre visible"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "El nombre visible es obligatorio"
+  },
   "Tenant form / Field name / Address": {
     "defaultMessage": "la dirección"
   },
@@ -4237,15 +4249,6 @@
   },
   "Tenant form / NIP required": {
     "defaultMessage": "El NIP es obligatorio"
-  },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "El nombre es demasiado largo"
-  },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "Nombre"
-  },
-  "Tenant form / Name required": {
-    "defaultMessage": "El nombre es obligatorio"
   },
   "Tenant form / REGON invalid": {
     "defaultMessage": "Número REGON no válido"

@@ -34,7 +34,7 @@ const lookupMock = (company: Record<string, string> | null) =>
   });
 
 const fillStepOne = async (name = 'new item name', nip = NIP) => {
-  await userEvent.type(await screen.findByPlaceholderText('Name'), name);
+  await userEvent.type(await screen.findByPlaceholderText('Display name'), name);
   await userEvent.type(screen.getByLabelText(/nip/i), nip);
   await userEvent.click(screen.getByRole('button', { name: /next/i }));
 };
@@ -45,7 +45,7 @@ describe('AddTenantForm: Component', () => {
   it('should display empty first step', async () => {
     const { waitForApolloMocks } = render(<Component />);
     await waitForApolloMocks();
-    expect(await screen.findByPlaceholderText('Name')).toHaveValue('');
+    expect(await screen.findByPlaceholderText('Display name')).toHaveValue('');
     expect(screen.getByLabelText(/nip/i)).toHaveValue('');
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('AddTenantForm: Component', () => {
     await fillStepOne('Acme');
     await userEvent.click(await screen.findByRole('button', { name: /back/i }));
 
-    expect(await screen.findByPlaceholderText('Name')).toHaveValue('Acme');
+    expect(await screen.findByPlaceholderText('Display name')).toHaveValue('Acme');
     expect(screen.getByLabelText(/nip/i)).toHaveValue(NIP);
     // Regression: the Back click used to be turned into a form submit (= Next) that jumped straight back to step 2
     await act(() => new Promise((resolve) => setTimeout(resolve, 100)));

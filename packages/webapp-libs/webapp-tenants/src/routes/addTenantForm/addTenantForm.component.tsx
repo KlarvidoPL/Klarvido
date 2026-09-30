@@ -3,7 +3,7 @@ import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
-import { Form, Input } from '@sb/webapp-core/components/forms';
+import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
@@ -15,7 +15,12 @@ import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
 
-import { COMPANY_DETAILS_FIELDS, CompanyDetailsFields, NipField } from '../../components/companyDetailsFields';
+import {
+  COMPANY_DETAILS_FIELDS,
+  CompanyDetailsFields,
+  DisplayNameField,
+  NipField,
+} from '../../components/companyDetailsFields';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import { useGenerateTenantPath } from '../../hooks';
 import {
@@ -26,8 +31,6 @@ import {
 } from '../../hooks/useCompanyLookup';
 import { normalizeDigits } from '../../utils/nip';
 import { addTenantMutation } from './addTenantForm.graphql';
-
-const MAX_NAME_LENGTH = 255;
 
 enum Step {
   BASICS = 1,
@@ -57,7 +60,6 @@ export const AddTenantForm = () => {
       defaultValues: { name: '', nip: '', companyName: '', regon: '', address: '', vatStatus: '' },
     });
   const {
-    register,
     formState: { errors },
     trigger,
     getValues,
@@ -172,27 +174,7 @@ export const AddTenantForm = () => {
             >
               {step === Step.BASICS && (
                 <>
-                  <Input
-                    {...register('name', {
-                      maxLength: {
-                        value: MAX_NAME_LENGTH,
-                        message: intl.formatMessage({
-                          defaultMessage: 'Name is too long',
-                          id: 'Tenant form / Name max length error',
-                        }),
-                      },
-                      required: {
-                        value: true,
-                        message: intl.formatMessage({
-                          defaultMessage: 'Name is required',
-                          id: 'Tenant form / Name required',
-                        }),
-                      },
-                    })}
-                    label={intl.formatMessage({ defaultMessage: 'Name:', id: 'Tenant Form / Name label' })}
-                    placeholder={intl.formatMessage({ defaultMessage: 'Name', id: 'Tenant form / Name placeholder' })}
-                    error={errors.name?.message}
-                  />
+                  <DisplayNameField />
                   <NipField />
                 </>
               )}

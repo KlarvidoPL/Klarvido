@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "यह कार्रवाई वापस नहीं ली जा सकती। इससे आपका संगठन हमारे सर्वरों से स्थायी रूप से हट जाएगा।"
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "नाम:"
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "क्या आप पूरी तरह से सुनिश्चित हैं?"
   },
@@ -4211,6 +4208,21 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "संगठन सफलतापूर्वक हटा दिया गया!"
   },
+  "Tenant form / Display name hint": {
+    "defaultMessage": "ऐप में दिखाया जाता है, जैसे संगठन स्विचर में। इसका पंजीकृत कंपनी नाम से मेल खाना ज़रूरी नहीं है।"
+  },
+  "Tenant form / Display name label": {
+    "defaultMessage": "प्रदर्शित नाम:"
+  },
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "प्रदर्शित नाम बहुत लंबा है"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "प्रदर्शित नाम"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "प्रदर्शित नाम आवश्यक है"
+  },
   "Tenant form / Field name / Address": {
     "defaultMessage": "पता"
   },
@@ -4237,15 +4249,6 @@
   },
   "Tenant form / NIP required": {
     "defaultMessage": "NIP आवश्यक है"
-  },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "नाम बहुत लंबा है"
-  },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "नाम"
-  },
-  "Tenant form / Name required": {
-    "defaultMessage": "नाम आवश्यक है"
   },
   "Tenant form / REGON invalid": {
     "defaultMessage": "अमान्य REGON नंबर"

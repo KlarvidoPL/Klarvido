@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "لا يمكن التراجع عن هذا الإجراء. سيؤدي إلى حذف مؤسستك نهائيًا من خوادمنا."
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "الاسم:"
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "هل أنت متأكد تمامًا؟"
   },
@@ -4211,6 +4208,21 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "تم حذف المؤسسة بنجاح!"
   },
+  "Tenant form / Display name hint": {
+    "defaultMessage": "يظهر داخل التطبيق، مثل مُبدِّل المؤسسات. لا يلزم أن يطابق الاسم المسجل للشركة."
+  },
+  "Tenant form / Display name label": {
+    "defaultMessage": "الاسم المعروض:"
+  },
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "الاسم المعروض طويل جدًا"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "الاسم المعروض"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "الاسم المعروض مطلوب"
+  },
   "Tenant form / Field name / Address": {
     "defaultMessage": "العنوان"
   },
@@ -4237,15 +4249,6 @@
   },
   "Tenant form / NIP required": {
     "defaultMessage": "رقم NIP مطلوب"
-  },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "الاسم طويل جدًا"
-  },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "الاسم"
-  },
-  "Tenant form / Name required": {
-    "defaultMessage": "الاسم مطلوب"
   },
   "Tenant form / REGON invalid": {
     "defaultMessage": "رقم REGON غير صالح"

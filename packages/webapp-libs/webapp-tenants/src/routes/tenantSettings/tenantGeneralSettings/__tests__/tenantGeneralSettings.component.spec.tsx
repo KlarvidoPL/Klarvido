@@ -84,7 +84,7 @@ describe('TenantGeneralSettings: Component', () => {
     renderWithTenant([requestMock, refetchMock]);
 
     // Wait for permissions to load and form to be enabled
-    const nameInput = await screen.findByPlaceholderText('Name');
+    const nameInput = await screen.findByPlaceholderText('Display name');
     await waitFor(() => {
       expect(nameInput).not.toBeDisabled();
     });
@@ -117,7 +117,7 @@ describe('TenantGeneralSettings: Component', () => {
     renderWithTenant([lookupMock]);
 
     const refreshButton = await screen.findByRole('button', { name: /refresh from mf/i });
-    await waitFor(() => expect(screen.getByPlaceholderText('Name')).not.toBeDisabled());
+    await waitFor(() => expect(screen.getByPlaceholderText('Display name')).not.toBeDisabled());
     await userEvent.click(refreshButton);
 
     expect(await screen.findByDisplayValue('ACME NEW NAME SP. Z O.O.')).toBeInTheDocument();
@@ -144,7 +144,7 @@ describe('TenantGeneralSettings: Component', () => {
     renderWithTenant([lookupMock]);
 
     const refreshButton = await screen.findByRole('button', { name: /refresh from mf/i });
-    await waitFor(() => expect(screen.getByPlaceholderText('Name')).not.toBeDisabled());
+    await waitFor(() => expect(screen.getByPlaceholderText('Display name')).not.toBeDisabled());
     await userEvent.click(refreshButton);
 
     expect(await screen.findByDisplayValue('ACME NEW NAME SP. Z O.O.')).toBeInTheDocument();

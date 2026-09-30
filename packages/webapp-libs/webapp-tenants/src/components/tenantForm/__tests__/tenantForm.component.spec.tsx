@@ -20,13 +20,12 @@ describe('TenantForm: Component', () => {
 
   it('should display empty string', async () => {
     render(<Component initialData={{ name: '' }} />);
-    const value = (await screen.findByPlaceholderText('Name')).getAttribute('value');
-    expect(value).toBe('');
+    expect(await screen.findByPlaceholderText('Display name')).toHaveValue('');
   });
 
   it('should not show company details unless enabled', async () => {
     render(<Component />);
-    await screen.findByPlaceholderText('Name');
+    await screen.findByPlaceholderText('Display name');
     expect(screen.queryByLabelText(/nip/i)).not.toBeInTheDocument();
   });
 
@@ -35,7 +34,7 @@ describe('TenantForm: Component', () => {
       const onSubmit = jest.fn();
       render(<Component onSubmit={onSubmit} />);
 
-      const nameField = await screen.findByPlaceholderText('Name');
+      const nameField = await screen.findByPlaceholderText('Display name');
       await userEvent.clear(nameField);
       await userEvent.type(nameField, 'new tenant name');
       await userEvent.click(screen.getByRole('button', { name: /save/i }));

@@ -3950,9 +3950,6 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "此操作无法撤销。这将从我们的服务器中永久删除您的组织。"
   },
-  "Tenant Form / Name label": {
-    "defaultMessage": "名称："
-  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "您确定要执行此操作吗？"
   },
@@ -4211,6 +4208,21 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "组织删除成功!"
   },
+  "Tenant form / Display name hint": {
+    "defaultMessage": "在应用内显示，例如在组织切换器中。无需与公司注册名称一致。"
+  },
+  "Tenant form / Display name label": {
+    "defaultMessage": "显示名称："
+  },
+  "Tenant form / Display name max length error": {
+    "defaultMessage": "显示名称过长"
+  },
+  "Tenant form / Display name placeholder": {
+    "defaultMessage": "显示名称"
+  },
+  "Tenant form / Display name required": {
+    "defaultMessage": "显示名称为必填项"
+  },
   "Tenant form / Field name / Address": {
     "defaultMessage": "地址"
   },
@@ -4237,15 +4249,6 @@
   },
   "Tenant form / NIP required": {
     "defaultMessage": "NIP 为必填项"
-  },
-  "Tenant form / Name max length error": {
-    "defaultMessage": "名称过长"
-  },
-  "Tenant form / Name placeholder": {
-    "defaultMessage": "名称"
-  },
-  "Tenant form / Name required": {
-    "defaultMessage": "名称为必填项"
   },
   "Tenant form / REGON invalid": {
     "defaultMessage": "REGON 号码无效"
