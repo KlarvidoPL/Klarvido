@@ -16,7 +16,7 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
 
   return (
     <ol
-      className="grid auto-rows-fr grid-cols-2 gap-2 pt-4 md:grid-cols-4 2xl:grid-cols-8"
+      className="grid auto-rows-fr grid-cols-2 gap-2 pt-4 md:grid-cols-4 xl:grid-cols-8"
       aria-label={intl.formatMessage({ defaultMessage: 'Onboarding steps', id: 'Onboarding / Steps label' })}
     >
       {steps.map((label, index) => {
@@ -26,7 +26,7 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
             key={number}
             aria-current={number === step ? 'step' : undefined}
             className={cn(
-              'flex min-h-14 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-sm',
+              'flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-sm',
               number === step
                 ? 'border-primary bg-primary text-primary-foreground'
                 : number < step
