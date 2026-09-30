@@ -1,4 +1,4 @@
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 from config import settings
 from social_django.strategy import DjangoStrategy
@@ -25,6 +25,18 @@ class DjangoJWTStrategy(DjangoStrategy):
 
         if self._user_is_authenticated():
             if self.refresh_token:
+                # Land on a frontend callback page instead of `url` (the original
+                # "next") directly. Every other login method (password, passkey,
+                # OTP, SSO) hands the frontend its access/refresh tokens so it can
+                # populate the localStorage fallback used when the httpOnly cookie
+                # isn't reliably sent (Safari/iOS ITP, third-party-cookie edge
+                # cases) - see auth.utils.ts::storeAuthTokens(). A plain redirect
+                # here would skip that entirely, since cookies aren't readable by
+                # JS: the callback page instead calls the token-refresh endpoint
+                # (already valid via the cookies set below) to fetch tokens into
+                # the JSON response body, the same way a normal refresh does.
+                oauth_callback_url = self._construct_oauth_callback_url(url)
+                response = super(DjangoJWTStrategy, self).redirect(oauth_callback_url)
                 auth_cookies = {
                     settings.ACCESS_TOKEN_COOKIE: str(self.refresh_token.access_token),
                     settings.REFRESH_TOKEN_COOKIE: str(self.refresh_token),
@@ -95,3 +107,12 @@ class DjangoJWTStrategy(DjangoStrategy):
         locale = self.session_get("locale") or "en"
         origin = urlsplit(url)
         return f"{origin.scheme}://{origin.netloc}/{locale}{settings.OTP_VALIDATE_PATH}"
+
+    def _construct_oauth_callback_url(self, url: str) -> str:
+        """`url` is the final "next" redirect target the OAuth flow was started
+        with - preserve it as a query param so the callback page can forward the
+        user there once it's done, same approach as _construct_otp_validate_url."""
+        locale = self.session_get("locale") or "en"
+        origin = urlsplit(url)
+        next_param = quote(url, safe="")
+        return f"{origin.scheme}://{origin.netloc}/{locale}{settings.OAUTH_CALLBACK_PATH}?next={next_param}"

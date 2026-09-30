@@ -45,18 +45,26 @@ def get_sso_enforced_tenant_ids(user) -> set:
     return enforced_ids
 
 
-def is_password_session(request) -> bool:
-    """Check if the current session was authenticated via password."""
-    return get_auth_method_from_token(request) == 'password'
+def should_enforce_sso_for_session(request) -> bool:
+    """Whether this session's auth method needs to be checked against
+    per-tenant SSO enforcement. True for every auth method except a genuine
+    'sso' session (the tenant's own configured SAML/OIDC connection) -
+    password, OAuth, and any other non-SSO method can all bypass that
+    connection just as easily as each other, so all of them must be enforced
+    against equally (a session with a missing/legacy auth_method claim
+    defaults to 'password' - see get_auth_method_from_token - which is
+    correctly treated as "enforce" here too)."""
+    return get_auth_method_from_token(request) != 'sso'
 
 
 def filter_tenants_for_password_session(request, queryset: QuerySet) -> QuerySet:
     """
-    If the user authenticated via password, exclude tenants that enforce SSO
-    for the user's email domain -- unless the user has break-glass permission
+    If the user did not authenticate via the tenant's own SSO connection
+    (password, OAuth, ...), exclude tenants that enforce SSO for the user's
+    email domain -- unless the user has break-glass permission
     (security.sso.manage) on that tenant.
     """
-    if not is_password_session(request):
+    if not should_enforce_sso_for_session(request):
         return queryset
 
     enforced_ids = get_sso_enforced_tenant_ids(request.user)
@@ -89,7 +97,7 @@ def check_tenant_sso_enforcement(request, tenant, user) -> Optional[str]:
     For users with 'security.sso.manage' permission, access is granted (break-glass)
     and an audit log entry is recorded.
     """
-    if not is_password_session(request):
+    if not should_enforce_sso_for_session(request):
         return None
 
     enforced_ids = get_sso_enforced_tenant_ids(user)

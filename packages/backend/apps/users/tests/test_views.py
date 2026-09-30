@@ -223,3 +223,34 @@ class TestSocialAuthCreatesSession:
 
         assert not SSOSession.objects.filter(user=user).exists()
         mock_backend.strategy.set_session_id.assert_not_called()
+
+
+class TestSocialAuthSetsAuthMethodClaim:
+    """Regression test for a bug where the OAuth-issued JWT never got an
+    `auth_method` claim (it was minted via a raw RefreshToken.for_user() instead
+    of the create_jwt_tokens() helper every other login path uses). It isn't a
+    live bypass on its own - get_auth_method_from_token() defaults a missing
+    claim to 'password', and should_enforce_sso_for_session() (see
+    apps/sso/enforcement.py) enforces against 'password' the same as any other
+    non-'sso' method - but it does mean OAuth sessions are indistinguishable
+    from password ones to any code that inspects auth_method, and it's exactly
+    the kind of gap that would silently become a real SSO-enforcement bypass
+    if that check were ever narrowed to literally `== 'password'` instead of
+    `!= 'sso'`."""
+
+    def _get_do_login_callback(self, api_client):
+        with patch("apps.users.views.do_complete") as mock_do_complete:
+            mock_do_complete.return_value = HttpResponse()
+            api_client.get(reverse("social:complete", kwargs={"backend": "google-oauth2"}))
+        return mock_do_complete.call_args.args[1]
+
+    def test_oauth_token_carries_oauth_auth_method_claim(self, api_client, user_factory):
+        user = user_factory(otp_enabled=False)
+        do_login = self._get_do_login_callback(api_client)
+        mock_backend = MagicMock()
+
+        do_login(mock_backend, user, social_user=None)
+
+        token = mock_backend.strategy.set_jwt.call_args.args[0]
+        assert token['auth_method'] == 'oauth'
+        assert token.access_token['auth_method'] == 'oauth'

@@ -19,4 +19,5 @@ export const RoutesConfig = {
   ssoCallback: 'auth/sso/callback',
   ssoError: 'auth/sso/error',
   ssoLogin: 'auth/sso/login',
+  oauthCallback: 'auth/oauth/callback',
 };

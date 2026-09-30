@@ -51,6 +51,63 @@ class TestConstructOtpValidateUrl:
         assert result == "https://klarvido.com/en/auth/validate-otp"
 
 
+class TestConstructOauthCallbackUrl:
+    """Google OAuth login is a full backend redirect chain (Google -> API host ->
+    webapp host), so the frontend never sees the tokens the way a client-side
+    login mutation does - it lands on this callback URL instead, which carries
+    the original "next" destination as a query param rather than the tokens
+    themselves (those come from a follow-up call to the token-refresh endpoint,
+    same as password logins on Safari/ITP already rely on)."""
+
+    def test_builds_url_from_origin_with_next_query_param(self, monkeypatch):
+        monkeypatch.setattr(config_settings, "OAUTH_CALLBACK_PATH", "/auth/oauth/callback")
+        strategy = _strategy({"locale": "pl"})
+
+        result = strategy._construct_oauth_callback_url("https://klarvido.com/pl/auth/login")
+
+        assert (
+            result == "https://klarvido.com/pl/auth/oauth/callback?next=https%3A%2F%2Fklarvido.com%2Fpl%2Fauth%2Flogin"
+        )
+
+    def test_defaults_to_english_locale_when_missing_from_session(self, monkeypatch):
+        monkeypatch.setattr(config_settings, "OAUTH_CALLBACK_PATH", "/auth/oauth/callback")
+        strategy = _strategy({})
+
+        result = strategy._construct_oauth_callback_url("https://klarvido.com/en/auth/signup")
+
+        assert (
+            result == "https://klarvido.com/en/auth/oauth/callback?next=https%3A%2F%2Fklarvido.com%2Fen%2Fauth%2Fsignup"
+        )
+
+
+class TestRedirectTargetsOauthCallback:
+    """The final redirect on a successful OAuth login must land on the callback
+    page (so the frontend can fetch tokens into its localStorage fallback -
+    see auth.utils.ts::storeAuthTokens), not directly on the original "next" -
+    a plain redirect there would leave OAuth sessions with no fallback and,
+    unlike password/passkey/OTP/SSO logins, no way to recover from a dropped
+    httpOnly cookie."""
+
+    def test_redirects_to_callback_url_not_next_directly(self, user):
+        strategy = _strategy({"locale": "pl"})
+        strategy.set_jwt(RefreshToken.for_user(user))
+
+        response = strategy.redirect("https://klarvido.com/pl/auth/login")
+
+        assert response.url == (
+            "https://klarvido.com/pl/auth/oauth/callback" "?next=https%3A%2F%2Fklarvido.com%2Fpl%2Fauth%2Flogin"
+        )
+
+    def test_still_sets_auth_cookies_on_the_callback_redirect(self, user):
+        strategy = _strategy()
+        strategy.set_jwt(RefreshToken.for_user(user))
+
+        response = strategy.redirect("https://klarvido.com/en/auth/login")
+
+        assert config_settings.ACCESS_TOKEN_COOKIE in response.cookies
+        assert config_settings.REFRESH_TOKEN_COOKIE in response.cookies
+
+
 class TestRedirectSetsNewSignupCookie:
     """The frontend needs a signal to show the welcome modal after a brand new
     OAuth signup - unlike the password-signup flow (a client-side mutation that
