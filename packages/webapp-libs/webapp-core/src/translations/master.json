@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "We couldn't process your payment"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "Go to Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "All of its data, including backups and files, has been permanently removed and can't be restored."
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "Organization \"{tenantName}\" has been deleted"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "Organization \"{tenantName}\" has been deleted"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "You deleted the organization \"{tenantName}\". If this wasn't you, change your password and contact us right away."
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "The organization \"{tenantName}\" was deleted by {deletedBy}. You no longer have access to it."
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "Organization deleted"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "Join the team and start collaborating today"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO Connection Deactivated"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "Organization \"{tenant_name}\" was deleted by \"{name}\""
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "Your invitation to \"{tenant_name}\" has been accepted by \"{name}\""

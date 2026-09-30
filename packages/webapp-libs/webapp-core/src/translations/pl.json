@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "Nie udało się przetworzyć płatności"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "Przejdź do Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "Wszystkie jej dane, w tym kopie zapasowe i pliki, zostały trwale usunięte i nie można ich przywrócić."
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "Organizacja „{tenantName}” została usunięta"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "Organizacja „{tenantName}” została usunięta"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "Organizacja „{tenantName}” została przez Ciebie usunięta. Jeśli to nie Ty, natychmiast zmień hasło i skontaktuj się z nami."
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "Organizacja „{tenantName}” została usunięta przez {deletedBy}. Nie masz już do niej dostępu."
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "Organizacja usunięta"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "Dołącz do zespołu i zacznij współpracę już dziś"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "Połączenie SSO dezaktywowane"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "Organizacja „{tenant_name}” została usunięta przez „{name}”"
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "Twoje zaproszenie do „{tenant_name}” zostało zaakceptowane przez „{name}”"

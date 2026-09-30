@@ -53,6 +53,29 @@ describe('renderEmail', () => {
     expect(result.html).toContain('View invitation');
   });
 
+  test('TENANT_DELETED for a member', () => {
+    const result = renderEmail(
+      EmailTemplateType.TENANT_DELETED,
+      { to: 'user@example.com', tenantName: 'Acme', deletedBy: 'Jan Kowalski', isDeleter: false },
+      'en'
+    );
+
+    expect(result.subject).toContain('Acme');
+    expect(result.html).toContain('was deleted by Jan Kowalski');
+    expect(result.html).toContain('permanently removed');
+  });
+
+  test('TENANT_DELETED for the deleter', () => {
+    const result = renderEmail(
+      EmailTemplateType.TENANT_DELETED,
+      { to: 'owner@example.com', tenantName: 'Acme', deletedBy: 'Jan Kowalski', isDeleter: true },
+      'en'
+    );
+
+    expect(result.html).toContain('You deleted the organization');
+    expect(result.html).toContain('If this wasn');
+  });
+
   test('SUBSCRIPTION_ERROR', () => {
     const result = renderEmail(EmailTemplateType.SUBSCRIPTION_ERROR, { to: 'user@example.com' }, 'en');
 

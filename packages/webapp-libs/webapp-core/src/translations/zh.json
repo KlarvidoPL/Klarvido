@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "我们无法处理你的付款"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "前往 Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "其所有数据（包括备份和文件）均已被永久删除，且无法恢复。"
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "组织“{tenantName}”已被删除"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "组织“{tenantName}”已被删除"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "您已删除组织“{tenantName}”。如果这不是您本人所为，请立即更改密码并联系我们。"
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "组织“{tenantName}”已被 {deletedBy} 删除。您将无法再访问该组织。"
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "组织已删除"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "加入团队，立即开始协作"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO 连接已停用"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "组织“{tenant_name}”已被“{name}”删除"
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "您邀请加入“{tenant_name}”的请求已被“{name}”接受"
