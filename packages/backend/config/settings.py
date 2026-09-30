@@ -108,6 +108,7 @@ MIDDLEWARE = [
     "common.middleware.HealthCheckMiddleware",
     "common.middleware.ManageCookiesMiddleware",
     "common.middleware.SetAuthTokenCookieMiddleware",
+    "apps.sso.middleware.SessionActivityMiddleware",
     "django_hosts.middleware.HostsRequestMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -712,6 +713,10 @@ CELERY_BEAT_SCHEDULE = {
     },
     'cleanup-old-backups-daily': {
         'task': 'apps.backup.tasks.cleanup_old_backups',
+        'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
+    },
+    'cleanup-expired-sessions-daily': {
+        'task': 'apps.sso.tasks.cleanup_expired_sessions',
         'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
     },
 }

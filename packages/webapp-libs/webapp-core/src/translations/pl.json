@@ -3704,26 +3704,20 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Wszystkie inne sesje zostały wylogowane."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} na {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Bieżąca"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Bieżąca sesja"
-  },
-  "Sessions / Days ago": {
-    "defaultMessage": "{days} dni temu"
   },
   "Sessions / Description": {
     "defaultMessage": "Zarządzaj aktywnymi sesjami logowania na różnych urządzeniach"
   },
-  "Sessions / Hours ago": {
-    "defaultMessage": "{hours} godziny temu"
-  },
   "Sessions / Last active": {
     "defaultMessage": "Aktywna {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "{minutes} minuty temu"
+  "Sessions / Last active relative": {
+    "defaultMessage": "Ostatnio aktywna {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "Brak innych aktywnych sesji. Jesteś zalogowany tylko na tym urządzeniu."
@@ -3776,11 +3770,17 @@
   "Sessions / Sign out all": {
     "defaultMessage": "Wyloguj ze wszystkich urządzeń"
   },
+  "Sessions / Signed in date": {
+    "defaultMessage": "Zalogowano {date}"
+  },
   "Sessions / This Device Badge": {
     "defaultMessage": "To urządzenie"
   },
   "Sessions / Title": {
     "defaultMessage": "Aktywne sesje"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Nieznane urządzenie"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administracja"

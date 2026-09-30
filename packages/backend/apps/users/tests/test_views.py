@@ -114,6 +114,34 @@ class TestTokenRefresh:
         second_response = api_client.post(reverse('jwt_token_refresh'))
         assert second_response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_refresh_extends_session_and_records_activity(self, api_client, user: models.User):
+        """Each refresh gives the device a new full-lifetime refresh token, so the session must live as long,
+        and "last activity" in Active Sessions must move with it."""
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from apps.sso.models import SSOSession
+        from apps.sso.tests.factories import SSOSessionFactory
+
+        refresh = RefreshToken.for_user(user)
+        session = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+        # Logged in a while ago, soon to expire
+        stale = timezone.now() - timedelta(hours=3)
+        SSOSession.objects.filter(pk=session.pk).update(
+            last_activity_at=stale, expires_at=timezone.now() + timedelta(hours=1)
+        )
+
+        api_client.cookies = SimpleCookie({settings.REFRESH_TOKEN_COOKIE: str(refresh)})
+        before = timezone.now()
+        response = api_client.post(reverse('jwt_token_refresh'))
+        assert response.status_code == status.HTTP_200_OK
+
+        session.refresh_from_db()
+        assert session.last_activity_at >= before
+        lifetime = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
+        assert before + lifetime <= session.expires_at <= timezone.now() + lifetime
+
 
 class TestLogout:
     def test_graceful_logout_without_token(self, api_client):

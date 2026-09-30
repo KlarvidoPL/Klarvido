@@ -3704,26 +3704,20 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "All other sessions have been signed out."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} on {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Current"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Current Session"
-  },
-  "Sessions / Days ago": {
-    "defaultMessage": "{days} days ago"
   },
   "Sessions / Description": {
     "defaultMessage": "Manage your active sign-in sessions across devices"
   },
-  "Sessions / Hours ago": {
-    "defaultMessage": "{hours} hours ago"
-  },
   "Sessions / Last active": {
     "defaultMessage": "Active {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "{minutes} minutes ago"
+  "Sessions / Last active relative": {
+    "defaultMessage": "Last active {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "No other active sessions. You're only signed in on this device."
@@ -3776,11 +3770,17 @@
   "Sessions / Sign out all": {
     "defaultMessage": "Sign out all devices"
   },
+  "Sessions / Signed in date": {
+    "defaultMessage": "Signed in {date}"
+  },
   "Sessions / This Device Badge": {
     "defaultMessage": "This device"
   },
   "Sessions / Title": {
     "defaultMessage": "Active Sessions"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Unknown device"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administration"

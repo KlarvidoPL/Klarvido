@@ -357,7 +357,7 @@ export const PasskeysForm = () => {
                           <FormattedMessage
                             defaultMessage="Created {date}"
                             id="Passkeys / Created date"
-                            values={{ date: new Date(passkey.createdAt as string).toLocaleDateString() }}
+                            values={{ date: intl.formatDate(passkey.createdAt as string) }}
                           />
                         </span>
                         {passkey.lastUsedAt != null && (
@@ -367,7 +367,7 @@ export const PasskeysForm = () => {
                               <FormattedMessage
                                 defaultMessage="Last used {date}"
                                 id="Passkeys / Last used date"
-                                values={{ date: new Date(passkey.lastUsedAt as string).toLocaleDateString() }}
+                                values={{ date: intl.formatDate(passkey.lastUsedAt as string) }}
                               />
                             </span>
                           </>

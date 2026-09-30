@@ -5,10 +5,14 @@ Tests for SSO services.
 import pytest
 from unittest.mock import Mock, patch
 from datetime import timedelta
+from django.conf import settings
+from django.test import RequestFactory
 from django.utils import timezone
 
 from apps.sso import constants
 from apps.sso.services.provisioning import JITProvisioningService
+from apps.sso.services.sessions import SessionService
+from apps.sso.tasks import cleanup_expired_sessions
 from apps.sso import models
 from apps.multitenancy.constants import TenantUserRole
 from apps.multitenancy.models import TenantMembership
@@ -166,6 +170,31 @@ class TestSSOSessionManager:
 
         assert session1.is_active is False
         assert session2.is_active is False
+
+
+class TestSessionLifetime:
+    """A session lives exactly as long as the device's refresh token, and is deleted once expired."""
+
+    def test_new_session_expires_with_the_refresh_token(self, user):
+        before = timezone.now()
+        session, _ = SessionService(user).create_session(RequestFactory().get("/"))
+
+        lifetime = settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
+        assert before + lifetime <= session.expires_at <= timezone.now() + lifetime
+
+    def test_explicit_ttl_still_wins(self, user):
+        session, _ = SessionService(user).create_session(RequestFactory().get("/"), ttl_days=1)
+
+        assert session.expires_at <= timezone.now() + timedelta(days=1)
+
+    def test_cleanup_task_deletes_only_expired_sessions(self, user):
+        expired = factories.SSOSessionFactory(user=user, expires_at=timezone.now() - timedelta(minutes=1))
+        valid = factories.SSOSessionFactory(user=user)
+
+        assert cleanup_expired_sessions() == 1
+
+        assert not models.SSOSession.objects.filter(pk=expired.pk).exists()
+        assert models.SSOSession.objects.filter(pk=valid.pk).exists()
 
 
 class TestUserPasskeyManager:

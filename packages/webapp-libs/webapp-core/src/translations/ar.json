@@ -3704,26 +3704,20 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "تم تسجيل الخروج من جميع الجلسات الأخرى."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} على {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "الحالية"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "الجلسة الحالية"
-  },
-  "Sessions / Days ago": {
-    "defaultMessage": "منذ {days} يومًا"
   },
   "Sessions / Description": {
     "defaultMessage": "إدارة جلسات تسجيل الدخول النشطة عبر الأجهزة"
   },
-  "Sessions / Hours ago": {
-    "defaultMessage": "منذ {hours} ساعة"
-  },
   "Sessions / Last active": {
     "defaultMessage": "آخر نشاط: {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "منذ {minutes} دقيقة"
+  "Sessions / Last active relative": {
+    "defaultMessage": "آخر نشاط {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "لا توجد جلسات نشطة أخرى. أنت مسجّل الدخول على هذا الجهاز فقط."
@@ -3776,11 +3770,17 @@
   "Sessions / Sign out all": {
     "defaultMessage": "تسجيل الخروج من جميع الأجهزة"
   },
+  "Sessions / Signed in date": {
+    "defaultMessage": "تم تسجيل الدخول في {date}"
+  },
   "Sessions / This Device Badge": {
     "defaultMessage": "هذا الجهاز"
   },
   "Sessions / Title": {
     "defaultMessage": "الجلسات النشطة"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "جهاز غير معروف"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "الإدارة"

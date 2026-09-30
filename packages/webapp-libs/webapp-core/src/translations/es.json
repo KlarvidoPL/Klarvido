@@ -3704,26 +3704,20 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Se han cerrado todas las demás sesiones."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} en {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Actual"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Sesión actual"
-  },
-  "Sessions / Days ago": {
-    "defaultMessage": "Hace {days} días"
   },
   "Sessions / Description": {
     "defaultMessage": "Administra tus sesiones activas en distintos dispositivos"
   },
-  "Sessions / Hours ago": {
-    "defaultMessage": "Hace {hours} horas"
-  },
   "Sessions / Last active": {
     "defaultMessage": "Activa hace {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "Hace {minutes} minutos"
+  "Sessions / Last active relative": {
+    "defaultMessage": "Última actividad {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "No hay otras sesiones activas. Solo has iniciado sesión en este dispositivo."
@@ -3776,11 +3770,17 @@
   "Sessions / Sign out all": {
     "defaultMessage": "Cerrar sesión en todos los dispositivos"
   },
+  "Sessions / Signed in date": {
+    "defaultMessage": "Sesión iniciada el {date}"
+  },
   "Sessions / This Device Badge": {
     "defaultMessage": "Este dispositivo"
   },
   "Sessions / Title": {
     "defaultMessage": "Sesiones activas"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Dispositivo desconocido"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administración"

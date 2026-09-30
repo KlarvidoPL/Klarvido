@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 // GraphQL queries and mutations
-const SESSIONS_QUERY = gql(`
+export const activeSessionsQuery = gql(`
   query ActiveSessionsQuery {
     mySessions(first: 50) {
       edges {
@@ -76,32 +76,77 @@ const getDeviceIcon = (deviceType: string) => {
   }
 };
 
-const formatLastActive = (dateStr: string, intl: ReturnType<typeof useIntl>) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+// The backend stores "Unknown" when it can't tell the browser / OS from the user agent
+const knownOrNull = (value?: string | null) => (value && value !== 'Unknown' ? value : null);
 
-  if (diffMinutes < 1) {
-    return intl.formatMessage({ defaultMessage: 'Active now', id: 'Sessions / Active now' });
-  } else if (diffMinutes < 60) {
-    return intl.formatMessage(
-      { defaultMessage: '{minutes} minutes ago', id: 'Sessions / Minutes ago' },
-      { minutes: diffMinutes }
-    );
-  } else if (diffHours < 24) {
-    return intl.formatMessage(
-      { defaultMessage: '{hours} hours ago', id: 'Sessions / Hours ago' },
-      { hours: diffHours }
-    );
-  } else {
-    return intl.formatMessage(
-      { defaultMessage: '{days} days ago', id: 'Sessions / Days ago' },
-      { days: diffDays }
-    );
+// Built here rather than using the backend's deviceName, which is a fixed English "{browser} on {os}"
+const formatDeviceName = (session: SessionNode, intl: ReturnType<typeof useIntl>) => {
+  const browser = knownOrNull(session.browser);
+  const os = knownOrNull(session.operatingSystem);
+  if (browser && os) {
+    return intl.formatMessage({ defaultMessage: '{browser} on {os}', id: 'Sessions / Browser on OS' }, { browser, os });
   }
+  return browser || os || intl.formatMessage({ defaultMessage: 'Unknown device', id: 'Sessions / Unknown device' });
+};
+
+// The backend records activity at most once a minute per session, so anything this recent counts as "now"
+const ACTIVE_NOW_MINUTES = 2;
+
+const formatLastActive = (session: SessionNode, intl: ReturnType<typeof useIntl>) => {
+  const diffMinutes = Math.floor((Date.now() - new Date(session.lastActivityAt).getTime()) / (1000 * 60));
+
+  // The current device is the one looking at this list, so it's always active now
+  if (session.isCurrent || diffMinutes < ACTIVE_NOW_MINUTES) {
+    return intl.formatMessage({ defaultMessage: 'Active now', id: 'Sessions / Active now' });
+  }
+  // Intl.RelativeTimeFormat handles each language's plural forms ("1 minutę temu", "4 minuty temu", "5 minut temu")
+  let time: string;
+  if (diffMinutes < 60) {
+    time = intl.formatRelativeTime(-diffMinutes, 'minute');
+  } else if (diffMinutes < 60 * 24) {
+    time = intl.formatRelativeTime(-Math.floor(diffMinutes / 60), 'hour');
+  } else {
+    time = intl.formatRelativeTime(-Math.floor(diffMinutes / (60 * 24)), 'day');
+  }
+  return intl.formatMessage({ defaultMessage: 'Last active {time}', id: 'Sessions / Last active relative' }, { time });
+};
+
+const SessionDetails = ({ session }: { session: SessionNode }) => {
+  const intl = useIntl();
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+      {session.ipAddress && (
+        <>
+          <span>{session.ipAddress}</span>
+          <span>•</span>
+        </>
+      )}
+      {session.location && (
+        <>
+          <span>{session.location}</span>
+          <span>•</span>
+        </>
+      )}
+      <span>
+        <FormattedMessage
+          defaultMessage="Signed in {date}"
+          id="Sessions / Signed in date"
+          values={{
+            date: intl.formatDate(session.createdAt, {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+          }}
+        />
+      </span>
+      <span>•</span>
+      <span>{formatLastActive(session, intl)}</span>
+    </div>
+  );
 };
 
 export const ActiveSessions = () => {
@@ -110,7 +155,7 @@ export const ActiveSessions = () => {
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
   // Fetch sessions from backend
-  const { data, loading, refetch } = useQuery(SESSIONS_QUERY, {
+  const { data, loading, refetch } = useQuery(activeSessionsQuery, {
     fetchPolicy: 'cache-and-network',
   });
 
@@ -198,25 +243,19 @@ export const ActiveSessions = () => {
     <div className="space-y-4">
       {/* Current Session */}
       {currentSession && (
-        <div className="flex items-center justify-between rounded-lg border bg-primary/5 p-4 border-primary/20">
+        <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-primary/10 p-2 text-primary">
               {getDeviceIcon(currentSession.deviceType)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium">
-                  {currentSession.deviceName || (
-                    <FormattedMessage defaultMessage="Current Session" id="Sessions / Current Session" />
-                  )}
-                </p>
+                <p className="text-sm font-medium">{formatDeviceName(currentSession, intl)}</p>
                 <Badge variant="default" className="text-xs">
                   <FormattedMessage defaultMessage="This device" id="Sessions / This Device Badge" />
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {formatLastActive(currentSession.lastActivityAt, intl)}
-              </p>
+              <SessionDetails session={currentSession} />
             </div>
           </div>
         </div>
@@ -227,24 +266,12 @@ export const ActiveSessions = () => {
         <>
           <div className="space-y-2">
             {otherSessions.map((session) => (
-              <div
-                key={session.id}
-                className="flex items-center justify-between rounded-lg border p-4"
-              >
+              <div key={session.id} className="flex items-center justify-between rounded-lg border p-4">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-muted p-2">
-                    {getDeviceIcon(session.deviceType)}
-                  </div>
+                  <div className="rounded-full bg-muted p-2">{getDeviceIcon(session.deviceType)}</div>
                   <div>
-                    <p className="text-sm font-medium">
-                      {session.deviceName || `${session.browser} on ${session.operatingSystem}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {session.ipAddress}
-                      {session.location && ` • ${session.location}`}
-                      {' • '}
-                      {formatLastActive(session.lastActivityAt, intl)}
-                    </p>
+                    <p className="text-sm font-medium">{formatDeviceName(session, intl)}</p>
+                    <SessionDetails session={session} />
                   </div>
                 </div>
                 <Button
@@ -277,17 +304,14 @@ export const ActiveSessions = () => {
           >
             {revokingAll && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <XCircle className="mr-2 h-4 w-4" />
-            <FormattedMessage
-              defaultMessage="Sign out all other sessions"
-              id="Sessions / Sign Out All Button"
-            />
+            <FormattedMessage defaultMessage="Sign out all other sessions" id="Sessions / Sign Out All Button" />
           </Button>
         </div>
       )}
 
       {/* No other sessions message */}
       {otherSessions.length === 0 && (
-        <p className="text-center text-sm text-muted-foreground py-2">
+        <p className="py-2 text-center text-sm text-muted-foreground">
           <FormattedMessage
             defaultMessage="No other active sessions. You're only signed in on this device."
             id="Sessions / No Other Sessions"
@@ -297,4 +321,3 @@ export const ActiveSessions = () => {
     </div>
   );
 };
-
