@@ -52,6 +52,19 @@ describe('OAuthCallback: Component', () => {
     expect(window.location.href).toBe('/en/profile');
   });
 
+  it('should ignore a cross-origin next and redirect to "/" instead (open-redirect guard)', async () => {
+    mockRefreshToken.mockResolvedValue({ access: 'access-token', refresh: 'refresh-token' });
+    mockUseSearchParams.mockReturnValue([new URLSearchParams('?next=https%3A%2F%2Fevil.example.com%2Fphish')]);
+
+    render(<OAuthCallback />, {
+      routerProps: createMockRouterProps(`auth/oauth/callback`, {}),
+    });
+
+    await screen.findByText(/completing sign in/i);
+
+    expect(window.location.href).toBe('/');
+  });
+
   it('should show error when the refresh response has no access token', async () => {
     mockRefreshToken.mockResolvedValue({});
 
