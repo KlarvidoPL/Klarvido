@@ -4190,6 +4190,9 @@
   "Tenant form / Address placeholder": {
     "defaultMessage": "सड़क, पिन कोड, शहर"
   },
+  "Tenant form / Address required": {
+    "defaultMessage": "पता आवश्यक है"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "रद्द करें"
   },
@@ -4201,6 +4204,9 @@
   },
   "Tenant form / Company name placeholder": {
     "defaultMessage": "पंजीकृत कंपनी का नाम"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "कंपनी का नाम आवश्यक है"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "संगठन सफलतापूर्वक हटा दिया गया!"
@@ -4216,6 +4222,9 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "VAT स्थिति"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "सहेजने के बाद NIP और REGON बदले नहीं जा सकते।"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "अमान्य NIP नंबर"
@@ -4246,6 +4255,9 @@
   },
   "Tenant form / REGON placeholder": {
     "defaultMessage": "9 या 14 अंक"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON आवश्यक है"
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "वित्त मंत्रालय के रजिस्टर में इस NIP के लिए कोई कंपनी नहीं मिली।"
@@ -4279,6 +4291,9 @@
   },
   "Tenant form / VAT status placeholder": {
     "defaultMessage": "VAT स्थिति चुनें"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "VAT स्थिति आवश्यक है"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "अपने संगठन में शामिल होने के लिए आमंत्रण भेजें"

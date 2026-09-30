@@ -20,6 +20,14 @@ from ..services.mf_whitelist import CompanyDetails
 pytestmark = pytest.mark.django_db
 
 VALID_NIP = "9721382373"
+# Complete company details - every one is required when creating an organization
+COMPANY_DETAILS = {
+    "nip": VALID_NIP,
+    "companyName": "ACME SP. Z O.O.",
+    "regon": "123456785",
+    "address": "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+    "vatStatus": VatStatus.ACTIVE,
+}
 
 
 class TestCompanyLookupByNipQuery:
@@ -109,7 +117,7 @@ class TestCreateTenantMutation:
 
     def test_create_new_tenant(self, graphene_client, user):
         graphene_client.force_authenticate(user)
-        executed = self.mutate(graphene_client, {"name": "Test", "billingEmail": "test@example.com", "nip": VALID_NIP})
+        executed = self.mutate(graphene_client, {"name": "Test", "billingEmail": "test@example.com", **COMPANY_DETAILS})
         response_data = executed["data"]["createTenant"]["tenant"]
         assert response_data["name"] == "Test"
         assert response_data["slug"] == "test"
@@ -139,25 +147,35 @@ class TestCreateTenantMutation:
         assert response_data["address"] == "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA"
         assert response_data["vatStatus"] == VatStatus.ACTIVE
 
-    def test_create_new_tenant_without_nip(self, graphene_client, user):
+    def test_create_new_tenant_without_company_details(self, graphene_client, user):
         graphene_client.force_authenticate(user)
         executed = self.mutate(graphene_client, {"name": "Test"})
-        assert executed["errors"][0]["extensions"]["nip"][0]["code"] == "required"
+        extensions = executed["errors"][0]["extensions"]
+        # Every missing field is reported at once, so the form can mark all of them
+        for field in ("nip", "company_name", "regon", "address", "vat_status"):
+            assert extensions[field][0]["code"] == "required", field
+
+    @pytest.mark.parametrize("field", ["companyName", "regon", "address", "vatStatus"])
+    def test_create_new_tenant_with_blank_company_field(self, graphene_client, user, field):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, field: ""})
+        assert "errors" in executed, executed
+        assert TenantMembership.objects.filter(user=user, tenant__name="Test").exists() is False
 
     def test_create_new_tenant_with_invalid_nip(self, graphene_client, user):
         graphene_client.force_authenticate(user)
-        executed = self.mutate(graphene_client, {"name": "Test", "nip": "1234567890"})
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, "nip": "1234567890"})
         assert executed["errors"][0]["extensions"]["nip"][0]["code"] == "invalid_nip"
 
     def test_create_new_tenant_with_invalid_regon(self, graphene_client, user):
         graphene_client.force_authenticate(user)
-        executed = self.mutate(graphene_client, {"name": "Test", "nip": VALID_NIP, "regon": "123456789"})
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, "regon": "123456789"})
         assert executed["errors"][0]["extensions"]["regon"][0]["code"] == "invalid_regon"
 
     def test_create_new_tenant_with_same_name(self, graphene_client, user, tenant_factory):
         tenant_factory(name="Test", slug="test")
         graphene_client.force_authenticate(user)
-        executed = self.mutate(graphene_client, {"name": "Test", "nip": VALID_NIP})
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS})
         response_data = executed["data"]["createTenant"]["tenant"]
         assert response_data["name"] == "Test"
         assert response_data["slug"] == "test-1"
@@ -165,7 +183,7 @@ class TestCreateTenantMutation:
         assert response_data["membership"]["role"] == TenantUserRole.OWNER
 
     def test_unauthenticated_user(self, graphene_client):
-        executed = self.mutate(graphene_client, {"name": "Test", "nip": VALID_NIP})
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS})
         assert executed["errors"][0]["message"] == "permission_denied"
 
     @classmethod
@@ -287,6 +305,57 @@ class TestUpdateTenantMutation:
             },
         )
         assert "errors" not in executed, executed.get("errors")
+
+    @pytest.fixture
+    def company_tenant(self, graphene_client, user, tenant_factory, tenant_membership_factory):
+        tenant = tenant_factory(
+            name="Tenant 1",
+            type=TenantType.ORGANIZATION,
+            nip=VALID_NIP,
+            company_name="ACME SP. Z O.O.",
+            regon="123456785",
+            address="UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
+            vat_status=VatStatus.ACTIVE,
+        )
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        return tenant
+
+    @classmethod
+    def update_input(cls, tenant, **fields):
+        return {
+            "id": to_global_id("TenantType", tenant.id),
+            "tenantId": to_global_id("TenantType", tenant.id),
+            "name": tenant.name,
+            **COMPANY_DETAILS,
+            **fields,
+        }
+
+    def test_update_keeps_locked_nip_and_regon(self, graphene_client, company_tenant):
+        """Re-sending the stored NIP/REGON (what the General tab does) is fine; other fields still update."""
+        executed = self.mutate(
+            graphene_client, self.update_input(company_tenant, address="UL. NOWA 5, 00-002 WARSZAWA")
+        )
+        assert "errors" not in executed, executed.get("errors")
+        company_tenant.refresh_from_db()
+        assert company_tenant.address == "UL. NOWA 5, 00-002 WARSZAWA"
+
+    @pytest.mark.parametrize("field, value", [("nip", "1234563218"), ("regon", "12345678512347")])
+    def test_update_cannot_change_locked_nip_or_regon(self, graphene_client, company_tenant, field, value):
+        executed = self.mutate(graphene_client, self.update_input(company_tenant, **{field: value}))
+        assert executed["errors"][0]["extensions"][field][0]["code"] == "immutable"
+        company_tenant.refresh_from_db()
+        assert company_tenant.nip == VALID_NIP
+        assert company_tenant.regon == "123456785"
+
+    @pytest.mark.parametrize(
+        "field, error_key",
+        [("companyName", "company_name"), ("regon", "regon"), ("address", "address"), ("vatStatus", "vat_status")],
+    )
+    def test_update_cannot_blank_company_field(self, graphene_client, company_tenant, field, error_key):
+        executed = self.mutate(graphene_client, self.update_input(company_tenant, **{field: ""}))
+        assert executed["errors"][0]["extensions"][error_key][0]["code"] == "required"
 
     def test_update_with_invalid_nip(self, graphene_client, user, tenant_factory, tenant_membership_factory):
         tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)

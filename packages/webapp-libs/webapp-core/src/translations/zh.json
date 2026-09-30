@@ -4190,6 +4190,9 @@
   "Tenant form / Address placeholder": {
     "defaultMessage": "街道、邮政编码、城市"
   },
+  "Tenant form / Address required": {
+    "defaultMessage": "地址为必填项"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "取消"
   },
@@ -4201,6 +4204,9 @@
   },
   "Tenant form / Company name placeholder": {
     "defaultMessage": "注册公司名称"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "公司名称为必填项"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "组织删除成功!"
@@ -4216,6 +4222,9 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "增值税状态"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "NIP 和 REGON 保存后无法更改。"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "NIP 号码无效"
@@ -4246,6 +4255,9 @@
   },
   "Tenant form / REGON placeholder": {
     "defaultMessage": "9 位或 14 位数字"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON 为必填项"
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "在财政部登记册中未找到此 NIP 对应的公司。"
@@ -4279,6 +4291,9 @@
   },
   "Tenant form / VAT status placeholder": {
     "defaultMessage": "选择增值税状态"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "增值税状态为必填项"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "发送邀请以加入您的组织"

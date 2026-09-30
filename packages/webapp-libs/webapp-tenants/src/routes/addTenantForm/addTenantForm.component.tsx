@@ -11,11 +11,11 @@ import { cn } from '@sb/webapp-core/lib/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
 
-import { CompanyDetailsFields, NipField } from '../../components/companyDetailsFields';
+import { COMPANY_DETAILS_FIELDS, CompanyDetailsFields, NipField } from '../../components/companyDetailsFields';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import { useGenerateTenantPath } from '../../hooks';
 import {
@@ -53,6 +53,7 @@ export const AddTenantForm = () => {
 
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
     useApiForm<TenantFormFields>({
+      mode: 'onChange',
       defaultValues: { name: '', nip: '', companyName: '', regon: '', address: '', vatStatus: '' },
     });
   const {
@@ -61,7 +62,20 @@ export const AddTenantForm = () => {
     trigger,
     getValues,
     setValue,
+    watch,
   } = form;
+
+  // Every company field is required: as soon as step 2 opens, flag the ones the register didn't fill (red error on
+  // each), and keep "Create organization" disabled until all of them are filled in and valid
+  useEffect(() => {
+    if (step === Step.COMPANY_DETAILS) {
+      trigger([...COMPANY_DETAILS_FIELDS]);
+    }
+  }, [step, trigger]);
+  const companyValues = watch([...COMPANY_DETAILS_FIELDS]);
+  const companyDetailsIncomplete = COMPANY_DETAILS_FIELDS.some(
+    (field, index) => !companyValues[index] || !!errors[field]
+  );
 
   const successMessage = intl.formatMessage({
     id: 'Tenant form / AddTenant / Success message',
@@ -223,7 +237,12 @@ export const AddTenantForm = () => {
                     >
                       <FormattedMessage defaultMessage="Back" id="Tenant form / AddTenant / Back button" />
                     </Button>
-                    <Button key="create" type="submit" disabled={loadingMutation} className="w-full sm:w-fit">
+                    <Button
+                      key="create"
+                      type="submit"
+                      disabled={loadingMutation || companyDetailsIncomplete}
+                      className="w-full sm:w-fit"
+                    >
                       <FormattedMessage
                         defaultMessage="Create organization"
                         id="Tenant form / AddTenant / Submit button"

@@ -92,6 +92,27 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/address/i)).toHaveValue('');
   });
 
+  it('should require every company field before creating the organization', async () => {
+    render(<Component />, { apolloMocks: [lookupMock(null)] });
+
+    await fillStepOne();
+
+    // Nothing was found, so every field is empty: each one is flagged and creating is blocked
+    expect(await screen.findByText('Company name is required')).toBeInTheDocument();
+    expect(screen.getByText('REGON is required')).toBeInTheDocument();
+    expect(screen.getByText('Address is required')).toBeInTheDocument();
+    expect(screen.getByText('VAT status is required')).toBeInTheDocument();
+    const createButton = screen.getByRole('button', { name: /create organization/i });
+    expect(createButton).toBeDisabled();
+
+    await userEvent.type(screen.getByLabelText(/company name/i), 'JAN KOWALSKI');
+    await userEvent.type(screen.getByLabelText(/regon/i), '123456785');
+    await userEvent.type(screen.getByLabelText(/address/i), 'UL. DŁUGA 1, 00-001 WARSZAWA');
+    expect(screen.queryByText('Company name is required')).not.toBeInTheDocument();
+    // VAT status still missing
+    expect(createButton).toBeDisabled();
+  });
+
   it('should go back to step one and stay there, keeping its values', async () => {
     render(<Component />, { apolloMocks: [lookupMock(null)] });
 

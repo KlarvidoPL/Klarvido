@@ -4190,6 +4190,9 @@
   "Tenant form / Address placeholder": {
     "defaultMessage": "Street, postal code, city"
   },
+  "Tenant form / Address required": {
+    "defaultMessage": "Address is required"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Cancel"
   },
@@ -4201,6 +4204,9 @@
   },
   "Tenant form / Company name placeholder": {
     "defaultMessage": "Registered company name"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "Company name is required"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organization deleted successfully!"
@@ -4216,6 +4222,9 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "VAT status"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "NIP and REGON can't be changed once saved."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Invalid NIP number"
@@ -4246,6 +4255,9 @@
   },
   "Tenant form / REGON placeholder": {
     "defaultMessage": "9 or 14 digits"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON is required"
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "No company found for this NIP in the Ministry of Finance register."
@@ -4279,6 +4291,9 @@
   },
   "Tenant form / VAT status placeholder": {
     "defaultMessage": "Select VAT status"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "VAT status is required"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Send an invitation to join your organization"

@@ -91,8 +91,9 @@ export const TenantGeneralSettings = () => {
         </CardHeader>
         <CardContent>
           <TenantForm
-            // Remount when the tenant (or its data) loads/changes, so the form's default values follow it
-            key={currentTenant?.id}
+            // Remount when the tenant loads/changes - or a NIP/REGON gets saved for the first time, so the form's
+            // defaults (and which of those two are locked) follow it
+            key={`${currentTenant?.id}-${currentTenant?.nip}-${currentTenant?.regon}`}
             loading={loading}
             error={error}
             onSubmit={onFormSubmit}

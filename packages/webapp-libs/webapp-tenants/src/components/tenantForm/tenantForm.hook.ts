@@ -8,6 +8,8 @@ type UseTenantFormProps = Pick<TenantFormProps, 'error' | 'onSubmit' | 'initialD
 
 export const useTenantForm = ({ error, onSubmit, initialData }: UseTenantFormProps) => {
   const form = useApiForm<TenantFormFields>({
+    // Company fields are required: flag a field as soon as it's left empty, not only on submit
+    mode: 'onTouched',
     defaultValues: {
       name: initialData?.name ?? '',
       nip: initialData?.nip ?? '',

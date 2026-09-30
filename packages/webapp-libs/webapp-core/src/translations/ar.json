@@ -4190,6 +4190,9 @@
   "Tenant form / Address placeholder": {
     "defaultMessage": "الشارع، الرمز البريدي، المدينة"
   },
+  "Tenant form / Address required": {
+    "defaultMessage": "العنوان مطلوب"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "إلغاء"
   },
@@ -4201,6 +4204,9 @@
   },
   "Tenant form / Company name placeholder": {
     "defaultMessage": "الاسم المسجل للشركة"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "اسم الشركة مطلوب"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "تم حذف المؤسسة بنجاح!"
@@ -4216,6 +4222,9 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "حالة ضريبة القيمة المضافة"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "لا يمكن تغيير رقمي NIP وREGON بعد حفظهما."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "رقم NIP غير صالح"
@@ -4246,6 +4255,9 @@
   },
   "Tenant form / REGON placeholder": {
     "defaultMessage": "9 أو 14 رقمًا"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "رقم REGON مطلوب"
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "لم يتم العثور على شركة بهذا الرقم NIP في سجل وزارة المالية."
@@ -4279,6 +4291,9 @@
   },
   "Tenant form / VAT status placeholder": {
     "defaultMessage": "اختر حالة ضريبة القيمة المضافة"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "حالة ضريبة القيمة المضافة مطلوبة"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "إرسال دعوة للانضمام إلى مؤسستك"

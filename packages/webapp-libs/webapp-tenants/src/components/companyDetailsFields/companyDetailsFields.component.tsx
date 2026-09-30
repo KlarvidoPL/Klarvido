@@ -1,10 +1,12 @@
-import { FormControl, FormField, FormItem, FormLabel, Input } from '@sb/webapp-core/components/forms';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from '@sb/webapp-core/components/forms';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sb/webapp-core/components/ui/select';
+import { cn } from '@sb/webapp-core/lib/utils';
+import { Lock } from 'lucide-react';
 import { ReactNode } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { isValidNip, isValidRegon, normalizeDigits } from '../../utils/nip';
+import { isValidNip, isValidRegon } from '../../utils/nip';
 
 export enum VatStatus {
   ACTIVE = 'ACTIVE',
@@ -20,17 +22,26 @@ export type CompanyDetailsFormFields = {
   vatStatus: string;
 };
 
+/** Company fields other than NIP - rendered by `CompanyDetailsFields`, all required. */
+export const COMPANY_DETAILS_FIELDS = ['companyName', 'regon', 'address', 'vatStatus'] as const;
+
 const MAX_COMPANY_NAME_LENGTH = 255;
 const MAX_ADDRESS_LENGTH = 500;
 
+// NIP/REGON never change for a company, so once saved they're read-only (the backend rejects a change too).
+// readOnly rather than disabled: the value must still be submitted with the rest of the form.
+const LOCKED_INPUT_CLASS = '[&_input]:cursor-not-allowed [&_input]:bg-muted [&_input]:text-muted-foreground';
+
 export type NipFieldProps = {
   disabled?: boolean;
+  /** Read-only: the organization's NIP is already saved */
+  locked?: boolean;
   /** Rendered next to the input, e.g. a "Refresh from MF" button */
   action?: ReactNode;
 };
 
 /** NIP input with checksum validation. Must be rendered inside a `<Form>` whose fields include `nip`. */
-export const NipField = ({ disabled, action }: NipFieldProps) => {
+export const NipField = ({ disabled, locked, action }: NipFieldProps) => {
   const intl = useIntl();
   const {
     register,
@@ -38,44 +49,59 @@ export const NipField = ({ disabled, action }: NipFieldProps) => {
   } = useFormContext<CompanyDetailsFormFields>();
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-      <Input
-        {...register('nip', {
-          required: {
-            value: true,
-            message: intl.formatMessage({
-              defaultMessage: 'NIP is required',
-              id: 'Tenant form / NIP required',
-            }),
-          },
-          validate: (value) =>
-            isValidNip(value) ||
-            intl.formatMessage({
-              defaultMessage: 'Invalid NIP number',
-              id: 'Tenant form / NIP invalid',
-            }),
-        })}
-        label={intl.formatMessage({ defaultMessage: 'NIP:', id: 'Tenant form / NIP label' })}
-        placeholder={intl.formatMessage({ defaultMessage: '10-digit tax ID', id: 'Tenant form / NIP placeholder' })}
-        inputMode="numeric"
-        autoComplete="off"
-        error={errors.nip?.message}
-        disabled={disabled}
-      />
-      {action && <div className="shrink-0 sm:mt-6">{action}</div>}
+    <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <Input
+          {...register('nip', {
+            required: {
+              value: true,
+              message: intl.formatMessage({
+                defaultMessage: 'NIP is required',
+                id: 'Tenant form / NIP required',
+              }),
+            },
+            validate: (value) =>
+              isValidNip(value) ||
+              intl.formatMessage({
+                defaultMessage: 'Invalid NIP number',
+                id: 'Tenant form / NIP invalid',
+              }),
+          })}
+          label={intl.formatMessage({ defaultMessage: 'NIP:', id: 'Tenant form / NIP label' })}
+          placeholder={intl.formatMessage({ defaultMessage: '10-digit tax ID', id: 'Tenant form / NIP placeholder' })}
+          inputMode="numeric"
+          autoComplete="off"
+          error={errors.nip?.message}
+          disabled={disabled}
+          readOnly={locked}
+          className={cn(locked && LOCKED_INPUT_CLASS)}
+        />
+        {action && <div className="shrink-0 sm:mt-6">{action}</div>}
+      </div>
+      {locked && (
+        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Lock className="h-3.5 w-3.5 shrink-0" />
+          <FormattedMessage
+            defaultMessage="NIP and REGON can't be changed once saved."
+            id="Tenant form / NIP and REGON locked hint"
+          />
+        </p>
+      )}
     </div>
   );
 };
 
 export type CompanyDetailsFieldsProps = {
   disabled?: boolean;
+  /** Read-only REGON: the organization's REGON is already saved */
+  regonLocked?: boolean;
 };
 
 /**
- * Company name, REGON, address and VAT status inputs, shared by the Add Organization wizard and the General
- * settings form. Must be rendered inside a `<Form>` whose fields include `CompanyDetailsFormFields`.
+ * Company name, REGON, address and VAT status inputs (all required), shared by the Add Organization wizard and the
+ * General settings form. Must be rendered inside a `<Form>` whose fields include `CompanyDetailsFormFields`.
  */
-export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) => {
+export const CompanyDetailsFields = ({ disabled, regonLocked }: CompanyDetailsFieldsProps) => {
   const intl = useIntl();
   const {
     register,
@@ -102,6 +128,13 @@ export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) =>
     <div className="flex flex-col gap-4">
       <Input
         {...register('companyName', {
+          required: {
+            value: true,
+            message: intl.formatMessage({
+              defaultMessage: 'Company name is required',
+              id: 'Tenant form / Company name required',
+            }),
+          },
           maxLength: {
             value: MAX_COMPANY_NAME_LENGTH,
             message: intl.formatMessage({
@@ -121,8 +154,14 @@ export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) =>
 
       <Input
         {...register('regon', {
+          required: {
+            value: true,
+            message: intl.formatMessage({
+              defaultMessage: 'REGON is required',
+              id: 'Tenant form / REGON required',
+            }),
+          },
           validate: (value) =>
-            !normalizeDigits(value) ||
             isValidRegon(value) ||
             intl.formatMessage({ defaultMessage: 'Invalid REGON number', id: 'Tenant form / REGON invalid' }),
         })}
@@ -132,10 +171,19 @@ export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) =>
         autoComplete="off"
         error={errors.regon?.message}
         disabled={disabled}
+        readOnly={regonLocked}
+        className={cn(regonLocked && LOCKED_INPUT_CLASS)}
       />
 
       <Input
         {...register('address', {
+          required: {
+            value: true,
+            message: intl.formatMessage({
+              defaultMessage: 'Address is required',
+              id: 'Tenant form / Address required',
+            }),
+          },
           maxLength: {
             value: MAX_ADDRESS_LENGTH,
             message: intl.formatMessage({
@@ -156,6 +204,15 @@ export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) =>
       <FormField
         control={control}
         name="vatStatus"
+        rules={{
+          required: {
+            value: true,
+            message: intl.formatMessage({
+              defaultMessage: 'VAT status is required',
+              id: 'Tenant form / VAT status required',
+            }),
+          },
+        }}
         render={({ field }) => (
           <FormItem>
             <FormLabel>
@@ -163,7 +220,7 @@ export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) =>
             </FormLabel>
             <Select onValueChange={field.onChange} value={field.value || undefined} disabled={disabled}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger onBlur={field.onBlur}>
                   <SelectValue
                     placeholder={intl.formatMessage({
                       defaultMessage: 'Select VAT status',
@@ -180,6 +237,7 @@ export const CompanyDetailsFields = ({ disabled }: CompanyDetailsFieldsProps) =>
                 ))}
               </SelectContent>
             </Select>
+            <FormMessage className="font-normal leading-tight" />
           </FormItem>
         )}
       />

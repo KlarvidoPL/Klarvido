@@ -4190,6 +4190,9 @@
   "Tenant form / Address placeholder": {
     "defaultMessage": "Calle, código postal, ciudad"
   },
+  "Tenant form / Address required": {
+    "defaultMessage": "La dirección es obligatoria"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Cancelar"
   },
@@ -4201,6 +4204,9 @@
   },
   "Tenant form / Company name placeholder": {
     "defaultMessage": "Nombre registrado de la empresa"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "El nombre de la empresa es obligatorio"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "¡Organización eliminada correctamente!"
@@ -4216,6 +4222,9 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "el estado del IVA"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "El NIP y el REGON no se pueden cambiar una vez guardados."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Número NIP no válido"
@@ -4246,6 +4255,9 @@
   },
   "Tenant form / REGON placeholder": {
     "defaultMessage": "9 o 14 dígitos"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "El REGON es obligatorio"
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "No se ha encontrado ninguna empresa con este NIP en el registro del Ministerio de Finanzas."
@@ -4279,6 +4291,9 @@
   },
   "Tenant form / VAT status placeholder": {
     "defaultMessage": "Selecciona el estado del IVA"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "El estado del IVA es obligatorio"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Envía una invitación para unirse a tu organización"

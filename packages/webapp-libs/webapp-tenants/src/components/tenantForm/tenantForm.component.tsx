@@ -69,6 +69,11 @@ export const TenantForm = ({
 
   const defaultCancelUrl = generateLocalePath(RoutesConfig.home);
 
+  // NIP/REGON never change for a company: read-only once the organization has them saved. Still empty (organizations
+  // created before these fields existed) they can be filled in once.
+  const nipLocked = !!initialData?.nip;
+  const regonLocked = !!initialData?.regon;
+
   const handleRefreshFromMF = async () => {
     if (!(await trigger('nip')) || !isValidNip(getValues('nip'))) return;
 
@@ -84,10 +89,12 @@ export const TenantForm = ({
       return;
     }
 
-    // Only overwrite what the register actually returned - an empty value (e.g. no REGON) keeps what's there
-    const missingFields = getMissingCompanyFields(company);
+    // Only overwrite what the register actually returned - an empty value (e.g. no REGON) keeps what's there - and
+    // never a locked REGON (nor report it as missing: the organization already has one)
+    const lockedFields: Array<keyof typeof company> = regonLocked ? ['regon'] : [];
+    const missingFields = getMissingCompanyFields(company).filter((field) => !lockedFields.includes(field));
     (Object.keys(company) as Array<keyof typeof company>)
-      .filter((field) => !missingFields.includes(field))
+      .filter((field) => !missingFields.includes(field) && !lockedFields.includes(field))
       .forEach((field) => setValue(field, company[field], { shouldDirty: true, shouldValidate: true }));
 
     if (missingFields.length > 0) {
@@ -160,6 +167,7 @@ export const TenantForm = ({
           <>
             <NipField
               disabled={disabled}
+              locked={nipLocked}
               action={
                 !disabled && (
                   <Button
@@ -177,7 +185,7 @@ export const TenantForm = ({
                 )
               }
             />
-            <CompanyDetailsFields disabled={disabled} />
+            <CompanyDetailsFields disabled={disabled} regonLocked={regonLocked} />
           </>
         )}
 

@@ -134,8 +134,8 @@ describe('TenantGeneralSettings: Component', () => {
           found: true,
           nip: COMPANY_DETAILS.nip,
           companyName: 'ACME NEW NAME SP. Z O.O.',
-          regon: null,
-          address: 'UL. NOWA 5, 00-002 WARSZAWA',
+          regon: COMPANY_DETAILS.regon,
+          address: null,
           vatStatus: 'ACTIVE',
         },
       },
@@ -148,8 +148,33 @@ describe('TenantGeneralSettings: Component', () => {
     await userEvent.click(refreshButton);
 
     expect(await screen.findByDisplayValue('ACME NEW NAME SP. Z O.O.')).toBeInTheDocument();
-    // REGON wasn't returned, so the saved one stays
-    expect(screen.getByDisplayValue(COMPANY_DETAILS.regon)).toBeInTheDocument();
-    expect(await screen.findByTestId('toast-1')).toHaveTextContent('the register has no REGON');
+    // The address wasn't returned, so the saved one stays
+    expect(screen.getByDisplayValue(COMPANY_DETAILS.address)).toBeInTheDocument();
+    expect(await screen.findByTestId('toast-1')).toHaveTextContent('the register has no address');
+  });
+
+  it('should make a saved NIP and REGON read-only', async () => {
+    renderWithTenant();
+
+    expect(await screen.findByDisplayValue(COMPANY_DETAILS.nip)).toHaveAttribute('readonly');
+    expect(screen.getByDisplayValue(COMPANY_DETAILS.regon)).toHaveAttribute('readonly');
+    expect(screen.getByDisplayValue(COMPANY_DETAILS.address)).not.toHaveAttribute('readonly');
+    expect(screen.getByText("NIP and REGON can't be changed once saved.")).toBeInTheDocument();
+  });
+
+  it('should let an organization without a NIP yet fill it in', async () => {
+    const user = currentUserFactory({
+      tenants: [tenantFactory({ name: 'name', id: MOCKED_TENANT_ID, nip: '', regon: '' })],
+    });
+    const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.general, { tenantId: MOCKED_TENANT_ID });
+    render(<TenantGeneralSettings />, {
+      apolloMocks: [fillCommonQueryWithUser(user), createPermissionsMock(['org.settings.edit'])],
+      routerProps,
+    });
+
+    const nipInput = await screen.findByLabelText(/nip/i);
+    expect(nipInput).not.toHaveAttribute('readonly');
+    expect(screen.getByLabelText(/regon/i)).not.toHaveAttribute('readonly');
+    expect(screen.queryByText("NIP and REGON can't be changed once saved.")).not.toBeInTheDocument();
   });
 });

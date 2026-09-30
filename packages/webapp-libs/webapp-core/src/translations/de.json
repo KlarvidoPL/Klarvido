@@ -4190,6 +4190,9 @@
   "Tenant form / Address placeholder": {
     "defaultMessage": "Straße, Postleitzahl, Ort"
   },
+  "Tenant form / Address required": {
+    "defaultMessage": "Adresse ist erforderlich"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Abbrechen"
   },
@@ -4201,6 +4204,9 @@
   },
   "Tenant form / Company name placeholder": {
     "defaultMessage": "Eingetragener Firmenname"
+  },
+  "Tenant form / Company name required": {
+    "defaultMessage": "Firmenname ist erforderlich"
   },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organisation erfolgreich gelöscht!"
@@ -4216,6 +4222,9 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "Umsatzsteuerstatus"
+  },
+  "Tenant form / NIP and REGON locked hint": {
+    "defaultMessage": "NIP und REGON können nach dem Speichern nicht mehr geändert werden."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Ungültige NIP-Nummer"
@@ -4246,6 +4255,9 @@
   },
   "Tenant form / REGON placeholder": {
     "defaultMessage": "9 oder 14 Ziffern"
+  },
+  "Tenant form / REGON required": {
+    "defaultMessage": "REGON ist erforderlich"
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "Für diese NIP wurde im Register des Finanzministeriums kein Unternehmen gefunden."
@@ -4279,6 +4291,9 @@
   },
   "Tenant form / VAT status placeholder": {
     "defaultMessage": "Umsatzsteuerstatus auswählen"
+  },
+  "Tenant form / VAT status required": {
+    "defaultMessage": "Umsatzsteuerstatus ist erforderlich"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Senden Sie eine Einladung zum Beitritt zu Ihrer Organisation"
