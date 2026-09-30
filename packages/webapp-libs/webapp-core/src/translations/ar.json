@@ -4148,11 +4148,29 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "موفرو الهوية المدعومون"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "رجوع"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "أدخل تفاصيل مؤسستك الجديدة"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "إضافة مؤسسة"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "وجدنا شركتك في سجل وزارة المالية وملأنا التفاصيل أدناه. يرجى مراجعتها قبل المتابعة."
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "لم نتمكن من العثور على رقم NIP هذا في سجل وزارة المالية. يرجى إدخال تفاصيل الشركة بنفسك."
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "التالي"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "المؤسسة"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "تفاصيل الشركة"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "إنشاء مؤسسة"
@@ -4160,11 +4178,41 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "تمت إضافة المؤسسة بنجاح!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "العنوان:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "العنوان طويل جدًا"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "الشارع، الرمز البريدي، المدينة"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "إلغاء"
   },
+  "Tenant form / Company name label": {
+    "defaultMessage": "اسم الشركة:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "اسم الشركة طويل جدًا"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "الاسم المسجل للشركة"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "تم حذف المؤسسة بنجاح!"
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "رقم NIP غير صالح"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "الرقم الضريبي المكون من 10 أرقام"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "رقم NIP مطلوب"
   },
   "Tenant form / Name max length error": {
     "defaultMessage": "الاسم طويل جدًا"
@@ -4175,11 +4223,44 @@
   "Tenant form / Name required": {
     "defaultMessage": "الاسم مطلوب"
   },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "رقم REGON غير صالح"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 أو 14 رقمًا"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "لم يتم العثور على شركة بهذا الرقم NIP في سجل وزارة المالية."
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "تم تحديث تفاصيل الشركة. احفظ التغييرات للاحتفاظ بها."
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "تحديث من سجل وزارة المالية"
+  },
   "Tenant form / Submit button": {
     "defaultMessage": "حفظ التغييرات"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "تم تحديث المؤسسة بنجاح!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "مكلف نشط بضريبة القيمة المضافة"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "معفى من ضريبة القيمة المضافة"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "حالة ضريبة القيمة المضافة:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "غير مسجل في ضريبة القيمة المضافة"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "اختر حالة ضريبة القيمة المضافة"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "إرسال دعوة للانضمام إلى مؤسستك"

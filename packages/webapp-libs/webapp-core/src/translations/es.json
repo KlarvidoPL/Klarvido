@@ -4148,11 +4148,29 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "Proveedores de identidad compatibles"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "Atrás"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "Introduce los datos de tu nueva organización"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "Agregar organización"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "Hemos encontrado tu empresa en el registro del Ministerio de Finanzas y hemos rellenado los datos a continuación. Revísalos antes de continuar."
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "No hemos encontrado este NIP en el registro del Ministerio de Finanzas. Rellena tú mismo los datos de la empresa."
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "Siguiente"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "Organización"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "Datos de la empresa"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "Crear organización"
@@ -4160,11 +4178,41 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "¡Organización agregada correctamente!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "Dirección:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "La dirección es demasiado larga"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "Calle, código postal, ciudad"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Cancelar"
   },
+  "Tenant form / Company name label": {
+    "defaultMessage": "Nombre de la empresa:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "El nombre de la empresa es demasiado largo"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "Nombre registrado de la empresa"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "¡Organización eliminada correctamente!"
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "Número NIP no válido"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "Identificación fiscal de 10 dígitos"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "El NIP es obligatorio"
   },
   "Tenant form / Name max length error": {
     "defaultMessage": "El nombre es demasiado largo"
@@ -4175,11 +4223,44 @@
   "Tenant form / Name required": {
     "defaultMessage": "El nombre es obligatorio"
   },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "Número REGON no válido"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 o 14 dígitos"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "No se ha encontrado ninguna empresa con este NIP en el registro del Ministerio de Finanzas."
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "Datos de la empresa actualizados. Guarda los cambios para conservarlos."
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "Actualizar desde MF"
+  },
   "Tenant form / Submit button": {
     "defaultMessage": "Guardar cambios"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "¡Organización actualizada correctamente!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "Contribuyente de IVA activo"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "Exento de IVA"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "Estado del IVA:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "No registrado a efectos del IVA"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "Selecciona el estado del IVA"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Envía una invitación para unirse a tu organización"

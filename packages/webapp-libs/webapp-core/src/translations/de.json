@@ -4148,11 +4148,29 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "Unterstützte Identity Provider"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "Zurück"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "Geben Sie die Details für Ihre neue Organisation ein"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "Organisation hinzufügen"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "Wir haben Ihr Unternehmen im Register des polnischen Finanzministeriums gefunden und die folgenden Angaben ausgefüllt. Bitte prüfen Sie sie, bevor Sie fortfahren."
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "Wir konnten diese NIP im Register des polnischen Finanzministeriums nicht finden. Bitte geben Sie die Unternehmensdaten selbst ein."
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "Weiter"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "Organisation"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "Unternehmensdaten"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "Organisation erstellen"
@@ -4160,11 +4178,41 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "Organisation erfolgreich hinzugefügt!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "Adresse:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "Die Adresse ist zu lang"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "Straße, Postleitzahl, Ort"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Abbrechen"
   },
+  "Tenant form / Company name label": {
+    "defaultMessage": "Firmenname:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "Der Firmenname ist zu lang"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "Eingetragener Firmenname"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organisation erfolgreich gelöscht!"
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "Ungültige NIP-Nummer"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "10-stellige Steuernummer"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "NIP ist erforderlich"
   },
   "Tenant form / Name max length error": {
     "defaultMessage": "Name ist zu lang"
@@ -4175,11 +4223,44 @@
   "Tenant form / Name required": {
     "defaultMessage": "Name ist erforderlich"
   },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "Ungültige REGON-Nummer"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 oder 14 Ziffern"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "Für diese NIP wurde im Register des Finanzministeriums kein Unternehmen gefunden."
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "Unternehmensdaten aktualisiert. Speichern Sie die Änderungen, um sie zu übernehmen."
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "Aus MF-Register aktualisieren"
+  },
   "Tenant form / Submit button": {
     "defaultMessage": "Änderungen speichern"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "Organisation erfolgreich aktualisiert!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "Aktiver Umsatzsteuerpflichtiger"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "Von der Umsatzsteuer befreit"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "Umsatzsteuerstatus:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "Nicht für die Umsatzsteuer registriert"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "Umsatzsteuerstatus auswählen"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Senden Sie eine Einladung zum Beitritt zu Ihrer Organisation"

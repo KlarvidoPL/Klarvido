@@ -4148,11 +4148,29 @@
   "Tenant Security Settings / Supported IdPs": {
     "defaultMessage": "Supported Identity Providers"
   },
+  "Tenant form / AddTenant / Back button": {
+    "defaultMessage": "Back"
+  },
   "Tenant form / AddTenant / Card description": {
     "defaultMessage": "Enter the details for your new organization"
   },
   "Tenant form / AddTenant / Card title": {
     "defaultMessage": "Add Organization"
+  },
+  "Tenant form / AddTenant / Lookup found": {
+    "defaultMessage": "We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
+  },
+  "Tenant form / AddTenant / Lookup not found": {
+    "defaultMessage": "We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
+  },
+  "Tenant form / AddTenant / Next button": {
+    "defaultMessage": "Next"
+  },
+  "Tenant form / AddTenant / Step basics": {
+    "defaultMessage": "Organization"
+  },
+  "Tenant form / AddTenant / Step company details": {
+    "defaultMessage": "Company details"
   },
   "Tenant form / AddTenant / Submit button": {
     "defaultMessage": "Create organization"
@@ -4160,11 +4178,41 @@
   "Tenant form / AddTenant / Success message": {
     "defaultMessage": "Organization added successfully!"
   },
+  "Tenant form / Address label": {
+    "defaultMessage": "Address:"
+  },
+  "Tenant form / Address max length error": {
+    "defaultMessage": "Address is too long"
+  },
+  "Tenant form / Address placeholder": {
+    "defaultMessage": "Street, postal code, city"
+  },
   "Tenant form / Cancel button": {
     "defaultMessage": "Cancel"
   },
+  "Tenant form / Company name label": {
+    "defaultMessage": "Company name:"
+  },
+  "Tenant form / Company name max length error": {
+    "defaultMessage": "Company name is too long"
+  },
+  "Tenant form / Company name placeholder": {
+    "defaultMessage": "Registered company name"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organization deleted successfully!"
+  },
+  "Tenant form / NIP invalid": {
+    "defaultMessage": "Invalid NIP number"
+  },
+  "Tenant form / NIP label": {
+    "defaultMessage": "NIP:"
+  },
+  "Tenant form / NIP placeholder": {
+    "defaultMessage": "10-digit tax ID"
+  },
+  "Tenant form / NIP required": {
+    "defaultMessage": "NIP is required"
   },
   "Tenant form / Name max length error": {
     "defaultMessage": "Name is too long"
@@ -4175,11 +4223,44 @@
   "Tenant form / Name required": {
     "defaultMessage": "Name is required"
   },
+  "Tenant form / REGON invalid": {
+    "defaultMessage": "Invalid REGON number"
+  },
+  "Tenant form / REGON label": {
+    "defaultMessage": "REGON:"
+  },
+  "Tenant form / REGON placeholder": {
+    "defaultMessage": "9 or 14 digits"
+  },
+  "Tenant form / Refresh from MF / Not found": {
+    "defaultMessage": "No company found for this NIP in the Ministry of Finance register."
+  },
+  "Tenant form / Refresh from MF / Success": {
+    "defaultMessage": "Company details refreshed. Save changes to keep them."
+  },
+  "Tenant form / Refresh from MF button": {
+    "defaultMessage": "Refresh from MF"
+  },
   "Tenant form / Submit button": {
     "defaultMessage": "Save changes"
   },
   "Tenant form / UpdateTenant / Success message": {
     "defaultMessage": "Organization updated successfully!"
+  },
+  "Tenant form / VAT status active": {
+    "defaultMessage": "Active VAT payer"
+  },
+  "Tenant form / VAT status exempt": {
+    "defaultMessage": "Exempt from VAT"
+  },
+  "Tenant form / VAT status label": {
+    "defaultMessage": "VAT status:"
+  },
+  "Tenant form / VAT status not registered": {
+    "defaultMessage": "Not registered for VAT"
+  },
+  "Tenant form / VAT status placeholder": {
+    "defaultMessage": "Select VAT status"
   },
   "Tenant invitation form / Description": {
     "defaultMessage": "Send an invitation to join your organization"

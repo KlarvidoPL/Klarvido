@@ -1,22 +1,29 @@
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useEffect } from 'react';
 
 import { TenantFormFields, TenantFormProps } from './tenantForm.component';
 
-type UseTenantFormProps = Omit<TenantFormProps, 'loading'>;
+type UseTenantFormProps = Pick<TenantFormProps, 'error' | 'onSubmit' | 'initialData'>;
 
 export const useTenantForm = ({ error, onSubmit, initialData }: UseTenantFormProps) => {
   const form = useApiForm<TenantFormFields>({
     defaultValues: {
-      name: initialData?.name,
+      name: initialData?.name ?? '',
+      nip: initialData?.nip ?? '',
+      companyName: initialData?.companyName ?? '',
+      regon: initialData?.regon ?? '',
+      address: initialData?.address ?? '',
+      vatStatus: initialData?.vatStatus ?? '',
     },
   });
 
   const { handleSubmit, setApolloGraphQLResponseErrors } = form;
 
   useEffect(() => {
-    if (error && 'graphQLErrors' in error) {
-      setApolloGraphQLResponseErrors((error as any).graphQLErrors);
+    const graphQLErrors = extractGraphQLErrors(error);
+    if (graphQLErrors) {
+      setApolloGraphQLResponseErrors(graphQLErrors);
     }
   }, [error, setApolloGraphQLResponseErrors]);
 

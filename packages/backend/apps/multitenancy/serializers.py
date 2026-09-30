@@ -12,6 +12,7 @@ from . import models, notifications
 from .constants import TenantType, TenantUserRole, SystemRoleType
 from .services.membership import create_tenant_membership
 from .tokens import tenant_invitation_token
+from .validators import normalize_digits, validate_nip, validate_regon
 
 
 def decode_role_id(role_id: str) -> str:
@@ -32,6 +33,21 @@ def decode_role_id(role_id: str) -> str:
 
 class TenantSerializer(serializers.ModelSerializer):
     id = hidrest.HashidSerializerCharField(source_field="multitenancy.Tenant.id", read_only=True)
+    # Looser than the model's max_length: input may contain separators ("972-138-23-73") that validate_* strips
+    nip = serializers.CharField(required=False, allow_blank=True, max_length=20)
+    regon = serializers.CharField(required=False, allow_blank=True, max_length=20)
+
+    def validate_nip(self, value):
+        # Empty is allowed on update (organizations created before NIP existed); validate() requires it on create.
+        return validate_nip(value) if normalize_digits(value) else ""
+
+    def validate_regon(self, value):
+        return validate_regon(value)
+
+    def validate(self, attrs):
+        if self.instance is None and not attrs.get("nip"):
+            raise serializers.ValidationError({"nip": _("NIP is required")}, code="required")
+        return attrs
 
     def create(self, validated_data):
         from .permissions import create_system_roles_for_tenant
@@ -61,7 +77,7 @@ class TenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tenant
-        fields = ("id", "name", "billing_email")
+        fields = ("id", "name", "billing_email", "nip", "company_name", "regon", "address", "vat_status")
 
 
 class TenantInvitationActionSerializer(serializers.Serializer):

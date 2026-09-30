@@ -2,19 +2,24 @@ import { Button, ButtonVariant, Link } from '@sb/webapp-core/components/buttons'
 import { Form, FormControl, FormField, FormItem, Input } from '@sb/webapp-core/components/forms';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
+import { useToast } from '@sb/webapp-core/toast';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { useCompanyLookup } from '../../hooks/useCompanyLookup';
+import { isValidNip } from '../../utils/nip';
+import { CompanyDetailsFields, CompanyDetailsFormFields, NipField } from '../companyDetailsFields';
 import { useTenantForm } from './tenantForm.hook';
 
 const MAX_NAME_LENGTH = 255;
 
-export type TenantFormFields = {
+export type TenantFormFields = CompanyDetailsFormFields & {
   name: string;
 };
 
 export type TenantFormProps = {
-  initialData?: TenantFormFields | null;
+  initialData?: Partial<TenantFormFields> | null;
   onSubmit: (formData: TenantFormFields) => void;
   loading: boolean;
   error?: Error;
@@ -26,6 +31,8 @@ export type TenantFormProps = {
   hideCancel?: boolean;
   /** Disable the form (read-only mode) */
   disabled?: boolean;
+  /** Show NIP + company details (organizations only; the personal default tenant has none) */
+  showCompanyDetails?: boolean;
 };
 
 export const TenantForm = ({
@@ -37,15 +44,21 @@ export const TenantForm = ({
   cancelUrl,
   hideCancel,
   disabled,
+  showCompanyDetails,
 }: TenantFormProps) => {
   const intl = useIntl();
+  const { toast } = useToast();
   const generateLocalePath = useGenerateLocalePath();
+  const { lookup, loading: lookupLoading } = useCompanyLookup();
 
   const {
     form: {
       register,
       formState: { errors },
       control,
+      getValues,
+      setValue,
+      trigger,
     },
     form,
     genericError,
@@ -55,9 +68,36 @@ export const TenantForm = ({
 
   const defaultCancelUrl = generateLocalePath(RoutesConfig.home);
 
+  const handleRefreshFromMF = async () => {
+    if (!(await trigger('nip')) || !isValidNip(getValues('nip'))) return;
+
+    const company = await lookup(getValues('nip'));
+    if (!company) {
+      toast({
+        description: intl.formatMessage({
+          defaultMessage: 'No company found for this NIP in the Ministry of Finance register.',
+          id: 'Tenant form / Refresh from MF / Not found',
+        }),
+        variant: 'warning',
+      });
+      return;
+    }
+
+    (Object.keys(company) as Array<keyof typeof company>).forEach((field) =>
+      setValue(field, company[field], { shouldDirty: true, shouldValidate: true })
+    );
+    toast({
+      description: intl.formatMessage({
+        defaultMessage: 'Company details refreshed. Save changes to keep them.',
+        id: 'Tenant form / Refresh from MF / Success',
+      }),
+      variant: 'info',
+    });
+  };
+
   return (
     <Form {...form}>
-      <form className="flex flex-col" onSubmit={handleFormSubmit}>
+      <form className="flex flex-col gap-4" onSubmit={handleFormSubmit} noValidate>
         <FormField
           control={control}
           name="name"
@@ -98,27 +138,46 @@ export const TenantForm = ({
           )}
         />
 
+        {showCompanyDetails && (
+          <>
+            <NipField
+              disabled={disabled}
+              action={
+                !disabled && (
+                  <Button
+                    type="button"
+                    variant={ButtonVariant.SECONDARY}
+                    onClick={handleRefreshFromMF}
+                    disabled={lookupLoading}
+                    className="w-full sm:w-fit"
+                    icon={
+                      lookupLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />
+                    }
+                  >
+                    <FormattedMessage defaultMessage="Refresh from MF" id="Tenant form / Refresh from MF button" />
+                  </Button>
+                )
+              }
+            />
+            <CompanyDetailsFields disabled={disabled} />
+          </>
+        )}
+
         {hasGenericErrorOnly && (
-          <div className="mt-4 text-sm text-destructive dark:text-red-400">
+          <div className="text-sm text-destructive dark:text-red-400">
             <span>{genericError}</span>
           </div>
         )}
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           {!hideCancel && (
-            <Link
-              to={cancelUrl ?? defaultCancelUrl}
-              variant={ButtonVariant.SECONDARY}
-              className="w-full sm:w-fit"
-            >
+            <Link to={cancelUrl ?? defaultCancelUrl} variant={ButtonVariant.SECONDARY} className="w-full sm:w-fit">
               <FormattedMessage defaultMessage="Cancel" id="Tenant form / Cancel button" />
             </Link>
           )}
 
           <Button type="submit" disabled={loading || disabled} className="w-full sm:w-fit">
-            {submitLabel ?? (
-              <FormattedMessage defaultMessage="Save changes" id="Tenant form / Submit button" />
-            )}
+            {submitLabel ?? <FormattedMessage defaultMessage="Save changes" id="Tenant form / Submit button" />}
           </Button>
         </div>
       </form>

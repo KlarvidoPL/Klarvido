@@ -650,6 +650,12 @@ OPENAI_API_KEY = env("OPENAI_API_KEY", default="")
 # Note: gpt-4 and gpt-4-vision-preview do NOT support JSON mode with vision
 OPENAI_MODEL = env("OPENAI_MODEL", default="gpt-5.1")
 
+# Polish Ministry of Finance "White List" of VAT taxpayers - used to prefill organization company details
+# (legal name, REGON, address, VAT status) from a NIP. Public API, no key needed; the MF limits search requests
+# per day per client IP, so lookups are also rate-limited per user (apps.multitenancy.schema).
+MF_WHITELIST_API_URL = env("MF_WHITELIST_API_URL", default="https://wl-api.mf.gov.pl")
+MF_WHITELIST_API_TIMEOUT = env.float("MF_WHITELIST_API_TIMEOUT", default=5.0)
+
 # MCP Server Configuration for AI Assistant
 # The MCP server exposes GraphQL operations as tools for AI models
 MCP_SERVER_URL = env("MCP_SERVER_URL", default="http://mcp-server:4000")
