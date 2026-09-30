@@ -40,6 +40,8 @@ const MAX_ADDRESS_LENGTH = 500;
 // Country, NIP and REGON never change for a company, so once saved they're read-only (the backend rejects a change too).
 // readOnly rather than disabled: the value must still be submitted with the rest of the form.
 const LOCKED_INPUT_CLASS = '[&_input]:cursor-not-allowed [&_input]:bg-muted [&_input]:text-muted-foreground';
+// A locked Select has to be disabled (it has no readOnly), so undo the disabled fade and hide the chevron to match
+const LOCKED_SELECT_CLASS = 'bg-muted text-muted-foreground disabled:opacity-100 [&>svg]:hidden';
 
 export type DisplayNameFieldProps = {
   disabled?: boolean;
@@ -126,7 +128,7 @@ export const CountryField = ({ disabled, locked }: CountryFieldProps) => {
           </FormLabel>
           <Select onValueChange={field.onChange} value={field.value || undefined} disabled={disabled || locked}>
             <FormControl>
-              <SelectTrigger onBlur={field.onBlur} className={cn(locked && 'bg-muted text-muted-foreground')}>
+              <SelectTrigger onBlur={field.onBlur} className={cn(locked && LOCKED_SELECT_CLASS)}>
                 <SelectValue
                   placeholder={intl.formatMessage({
                     defaultMessage: 'Select country',
