@@ -714,6 +714,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.backup.tasks.cleanup_old_backups',
         'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
     },
+    'cleanup-expired-sessions-daily': {
+        'task': 'apps.sso.tasks.cleanup_expired_sessions',
+        'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
+    },
 }
 
 # Contentful CMS settings (optional)

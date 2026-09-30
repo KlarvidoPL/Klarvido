@@ -344,10 +344,10 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
             new_refresh.access_token['auth_method'] = auth_method
 
             # Rotation mints a brand new refresh token (new jti) - re-point the
-            # session's link so it stays revocable after this refresh too.
+            # session's link so it stays revocable after this refresh too, and
+            # extend its expiry / last activity along with it.
             if session:
-                session.refresh_token_jti = new_refresh.get("jti")
-                session.save(update_fields=["refresh_token_jti"])
+                session.extend(new_refresh.get("jti"))
 
             return {"access": str(new_refresh.access_token), "refresh": str(new_refresh)}
 

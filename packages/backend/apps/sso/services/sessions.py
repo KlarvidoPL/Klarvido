@@ -5,6 +5,7 @@ Session management service for tracking user sessions.
 from datetime import timedelta
 from typing import Optional, Tuple
 
+from django.conf import settings
 from django.utils import timezone
 
 from ..models import SSOSession
@@ -92,8 +93,6 @@ class SessionService:
     Service for managing user sessions.
     """
 
-    DEFAULT_SESSION_TTL_DAYS = 30
-
     def __init__(self, user=None):
         self.user = user
 
@@ -110,7 +109,7 @@ class SessionService:
         Args:
             request: The HTTP request object (for user agent and IP)
             sso_link: Optional SSOUserLink if logging in via SSO
-            ttl_days: Session TTL in days (default 30)
+            ttl_days: Session TTL in days (default: the refresh token lifetime, which each refresh extends it by)
             refresh_token_jti: `jti` claim of the refresh token issued alongside
                 this session, so it can later be revoked (see `SSOSession.revoke`)
 
@@ -120,7 +119,8 @@ class SessionService:
         if not self.user:
             raise ValueError("User is required to create a session")
 
-        ttl = ttl_days or self.DEFAULT_SESSION_TTL_DAYS
+        # By default the session expires together with the refresh token issued alongside it
+        ttl = timedelta(days=ttl_days) if ttl_days else settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
 
         # Parse user agent
         user_agent = request.META.get("HTTP_USER_AGENT", "")
@@ -143,7 +143,7 @@ class SessionService:
             browser=device_info["browser"],
             operating_system=device_info["operating_system"],
             ip_address=ip_address,
-            expires_at=timezone.now() + timedelta(days=ttl),
+            expires_at=timezone.now() + ttl,
         )
 
         return session, session_id
