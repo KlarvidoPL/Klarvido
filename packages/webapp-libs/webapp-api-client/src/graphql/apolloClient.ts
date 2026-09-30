@@ -263,7 +263,7 @@ const refreshTokenLink = onError((error: any) => {
 
       (async () => {
         try {
-          await auth.refreshToken();
+          await auth.coordinatedRefreshToken();
           IS_LOCAL_ENV && console.log('[refreshTokenLink] Token refresh successful');
 
           // Process any queued requests
