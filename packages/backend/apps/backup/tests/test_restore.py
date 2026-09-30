@@ -10,6 +10,7 @@ from apps.backup.models import BackupConfig, BackupRecord, RestoreRecord
 from apps.backup.restore import RestoreService, RestoreConflictError, RestoreValidationError
 from apps.backup.schema import RestoreBackupMutation
 from apps.multitenancy.models import Tenant
+from rest_framework.exceptions import PermissionDenied
 
 
 pytestmark = pytest.mark.django_db
@@ -383,6 +384,7 @@ class TestRestoreBackupMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
             from graphql_relay import to_global_id
 
@@ -391,7 +393,9 @@ class TestRestoreBackupMutation:
             with patch('apps.backup.tasks.restore_backup') as mock_task:
                 mock_task.delay = MagicMock()
 
-                result = RestoreBackupMutation.mutate(None, info, backup_id=backup_global_id, conflict_strategy="SKIP")
+                result = RestoreBackupMutation.mutate(
+                    None, info, backup_id=backup_global_id, tenant_id=str(tenant.id), conflict_strategy="SKIP"
+                )
 
                 assert result.ok is True
                 assert result.restore_id is not None
@@ -423,11 +427,14 @@ class TestRestoreBackupMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
             from graphql_relay import to_global_id
 
             backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-            result = RestoreBackupMutation.mutate(None, info, backup_id=backup_global_id, conflict_strategy="SKIP")
+            result = RestoreBackupMutation.mutate(
+                None, info, backup_id=backup_global_id, tenant_id=str(tenant.id), conflict_strategy="SKIP"
+            )
 
             assert result.ok is False
             assert "completed" in result.error.lower()
@@ -449,11 +456,14 @@ class TestRestoreBackupMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
             from graphql_relay import to_global_id
 
             backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-            result = RestoreBackupMutation.mutate(None, info, backup_id=backup_global_id, conflict_strategy="SKIP")
+            result = RestoreBackupMutation.mutate(
+                None, info, backup_id=backup_global_id, tenant_id=str(tenant.id), conflict_strategy="SKIP"
+            )
 
             assert result.ok is False
             assert "file" in result.error.lower()
@@ -476,12 +486,13 @@ class TestRestoreBackupMutation:
         from graphql_relay import to_global_id
 
         backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-        result = RestoreBackupMutation.mutate(None, info, backup_id=backup_global_id, conflict_strategy="SKIP")
+        # No organization was resolved for the request (not signed in / not a member): refused outright
+        with pytest.raises(PermissionDenied):
+            RestoreBackupMutation.mutate(
+                None, info, backup_id=backup_global_id, tenant_id=str(tenant.id), conflict_strategy="SKIP"
+            )
 
-        assert result.ok is False
-        assert "Authentication" in result.error or "required" in result.error.lower()
-
-    def test_restore_mutation_backup_not_found(self, user):
+    def test_restore_mutation_backup_not_found(self, tenant, user):
         """Test that mutation handles non-existent backup."""
         with patch.object(type(user), 'is_authenticated', new_callable=PropertyMock, return_value=True):
 
@@ -491,11 +502,14 @@ class TestRestoreBackupMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
             from graphql_relay import to_global_id
 
             invalid_global_id = to_global_id('BackupRecordType', '999999')
-            result = RestoreBackupMutation.mutate(None, info, backup_id=invalid_global_id, conflict_strategy="SKIP")
+            result = RestoreBackupMutation.mutate(
+                None, info, backup_id=invalid_global_id, tenant_id=str(tenant.id), conflict_strategy="SKIP"
+            )
 
             assert result.ok is False
             assert "not found" in result.error.lower()
