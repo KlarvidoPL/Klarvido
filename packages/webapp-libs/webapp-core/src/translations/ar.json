@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "تعذّر معالجة عملية الدفع"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "الانتقال إلى Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "تم حذف جميع بياناتها نهائيًا، بما في ذلك النسخ الاحتياطية والملفات، ولا يمكن استعادتها."
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "تم حذف المؤسسة \"{tenantName}\""
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "تم حذف المؤسسة \"{tenantName}\""
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "لقد حذفت المؤسسة \"{tenantName}\". إذا لم تكن أنت من فعل ذلك، فغيّر كلمة المرور فورًا وتواصل معنا."
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "قام {deletedBy} بحذف المؤسسة \"{tenantName}\". لم يعد بإمكانك الوصول إليها."
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "تم حذف المؤسسة"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "انضم إلى الفريق وابدأ التعاون اليوم"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "تم إلغاء تفعيل اتصال SSO"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "قام \"{name}\" بحذف المؤسسة \"{tenant_name}\""
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "تم قبول دعوتك إلى \"{tenant_name}\" من قِبل \"{name}\""

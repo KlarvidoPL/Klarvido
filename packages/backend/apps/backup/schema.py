@@ -10,6 +10,8 @@ from graphene_django import DjangoObjectType
 from graphql_relay import from_global_id, to_global_id
 
 from common.graphql.acl import permission_classes, requires
+from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE
+from rest_framework.exceptions import PermissionDenied
 from common.acl.policies import IsTenantMemberAccess
 
 from apps.multitenancy import models as tenant_models
@@ -19,6 +21,18 @@ from . import models
 from .modules import get_all_modules, get_module
 
 logger = logging.getLogger(__name__)
+
+
+def get_checked_tenant(info):
+    """
+    The organization the request acts on: resolved by TenantUserRoleMiddleware from the explicit tenantId argument,
+    only when the user is a member of it (or a superuser, audited). Backups must never be touched through any other
+    organization - so without one, refuse.
+    """
+    tenant = getattr(info.context, "tenant", None)
+    if not tenant:
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    return tenant
 
 
 # ============ Backup Types ============
@@ -202,21 +216,9 @@ class UpdateBackupConfigMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, input):
-        from graphql import GraphQLError
-        from apps.multitenancy.models import Tenant
+        tenant = get_checked_tenant(info)
 
         try:
-            if not info or not hasattr(info, 'context'):
-                raise GraphQLError("Invalid request context")
-
-            _, tenant_id = from_global_id(input['tenant_id'])
-            tenant = Tenant.objects.get(pk=tenant_id)
-
-            # Verify user has access to this tenant
-            user = getattr(info.context, 'user', None)
-            if not user or not user.is_authenticated:
-                raise GraphQLError("Authentication required")
-
             # Decode email recipient IDs
             email_recipient_ids = []
             if input.get('email_recipients'):
@@ -261,26 +263,21 @@ class DeleteBackupMutation(graphene.Mutation):
 
     class Arguments:
         backup_id = graphene.ID(required=True)
+        tenant_id = graphene.ID(required=True)
 
     ok = graphene.Boolean()
     error = graphene.String()
 
     @classmethod
-    def mutate(cls, root, info, backup_id):
-        from graphql import GraphQLError
+    def mutate(cls, root, info, backup_id, tenant_id):
         from common.storages import get_exports_storage
 
+        tenant = get_checked_tenant(info)
+
         try:
-            if not info or not hasattr(info, 'context'):
-                raise GraphQLError("Invalid request context")
-
             _, decoded_id = from_global_id(backup_id)
-            backup = models.BackupRecord.objects.get(pk=decoded_id)
-
-            # Verify user has access to this tenant
-            user = getattr(info.context, 'user', None)
-            if not user or not user.is_authenticated:
-                raise GraphQLError("Authentication required")
+            # Scoped to the checked organization: another organization's backup is simply "not found"
+            backup = models.BackupRecord.objects.get(pk=decoded_id, tenant=tenant)
 
             # Delete file from storage
             if backup.file_path:
@@ -314,22 +311,11 @@ class TriggerBackupMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, tenant_id):
-        from graphql import GraphQLError
-        from apps.multitenancy.models import Tenant
         from .tasks import create_backup
 
+        tenant = get_checked_tenant(info)
+
         try:
-            if not info or not hasattr(info, 'context'):
-                raise GraphQLError("Invalid request context")
-
-            _, decoded_tenant_id = from_global_id(tenant_id)
-            tenant = Tenant.objects.get(pk=decoded_tenant_id)
-
-            # Verify user has access to this tenant
-            user = getattr(info.context, 'user', None)
-            if not user or not user.is_authenticated:
-                raise GraphQLError("Authentication required")
-
             # Get backup config if exists
             try:
                 backup_config = models.BackupConfig.objects.get(tenant=tenant)
@@ -339,14 +325,12 @@ class TriggerBackupMutation(graphene.Mutation):
 
             # Trigger backup task
             create_backup.delay(
-                tenant_id=decoded_tenant_id,
+                tenant_id=str(tenant.pk),
                 config_id=config_id,
             )
 
             return cls(ok=True, backup_id=None)  # Backup ID will be created by the task
 
-        except Tenant.DoesNotExist:
-            return cls(ok=False, error="Tenant not found")
         except Exception as e:
             logger.exception(f"Failed to trigger backup: {e}")
             return cls(ok=False, error=str(e))
@@ -369,27 +353,22 @@ class RestoreBackupMutation(graphene.Mutation):
             required=True,
             description="Strategy for handling conflicting records: SKIP, UPDATE, or FAIL",
         )
+        tenant_id = graphene.ID(required=True)
 
     ok = graphene.Boolean()
     error = graphene.String()
     restore_id = graphene.ID(description="ID of the created restore record")
 
     @classmethod
-    def mutate(cls, root, info, backup_id, conflict_strategy):
-        from graphql import GraphQLError
+    def mutate(cls, root, info, backup_id, conflict_strategy, tenant_id):
         from .tasks import restore_backup
 
+        tenant = get_checked_tenant(info)
+
         try:
-            if not info or not hasattr(info, 'context'):
-                raise GraphQLError("Invalid request context")
-
             _, decoded_id = from_global_id(backup_id)
-            backup_record = models.BackupRecord.objects.get(pk=decoded_id)
-
-            # Verify user has access
-            user = getattr(info.context, 'user', None)
-            if not user or not user.is_authenticated:
-                raise GraphQLError("Authentication required")
+            # Scoped to the checked organization: another organization's backup is simply "not found"
+            backup_record = models.BackupRecord.objects.get(pk=decoded_id, tenant=tenant)
 
             # Verify backup is completed
             if backup_record.status != models.BackupRecord.Status.COMPLETED:
@@ -452,28 +431,23 @@ class DownloadBackupDecryptedMutation(graphene.Mutation):
 
     class Arguments:
         backup_id = graphene.ID(required=True)
+        tenant_id = graphene.ID(required=True)
 
     content = graphene.String(description="Decrypted backup XML content")
     ok = graphene.Boolean()
     error = graphene.String()
 
     @classmethod
-    def mutate(cls, root, info, backup_id):
-        from graphql import GraphQLError
+    def mutate(cls, root, info, backup_id, tenant_id):
         from common.storages import get_exports_storage
         from .encryption import get_backup_encryption_service
 
+        tenant = get_checked_tenant(info)
+
         try:
-            if not info or not hasattr(info, 'context'):
-                raise GraphQLError("Invalid request context")
-
             _, decoded_id = from_global_id(backup_id)
-            backup = models.BackupRecord.objects.get(pk=decoded_id)
-
-            # Verify user has access to this tenant
-            user = getattr(info.context, 'user', None)
-            if not user or not user.is_authenticated:
-                raise GraphQLError("Authentication required")
+            # Scoped to the checked organization: another organization's backup is simply "not found"
+            backup = models.BackupRecord.objects.get(pk=decoded_id, tenant=tenant)
 
             if not backup.file_path:
                 return cls(ok=False, error="Backup file not found")
@@ -684,8 +658,13 @@ class BackupQuery(graphene.ObjectType):
 class BackupMutation(graphene.ObjectType):
     """Mutations for backup functionality."""
 
-    update_backup_config = permission_classes(requires('backup.manage'))(UpdateBackupConfigMutation.Field())
-    delete_backup = permission_classes(requires('backup.manage'))(DeleteBackupMutation.Field())
-    trigger_backup = permission_classes(requires('backup.manage'))(TriggerBackupMutation.Field())
-    download_backup_decrypted = permission_classes(requires('backup.view'))(DownloadBackupDecryptedMutation.Field())
-    restore_backup = permission_classes(requires('backup.manage'))(RestoreBackupMutation.Field())
+    # IsTenantMemberAccess first: requires() alone lets a request through when no member tenant was resolved
+    update_backup_config = permission_classes(IsTenantMemberAccess, requires('backup.manage'))(
+        UpdateBackupConfigMutation.Field()
+    )
+    delete_backup = permission_classes(IsTenantMemberAccess, requires('backup.manage'))(DeleteBackupMutation.Field())
+    trigger_backup = permission_classes(IsTenantMemberAccess, requires('backup.manage'))(TriggerBackupMutation.Field())
+    download_backup_decrypted = permission_classes(IsTenantMemberAccess, requires('backup.view'))(
+        DownloadBackupDecryptedMutation.Field()
+    )
+    restore_backup = permission_classes(IsTenantMemberAccess, requires('backup.manage'))(RestoreBackupMutation.Field())

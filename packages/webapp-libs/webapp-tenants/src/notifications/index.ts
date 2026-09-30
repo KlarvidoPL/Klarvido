@@ -6,3 +6,4 @@ export * from './actionLogExportFailed';
 export * from './ssoConnectionActivated';
 export * from './ssoConnectionDeactivated';
 export * from './passkeyRegistered';
+export * from './tenantDeleted';

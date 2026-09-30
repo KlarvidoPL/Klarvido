@@ -104,7 +104,7 @@ describe('TenantDangerSettings: Component', () => {
     const permissionsMock = createPermissionsMock(['org.delete']);
 
     const variables = {
-      input: { id: MOCKED_TENANT_ID },
+      input: { id: MOCKED_TENANT_ID, tenantId: MOCKED_TENANT_ID },
     };
     const data = {
       deleteTenant: {

@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "Wir konnten Ihre Zahlung nicht verarbeiten"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "Zu Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "Alle ihre Daten, einschließlich Backups und Dateien, wurden endgültig gelöscht und können nicht wiederhergestellt werden."
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "Die Organisation „{tenantName}“ wurde gelöscht"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "Die Organisation „{tenantName}“ wurde gelöscht"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "Sie haben die Organisation „{tenantName}“ gelöscht. Falls Sie das nicht waren, ändern Sie sofort Ihr Passwort und kontaktieren Sie uns."
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "Die Organisation „{tenantName}“ wurde von {deletedBy} gelöscht. Sie haben keinen Zugriff mehr darauf."
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "Organisation gelöscht"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "Treten Sie dem Team bei und starten Sie noch heute mit der Zusammenarbeit"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO-Verbindung deaktiviert"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "Die Organisation „{tenant_name}“ wurde von „{name}“ gelöscht"
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "Ihre Einladung zu „{tenant_name}“ wurde von „{name}“ angenommen"

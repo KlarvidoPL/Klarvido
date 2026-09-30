@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "Nous n’avons pas pu traiter votre paiement"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "Aller sur Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "Toutes ses données, y compris les sauvegardes et les fichiers, ont été définitivement supprimées et ne peuvent pas être restaurées."
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "L’organisation « {tenantName} » a été supprimée"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "L’organisation « {tenantName} » a été supprimée"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "Vous avez supprimé l’organisation « {tenantName} ». Si ce n’était pas vous, changez immédiatement votre mot de passe et contactez-nous."
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "L’organisation « {tenantName} » a été supprimée par {deletedBy}. Vous n’y avez plus accès."
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "Organisation supprimée"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "Rejoignez l’équipe et commencez à collaborer dès aujourd’hui"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "Connexion SSO désactivée"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "L’organisation « {tenant_name} » a été supprimée par « {name} »"
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "Votre invitation à « {tenant_name} » a été acceptée par « {name} »"

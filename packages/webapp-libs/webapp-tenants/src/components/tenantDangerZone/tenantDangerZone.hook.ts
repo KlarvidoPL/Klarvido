@@ -49,6 +49,8 @@ export const useTenantDelete = () => {
       variables: {
         input: {
           id: currentTenant.id,
+          // The backend resolves (and permission-checks) the organization from tenantId only, never from id
+          tenantId: currentTenant.id,
         },
       },
     });

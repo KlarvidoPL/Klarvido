@@ -1,7 +1,10 @@
 import pytest
 import os
 from unittest.mock import patch
+from django.conf import settings
 from graphql_relay import to_global_id
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.notifications.models import Notification
 from ..constants import (
@@ -12,7 +15,7 @@ from ..constants import (
     SystemRoleType,
     VatStatus,
 )
-from ..models import ActionLog, TenantMembership, TenantMembershipRole, OrganizationRole
+from ..models import ActionLog, Tenant, TenantMembership, TenantMembershipRole, OrganizationRole
 from ..permissions import create_system_roles_for_tenant
 from ..services.mf_whitelist import CompanyDetails
 
@@ -526,7 +529,7 @@ class TestDeleteTenantMutation:
         )
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         response_data = executed["data"]["deleteTenant"]["deletedIds"]
         assert response_data[0] == to_global_id("TenantType", tenant_id)
 
@@ -544,7 +547,7 @@ class TestDeleteTenantMutation:
         subscription_schedule_factory(phases=None, customer__subscriber=tenant)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         response_data = executed["data"]["deleteTenant"]["deletedIds"]
         assert response_data[0] == to_global_id("TenantType", tenant_id)
 
@@ -553,14 +556,14 @@ class TestDeleteTenantMutation:
         tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         assert executed["errors"][0]["message"] == "GraphQlValidationError"
 
     def test_user_without_membership(self, graphene_client, user, tenant_factory):
         tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, None)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         assert executed["errors"][0]["message"] == "permission_denied"
 
     def test_user_with_admin_membership(self, graphene_client, user, tenant_factory, tenant_membership_factory):
@@ -568,7 +571,7 @@ class TestDeleteTenantMutation:
         tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.ADMIN)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.ADMIN)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         assert "errors" in executed, f"Admin cannot delete tenant (owner-only), got: {executed}"
         assert executed["errors"][0]["message"] == "permission_denied"
 
@@ -577,13 +580,61 @@ class TestDeleteTenantMutation:
         tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.MEMBER)
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.MEMBER)
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         assert executed["errors"][0]["message"] == "permission_denied"
 
     def test_unauthenticated_user(self, graphene_client, tenant_factory):
         tenant = tenant_factory(name="Tenant 1")
-        executed = self.mutate(graphene_client, {"id": to_global_id("TenantType", tenant.id)})
+        executed = self.mutate(graphene_client, self.input_for(tenant))
         assert executed["errors"][0]["message"] == "permission_denied"
+
+    def test_delete_over_http_resolves_tenant_from_tenant_id(
+        self, mocker, user, tenant_factory, tenant_membership_factory
+    ):
+        """End to end through the middleware (the other tests inject the tenant into the context directly)."""
+        # It would close the test's transaction-wrapped connection before the assertions below
+        mocker.patch("apps.multitenancy.schema.close_old_connections")
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+
+        response = self.post(user, self.input_for(tenant))
+
+        assert "errors" not in response, response
+        assert response["data"]["deleteTenant"]["deletedIds"] == [to_global_id("TenantType", tenant.id)]
+        assert not Tenant.objects.filter(pk=tenant.pk).exists()
+
+    def test_delete_over_http_without_tenant_id_is_rejected(self, user, tenant_factory, tenant_membership_factory):
+        """Regression: sending only `id` left no tenant in the context and crashed on `None.type`."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+
+        response = self.post(user, {"id": to_global_id("TenantType", tenant.id)})
+
+        assert "errors" in response
+        assert Tenant.objects.filter(pk=tenant.pk).exists()
+
+    def test_cannot_delete_a_different_tenant_than_tenant_id(self, user, tenant_factory, tenant_membership_factory):
+        own = tenant_factory(name="Own", type=TenantType.ORGANIZATION)
+        other = tenant_factory(name="Other", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=own, user=user, role=TenantUserRole.OWNER)
+
+        response = self.post(
+            user, {"id": to_global_id("TenantType", other.id), "tenantId": to_global_id("TenantType", own.id)}
+        )
+
+        assert response["errors"][0]["message"] == "permission_denied"
+        assert Tenant.objects.filter(pk=other.pk).exists()
+
+    @staticmethod
+    def input_for(tenant):
+        return {"id": to_global_id("TenantType", tenant.id), "tenantId": to_global_id("TenantType", tenant.id)}
+
+    @classmethod
+    def post(cls, user, data):
+        client = APIClient()
+        client.cookies[settings.ACCESS_TOKEN_COOKIE] = str(RefreshToken.for_user(user).access_token)
+        response = client.post("/api/graphql/", {"query": cls.MUTATION, "variables": {"input": data}}, format="json")
+        return response.json()
 
     @classmethod
     def mutate(cls, graphene_client, data):

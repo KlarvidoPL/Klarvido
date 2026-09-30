@@ -8,6 +8,7 @@ import {
   PasskeyRegistered,
   SSOConnectionActivated,
   SSOConnectionDeactivated,
+  TenantDeleted,
   TenantInvitationAccepted,
   TenantInvitationCreated,
   TenantInvitationDeclined,
@@ -25,6 +26,7 @@ const templates: Record<NotificationTypes, ElementType> = {
   [NotificationTypes.SSO_CONNECTION_ACTIVATED]: SSOConnectionActivated,
   [NotificationTypes.SSO_CONNECTION_DEACTIVATED]: SSOConnectionDeactivated,
   [NotificationTypes.PASSKEY_REGISTERED]: PasskeyRegistered,
+  [NotificationTypes.TENANT_DELETED]: TenantDeleted,
   // Backup notifications
   ...backupNotificationTemplates,
 };

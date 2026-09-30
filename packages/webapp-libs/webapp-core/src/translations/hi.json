@@ -2246,6 +2246,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "हम आपका पेमेंट प्रोसेस नहीं कर सके"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "Klarvido पर जाएँ"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "बैकअप और फ़ाइलों सहित इसका सारा डेटा स्थायी रूप से हटा दिया गया है और इसे पुनर्स्थापित नहीं किया जा सकता।"
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "संगठन \"{tenantName}\" हटा दिया गया है"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "संगठन \"{tenantName}\" हटा दिया गया है"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "आपने संगठन \"{tenantName}\" हटा दिया है। यदि यह आपने नहीं किया, तो तुरंत अपना पासवर्ड बदलें और हमसे संपर्क करें।"
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "संगठन \"{tenantName}\" को {deletedBy} ने हटा दिया है। अब आपके पास इसकी पहुँच नहीं है।"
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "संगठन हटाया गया"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "टीम से जुड़ें और आज ही सहयोग शुरू करें"
   },
@@ -2884,6 +2905,9 @@
   },
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO कनेक्शन निष्क्रिय किया गया"
+  },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "संगठन \"{tenant_name}\" को \"{name}\" ने हटा दिया"
   },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "आपका \"{tenant_name}\" के लिए आमंत्रण \"{name}\" द्वारा स्वीकार कर लिया गया है"

@@ -355,7 +355,7 @@ export const BackupSettings = () => {
 
   const handleRestore = () => {
     if (!restoreBackupId) return;
-    restoreBackup({ variables: { backupId: restoreBackupId, conflictStrategy } });
+    restoreBackup({ variables: { backupId: restoreBackupId, conflictStrategy, tenantId } });
   };
 
   const restoreRecords = restoreData?.restoreRecords?.edges?.map((edge: any) => edge?.node).filter(Boolean) || [];
@@ -392,7 +392,7 @@ export const BackupSettings = () => {
   };
 
   const handleDeleteBackup = (backupId: string) => {
-    deleteBackup({ variables: { backupId } });
+    deleteBackup({ variables: { backupId, tenantId } });
   };
 
   const toggleUser = (userId: string) => {
@@ -762,7 +762,7 @@ export const BackupSettings = () => {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => downloadBackup({ variables: { backupId: backup.id } })}
+                                  onClick={() => downloadBackup({ variables: { backupId: backup.id, tenantId } })}
                                   disabled={downloading}
                                   title={intl.formatMessage({ defaultMessage: 'Download backup', id: 'Backup Settings / Download Tooltip' })}
                                 >
