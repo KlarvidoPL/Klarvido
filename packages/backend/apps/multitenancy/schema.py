@@ -14,7 +14,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError as DRFVa
 from apps.users.services.users import get_user_from_resolver, get_user_avatar_url
 from common.acl import policies
 from common.graphql import mutations, exceptions
-from common.graphql.acl.decorators import permission_classes, requires
+from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE, permission_classes, requires
 from common.action_logging.decorators import action_logged
 from common.action_logging.service import log_action, log_delete
 from common.ratelimiting import graphql_ratelimit, RateLimitKey
@@ -366,12 +366,24 @@ class CreateTenantMutation(mutations.CreateModelMutation):
 @action_logged(entity_type="tenant", action_type=ActionType.UPDATE)
 class UpdateTenantMutation(mutations.UpdateModelMutation):
     class Meta:
-        serializer_class = serializers.TenantSerializer
+        serializer_class = serializers.UpdateTenantSerializer
         edge_class = TenantConnection.Edge
 
     @classmethod
     def get_object(cls, model_class, root, info, **input):
-        return info.context.tenant
+        # info.context.tenant is resolved by TenantUserRoleMiddleware from input.tenantId, with the membership check
+        # applied. Without it the requires("org.settings.edit") check has no tenant to evaluate against, so refuse
+        # instead of updating nothing (or crashing on None); and never update a tenant other than the checked one.
+        tenant = info.context.tenant
+        if not tenant:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            _, pk = from_global_id(input.get("id") or "")
+        except (TypeError, ValueError):
+            pk = None
+        if pk and str(pk) != str(tenant.pk):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return tenant
 
 
 class DeleteTenantMutation(mutations.DeleteModelMutation):

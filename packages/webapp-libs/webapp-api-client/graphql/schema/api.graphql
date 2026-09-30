@@ -2964,6 +2964,7 @@ input UpdateTenantMutationInput {
   regon: String
   address: String
   vatStatus: String
+  tenantId: String!
   id: ID!
   clientMutationId: String
 }

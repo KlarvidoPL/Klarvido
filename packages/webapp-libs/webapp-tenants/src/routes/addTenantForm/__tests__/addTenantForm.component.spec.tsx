@@ -4,7 +4,7 @@ import { commonQueryCurrentUserQuery } from '@sb/webapp-api-client/providers';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
@@ -92,7 +92,7 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/address/i)).toHaveValue('');
   });
 
-  it('should keep step one values when going back', async () => {
+  it('should go back to step one and stay there, keeping its values', async () => {
     render(<Component />, { apolloMocks: [lookupMock(null)] });
 
     await fillStepOne('Acme');
@@ -100,6 +100,29 @@ describe('AddTenantForm: Component', () => {
 
     expect(await screen.findByPlaceholderText('Name')).toHaveValue('Acme');
     expect(screen.getByLabelText(/nip/i)).toHaveValue(NIP);
+    // Regression: the Back click used to be turned into a form submit (= Next) that jumped straight back to step 2
+    await act(() => new Promise((resolve) => setTimeout(resolve, 100)));
+    expect(screen.queryByLabelText(/company name/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+  });
+
+  it('should name the fields the MF register is missing', async () => {
+    render(<Component />, {
+      apolloMocks: [
+        lookupMock({
+          companyName: 'JAN KOWALSKI',
+          regon: '',
+          address: 'UL. DŁUGA 1, 00-001 WARSZAWA',
+          vatStatus: 'ACTIVE',
+        }),
+      ],
+    });
+
+    await fillStepOne();
+
+    expect(await screen.findByText(/but it has no/i)).toHaveTextContent('REGON');
+    expect(screen.getByDisplayValue('JAN KOWALSKI')).toBeInTheDocument();
+    expect(screen.getByLabelText(/regon/i)).toHaveValue('');
   });
 
   describe('action completes successfully', () => {

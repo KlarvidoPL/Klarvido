@@ -57,7 +57,7 @@ describe('TenantGeneralSettings: Component', () => {
 
   it('should commit update mutation', async () => {
     const variables = {
-      input: { id: MOCKED_TENANT_ID, name: 'name - new item name', ...COMPANY_DETAILS },
+      input: { id: MOCKED_TENANT_ID, tenantId: MOCKED_TENANT_ID, name: 'name - new item name', ...COMPANY_DETAILS },
     };
     const requestMock = composeMockedQueryResult(updateTenantMutation, {
       variables,
@@ -123,5 +123,33 @@ describe('TenantGeneralSettings: Component', () => {
     expect(await screen.findByDisplayValue('ACME NEW NAME SP. Z O.O.')).toBeInTheDocument();
     expect(screen.getByDisplayValue('UL. NOWA 5, 00-002 WARSZAWA')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveTextContent('Exempt from VAT');
+  });
+
+  it('should keep existing values the MF register is missing and say which', async () => {
+    const lookupMock = composeMockedQueryResult(companyLookupByNipQuery, {
+      variables: { nip: COMPANY_DETAILS.nip },
+      data: {
+        companyLookupByNip: {
+          __typename: 'CompanyLookupType',
+          found: true,
+          nip: COMPANY_DETAILS.nip,
+          companyName: 'ACME NEW NAME SP. Z O.O.',
+          regon: null,
+          address: 'UL. NOWA 5, 00-002 WARSZAWA',
+          vatStatus: 'ACTIVE',
+        },
+      },
+    });
+
+    renderWithTenant([lookupMock]);
+
+    const refreshButton = await screen.findByRole('button', { name: /refresh from mf/i });
+    await waitFor(() => expect(screen.getByPlaceholderText('Name')).not.toBeDisabled());
+    await userEvent.click(refreshButton);
+
+    expect(await screen.findByDisplayValue('ACME NEW NAME SP. Z O.O.')).toBeInTheDocument();
+    // REGON wasn't returned, so the saved one stays
+    expect(screen.getByDisplayValue(COMPANY_DETAILS.regon)).toBeInTheDocument();
+    expect(await screen.findByTestId('toast-1')).toHaveTextContent('the register has no REGON');
   });
 });

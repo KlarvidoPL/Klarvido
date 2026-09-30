@@ -4844,6 +4844,7 @@ export type UpdateTenantMutationInput = {
   name: Scalars['String']['input'];
   nip?: InputMaybe<Scalars['String']['input']>;
   regon?: InputMaybe<Scalars['String']['input']>;
+  tenantId: Scalars['String']['input'];
   vatStatus?: InputMaybe<Scalars['String']['input']>;
 };
 

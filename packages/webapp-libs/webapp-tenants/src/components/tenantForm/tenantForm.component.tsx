@@ -7,7 +7,7 @@ import { Loader2, RefreshCw } from 'lucide-react';
 import { ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { useCompanyLookup } from '../../hooks/useCompanyLookup';
+import { getMissingCompanyFields, useCompanyLookup, useFormatCompanyFields } from '../../hooks/useCompanyLookup';
 import { isValidNip } from '../../utils/nip';
 import { CompanyDetailsFields, CompanyDetailsFormFields, NipField } from '../companyDetailsFields';
 import { useTenantForm } from './tenantForm.hook';
@@ -50,6 +50,7 @@ export const TenantForm = ({
   const { toast } = useToast();
   const generateLocalePath = useGenerateLocalePath();
   const { lookup, loading: lookupLoading } = useCompanyLookup();
+  const formatCompanyFields = useFormatCompanyFields();
 
   const {
     form: {
@@ -83,9 +84,26 @@ export const TenantForm = ({
       return;
     }
 
-    (Object.keys(company) as Array<keyof typeof company>).forEach((field) =>
-      setValue(field, company[field], { shouldDirty: true, shouldValidate: true })
-    );
+    // Only overwrite what the register actually returned - an empty value (e.g. no REGON) keeps what's there
+    const missingFields = getMissingCompanyFields(company);
+    (Object.keys(company) as Array<keyof typeof company>)
+      .filter((field) => !missingFields.includes(field))
+      .forEach((field) => setValue(field, company[field], { shouldDirty: true, shouldValidate: true }));
+
+    if (missingFields.length > 0) {
+      toast({
+        description: intl.formatMessage(
+          {
+            defaultMessage:
+              "Company details refreshed, but the register has no {fields} for this company. Fill in what's missing and save changes.",
+            id: 'Tenant form / Refresh from MF / Partial',
+          },
+          { fields: formatCompanyFields(missingFields) }
+        ),
+        variant: 'warning',
+      });
+      return;
+    }
     toast({
       description: intl.formatMessage({
         defaultMessage: 'Company details refreshed. Save changes to keep them.',

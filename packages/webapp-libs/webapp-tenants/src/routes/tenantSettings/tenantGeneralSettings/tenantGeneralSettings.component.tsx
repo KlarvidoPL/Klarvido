@@ -55,6 +55,8 @@ export const TenantGeneralSettings = () => {
       variables: {
         input: {
           id: currentTenant.id,
+          // Lets the backend resolve and permission-check the tenant being updated
+          tenantId: currentTenant.id,
           name,
           // The personal default tenant has no company details
           ...(isOrganizationType ? companyDetails : {}),

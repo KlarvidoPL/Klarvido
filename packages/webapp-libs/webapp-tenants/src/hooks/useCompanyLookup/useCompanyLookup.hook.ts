@@ -9,6 +9,10 @@ export type CompanyDetails = {
   vatStatus: string;
 };
 
+/** Fields the MF register returned empty for a found company (e.g. some entries have no REGON). */
+export const getMissingCompanyFields = (company: CompanyDetails) =>
+  (Object.keys(company) as Array<keyof CompanyDetails>).filter((field) => !company[field]);
+
 /**
  * Looks up company details in the MF White List (via the backend) for a NIP.
  * Resolves to null when nothing was found or the lookup failed - callers just leave the fields for the user to fill.

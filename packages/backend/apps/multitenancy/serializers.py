@@ -80,6 +80,19 @@ class TenantSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "billing_email", "nip", "company_name", "regon", "address", "vat_status")
 
 
+class UpdateTenantSerializer(TenantSerializer):
+    # Not stored - only here so TenantUserRoleMiddleware resolves (and membership/RBAC-checks) the tenant being
+    # updated. The middleware deliberately never treats a generic `id` input as a tenant id.
+    tenant_id = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        attrs.pop("tenant_id", None)
+        return super().validate(attrs)
+
+    class Meta(TenantSerializer.Meta):
+        fields = TenantSerializer.Meta.fields + ("tenant_id",)
+
+
 class TenantInvitationActionSerializer(serializers.Serializer):
     """
     Parent serializer for Accept and Decline serializers.

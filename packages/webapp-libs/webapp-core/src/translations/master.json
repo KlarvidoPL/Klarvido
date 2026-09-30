@@ -4160,6 +4160,9 @@
   "Tenant form / AddTenant / Lookup found": {
     "defaultMessage": "We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
   },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "We found your company in the Ministry of Finance register, but it has no {fields} for it. Please check the details below and fill in what's missing."
+  },
   "Tenant form / AddTenant / Lookup not found": {
     "defaultMessage": "We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
   },
@@ -4202,6 +4205,18 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organization deleted successfully!"
   },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "address"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "company name"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "VAT status"
+  },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Invalid NIP number"
   },
@@ -4234,6 +4249,9 @@
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "No company found for this NIP in the Ministry of Finance register."
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "Company details refreshed, but the register has no {fields} for this company. Fill in what's missing and save changes."
   },
   "Tenant form / Refresh from MF / Success": {
     "defaultMessage": "Company details refreshed. Save changes to keep them."

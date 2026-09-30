@@ -4160,6 +4160,9 @@
   "Tenant form / AddTenant / Lookup found": {
     "defaultMessage": "Wir haben Ihr Unternehmen im Register des polnischen Finanzministeriums gefunden und die folgenden Angaben ausgefüllt. Bitte prüfen Sie sie, bevor Sie fortfahren."
   },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "Wir haben Ihr Unternehmen im Register des Finanzministeriums gefunden, aber folgende Angaben fehlen dort: {fields}. Bitte prüfen Sie die Daten unten und ergänzen Sie die fehlenden."
+  },
   "Tenant form / AddTenant / Lookup not found": {
     "defaultMessage": "Wir konnten diese NIP im Register des polnischen Finanzministeriums nicht finden. Bitte geben Sie die Unternehmensdaten selbst ein."
   },
@@ -4202,6 +4205,18 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organisation erfolgreich gelöscht!"
   },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "Adresse"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "Firmenname"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "Umsatzsteuerstatus"
+  },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Ungültige NIP-Nummer"
   },
@@ -4234,6 +4249,9 @@
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "Für diese NIP wurde im Register des Finanzministeriums kein Unternehmen gefunden."
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "Unternehmensdaten aktualisiert, aber im Register fehlen folgende Angaben: {fields}. Ergänzen Sie sie und speichern Sie die Änderungen."
   },
   "Tenant form / Refresh from MF / Success": {
     "defaultMessage": "Unternehmensdaten aktualisiert. Speichern Sie die Änderungen, um sie zu übernehmen."

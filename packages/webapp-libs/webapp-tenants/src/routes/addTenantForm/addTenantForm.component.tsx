@@ -10,7 +10,7 @@ import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
@@ -18,7 +18,12 @@ import { useNavigate } from 'react-router';
 import { CompanyDetailsFields, NipField } from '../../components/companyDetailsFields';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import { useGenerateTenantPath } from '../../hooks';
-import { useCompanyLookup } from '../../hooks/useCompanyLookup';
+import {
+  CompanyDetails,
+  getMissingCompanyFields,
+  useCompanyLookup,
+  useFormatCompanyFields,
+} from '../../hooks/useCompanyLookup';
 import { normalizeDigits } from '../../utils/nip';
 import { addTenantMutation } from './addTenantForm.graphql';
 
@@ -43,6 +48,8 @@ export const AddTenantForm = () => {
   // null = not looked up yet; true/false = whether MF returned a company for the NIP in the form
   const [companyFound, setCompanyFound] = useState<boolean | null>(null);
   const [lookedUpNip, setLookedUpNip] = useState<string>();
+  // Fields the register returned empty for a found company, e.g. no REGON
+  const [missingFields, setMissingFields] = useState<Array<keyof CompanyDetails>>([]);
 
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
     useApiForm<TenantFormFields>({
@@ -98,6 +105,7 @@ export const AddTenantForm = () => {
       setValue('address', company?.address ?? '');
       setValue('vatStatus', company?.vatStatus ?? '');
       setCompanyFound(!!company);
+      setMissingFields(company ? getMissingCompanyFields(company) : []);
       setLookedUpNip(nip);
     }
     setStep(Step.COMPANY_DETAILS);
@@ -120,7 +128,7 @@ export const AddTenantForm = () => {
 
   return (
     <PageLayout>
-      <Card className="mx-auto w-full max-w-3xl">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
@@ -177,7 +185,7 @@ export const AddTenantForm = () => {
 
               {step === Step.COMPANY_DETAILS && (
                 <>
-                  <LookupResultNote found={!!companyFound} />
+                  <LookupResultNote found={!!companyFound} missingFields={missingFields} />
                   <CompanyDetailsFields />
                 </>
               )}
@@ -189,8 +197,11 @@ export const AddTenantForm = () => {
               )}
 
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                {/* Distinct keys: without them React reuses the same <button> across steps, so clicking Back flips
+                    it to type="submit" mid-click and the browser submits the form (= Next) right back to step 2 */}
                 {step === Step.BASICS ? (
                   <Button
+                    key="next"
                     type="submit"
                     disabled={lookupLoading}
                     className="w-full sm:w-fit"
@@ -202,6 +213,7 @@ export const AddTenantForm = () => {
                 ) : (
                   <>
                     <Button
+                      key="back"
                       type="button"
                       variant={ButtonVariant.SECONDARY}
                       onClick={() => setStep(Step.BASICS)}
@@ -211,7 +223,7 @@ export const AddTenantForm = () => {
                     >
                       <FormattedMessage defaultMessage="Back" id="Tenant form / AddTenant / Back button" />
                     </Button>
-                    <Button type="submit" disabled={loadingMutation} className="w-full sm:w-fit">
+                    <Button key="create" type="submit" disabled={loadingMutation} className="w-full sm:w-fit">
                       <FormattedMessage
                         defaultMessage="Create organization"
                         id="Tenant form / AddTenant / Submit button"
@@ -253,29 +265,49 @@ const StepIndicator = ({ step }: { step: Step }) => (
   </div>
 );
 
-const LookupResultNote = ({ found }: { found: boolean }) => (
-  <div
-    className={cn(
-      'flex items-start gap-2 rounded-md border px-3 py-2 text-sm',
-      found ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-muted/50'
-    )}
-  >
-    {found ? (
-      <>
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
-        <FormattedMessage
-          defaultMessage="We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
-          id="Tenant form / AddTenant / Lookup found"
-        />
-      </>
-    ) : (
-      <>
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-        <FormattedMessage
-          defaultMessage="We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
-          id="Tenant form / AddTenant / Lookup not found"
-        />
-      </>
-    )}
-  </div>
-);
+const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFields: Array<keyof CompanyDetails> }) => {
+  const formatCompanyFields = useFormatCompanyFields();
+
+  if (found && missingFields.length > 0) {
+    return (
+      <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+        {/* One text node: FormattedMessage with rich values renders several siblings, which the flex row would split */}
+        <span>
+          <FormattedMessage
+            defaultMessage="We found your company in the Ministry of Finance register, but it has no {fields} for it. Please check the details below and fill in what's missing."
+            id="Tenant form / AddTenant / Lookup found partial"
+            values={{ fields: <strong>{formatCompanyFields(missingFields)}</strong> }}
+          />
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        'flex items-start gap-2 rounded-md border px-3 py-2 text-sm',
+        found ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-muted/50'
+      )}
+    >
+      {found ? (
+        <>
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+          <FormattedMessage
+            defaultMessage="We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
+            id="Tenant form / AddTenant / Lookup found"
+          />
+        </>
+      ) : (
+        <>
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+          <FormattedMessage
+            defaultMessage="We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
+            id="Tenant form / AddTenant / Lookup not found"
+          />
+        </>
+      )}
+    </div>
+  );
+};

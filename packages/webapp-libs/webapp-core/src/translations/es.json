@@ -4160,6 +4160,9 @@
   "Tenant form / AddTenant / Lookup found": {
     "defaultMessage": "Hemos encontrado tu empresa en el registro del Ministerio de Finanzas y hemos rellenado los datos a continuación. Revísalos antes de continuar."
   },
+  "Tenant form / AddTenant / Lookup found partial": {
+    "defaultMessage": "Hemos encontrado tu empresa en el registro del Ministerio de Finanzas, pero no incluye {fields}. Revisa los datos a continuación y completa lo que falta."
+  },
   "Tenant form / AddTenant / Lookup not found": {
     "defaultMessage": "No hemos encontrado este NIP en el registro del Ministerio de Finanzas. Rellena tú mismo los datos de la empresa."
   },
@@ -4202,6 +4205,18 @@
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "¡Organización eliminada correctamente!"
   },
+  "Tenant form / Field name / Address": {
+    "defaultMessage": "la dirección"
+  },
+  "Tenant form / Field name / Company name": {
+    "defaultMessage": "el nombre de la empresa"
+  },
+  "Tenant form / Field name / REGON": {
+    "defaultMessage": "el REGON"
+  },
+  "Tenant form / Field name / VAT status": {
+    "defaultMessage": "el estado del IVA"
+  },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Número NIP no válido"
   },
@@ -4234,6 +4249,9 @@
   },
   "Tenant form / Refresh from MF / Not found": {
     "defaultMessage": "No se ha encontrado ninguna empresa con este NIP en el registro del Ministerio de Finanzas."
+  },
+  "Tenant form / Refresh from MF / Partial": {
+    "defaultMessage": "Datos de la empresa actualizados, pero el registro no incluye {fields} de esta empresa. Completa lo que falta y guarda los cambios."
   },
   "Tenant form / Refresh from MF / Success": {
     "defaultMessage": "Datos de la empresa actualizados. Guarda los cambios para conservarlos."
