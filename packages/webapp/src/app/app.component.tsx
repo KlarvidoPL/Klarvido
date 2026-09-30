@@ -46,6 +46,12 @@ export const App = () => {
       <Route element={<ValidRoutesProviders />}>
         <Route path={LANG_PREFIX}>
           <Route path={RoutesConfig.logout} element={<Logout />} />
+          {/* Not under AnonymousRoute: the backend has already set auth cookies by
+              the time the browser lands here, so the app's own "who am I" query
+              resolves as logged-in almost immediately - AnonymousRoute would bounce
+              the user away before this page's effect (which fetches tokens into
+              localStorage) ever got a chance to run. Same reasoning as Logout above. */}
+          <Route path={RoutesConfig.oauthCallback} element={<OAuthCallback />} />
 
           <Route element={<AnonymousRoute />}>
             <Route path={RoutesConfig.signup} element={<Signup />} />
@@ -55,7 +61,6 @@ export const App = () => {
             <Route path={RoutesConfig.ssoLogin} element={<SSOLogin />} />
             <Route path={RoutesConfig.ssoCallback} element={<SSOCallback />} />
             <Route path={RoutesConfig.ssoError} element={<SSOError />} />
-            <Route path={RoutesConfig.oauthCallback} element={<OAuthCallback />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 
