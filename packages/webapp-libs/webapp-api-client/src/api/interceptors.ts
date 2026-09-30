@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
 import { Emitter } from '../utils/eventEmitter';
-import { AUTH_URL, refreshToken } from './auth';
+import { AUTH_URL, coordinatedRefreshToken } from './auth';
 import { ApiClientEvents, PendingRequest } from './types';
 
 let pendingRequests: PendingRequest[] = [];
@@ -41,7 +41,7 @@ export const createRefreshTokenInterceptor = (props?: CreateRefreshTokenIntercep
       const requestPromise = delayRequest(error.config);
 
       if (isRequestQueueEmpty) {
-        await refreshToken();
+        await coordinatedRefreshToken();
         await Promise.all(
           pendingRequests.map(async ({ request, resolve, reject }: PendingRequest) => {
             try {
