@@ -36,7 +36,7 @@ import { Admin } from '../routes/admin';
 import { PasswordReset } from '../routes/auth/passwordReset';
 import ValidateOtp from '../routes/auth/validateOtp';
 import { AnonymousRoute, AuthRoute } from '../shared/components/routes';
-import { ConfirmEmail, Home, Login, Logout, NotFound, Profile, Signup, SSOCallback, SSOError, SSOLogin } from './asyncComponents';
+import { ConfirmEmail, Home, Login, Logout, NotFound, OAuthCallback, Profile, Signup, SSOCallback, SSOError, SSOLogin } from './asyncComponents';
 import { LANG_PREFIX, RoutesConfig, TENANT_PREFIX } from './config/routes';
 import { ValidRoutesProviders } from './providers';
 
@@ -46,6 +46,12 @@ export const App = () => {
       <Route element={<ValidRoutesProviders />}>
         <Route path={LANG_PREFIX}>
           <Route path={RoutesConfig.logout} element={<Logout />} />
+          {/* Not under AnonymousRoute: the backend has already set auth cookies by
+              the time the browser lands here, so the app's own "who am I" query
+              resolves as logged-in almost immediately - AnonymousRoute would bounce
+              the user away before this page's effect (which fetches tokens into
+              localStorage) ever got a chance to run. Same reasoning as Logout above. */}
+          <Route path={RoutesConfig.oauthCallback} element={<OAuthCallback />} />
 
           <Route element={<AnonymousRoute />}>
             <Route path={RoutesConfig.signup} element={<Signup />} />
