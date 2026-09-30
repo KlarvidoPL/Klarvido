@@ -4205,6 +4205,21 @@
   "Tenant form / Company name required": {
     "defaultMessage": "Le nom de l’entreprise est obligatoire"
   },
+  "Tenant form / Country NIP and REGON locked hint": {
+    "defaultMessage": "Le pays, le NIP et le REGON ne peuvent plus être modifiés une fois enregistrés."
+  },
+  "Tenant form / Country hint": {
+    "defaultMessage": "Choisissez le pays dans lequel l’entreprise est immatriculée. Actuellement pris en charge : {countries}."
+  },
+  "Tenant form / Country label": {
+    "defaultMessage": "Pays d’immatriculation :"
+  },
+  "Tenant form / Country placeholder": {
+    "defaultMessage": "Sélectionnez un pays"
+  },
+  "Tenant form / Country required": {
+    "defaultMessage": "Le pays est obligatoire"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "Organisation supprimée avec succès !"
   },
@@ -4234,9 +4249,6 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "le statut TVA"
-  },
-  "Tenant form / NIP and REGON locked hint": {
-    "defaultMessage": "Le NIP et le REGON ne peuvent plus être modifiés une fois enregistrés."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Numéro NIP invalide"

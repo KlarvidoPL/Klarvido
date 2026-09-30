@@ -31,10 +31,19 @@ COMPANY_DETAILS = {
 
 
 class TestCompanyLookupByNipQuery:
+    QUERY_WITH_COUNTRY = '''
+        query CompanyLookupByNip($nip: String!, $country: String) {
+          companyLookupByNip(nip: $nip, country: $country) {
+            found
+            nip
+          }
+        }
+    '''
     QUERY = '''
         query CompanyLookupByNip($nip: String!) {
           companyLookupByNip(nip: $nip) {
             found
+            country
             nip
             companyName
             regon
@@ -44,7 +53,7 @@ class TestCompanyLookupByNipQuery:
         }
     '''
 
-    @patch("apps.multitenancy.schema.lookup_company_by_nip")
+    @patch("apps.multitenancy.schema.lookup_company")
     def test_found(self, mock_lookup, graphene_client, user):
         mock_lookup.return_value = CompanyDetails(
             company_name="ACME SP. Z O.O.",
@@ -57,15 +66,16 @@ class TestCompanyLookupByNipQuery:
 
         assert executed["data"]["companyLookupByNip"] == {
             "found": True,
+            "country": "PL",
             "nip": VALID_NIP,
             "companyName": "ACME SP. Z O.O.",
             "regon": "123456785",
             "address": "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA",
             "vatStatus": VatStatus.ACTIVE,
         }
-        mock_lookup.assert_called_once_with(VALID_NIP)
+        mock_lookup.assert_called_once_with("PL", VALID_NIP)
 
-    @patch("apps.multitenancy.schema.lookup_company_by_nip", return_value=None)
+    @patch("apps.multitenancy.schema.lookup_company", return_value=None)
     def test_not_found(self, mock_lookup, graphene_client, user):
         graphene_client.force_authenticate(user)
         executed = graphene_client.query(self.QUERY, variable_values={"nip": VALID_NIP})
@@ -75,7 +85,7 @@ class TestCompanyLookupByNipQuery:
         assert result["nip"] == VALID_NIP
         assert result["companyName"] is None
 
-    @patch("apps.multitenancy.schema.lookup_company_by_nip")
+    @patch("apps.multitenancy.schema.lookup_company")
     def test_invalid_nip(self, mock_lookup, graphene_client, user):
         graphene_client.force_authenticate(user)
         executed = graphene_client.query(self.QUERY, variable_values={"nip": "1234567890"})
@@ -83,7 +93,24 @@ class TestCompanyLookupByNipQuery:
         assert "nip" in executed["errors"][0]["extensions"]
         mock_lookup.assert_not_called()
 
-    @patch("apps.multitenancy.schema.lookup_company_by_nip")
+    @patch("apps.multitenancy.schema.lookup_company", return_value=None)
+    def test_accepts_eu_vat_number_form(self, mock_lookup, graphene_client, user):
+        """ "PL" + NIP (the EU VAT number) is the same company - the prefix is stripped."""
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.query(self.QUERY, variable_values={"nip": f"PL {VALID_NIP}"})
+
+        assert executed["data"]["companyLookupByNip"]["nip"] == VALID_NIP
+        mock_lookup.assert_called_once_with("PL", VALID_NIP)
+
+    @patch("apps.multitenancy.schema.lookup_company")
+    def test_unsupported_country(self, mock_lookup, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.query(self.QUERY_WITH_COUNTRY, variable_values={"nip": VALID_NIP, "country": "DE"})
+
+        assert executed["errors"][0]["extensions"]["nip"][0]["code"] == "unsupported_country"
+        mock_lookup.assert_not_called()
+
+    @patch("apps.multitenancy.schema.lookup_company")
     def test_unauthenticated_user(self, mock_lookup, graphene_client):
         executed = graphene_client.query(self.QUERY, variable_values={"nip": VALID_NIP})
 
@@ -101,6 +128,7 @@ class TestCreateTenantMutation:
               slug
               type
               billingEmail
+              country
               nip
               companyName
               regon
@@ -146,6 +174,24 @@ class TestCreateTenantMutation:
         assert response_data["regon"] == "123456785"
         assert response_data["address"] == "UL. PRZYKŁADOWA 1, 00-001 WARSZAWA"
         assert response_data["vatStatus"] == VatStatus.ACTIVE
+
+    def test_create_new_tenant_defaults_to_poland(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS})
+        assert executed["data"]["createTenant"]["tenant"]["country"] == "PL"
+
+    def test_create_new_tenant_with_eu_vat_number_form(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(
+            graphene_client, {"name": "Test", **COMPANY_DETAILS, "country": "PL", "nip": f"PL{VALID_NIP}"}
+        )
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["createTenant"]["tenant"]["nip"] == VALID_NIP
+
+    def test_create_new_tenant_in_unsupported_country(self, graphene_client, user):
+        graphene_client.force_authenticate(user)
+        executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS, "country": "DE"})
+        assert executed["errors"][0]["extensions"]["country"][0]["code"] == "invalid_choice"
 
     def test_create_new_tenant_without_company_details(self, graphene_client, user):
         graphene_client.force_authenticate(user)

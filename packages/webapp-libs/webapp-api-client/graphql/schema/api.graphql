@@ -89,8 +89,8 @@ type Query {
   currentUserPermissions(tenantId: ID!): [String]
   "Get all organization roles for the current user in a tenant"
   currentUserOrganizationRoles(tenantId: ID!): [OrganizationRoleType]
-  "Look up company details (name, REGON, address, VAT status) in the MF White List by NIP"
-  companyLookupByNip(nip: String!): CompanyLookupType
+  "Look up company details (name, REGON, address, VAT status) by tax ID in the country's company registry (Poland: MF White List)"
+  companyLookupByNip(nip: String!, country: String = "PL"): CompanyLookupType
   allSubscriptionPlans(before: String, after: String, first: Int, last: Int): StripePriceConnection
   activeSubscription(tenantId: ID): SubscriptionScheduleType
   allPaymentMethods(tenantId: ID, before: String, after: String, first: Int, last: Int): PaymentMethodConnection
@@ -189,6 +189,7 @@ type TenantType implements Node {
   type: String
   billingEmail: String
   actionLoggingEnabled: Boolean
+  country: String
   nip: String
   companyName: String
   regon: String
@@ -682,6 +683,7 @@ type OrganizationRoleEdge {
 "Company details found in the MF White List for a NIP; `found` is False when there's nothing to prefill."
 type CompanyLookupType {
   found: Boolean!
+  country: String!
   nip: String!
   companyName: String
   regon: String
@@ -2959,6 +2961,7 @@ input DeletePasskeyMutationInput {
 input UpdateTenantMutationInput {
   name: String!
   billingEmail: String
+  country: String
   nip: String
   companyName: String
   regon: String
@@ -2994,6 +2997,7 @@ input UpdateTenantMembershipMutationInput {
 input CreateTenantMutationInput {
   name: String!
   billingEmail: String
+  country: String
   nip: String
   companyName: String
   regon: String

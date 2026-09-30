@@ -5,7 +5,7 @@ import { GraphQLError } from 'graphql/error/GraphQLError';
 import { render } from '../../../tests/utils/rendering';
 import { TenantForm, TenantFormProps } from '../tenantForm.component';
 
-const EMPTY_COMPANY_DETAILS = { nip: '', companyName: '', regon: '', address: '', vatStatus: '' };
+const EMPTY_COMPANY_DETAILS = { country: 'PL', nip: '', companyName: '', regon: '', address: '', vatStatus: '' };
 
 describe('TenantForm: Component', () => {
   const defaultProps: TenantFormProps = {
@@ -59,6 +59,7 @@ describe('TenantForm: Component', () => {
 
       expect(onSubmit).toHaveBeenCalledWith({
         name: 'Acme',
+        country: 'PL',
         nip: '9721382373',
         companyName: 'ACME SP. Z O.O.',
         regon: '123456785',

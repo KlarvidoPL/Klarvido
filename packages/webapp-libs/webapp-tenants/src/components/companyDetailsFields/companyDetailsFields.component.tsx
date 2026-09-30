@@ -6,7 +6,13 @@ import { ReactNode } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { isValidNip, isValidRegon } from '../../utils/nip';
+import {
+  SUPPORTED_COMPANY_COUNTRIES,
+  countryFlag,
+  getCompanyCountry,
+  isValidTaxId,
+} from '../../utils/companyCountries';
+import { isValidRegon } from '../../utils/nip';
 
 export enum VatStatus {
   ACTIVE = 'ACTIVE',
@@ -15,6 +21,8 @@ export enum VatStatus {
 }
 
 export type CompanyDetailsFormFields = {
+  /** ISO code of the country the company is registered in - decides the tax ID's prefix and validation */
+  country: string;
   nip: string;
   companyName: string;
   regon: string;
@@ -29,9 +37,11 @@ const MAX_DISPLAY_NAME_LENGTH = 255;
 const MAX_COMPANY_NAME_LENGTH = 255;
 const MAX_ADDRESS_LENGTH = 500;
 
-// NIP/REGON never change for a company, so once saved they're read-only (the backend rejects a change too).
+// Country, NIP and REGON never change for a company, so once saved they're read-only (the backend rejects a change too).
 // readOnly rather than disabled: the value must still be submitted with the rest of the form.
 const LOCKED_INPUT_CLASS = '[&_input]:cursor-not-allowed [&_input]:bg-muted [&_input]:text-muted-foreground';
+// A locked Select has to be disabled (it has no readOnly), so undo the disabled fade and hide the chevron to match
+const LOCKED_SELECT_CLASS = 'bg-muted text-muted-foreground disabled:opacity-100 [&>svg]:hidden';
 
 export type DisplayNameFieldProps = {
   disabled?: boolean;
@@ -85,6 +95,78 @@ export const DisplayNameField = ({ disabled }: DisplayNameFieldProps) => {
   );
 };
 
+export type CountryFieldProps = {
+  disabled?: boolean;
+  /** Read-only: the organization's country is already saved */
+  locked?: boolean;
+};
+
+/**
+ * Country the company is registered in, from the supported ones - picks the tax ID's prefix/validation and the
+ * registry used to prefill details. Must be rendered inside a `<Form>` whose fields include `country`.
+ */
+export const CountryField = ({ disabled, locked }: CountryFieldProps) => {
+  const intl = useIntl();
+  const { control } = useFormContext<CompanyDetailsFormFields>();
+  const countryNames = new Intl.DisplayNames([intl.locale], { type: 'region' });
+  const countryName = (code: string) => countryNames.of(code) ?? code;
+
+  return (
+    <FormField
+      control={control}
+      name="country"
+      rules={{
+        required: {
+          value: true,
+          message: intl.formatMessage({ defaultMessage: 'Country is required', id: 'Tenant form / Country required' }),
+        },
+      }}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>
+            {intl.formatMessage({ defaultMessage: 'Country of registration:', id: 'Tenant form / Country label' })}
+          </FormLabel>
+          <Select onValueChange={field.onChange} value={field.value || undefined} disabled={disabled || locked}>
+            <FormControl>
+              <SelectTrigger onBlur={field.onBlur} className={cn(locked && LOCKED_SELECT_CLASS)}>
+                <SelectValue
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Select country',
+                    id: 'Tenant form / Country placeholder',
+                  })}
+                />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {SUPPORTED_COMPANY_COUNTRIES.map(({ code }) => (
+                <SelectItem value={code} key={code}>
+                  <span className="mr-2">{countryFlag(code)}</span>
+                  {countryName(code)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {!locked && (
+            <p className="text-sm text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Choose the country where the company is registered. Currently supported: {countries}."
+                id="Tenant form / Country hint"
+                values={{
+                  countries: intl.formatList(
+                    SUPPORTED_COMPANY_COUNTRIES.map(({ code }) => countryName(code)),
+                    { type: 'conjunction' }
+                  ),
+                }}
+              />
+            </p>
+          )}
+          <FormMessage className="font-normal leading-tight" />
+        </FormItem>
+      )}
+    />
+  );
+};
+
 export type NipFieldProps = {
   disabled?: boolean;
   /** Read-only: the organization's NIP is already saved */
@@ -93,13 +175,19 @@ export type NipFieldProps = {
   action?: ReactNode;
 };
 
-/** NIP input with checksum validation. Must be rendered inside a `<Form>` whose fields include `nip`. */
+/**
+ * Tax ID input, prefixed with the selected country's code and validated by that country's rules (Poland: NIP). Must be
+ * rendered inside a `<Form>` whose fields include `country` and `nip`.
+ */
 export const NipField = ({ disabled, locked, action }: NipFieldProps) => {
   const intl = useIntl();
   const {
     register,
+    watch,
+    getValues,
     formState: { errors },
   } = useFormContext<CompanyDetailsFormFields>();
+  const country = getCompanyCountry(watch('country'));
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
@@ -113,7 +201,7 @@ export const NipField = ({ disabled, locked, action }: NipFieldProps) => {
             }),
           },
           validate: (value) =>
-            isValidNip(value) ||
+            isValidTaxId(value, getValues('country')) ||
             intl.formatMessage({
               defaultMessage: 'Invalid NIP number',
               id: 'Tenant form / NIP invalid',
@@ -124,6 +212,7 @@ export const NipField = ({ disabled, locked, action }: NipFieldProps) => {
         inputMode="numeric"
         autoComplete="off"
         error={errors.nip?.message}
+        startAdornment={country?.taxIdPrefix}
         disabled={disabled}
         readOnly={locked}
         className={cn(locked && LOCKED_INPUT_CLASS)}
@@ -137,7 +226,7 @@ export type CompanyDetailsFieldsProps = {
   disabled?: boolean;
   /** Read-only REGON: the organization's REGON is already saved */
   regonLocked?: boolean;
-  /** Show the "NIP and REGON can't be changed" hint under REGON (the NIP field sits right above it) */
+  /** Show the "Country, NIP and REGON can't be changed" hint under REGON (the NIP field sits right above it) */
   showLockHint?: boolean;
 };
 
@@ -196,8 +285,8 @@ export const CompanyDetailsFields = ({ disabled, regonLocked, showLockHint }: Co
         <p className="-mt-2.5 flex items-center gap-1.5 text-sm text-muted-foreground">
           <Lock className="h-3.5 w-3.5 shrink-0" />
           <FormattedMessage
-            defaultMessage="NIP and REGON can't be changed once saved."
-            id="Tenant form / NIP and REGON locked hint"
+            defaultMessage="Country, NIP and REGON can't be changed once saved."
+            id="Tenant form / Country NIP and REGON locked hint"
           />
         </p>
       )}

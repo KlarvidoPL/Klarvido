@@ -16,6 +16,7 @@ import { updateTenantMutation } from '../tenantGeneralSettings.graphql';
 const MOCKED_TENANT_ID = '1';
 
 const COMPANY_DETAILS = {
+  country: 'PL',
   nip: '9721382373',
   companyName: 'ACME SP. Z O.O.',
   regon: '123456785',
@@ -52,7 +53,8 @@ describe('TenantGeneralSettings: Component', () => {
     expect(screen.getByDisplayValue(COMPANY_DETAILS.companyName)).toBeInTheDocument();
     expect(screen.getByDisplayValue(COMPANY_DETAILS.regon)).toBeInTheDocument();
     expect(screen.getByDisplayValue(COMPANY_DETAILS.address)).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toHaveTextContent('Active VAT payer');
+    expect(screen.getAllByRole('combobox')[1]).toHaveTextContent('Active VAT payer');
+    expect(screen.getAllByRole('combobox')[0]).toHaveTextContent('Poland');
   });
 
   it('should commit update mutation', async () => {
@@ -100,7 +102,7 @@ describe('TenantGeneralSettings: Component', () => {
 
   it('should refresh company details from MF', async () => {
     const lookupMock = composeMockedQueryResult(companyLookupByNipQuery, {
-      variables: { nip: COMPANY_DETAILS.nip },
+      variables: { nip: COMPANY_DETAILS.nip, country: 'PL' },
       data: {
         companyLookupByNip: {
           __typename: 'CompanyLookupType',
@@ -122,12 +124,12 @@ describe('TenantGeneralSettings: Component', () => {
 
     expect(await screen.findByDisplayValue('ACME NEW NAME SP. Z O.O.')).toBeInTheDocument();
     expect(screen.getByDisplayValue('UL. NOWA 5, 00-002 WARSZAWA')).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toHaveTextContent('Exempt from VAT');
+    expect(screen.getAllByRole('combobox')[1]).toHaveTextContent('Exempt from VAT');
   });
 
   it('should keep existing values the MF register is missing and say which', async () => {
     const lookupMock = composeMockedQueryResult(companyLookupByNipQuery, {
-      variables: { nip: COMPANY_DETAILS.nip },
+      variables: { nip: COMPANY_DETAILS.nip, country: 'PL' },
       data: {
         companyLookupByNip: {
           __typename: 'CompanyLookupType',
@@ -159,7 +161,8 @@ describe('TenantGeneralSettings: Component', () => {
     expect(await screen.findByDisplayValue(COMPANY_DETAILS.nip)).toHaveAttribute('readonly');
     expect(screen.getByDisplayValue(COMPANY_DETAILS.regon)).toHaveAttribute('readonly');
     expect(screen.getByDisplayValue(COMPANY_DETAILS.address)).not.toHaveAttribute('readonly');
-    expect(screen.getByText("NIP and REGON can't be changed once saved.")).toBeInTheDocument();
+    expect(screen.getByText("Country, NIP and REGON can't be changed once saved.")).toBeInTheDocument();
+    expect(screen.getAllByRole('combobox')[0]).toBeDisabled();
   });
 
   it('should let an organization without a NIP yet fill it in', async () => {
@@ -175,6 +178,6 @@ describe('TenantGeneralSettings: Component', () => {
     const nipInput = await screen.findByLabelText(/nip/i);
     expect(nipInput).not.toHaveAttribute('readonly');
     expect(screen.getByLabelText(/regon/i)).not.toHaveAttribute('readonly');
-    expect(screen.queryByText("NIP and REGON can't be changed once saved.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Country, NIP and REGON can't be changed once saved.")).not.toBeInTheDocument();
   });
 });

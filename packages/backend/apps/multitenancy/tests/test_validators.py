@@ -1,7 +1,7 @@
 import pytest
 from rest_framework import serializers
 
-from ..validators import is_valid_nip, is_valid_regon, validate_nip, validate_regon
+from ..validators import is_valid_nip, is_valid_regon, normalize_tax_id, validate_nip, validate_regon, validate_tax_id
 
 pytestmark = pytest.mark.django_db
 
@@ -48,3 +48,20 @@ class TestRegonValidation:
     def test_validate_regon_raises(self):
         with pytest.raises(serializers.ValidationError):
             validate_regon("123456789")
+
+
+class TestTaxIdValidation:
+    @pytest.mark.parametrize("value", ["9721382373", "PL9721382373", "pl 972-138-23-73", "PL-972-138-23-73"])
+    def test_polish_tax_id_with_or_without_country_prefix(self, value):
+        assert normalize_tax_id(value, "PL") == "9721382373"
+        assert validate_tax_id(value, "PL") == "9721382373"
+
+    def test_invalid_polish_tax_id(self):
+        with pytest.raises(serializers.ValidationError) as e:
+            validate_tax_id("PL9721382374", "PL")
+        assert e.value.detail[0].code == "invalid_nip"
+
+    def test_unsupported_country(self):
+        with pytest.raises(serializers.ValidationError) as e:
+            validate_tax_id("123456789", "DE")
+        assert e.value.detail[0].code == "unsupported_country"

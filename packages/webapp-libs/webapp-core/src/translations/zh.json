@@ -4205,6 +4205,21 @@
   "Tenant form / Company name required": {
     "defaultMessage": "公司名称为必填项"
   },
+  "Tenant form / Country NIP and REGON locked hint": {
+    "defaultMessage": "国家、NIP 和 REGON 保存后无法更改。"
+  },
+  "Tenant form / Country hint": {
+    "defaultMessage": "请选择公司注册所在的国家。目前支持：{countries}。"
+  },
+  "Tenant form / Country label": {
+    "defaultMessage": "注册国家："
+  },
+  "Tenant form / Country placeholder": {
+    "defaultMessage": "选择国家"
+  },
+  "Tenant form / Country required": {
+    "defaultMessage": "国家为必填项"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "组织删除成功!"
   },
@@ -4234,9 +4249,6 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "增值税状态"
-  },
-  "Tenant form / NIP and REGON locked hint": {
-    "defaultMessage": "NIP 和 REGON 保存后无法更改。"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "NIP 号码无效"

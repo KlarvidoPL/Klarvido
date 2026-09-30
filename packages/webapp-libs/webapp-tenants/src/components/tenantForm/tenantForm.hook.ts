@@ -2,6 +2,7 @@ import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useEffect } from 'react';
 
+import { DEFAULT_COMPANY_COUNTRY } from '../../utils/companyCountries';
 import { TenantFormFields, TenantFormProps } from './tenantForm.component';
 
 type UseTenantFormProps = Pick<TenantFormProps, 'error' | 'onSubmit' | 'initialData'>;
@@ -12,6 +13,7 @@ export const useTenantForm = ({ error, onSubmit, initialData }: UseTenantFormPro
     mode: 'onTouched',
     defaultValues: {
       name: initialData?.name ?? '',
+      country: initialData?.country || DEFAULT_COMPANY_COUNTRY,
       nip: initialData?.nip ?? '',
       companyName: initialData?.companyName ?? '',
       regon: initialData?.regon ?? '',

@@ -9,10 +9,10 @@ from graphql_relay import to_global_id, from_global_id
 
 from common.graphql.field_conversions import TextChoicesFieldType
 from . import models, notifications
-from .constants import TenantType, TenantUserRole, SystemRoleType
+from .constants import CompanyCountry, TenantType, TenantUserRole, SystemRoleType
 from .services.membership import create_tenant_membership
 from .tokens import tenant_invitation_token
-from .validators import normalize_digits, validate_nip, validate_regon
+from .validators import normalize_tax_id, validate_regon, validate_tax_id
 
 
 def decode_role_id(role_id: str) -> str:
@@ -44,21 +44,31 @@ class TenantSerializer(serializers.ModelSerializer):
         "address": _("Address is required"),
         "vat_status": _("VAT status is required"),
     }
-    IMMUTABLE_COMPANY_FIELDS = ("nip", "regon")
-
-    def validate_nip(self, value):
-        # Empty is allowed on update (organizations created before NIP existed); validate() requires it on create.
-        return validate_nip(value) if normalize_digits(value) else ""
+    # The country goes with the tax ID: both identify the registered company, so neither changes once stored
+    IMMUTABLE_COMPANY_FIELDS = ("country", "nip", "regon")
 
     def validate_regon(self, value):
         return validate_regon(value)
 
     def validate(self, attrs):
         errors = {}
+
+        # The tax ID's format depends on the company's country, so it's validated here rather than in a field
+        # validator. Empty is allowed on update (organizations created before NIP existed); required on create below.
+        if "nip" in attrs:
+            country = attrs.get("country") or getattr(self.instance, "country", None) or CompanyCountry.POLAND
+            if normalize_tax_id(attrs["nip"], country):
+                try:
+                    attrs["nip"] = validate_tax_id(attrs["nip"], country)
+                except serializers.ValidationError as e:
+                    errors["nip"] = e.detail
+            else:
+                attrs["nip"] = ""
+
         for field, message in self.REQUIRED_COMPANY_FIELDS.items():
             # Create: every company field is required. Update: fields left out stay as they are (e.g. renaming the
             # personal default tenant), but one that's sent can't be blanked.
-            if (self.instance is None or field in attrs) and not attrs.get(field):
+            if field not in errors and (self.instance is None or field in attrs) and not attrs.get(field):
                 errors[field] = [serializers.ErrorDetail(message, code="required")]
 
         # NIP and REGON never change for a company: once stored they're locked (a wrong one is fixed by a superuser in
@@ -103,7 +113,7 @@ class TenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tenant
-        fields = ("id", "name", "billing_email", "nip", "company_name", "regon", "address", "vat_status")
+        fields = ("id", "name", "billing_email", "country", "nip", "company_name", "regon", "address", "vat_status")
 
 
 class UpdateTenantSerializer(TenantSerializer):

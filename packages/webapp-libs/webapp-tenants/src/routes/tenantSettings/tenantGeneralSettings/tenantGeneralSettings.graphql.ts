@@ -6,6 +6,7 @@ export const updateTenantMutation = gql(/* GraphQL */ `
       tenant {
         id
         name
+        country
         nip
         companyName
         regon

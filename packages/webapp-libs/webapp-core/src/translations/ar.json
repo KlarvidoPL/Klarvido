@@ -4205,6 +4205,21 @@
   "Tenant form / Company name required": {
     "defaultMessage": "اسم الشركة مطلوب"
   },
+  "Tenant form / Country NIP and REGON locked hint": {
+    "defaultMessage": "لا يمكن تغيير الدولة ورقمي NIP وREGON بعد حفظها."
+  },
+  "Tenant form / Country hint": {
+    "defaultMessage": "اختر الدولة التي سُجلت فيها الشركة. الدول المدعومة حاليًا: {countries}."
+  },
+  "Tenant form / Country label": {
+    "defaultMessage": "دولة التسجيل:"
+  },
+  "Tenant form / Country placeholder": {
+    "defaultMessage": "اختر الدولة"
+  },
+  "Tenant form / Country required": {
+    "defaultMessage": "الدولة مطلوبة"
+  },
   "Tenant form / DeleteTenant / Success message": {
     "defaultMessage": "تم حذف المؤسسة بنجاح!"
   },
@@ -4234,9 +4249,6 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "حالة ضريبة القيمة المضافة"
-  },
-  "Tenant form / NIP and REGON locked hint": {
-    "defaultMessage": "لا يمكن تغيير رقمي NIP وREGON بعد حفظهما."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "رقم NIP غير صالح"

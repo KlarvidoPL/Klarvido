@@ -19,7 +19,7 @@ const NIP = '9721382373';
 
 const lookupMock = (company: Record<string, string> | null) =>
   composeMockedQueryResult(companyLookupByNipQuery, {
-    variables: { nip: NIP },
+    variables: { nip: NIP, country: 'PL' },
     data: {
       companyLookupByNip: {
         __typename: 'CompanyLookupType',
@@ -49,6 +49,24 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/nip/i)).toHaveValue('');
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
+  });
+
+  it('should preselect the only supported country and prefix the NIP with its code', async () => {
+    render(<Component />);
+
+    expect(await screen.findByRole('combobox')).toHaveTextContent('Poland');
+    expect(screen.getByText(/currently supported: poland/i)).toBeInTheDocument();
+    // The "PL" prefix sits inside the NIP input, as part of its label
+    expect(screen.getByLabelText(/nip/i).closest('label')).toHaveTextContent('PL');
+  });
+
+  it('should accept the NIP pasted in its EU VAT number form', async () => {
+    render(<Component />, { apolloMocks: [lookupMock(null)] });
+
+    await fillStepOne('Acme', 'PL 972-138-23-73');
+
+    // Valid, and looked up as the plain NIP (the mock only matches nip "9721382373")
+    expect(await screen.findByText(/couldn't find this NIP/i)).toBeInTheDocument();
   });
 
   it('should require a valid NIP before moving to the next step', async () => {
@@ -154,6 +172,7 @@ describe('AddTenantForm: Component', () => {
       const variables = {
         input: {
           name: 'new item name',
+          country: 'PL',
           nip: NIP,
           companyName: 'ACME SP. Z O.O.',
           regon: '123456785',
