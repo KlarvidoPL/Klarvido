@@ -26,7 +26,7 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
             key={number}
             aria-current={number === step ? 'step' : undefined}
             className={cn(
-              'flex min-h-11 min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-sm',
+              'flex h-12 min-w-0 items-center justify-center gap-2 overflow-hidden rounded-lg border px-2 text-center text-sm',
               number === step
                 ? 'border-primary bg-primary text-primary-foreground'
                 : number < step
@@ -35,7 +35,7 @@ export const OnboardingProgress = ({ step }: { step: number }) => {
             )}
           >
             <span className="shrink-0 font-semibold">{number}.</span>
-            <span className="min-w-0 break-words leading-tight">{label}</span>
+            <span className="whitespace-nowrap">{label}</span>
           </li>
         );
       })}
