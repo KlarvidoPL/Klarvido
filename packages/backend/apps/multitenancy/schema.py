@@ -397,6 +397,12 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
     class Meta:
         model = models.Tenant
 
+    class Input:
+        id = graphene.String()
+        # Resolved by TenantUserRoleMiddleware (with the membership check) into info.context.tenant - it never falls
+        # back to the generic `id`, so without this the requires("org.delete") check has no tenant to evaluate
+        tenant_id = graphene.String(required=True)
+
     @classmethod
     def mutate_and_get_payload(cls, root, info, id, **kwargs):
         """
@@ -407,8 +413,17 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
 
         Raises:
             GraphQlValidationError: If deletion encounters validation errors.
+            PermissionDenied: If no tenant was resolved, or `id` names a different tenant than the checked one.
         """
         tenant = info.context.tenant
+        if not tenant:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            _, pk = from_global_id(id or "")
+        except (TypeError, ValueError):
+            pk = None
+        if str(pk) != str(tenant.pk):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
         if tenant.type == ConstantsTenantType.DEFAULT:
             raise exceptions.GraphQlValidationError("Cannot delete default type tenant.")

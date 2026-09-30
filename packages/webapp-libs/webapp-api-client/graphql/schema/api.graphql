@@ -2973,6 +2973,7 @@ input UpdateTenantMutationInput {
 }
 input DeleteTenantMutationInput {
   id: String
+  tenantId: String!
   clientMutationId: String
 }
 input CreateTenantInvitationMutationInput {

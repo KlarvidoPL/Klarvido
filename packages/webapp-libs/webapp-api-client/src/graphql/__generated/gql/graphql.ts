@@ -1785,6 +1785,7 @@ export type DeleteTenantMembershipMutationPayload = {
 export type DeleteTenantMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
+  tenantId: Scalars['String']['input'];
 };
 
 /** Mutation to delete a tenant from the system. */
