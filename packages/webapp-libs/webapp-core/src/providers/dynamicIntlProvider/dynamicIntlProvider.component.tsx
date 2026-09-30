@@ -112,15 +112,8 @@ export const DynamicIntlProvider = ({
     };
   }, [onError, isDevMode]);
 
-  // Generate a unique key to force re-render when messages change
-  const providerKey = useMemo(() => {
-    const messagesPreview = JSON.stringify(messages).slice(0, 100);
-    return `${locale}-${messagesPreview}`;
-  }, [locale, messages]);
-
   return (
     <IntlProvider
-      key={providerKey}
       locale={locale}
       messages={messages}
       defaultLocale={DEFAULT_LOCALE}
