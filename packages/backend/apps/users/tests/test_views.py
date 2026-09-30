@@ -223,3 +223,30 @@ class TestSocialAuthCreatesSession:
 
         assert not SSOSession.objects.filter(user=user).exists()
         mock_backend.strategy.set_session_id.assert_not_called()
+
+
+class TestSocialAuthSetsAuthMethodClaim:
+    """Regression test for a bug where the OAuth-issued JWT never got an
+    `auth_method` claim (it was minted via a raw RefreshToken.for_user() instead
+    of the create_jwt_tokens() helper every other login path uses). Since
+    get_auth_method_from_token() defaults a missing claim to 'password', this
+    silently let a "Sign in with Google" login bypass SSO enforcement for
+    tenants that require it (is_password_session() wrongly treated it as
+    exempt)."""
+
+    def _get_do_login_callback(self, api_client):
+        with patch("apps.users.views.do_complete") as mock_do_complete:
+            mock_do_complete.return_value = HttpResponse()
+            api_client.get(reverse("social:complete", kwargs={"backend": "google-oauth2"}))
+        return mock_do_complete.call_args.args[1]
+
+    def test_oauth_token_carries_oauth_auth_method_claim(self, api_client, user_factory):
+        user = user_factory(otp_enabled=False)
+        do_login = self._get_do_login_callback(api_client)
+        mock_backend = MagicMock()
+
+        do_login(mock_backend, user, social_user=None)
+
+        token = mock_backend.strategy.set_jwt.call_args.args[0]
+        assert token['auth_method'] == 'oauth'
+        assert token.access_token['auth_method'] == 'oauth'

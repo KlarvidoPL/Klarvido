@@ -84,6 +84,11 @@ def complete(request, backend, *args, **kwargs):
             backend.strategy.set_otp_auth_token(otp_auth_token)
         else:
             token = jwt_tokens.RefreshToken.for_user(user)
+            # Without this, get_auth_method_from_token() defaults missing claims
+            # to 'password', which lets an OAuth login silently bypass SSO
+            # enforcement (is_password_session() would wrongly consider it exempt).
+            token['auth_method'] = 'oauth'
+            token.access_token['auth_method'] = 'oauth'
             backend.strategy.set_jwt(token)
 
             try:

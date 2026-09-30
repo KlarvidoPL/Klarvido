@@ -36,7 +36,7 @@ import { Admin } from '../routes/admin';
 import { PasswordReset } from '../routes/auth/passwordReset';
 import ValidateOtp from '../routes/auth/validateOtp';
 import { AnonymousRoute, AuthRoute } from '../shared/components/routes';
-import { ConfirmEmail, Home, Login, Logout, NotFound, Profile, Signup, SSOCallback, SSOError, SSOLogin } from './asyncComponents';
+import { ConfirmEmail, Home, Login, Logout, NotFound, OAuthCallback, Profile, Signup, SSOCallback, SSOError, SSOLogin } from './asyncComponents';
 import { LANG_PREFIX, RoutesConfig, TENANT_PREFIX } from './config/routes';
 import { ValidRoutesProviders } from './providers';
 
@@ -55,6 +55,7 @@ export const App = () => {
             <Route path={RoutesConfig.ssoLogin} element={<SSOLogin />} />
             <Route path={RoutesConfig.ssoCallback} element={<SSOCallback />} />
             <Route path={RoutesConfig.ssoError} element={<SSOError />} />
+            <Route path={RoutesConfig.oauthCallback} element={<OAuthCallback />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 

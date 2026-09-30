@@ -31,4 +31,5 @@ export const NO_NAVIGATION_ROUTES = [
   RoutesConfig.ssoLogin,
   RoutesConfig.ssoCallback,
   RoutesConfig.ssoError,
+  RoutesConfig.oauthCallback,
 ].map(getLocalePath);

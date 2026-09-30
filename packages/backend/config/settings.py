@@ -644,6 +644,8 @@ OTP_AUTH_TOKEN_COOKIE = "otp_auth_token"
 OTP_AUTH_TOKEN_LIFETIME_MINUTES = datetime.timedelta(minutes=env.int("OTP_AUTH_TOKEN_LIFETIME_MINUTES", default=5))
 OTP_VALIDATE_PATH = "/auth/validate-otp"
 
+OAUTH_CALLBACK_PATH = "/auth/oauth/callback"
+
 OPENAI_API_KEY = env("OPENAI_API_KEY", default="")
 # Use gpt-5.1 by default as it supports both vision (image parsing) and JSON mode
 # Other options: gpt-4o, gpt-4o-mini, gpt-4-turbo
