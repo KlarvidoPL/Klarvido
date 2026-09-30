@@ -108,6 +108,7 @@ MIDDLEWARE = [
     "common.middleware.HealthCheckMiddleware",
     "common.middleware.ManageCookiesMiddleware",
     "common.middleware.SetAuthTokenCookieMiddleware",
+    "apps.sso.middleware.SessionActivityMiddleware",
     "django_hosts.middleware.HostsRequestMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",

@@ -76,10 +76,14 @@ const getDeviceIcon = (deviceType: string) => {
   }
 };
 
-const formatLastActive = (dateStr: string, intl: ReturnType<typeof useIntl>) => {
-  const diffMinutes = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60));
+// The backend records activity at most once a minute per session, so anything this recent counts as "now"
+const ACTIVE_NOW_MINUTES = 2;
 
-  if (diffMinutes < 1) {
+const formatLastActive = (session: SessionNode, intl: ReturnType<typeof useIntl>) => {
+  const diffMinutes = Math.floor((Date.now() - new Date(session.lastActivityAt).getTime()) / (1000 * 60));
+
+  // The current device is the one looking at this list, so it's always active now
+  if (session.isCurrent || diffMinutes < ACTIVE_NOW_MINUTES) {
     return intl.formatMessage({ defaultMessage: 'Active now', id: 'Sessions / Active now' });
   }
   // Intl.RelativeTimeFormat handles each language's plural forms ("1 minutę temu", "4 minuty temu", "5 minut temu")
@@ -127,7 +131,7 @@ const SessionDetails = ({ session }: { session: SessionNode }) => {
         />
       </span>
       <span>•</span>
-      <span>{formatLastActive(session.lastActivityAt, intl)}</span>
+      <span>{formatLastActive(session, intl)}</span>
     </div>
   );
 };

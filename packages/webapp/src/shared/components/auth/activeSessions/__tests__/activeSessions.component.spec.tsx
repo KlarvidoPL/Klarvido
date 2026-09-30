@@ -39,7 +39,8 @@ describe('ActiveSessions: Component', () => {
     render(<ActiveSessions />, {
       apolloMocks: [
         sessionsMock([
-          sessionNode({ id: 'current', isCurrent: true, lastActivityAt: minutesAgo(0) }),
+          // The current device is always "Active now", even if its last recorded activity is a bit older
+          sessionNode({ id: 'current', isCurrent: true, lastActivityAt: minutesAgo(3) }),
           sessionNode({ id: 'other', deviceName: 'Firefox on Windows', lastActivityAt: minutesAgo(4) }),
         ]),
       ],
@@ -52,11 +53,30 @@ describe('ActiveSessions: Component', () => {
     expect(screen.getByText('Last active 4 minutes ago')).toBeInTheDocument();
   });
 
-  it('should use the singular form for one unit', async () => {
+  it('should treat very recent activity on another device as active now', async () => {
     render(<ActiveSessions />, {
-      apolloMocks: [sessionsMock([sessionNode({ isCurrent: true, lastActivityAt: minutesAgo(1) })])],
+      apolloMocks: [
+        sessionsMock([
+          sessionNode({ id: 'current', isCurrent: true }),
+          sessionNode({ id: 'other', deviceName: 'Firefox on Windows', lastActivityAt: minutesAgo(1) }),
+        ]),
+      ],
     });
 
-    expect(await screen.findByText('Last active 1 minute ago')).toBeInTheDocument();
+    expect(await screen.findByText('Firefox on Windows')).toBeInTheDocument();
+    expect(screen.getAllByText('Active now')).toHaveLength(2);
+  });
+
+  it('should use the singular form for one unit', async () => {
+    render(<ActiveSessions />, {
+      apolloMocks: [
+        sessionsMock([
+          sessionNode({ id: 'current', isCurrent: true }),
+          sessionNode({ id: 'other', deviceName: 'Firefox on Windows', lastActivityAt: minutesAgo(60) }),
+        ]),
+      ],
+    });
+
+    expect(await screen.findByText('Last active 1 hour ago')).toBeInTheDocument();
   });
 });
