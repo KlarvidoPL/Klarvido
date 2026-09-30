@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "所有其他会话已退出登录。"
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{os} 上的 {browser}"
+  },
   "Sessions / Current": {
     "defaultMessage": "当前"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "当前会话"
   },
   "Sessions / Description": {
     "defaultMessage": "管理你在各设备上的活动登录会话"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "活动会话"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "未知设备"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "管理"

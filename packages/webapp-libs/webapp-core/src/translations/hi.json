@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "अन्य सभी सेशन से साइन आउट कर दिया गया है।"
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{os} पर {browser}"
+  },
   "Sessions / Current": {
     "defaultMessage": "वर्तमान"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "वर्तमान सेशन"
   },
   "Sessions / Description": {
     "defaultMessage": "डिवाइसों पर अपने सक्रिय साइन-इन सेशन प्रबंधित करें"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "सक्रिय सेशन"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "अज्ञात डिवाइस"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "प्रशासन"

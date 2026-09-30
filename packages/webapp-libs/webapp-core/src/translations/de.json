@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Alle anderen Sitzungen wurden abgemeldet."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} auf {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Aktuell"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Aktuelle Sitzung"
   },
   "Sessions / Description": {
     "defaultMessage": "Verwalte deine aktiven Anmeldesitzungen auf allen Geräten"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "Aktive Sitzungen"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Unbekanntes Gerät"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administration"

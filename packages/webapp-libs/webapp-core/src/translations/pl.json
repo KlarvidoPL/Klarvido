@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Wszystkie inne sesje zostały wylogowane."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} na {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Bieżąca"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Bieżąca sesja"
   },
   "Sessions / Description": {
     "defaultMessage": "Zarządzaj aktywnymi sesjami logowania na różnych urządzeniach"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "Aktywne sesje"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Nieznane urządzenie"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administracja"

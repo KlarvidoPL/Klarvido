@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "تم تسجيل الخروج من جميع الجلسات الأخرى."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} على {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "الحالية"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "الجلسة الحالية"
   },
   "Sessions / Description": {
     "defaultMessage": "إدارة جلسات تسجيل الدخول النشطة عبر الأجهزة"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "الجلسات النشطة"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "جهاز غير معروف"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "الإدارة"

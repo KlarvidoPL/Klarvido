@@ -76,6 +76,19 @@ const getDeviceIcon = (deviceType: string) => {
   }
 };
 
+// The backend stores "Unknown" when it can't tell the browser / OS from the user agent
+const knownOrNull = (value?: string | null) => (value && value !== 'Unknown' ? value : null);
+
+// Built here rather than using the backend's deviceName, which is a fixed English "{browser} on {os}"
+const formatDeviceName = (session: SessionNode, intl: ReturnType<typeof useIntl>) => {
+  const browser = knownOrNull(session.browser);
+  const os = knownOrNull(session.operatingSystem);
+  if (browser && os) {
+    return intl.formatMessage({ defaultMessage: '{browser} on {os}', id: 'Sessions / Browser on OS' }, { browser, os });
+  }
+  return browser || os || intl.formatMessage({ defaultMessage: 'Unknown device', id: 'Sessions / Unknown device' });
+};
+
 // The backend records activity at most once a minute per session, so anything this recent counts as "now"
 const ACTIVE_NOW_MINUTES = 2;
 
@@ -230,18 +243,14 @@ export const ActiveSessions = () => {
     <div className="space-y-4">
       {/* Current Session */}
       {currentSession && (
-        <div className="flex items-center justify-between rounded-lg border bg-primary/5 p-4 border-primary/20">
+        <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-primary/10 p-2 text-primary">
               {getDeviceIcon(currentSession.deviceType)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium">
-                  {currentSession.deviceName || (
-                    <FormattedMessage defaultMessage="Current Session" id="Sessions / Current Session" />
-                  )}
-                </p>
+                <p className="text-sm font-medium">{formatDeviceName(currentSession, intl)}</p>
                 <Badge variant="default" className="text-xs">
                   <FormattedMessage defaultMessage="This device" id="Sessions / This Device Badge" />
                 </Badge>
@@ -257,18 +266,11 @@ export const ActiveSessions = () => {
         <>
           <div className="space-y-2">
             {otherSessions.map((session) => (
-              <div
-                key={session.id}
-                className="flex items-center justify-between rounded-lg border p-4"
-              >
+              <div key={session.id} className="flex items-center justify-between rounded-lg border p-4">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-muted p-2">
-                    {getDeviceIcon(session.deviceType)}
-                  </div>
+                  <div className="rounded-full bg-muted p-2">{getDeviceIcon(session.deviceType)}</div>
                   <div>
-                    <p className="text-sm font-medium">
-                      {session.deviceName || `${session.browser} on ${session.operatingSystem}`}
-                    </p>
+                    <p className="text-sm font-medium">{formatDeviceName(session, intl)}</p>
                     <SessionDetails session={session} />
                   </div>
                 </div>
@@ -302,17 +304,14 @@ export const ActiveSessions = () => {
           >
             {revokingAll && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <XCircle className="mr-2 h-4 w-4" />
-            <FormattedMessage
-              defaultMessage="Sign out all other sessions"
-              id="Sessions / Sign Out All Button"
-            />
+            <FormattedMessage defaultMessage="Sign out all other sessions" id="Sessions / Sign Out All Button" />
           </Button>
         </div>
       )}
 
       {/* No other sessions message */}
       {otherSessions.length === 0 && (
-        <p className="text-center text-sm text-muted-foreground py-2">
+        <p className="py-2 text-center text-sm text-muted-foreground">
           <FormattedMessage
             defaultMessage="No other active sessions. You're only signed in on this device."
             id="Sessions / No Other Sessions"
@@ -322,4 +321,3 @@ export const ActiveSessions = () => {
     </div>
   );
 };
-

@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Se han cerrado todas las demás sesiones."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} en {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Actual"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Sesión actual"
   },
   "Sessions / Description": {
     "defaultMessage": "Administra tus sesiones activas en distintos dispositivos"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "Sesiones activas"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Dispositivo desconocido"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administración"

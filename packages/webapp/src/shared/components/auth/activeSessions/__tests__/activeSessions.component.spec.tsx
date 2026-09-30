@@ -41,7 +41,7 @@ describe('ActiveSessions: Component', () => {
         sessionsMock([
           // The current device is always "Active now", even if its last recorded activity is a bit older
           sessionNode({ id: 'current', isCurrent: true, lastActivityAt: minutesAgo(3) }),
-          sessionNode({ id: 'other', deviceName: 'Firefox on Windows', lastActivityAt: minutesAgo(4) }),
+          sessionNode({ id: 'other', browser: 'Firefox', operatingSystem: 'Windows', lastActivityAt: minutesAgo(4) }),
         ]),
       ],
     });
@@ -58,7 +58,7 @@ describe('ActiveSessions: Component', () => {
       apolloMocks: [
         sessionsMock([
           sessionNode({ id: 'current', isCurrent: true }),
-          sessionNode({ id: 'other', deviceName: 'Firefox on Windows', lastActivityAt: minutesAgo(1) }),
+          sessionNode({ id: 'other', browser: 'Firefox', operatingSystem: 'Windows', lastActivityAt: minutesAgo(1) }),
         ]),
       ],
     });
@@ -72,11 +72,27 @@ describe('ActiveSessions: Component', () => {
       apolloMocks: [
         sessionsMock([
           sessionNode({ id: 'current', isCurrent: true }),
-          sessionNode({ id: 'other', deviceName: 'Firefox on Windows', lastActivityAt: minutesAgo(60) }),
+          sessionNode({ id: 'other', browser: 'Firefox', operatingSystem: 'Windows', lastActivityAt: minutesAgo(60) }),
         ]),
       ],
     });
 
     expect(await screen.findByText('Last active 1 hour ago')).toBeInTheDocument();
+  });
+
+  it('should name the device from the browser and OS, falling back when they are unknown', async () => {
+    render(<ActiveSessions />, {
+      apolloMocks: [
+        sessionsMock([
+          sessionNode({ id: 'current', isCurrent: true }),
+          sessionNode({ id: 'browser-only', browser: 'Safari', operatingSystem: 'Unknown' }),
+          sessionNode({ id: 'nothing', browser: 'Unknown', operatingSystem: 'Unknown' }),
+        ]),
+      ],
+    });
+
+    expect(await screen.findByText('Chrome on macOS')).toBeInTheDocument();
+    expect(screen.getByText('Safari')).toBeInTheDocument();
+    expect(screen.getByText('Unknown device')).toBeInTheDocument();
   });
 });

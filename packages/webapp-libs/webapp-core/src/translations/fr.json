@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Toutes les autres sessions ont été déconnectées."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} sur {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Actuelle"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Session actuelle"
   },
   "Sessions / Description": {
     "defaultMessage": "Gérez vos sessions de connexion actives sur tous vos appareils"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "Sessions actives"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Appareil inconnu"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administration"

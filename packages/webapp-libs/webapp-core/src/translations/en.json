@@ -3704,11 +3704,11 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "All other sessions have been signed out."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} on {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Current"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Current Session"
   },
   "Sessions / Description": {
     "defaultMessage": "Manage your active sign-in sessions across devices"
@@ -3778,6 +3778,9 @@
   },
   "Sessions / Title": {
     "defaultMessage": "Active Sessions"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Unknown device"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administration"
