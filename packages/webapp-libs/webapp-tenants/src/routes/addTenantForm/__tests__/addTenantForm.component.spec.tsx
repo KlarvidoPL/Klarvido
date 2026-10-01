@@ -4,7 +4,7 @@ import { commonQueryCurrentUserQuery } from '@sb/webapp-api-client/providers';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
@@ -235,12 +235,9 @@ describe('AddTenantForm: Component', () => {
       await screen.findByDisplayValue(variables.input.companyName);
       await userEvent.click(screen.getByRole('button', { name: /create organization/i }));
 
-      // Wait for the toast first (proves mutation completed), then verify mocks were called
-      const toast = await screen.findByTestId('toast-1');
-      expect(toast).toHaveTextContent('Organization added successfully!');
-
-      expect(requestMock.result).toHaveBeenCalled();
-      expect(trackEvent).toHaveBeenCalledWith('tenant', 'add', '1');
+      await waitFor(() => expect(requestMock.result).toHaveBeenCalled());
+      expect(screen.queryByText('Organization added successfully!')).not.toBeInTheDocument();
+      await waitFor(() => expect(trackEvent).toHaveBeenCalledWith('tenant', 'add', '1'));
     });
   });
 });

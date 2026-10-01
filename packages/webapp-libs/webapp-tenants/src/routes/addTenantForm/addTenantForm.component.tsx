@@ -8,7 +8,6 @@ import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { useToast } from '@sb/webapp-core/toast/useToast';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -46,7 +45,6 @@ type AddTenantFormFields = TenantFormFields & { respondentRole: string };
 
 export const AddTenantForm = () => {
   const generateTenantPath = useGenerateTenantPath();
-  const { toast } = useToast();
   const intl = useIntl();
   const navigate = useNavigate();
   const { reload: reloadCommonQuery } = useCommonQuery();
@@ -93,11 +91,6 @@ export const AddTenantForm = () => {
     (field, index) => !companyValues[index] || !!errors[field]
   );
 
-  const successMessage = intl.formatMessage({
-    id: 'Tenant form / AddTenant / Success message',
-    defaultMessage: 'Organization added successfully!',
-  });
-
   const [commitTenantFormMutation, { loading: loadingMutation }] = useMutation(addTenantMutation, {
     onCompleted: async (data) => {
       const id = data?.createTenant?.tenantEdge?.node?.id;
@@ -105,9 +98,9 @@ export const AddTenantForm = () => {
 
       trackEvent('tenant', 'add', id);
 
-      toast({ description: successMessage, variant: 'success' });
-
-      navigate(generateTenantPath(TenantRoutesConfig.tenant.onboarding, { tenantId: id! }));
+      navigate(generateTenantPath(TenantRoutesConfig.tenant.onboarding, { tenantId: id! }), {
+        state: { organizationCreated: true },
+      });
     },
     onError: (error) => {
       const graphQLErrors = extractGraphQLErrors(error);

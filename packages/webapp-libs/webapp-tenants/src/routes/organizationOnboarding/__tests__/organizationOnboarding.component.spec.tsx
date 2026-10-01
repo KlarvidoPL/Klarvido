@@ -122,4 +122,28 @@ describe('OrganizationOnboarding', () => {
     expect(await screen.findByText('What do customers pay you for?')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Project / assignment' })).toHaveAttribute('aria-pressed', 'true');
   });
+
+  it('shows the organization-created toast only after confirming the summary', async () => {
+    const completeMock = composeMockedQueryResult(saveOrganizationOnboardingStepMutation, {
+      variables: { tenantId, step: 7 },
+      data: {
+        saveOrganizationOnboardingStep: {
+          profile: { ...profile, currentStep: 7, ksefStatus: 'demo', completedAt: '2026-10-01T10:00:00Z' },
+        },
+      },
+    });
+    render(<OrganizationOnboarding />, {
+      TenantWrapper,
+      routerProps: {
+        initialEntries: [{ pathname: '/en/tenant-1/tenant/onboarding', state: { organizationCreated: true } }],
+      },
+      apolloMocks: (mocks) => [...mocks, profileMock(7, true), completeMock, profileMock(7, true)],
+    });
+
+    expect(await screen.findByText('Your business profile')).toBeInTheDocument();
+    expect(screen.queryByText('Organization added successfully!')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm profile' }));
+    expect(await screen.findByText('Organization added successfully!')).toBeInTheDocument();
+    expect(completeMock.result).toHaveBeenCalled();
+  });
 });

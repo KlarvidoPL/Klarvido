@@ -6,9 +6,9 @@ import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useToast } from '@sb/webapp-core/toast';
 import { ArrowLeft, ArrowRight, Building2, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
@@ -52,43 +52,72 @@ const ChoiceGroup = ({
   selected: string[];
   onChange: (values: string[]) => void;
   max?: number;
-}) => (
-  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-    {options.map((option) => {
-      const active = selected.includes(option.value);
-      return (
-        <button
-          key={option.value}
-          type="button"
-          aria-pressed={active}
-          className={cn(
-            'min-h-24 rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary',
-            active && 'border-primary bg-primary/5 ring-1 ring-primary'
-          )}
-          onClick={() =>
-            onChange(
-              max === 1
-                ? [option.value]
-                : active
-                  ? selected.filter((value) => value !== option.value)
-                  : selected.length < max
-                    ? [...selected, option.value]
-                    : selected
-            )
-          }
-        >
-          <span className="block font-medium">{option.label}</span>
-          {option.hint && <span className="mt-1 block text-sm text-muted-foreground">{option.hint}</span>}
-        </button>
-      );
-    })}
-  </div>
-);
+}) => {
+  const [optionWidth, setOptionWidth] = useState(192);
+  const measurementRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const labelsKey = options.map(({ label, hint }) => `${label}:${hint ?? ''}`).join('|');
+
+  useLayoutEffect(() => {
+    const widestLabel = Math.max(...measurementRefs.current.map((element) => element?.offsetWidth ?? 0));
+    setOptionWidth(Math.max(192, widestLabel + 32));
+  }, [labelsKey]);
+
+  return (
+    <div className="relative flex flex-wrap gap-3">
+      <div className="pointer-events-none absolute invisible" aria-hidden="true">
+        {options.map((option, index) => (
+          <span
+            key={option.value}
+            ref={(element) => {
+              measurementRefs.current[index] = element;
+            }}
+            className="block w-max whitespace-nowrap text-sm font-medium"
+          >
+            {option.label}
+          </span>
+        ))}
+      </div>
+      {options.map((option) => {
+        const active = selected.includes(option.value);
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={active}
+            style={{ width: optionWidth }}
+            className={cn(
+              'min-h-16 max-w-full flex-none rounded-lg border bg-card px-4 py-3 text-left text-sm transition-colors hover:border-primary',
+              active && 'border-primary bg-primary/5 ring-1 ring-primary'
+            )}
+            onClick={() =>
+              onChange(
+                max === 1
+                  ? [option.value]
+                  : active
+                    ? selected.filter((value) => value !== option.value)
+                    : selected.length < max
+                      ? [...selected, option.value]
+                      : selected
+              )
+            }
+          >
+            <span className="block font-medium">{option.label}</span>
+            {option.hint && <span className="mt-1 block text-sm text-muted-foreground">{option.hint}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 export const OrganizationOnboarding = () => {
   const { data: tenant } = useCurrentTenant();
   const tenantId = tenant?.id ?? '';
   const navigate = useNavigate();
+  const location = useLocation();
+  const organizationCreated = Boolean(
+    (location.state as { organizationCreated?: boolean } | null)?.organizationCreated
+  );
   const tenantPath = useGenerateTenantPath();
   const intl = useIntl();
   const { toast } = useToast();
@@ -314,7 +343,12 @@ export const OrganizationOnboarding = () => {
       }
       if (step === 7) {
         toast({
-          description: intl.formatMessage({ defaultMessage: 'Onboarding completed', id: 'Onboarding / Completed' }),
+          description: organizationCreated
+            ? intl.formatMessage({
+                defaultMessage: 'Organization added successfully!',
+                id: 'Tenant form / AddTenant / Success message',
+              })
+            : intl.formatMessage({ defaultMessage: 'Onboarding completed', id: 'Onboarding / Completed' }),
           variant: 'success',
         });
         navigate(tenantPath(RoutesConfig.home));
