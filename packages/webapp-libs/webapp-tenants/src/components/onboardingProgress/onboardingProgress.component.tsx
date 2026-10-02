@@ -37,7 +37,7 @@ export const OnboardingProgress = ({
               key={number}
               aria-current={number === step ? 'step' : undefined}
               className={cn(
-                'h-12 min-w-0 rounded-lg border text-center text-sm',
+                'onboarding-progress__step h-12 min-w-0 rounded-lg border text-center',
                 number === step
                   ? 'border-primary bg-primary text-primary-foreground'
                   : number < step
@@ -49,10 +49,11 @@ export const OnboardingProgress = ({
                 type="button"
                 disabled={!onStepChange || number > maxStep || number === step}
                 onClick={() => onStepChange?.(number)}
-                className="flex h-full w-full items-center justify-center gap-2 whitespace-nowrap px-2 disabled:cursor-default"
+                className="flex h-full min-w-0 w-full items-center justify-center whitespace-nowrap px-1 disabled:cursor-default"
               >
-                <span className="shrink-0 font-semibold">{number}.</span>
-                <span className="whitespace-nowrap [hyphens:none]">{label}</span>
+                <span className="whitespace-nowrap font-semibold [hyphens:none]">
+                  {number}. <span className="font-normal">{label}</span>
+                </span>
               </button>
             </li>
           );
