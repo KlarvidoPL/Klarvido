@@ -32,22 +32,25 @@ export const NotificationsList = (props: NotificationsListProps) => {
     })
   );
 
+  const markAllAsReadLabel = intl.formatMessage({
+    defaultMessage: 'Mark all as read',
+    id: 'Notifications / Notifications List / Mark all as read button',
+  });
+
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between border-b px-4 py-3">
-        <H4 className="text-base font-semibold">
+      <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
+        <H4 className="truncate text-base font-semibold">
           <FormattedMessage defaultMessage="Notifications" id="Notifications / Notifications List / Title" />
         </H4>
         <Button
           icon={<CheckCheck size={14} />}
-          className="h-8 text-xs"
+          className="h-8 shrink-0 text-xs"
           variant={ButtonVariant.GHOST}
           onClick={markAllAsRead}
+          aria-label={markAllAsReadLabel}
         >
-          <FormattedMessage
-            defaultMessage="Mark all as read"
-            id="Notifications / Notifications List / Mark all as read button"
-          />
+          <span className="hidden sm:inline">{markAllAsReadLabel}</span>
         </Button>
       </div>
       <ScrollableContainer {...props} />

@@ -249,7 +249,7 @@ export const ActiveSessions = () => {
               {getDeviceIcon(currentSession.deviceType)}
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="mb-1 flex items-center gap-2">
                 <p className="text-sm font-medium">{formatDeviceName(currentSession, intl)}</p>
                 <Badge variant="default" className="text-xs">
                   <FormattedMessage defaultMessage="This device" id="Sessions / This Device Badge" />
@@ -270,7 +270,7 @@ export const ActiveSessions = () => {
                 <div className="flex items-center gap-3">
                   <div className="rounded-full bg-muted p-2">{getDeviceIcon(session.deviceType)}</div>
                   <div>
-                    <p className="text-sm font-medium">{formatDeviceName(session, intl)}</p>
+                    <p className="mb-1 text-sm font-medium">{formatDeviceName(session, intl)}</p>
                     <SessionDetails session={session} />
                   </div>
                 </div>

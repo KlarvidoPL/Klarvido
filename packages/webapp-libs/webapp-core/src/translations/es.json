@@ -2918,6 +2918,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "Tu invitación a «{tenant_name}» ha sido rechazada por «{name}»"
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "Añadir"
   },
@@ -2995,6 +3004,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "p. ej., MacBook Pro, iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "Nunca utilizada"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Las passkeys ofrecen una forma más segura y práctica de iniciar sesión usando la biometría de tu dispositivo o una llave de seguridad."

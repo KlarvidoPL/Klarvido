@@ -2918,6 +2918,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "Your invitation to \"{tenant_name}\" has been declined by \"{name}\""
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "Add"
   },
@@ -2995,6 +3004,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "e.g., MacBook Pro, iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "Never used"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Passkeys provide a more secure and convenient way to sign in using your device's biometrics or a security key."

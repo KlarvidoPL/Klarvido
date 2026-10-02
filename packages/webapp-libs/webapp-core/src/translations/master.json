@@ -3005,6 +3005,9 @@
   "Passkeys / Name placeholder": {
     "defaultMessage": "e.g., MacBook Pro, iPhone 15"
   },
+  "Passkeys / Never used": {
+    "defaultMessage": "Never used"
+  },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Passkeys provide a more secure and convenient way to sign in using your device's biometrics or a security key."
   },

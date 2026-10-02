@@ -2918,6 +2918,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "आपका \"{tenant_name}\" के लिए आमंत्रण \"{name}\" द्वारा अस्वीकार कर दिया गया है"
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "जोड़ें"
   },
@@ -2995,6 +3004,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "जैसे MacBook Pro, iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "कभी उपयोग नहीं किया गया"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Passkeys आपके डिवाइस की बायोमेट्रिक या सुरक्षा कुंजी का उपयोग करके साइन इन करने का अधिक सुरक्षित और सुविधाजनक तरीका प्रदान करते हैं।"

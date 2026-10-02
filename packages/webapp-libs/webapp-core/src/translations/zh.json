@@ -2918,6 +2918,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "您邀请加入“{tenant_name}”的请求已被“{name}”拒绝"
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "添加"
   },
@@ -2995,6 +3004,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "例如：MacBook Pro、iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "从未使用"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Passkeys 通过使用设备生物识别或安全密钥，为登录提供更安全、更便捷的方式。"
