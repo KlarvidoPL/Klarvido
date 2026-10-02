@@ -20,6 +20,8 @@ export const tenantFactory = createDeepFactory<TenantType>(() => ({
   // scenario most tests want; specifically testing the personal/no-org state should
   // opt in explicitly via `tenantFactory({ type: TenantTypeField.PERSONAL, ... })`.
   type: TenantTypeField.ORGANIZATION,
+  onboardingRequired: false,
+  onboardingCompleted: false,
   __typename: 'TenantType',
 }));
 
@@ -57,9 +59,4 @@ export const ADMIN_PERMISSIONS = [
 /**
  * Default owner permissions (all permissions)
  */
-export const OWNER_PERMISSIONS = [
-  ...ADMIN_PERMISSIONS,
-  'org.delete',
-  'org.roles.view',
-  'org.roles.manage',
-];
+export const OWNER_PERMISSIONS = [...ADMIN_PERMISSIONS, 'org.delete', 'org.roles.view', 'org.roles.manage'];

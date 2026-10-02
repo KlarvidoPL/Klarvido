@@ -135,6 +135,7 @@ class OrganizationOnboardingProfile(TimestampedMixin, models.Model):
     pricing = models.CharField(max_length=80, blank=True, default="")
     main_goal = models.CharField(max_length=120, blank=True, default="")
     current_step = models.PositiveSmallIntegerField(default=2)
+    is_required = models.BooleanField(default=False)
     ksef_demo_token_encrypted = models.TextField(blank=True, default="")
     ksef_status = models.CharField(max_length=20, default="not_connected")
     completed_at = models.DateTimeField(null=True, blank=True)

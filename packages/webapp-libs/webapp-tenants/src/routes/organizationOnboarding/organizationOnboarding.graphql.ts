@@ -10,6 +10,7 @@ export const organizationOnboardingProfileQuery = gql(/* GraphQL */ `
       pricing
       mainGoal
       currentStep
+      isRequired
       ksefStatus
       completedAt
     }
@@ -47,8 +48,28 @@ export const saveOrganizationOnboardingStepMutation = gql(/* GraphQL */ `
         pricing
         mainGoal
         currentStep
+        isRequired
         ksefStatus
         completedAt
+      }
+    }
+  }
+`);
+
+export const updateOnboardingTenantMutation = gql(/* GraphQL */ `
+  mutation updateOnboardingTenant($input: UpdateTenantMutationInput!) {
+    updateTenant(input: $input) {
+      tenant {
+        id
+        name
+        country
+        nip
+        companyName
+        regon
+        address
+        vatStatus
+        onboardingRequired
+        onboardingCompleted
       }
     }
   }

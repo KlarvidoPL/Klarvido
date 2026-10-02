@@ -10,7 +10,7 @@ import { cn } from '@sb/webapp-core/lib/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router';
 
 import {
@@ -41,11 +41,8 @@ enum Step {
 
 const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
-type AddTenantFormFields = TenantFormFields & { respondentRole: string };
-
 export const AddTenantForm = () => {
   const generateTenantPath = useGenerateTenantPath();
-  const intl = useIntl();
   const navigate = useNavigate();
   const { reload: reloadCommonQuery } = useCommonQuery();
   const { lookup, loading: lookupLoading } = useCompanyLookup();
@@ -58,7 +55,7 @@ export const AddTenantForm = () => {
   const [missingFields, setMissingFields] = useState<Array<keyof CompanyDetails>>([]);
 
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
-    useApiForm<AddTenantFormFields>({
+    useApiForm<TenantFormFields>({
       mode: 'onChange',
       defaultValues: {
         name: '',
@@ -68,7 +65,6 @@ export const AddTenantForm = () => {
         regon: '',
         address: '',
         vatStatus: '',
-        respondentRole: 'OWNER_MANAGEMENT',
       },
     });
   const {
@@ -136,7 +132,7 @@ export const AddTenantForm = () => {
     setStep(Step.COMPANY_DETAILS);
   };
 
-  const onSubmit = handleSubmit((formData: AddTenantFormFields) => {
+  const onSubmit = handleSubmit((formData: TenantFormFields) => {
     commitTenantFormMutation({
       variables: {
         input: {
@@ -147,7 +143,6 @@ export const AddTenantForm = () => {
           regon: normalizeDigits(formData.regon),
           address: formData.address,
           vatStatus: formData.vatStatus,
-          respondentRole: formData.respondentRole,
         },
       },
     });
@@ -188,41 +183,6 @@ export const AddTenantForm = () => {
                   <DisplayNameField />
                   <CountryField />
                   <NipField />
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="respondent-role" className="text-sm font-medium">
-                      <FormattedMessage
-                        defaultMessage="Your role in the company"
-                        id="Onboarding / Respondent role label"
-                      />
-                    </label>
-                    <select
-                      id="respondent-role"
-                      className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                      {...form.register('respondentRole')}
-                    >
-                      <option value="OWNER_MANAGEMENT">
-                        {intl.formatMessage({
-                          defaultMessage: 'Owner / management',
-                          id: 'Onboarding / Role owner management',
-                        })}
-                      </option>
-                      <option value="ACCOUNTING">
-                        {intl.formatMessage({ defaultMessage: 'Accounting', id: 'Onboarding / Role accounting' })}
-                      </option>
-                      <option value="ADVISOR">
-                        {intl.formatMessage({ defaultMessage: 'Advisor', id: 'Onboarding / Role advisor' })}
-                      </option>
-                      <option value="EMPLOYEE">
-                        {intl.formatMessage({ defaultMessage: 'Employee', id: 'Onboarding / Role employee' })}
-                      </option>
-                    </select>
-                    <p className="text-sm text-muted-foreground">
-                      <FormattedMessage
-                        defaultMessage="This answer describes your work. Your organization access remains Owner."
-                        id="Onboarding / Respondent role hint"
-                      />
-                    </p>
-                  </div>
                 </>
               )}
 

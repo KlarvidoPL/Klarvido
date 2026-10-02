@@ -1594,7 +1594,6 @@
       "Onboarding / Pricing subscription": "Subscription / package",
       "Onboarding / Pricing time unit": "Time / unit",
       "Onboarding / Pricing title": "How do you make key decisions?",
-      "Onboarding / Respondent role hint": "This answer describes your work. Your organization access remains Owner.",
       "Onboarding / Respondent role label": "Your role in the company",
       "Onboarding / Respondent role profile hint": "This answer is descriptive and does not change your organization permissions.",
       "Onboarding / Revenue commission": "Commission / result",
@@ -1613,10 +1612,8 @@
       "Onboarding / Settings action": "Open business profile",
       "Onboarding / Settings description": "Complete or update your organization onboarding answers.",
       "Onboarding / Settings title": "Business profile",
-      "Onboarding / Step company": "Company",
       "Onboarding / Step costs": "Costs",
       "Onboarding / Step customers": "Customers",
-      "Onboarding / Step data": "Data",
       "Onboarding / Step pricing goal": "Pricing & goal",
       "Onboarding / Step revenue": "Revenue",
       "Onboarding / Step summary": "Summary",
@@ -1627,7 +1624,10 @@
       "Onboarding / Summary not set": "Not set",
       "Onboarding / Summary pricing": "Pricing",
       "Onboarding / Summary title": "Your business profile",
-      "Onboarding / Title": "Set up your organization"
+      "Onboarding / Title": "Set up your organization",
+      "Onboarding / Edit": "Edit",
+      "Onboarding / Organization save failed": "Could not update the organization. Please check the fields and try again.",
+      "Onboarding / Summary role": "Your role"
     },
     "pl": {
       "AI Assistant / Accessing data": "Łączenie ze źródłami danych",
@@ -3165,7 +3165,6 @@
       "Onboarding / Pricing subscription": "Abonament / pakiet",
       "Onboarding / Pricing time unit": "Czas / jednostka",
       "Onboarding / Pricing title": "Jak podejmujesz najważniejsze decyzje?",
-      "Onboarding / Respondent role hint": "Ta odpowiedź opisuje Twoją pracę. Twoje uprawnienia w organizacji pozostają na poziomie Owner.",
       "Onboarding / Respondent role label": "Twoja rola w firmie",
       "Onboarding / Respondent role profile hint": "Ta odpowiedź ma charakter informacyjny i nie zmienia Twoich uprawnień w organizacji.",
       "Onboarding / Revenue commission": "Prowizja / wynik",
@@ -3184,10 +3183,8 @@
       "Onboarding / Settings action": "Otwórz profil firmy",
       "Onboarding / Settings description": "Uzupełnij lub zmień odpowiedzi dotyczące Twojej organizacji.",
       "Onboarding / Settings title": "Profil firmy",
-      "Onboarding / Step company": "Firma",
       "Onboarding / Step costs": "Koszty",
       "Onboarding / Step customers": "Klienci",
-      "Onboarding / Step data": "Dane",
       "Onboarding / Step pricing goal": "Ceny i cel",
       "Onboarding / Step revenue": "Przychody",
       "Onboarding / Step summary": "Podsumowanie",
@@ -3198,7 +3195,10 @@
       "Onboarding / Summary not set": "Nie ustawiono",
       "Onboarding / Summary pricing": "Ceny",
       "Onboarding / Summary title": "Profil Twojej firmy",
-      "Onboarding / Title": "Skonfiguruj organizację"
+      "Onboarding / Title": "Skonfiguruj organizację",
+      "Onboarding / Edit": "Edytuj",
+      "Onboarding / Organization save failed": "Nie udało się zaktualizować organizacji. Sprawdź pola i spróbuj ponownie.",
+      "Onboarding / Summary role": "Twoja rola"
     },
     "de": {
       "AI Assistant / Accessing data": "Zugriff auf Datenquellen",

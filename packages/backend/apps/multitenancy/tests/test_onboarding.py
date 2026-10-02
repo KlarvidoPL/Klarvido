@@ -4,10 +4,15 @@ from rest_framework.exceptions import ValidationError
 
 from ..constants import TenantType, TenantUserRole
 from ..models import OrganizationOnboardingProfile
-from ..services.onboarding import save_onboarding_step
+from ..services.onboarding import decrypt_demo_token, save_onboarding_step
 
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def onboarding_encryption_key(settings):
+    settings.ONBOARDING_KSEF_ENCRYPTION_KEY = 'HLKgz3EuGIF4jOIAHFGl5atkYZxugw3trZu00Uex0QI='
 
 
 def test_step_answers_persist_and_completion_requires_every_step(tenant_factory):
@@ -22,11 +27,14 @@ def test_step_answers_persist_and_completion_requires_every_step(tenant_factory)
     profile = save_onboarding_step(tenant, 6, ksef_token='a' * 40)
     assert profile.ksef_status == 'demo'
     assert 'a' * 40 not in profile.ksef_demo_token_encrypted
+    assert decrypt_demo_token(profile.ksef_demo_token_encrypted) == 'a' * 40
     assert profile.current_step == 7
 
     completed = save_onboarding_step(tenant, 7)
     assert completed.completed_at is not None
     assert completed.revenue_models == ['PROJECT', 'PRODUCT']
+    first_completed_at = completed.completed_at
+    assert save_onboarding_step(tenant, 7).completed_at == first_completed_at
 
 
 @pytest.mark.parametrize(
@@ -39,8 +47,19 @@ def test_step_answers_persist_and_completion_requires_every_step(tenant_factory)
 )
 def test_invalid_answers_are_rejected(tenant_factory, step, answer):
     tenant = tenant_factory(type=TenantType.ORGANIZATION)
+    OrganizationOnboardingProfile.objects.create(tenant=tenant, current_step=step)
     with pytest.raises(ValidationError):
         save_onboarding_step(tenant, step, **answer)
+
+
+def test_cannot_skip_steps_or_onboard_personal_tenant(tenant_factory):
+    organization = tenant_factory(type=TenantType.ORGANIZATION)
+    with pytest.raises(ValidationError):
+        save_onboarding_step(organization, 3, revenue_models=['PROJECT'])
+
+    personal = tenant_factory(type=TenantType.DEFAULT)
+    with pytest.raises(ValidationError):
+        save_onboarding_step(personal, 2, respondent_role='OWNER_MANAGEMENT', customer_type='B2B')
 
 
 QUERY = '''

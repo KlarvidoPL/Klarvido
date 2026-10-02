@@ -2972,6 +2972,9 @@
   "Onboarding / Customers title": {
     "defaultMessage": "Kto najczęściej Ci płaci?"
   },
+  "Onboarding / Edit": {
+    "defaultMessage": "Edytuj"
+  },
   "Onboarding / Description": {
     "defaultMessage": "Opowiedz nam, jak działa Twoja firma. Możesz wracać do wcześniejszych kroków."
   },
@@ -3014,6 +3017,9 @@
   "Onboarding / Next": {
     "defaultMessage": "Dalej"
   },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "Nie udało się zapisać danych organizacji. Sprawdź pola i spróbuj ponownie."
+  },
   "Onboarding / Pricing cost plus": {
     "defaultMessage": "Koszt plus marża"
   },
@@ -3034,9 +3040,6 @@
   },
   "Onboarding / Pricing title": {
     "defaultMessage": "Jak podejmujesz najważniejsze decyzje?"
-  },
-  "Onboarding / Respondent role hint": {
-    "defaultMessage": "Ta odpowiedź opisuje Twoją pracę. Twoje uprawnienia w organizacji pozostają na poziomie Owner."
   },
   "Onboarding / Respondent role label": {
     "defaultMessage": "Twoja rola w firmie"
@@ -3092,17 +3095,11 @@
   "Onboarding / Settings title": {
     "defaultMessage": "Profil firmy"
   },
-  "Onboarding / Step company": {
-    "defaultMessage": "Firma"
-  },
   "Onboarding / Step costs": {
     "defaultMessage": "Koszty"
   },
   "Onboarding / Step customers": {
     "defaultMessage": "Klienci"
-  },
-  "Onboarding / Step data": {
-    "defaultMessage": "Dane"
   },
   "Onboarding / Step pricing goal": {
     "defaultMessage": "Ceny i cel"
@@ -3130,6 +3127,9 @@
   },
   "Onboarding / Summary pricing": {
     "defaultMessage": "Ceny"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "Twoja rola"
   },
   "Onboarding / Summary title": {
     "defaultMessage": "Profil Twojej firmy"

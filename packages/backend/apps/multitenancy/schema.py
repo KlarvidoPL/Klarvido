@@ -259,6 +259,8 @@ class TenantType(DjangoObjectType):
     address = graphene.String()
     # Plain String (not the auto-generated choices enum): legacy rows store "" which isn't a VatStatus member
     vat_status = graphene.String()
+    onboarding_required = graphene.Boolean(required=True)
+    onboarding_completed = graphene.Boolean(required=True)
     membership = graphene.Field(TenantMembershipType)
     user_memberships = graphene.List(of_type=TenantMembershipType)
 
@@ -292,6 +294,20 @@ class TenantType(DjangoObjectType):
 
     def resolve_id(self, info):
         return to_global_id("TenantType", self.id)
+
+    @staticmethod
+    def resolve_onboarding_required(parent, info):
+        try:
+            return parent.onboarding_profile.is_required
+        except models.OrganizationOnboardingProfile.DoesNotExist:
+            return False
+
+    @staticmethod
+    def resolve_onboarding_completed(parent, info):
+        try:
+            return parent.onboarding_profile.completed_at is not None
+        except models.OrganizationOnboardingProfile.DoesNotExist:
+            return False
 
     @staticmethod
     def resolve_user_memberships(parent, info):
@@ -375,6 +391,7 @@ class OrganizationOnboardingProfileType(graphene.ObjectType):
     pricing = graphene.String()
     main_goal = graphene.String()
     current_step = graphene.Int()
+    is_required = graphene.Boolean()
     ksef_status = graphene.String()
     completed_at = graphene.DateTime()
 
@@ -1309,6 +1326,8 @@ class Query(graphene.ObjectType):
             info.context.user, tenant, "org.settings.view"
         ):
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        if tenant.type != ConstantsTenantType.ORGANIZATION:
+            raise DRFValidationError({'tenant': 'Onboarding is available only for organizations.'})
         return models.OrganizationOnboardingProfile.objects.filter(tenant_id=pk).first()
 
     # Action Logs

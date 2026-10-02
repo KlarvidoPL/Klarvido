@@ -48,6 +48,7 @@ describe('AddTenantForm: Component', () => {
     expect(await screen.findByPlaceholderText('Display name')).toHaveValue('');
     expect(screen.getByLabelText(/nip/i)).toHaveValue('');
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/role in the company/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
     const progress = screen.getByRole('list', { name: 'Onboarding steps' });
     expect(within(progress).getAllByRole('listitem')).toHaveLength(8);
@@ -113,6 +114,21 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/company name/i)).toHaveValue('');
     expect(screen.getByLabelText(/regon/i)).toHaveValue('');
     expect(screen.getByLabelText(/address/i)).toHaveValue('');
+  });
+
+  it('should allow manual entry when the MF lookup fails', async () => {
+    const failedLookup = composeMockedQueryResult(companyLookupByNipQuery, {
+      variables: { nip: NIP, country: 'PL' },
+      errors: [{ message: 'MF unavailable' }],
+    });
+    render(<Component />, { apolloMocks: [failedLookup] });
+
+    await fillStepOne();
+
+    expect(await screen.findByText(/couldn't find this NIP/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/company name/i)).toBeEnabled();
+    expect(screen.getByLabelText(/regon/i)).toBeEnabled();
+    expect(screen.getByLabelText(/address/i)).toBeEnabled();
   });
 
   it('should require every company field before creating the organization', async () => {
@@ -183,7 +199,6 @@ describe('AddTenantForm: Component', () => {
           regon: '123456785',
           address: 'UL. PRZYKŁADOWA 1, 00-001 WARSZAWA',
           vatStatus: 'ACTIVE',
-          respondentRole: 'OWNER_MANAGEMENT',
         },
       };
       const data = {

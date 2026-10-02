@@ -1,13 +1,12 @@
 """Validation and storage for the organization onboarding profile."""
 
-import base64
-import hashlib
-
 from cryptography.fernet import Fernet
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
+from ..constants import TenantType
 from ..models import OrganizationOnboardingProfile
 
 
@@ -20,9 +19,19 @@ MAIN_GOALS = ('CASH', 'COSTS', 'PRICING', 'HIRING', 'CLIENT_LOSS', 'EARLY_WARNIN
 
 
 def encrypt_demo_token(token: str) -> str:
-    """Encrypt at rest; the existing server secret is the key source across supported deployments."""
-    key = base64.urlsafe_b64encode(hashlib.sha256(settings.SECRET_KEY.encode()).digest())
-    return Fernet(key).encrypt(token.encode()).decode()
+    """Encrypt the write-only demo token with its dedicated, rotatable key."""
+    key = settings.ONBOARDING_KSEF_ENCRYPTION_KEY
+    if not key:
+        raise ImproperlyConfigured('ONBOARDING_KSEF_ENCRYPTION_KEY must be configured')
+    return Fernet(key.encode()).encrypt(token.encode()).decode()
+
+
+def decrypt_demo_token(token: str) -> str:
+    """Backend-only helper for future integration work and encryption tests."""
+    key = settings.ONBOARDING_KSEF_ENCRYPTION_KEY
+    if not key:
+        raise ImproperlyConfigured('ONBOARDING_KSEF_ENCRYPTION_KEY must be configured')
+    return Fernet(key.encode()).decrypt(token.encode()).decode()
 
 
 def _valid_choice(value, choices, field):
@@ -38,7 +47,12 @@ def _valid_choices(values, choices, maximum, field):
 
 
 def save_onboarding_step(tenant, step, **answers):
+    if tenant.type != TenantType.ORGANIZATION:
+        raise ValidationError({'tenant': 'Onboarding is available only for organizations.'})
+
     profile, _ = OrganizationOnboardingProfile.objects.get_or_create(tenant=tenant)
+    if step > profile.current_step:
+        raise ValidationError({'step': 'Complete the previous onboarding steps first.'})
     if step == 2:
         _valid_choice(answers.get('respondent_role'), RESPONDENT_ROLES, 'respondent_role')
         _valid_choice(answers.get('customer_type'), CUSTOMER_TYPES, 'customer_type')
@@ -74,10 +88,12 @@ def save_onboarding_step(tenant, step, **answers):
             )
         ):
             raise ValidationError({'step': 'Complete all onboarding steps first.'})
-        profile.completed_at = timezone.now()
+        if profile.completed_at is None:
+            profile.completed_at = timezone.now()
     else:
         raise ValidationError({'step': 'Invalid onboarding step.'})
 
-    profile.current_step = max(profile.current_step, min(step + 1, 7))
+    if step == profile.current_step:
+        profile.current_step = min(step + 1, 7)
     profile.save()
     return profile

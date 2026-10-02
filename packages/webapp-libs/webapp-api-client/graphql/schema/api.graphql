@@ -197,6 +197,8 @@ type TenantType implements Node {
   address: String
   vatStatus: String
   userMemberships: [TenantMembershipType]
+  onboardingRequired: Boolean!
+  onboardingCompleted: Boolean!
   membership: TenantMembershipType
 }
 type TenantMembershipType implements Node {
@@ -606,6 +608,7 @@ type OrganizationOnboardingProfileType {
   pricing: String
   mainGoal: String
   currentStep: Int
+  isRequired: Boolean
   ksefStatus: String
   completedAt: DateTime
 }
@@ -3019,7 +3022,6 @@ input CreateTenantMutationInput {
   regon: String
   address: String
   vatStatus: String
-  respondentRole: String
   clientMutationId: String
 }
 input AcceptTenantInvitationMutationInput {

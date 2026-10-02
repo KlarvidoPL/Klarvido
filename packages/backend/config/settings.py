@@ -548,6 +548,10 @@ AWS_REGION = env("AWS_REGION", default=None)
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 BACKUP_MASTER_KEY = env("BACKUP_MASTER_KEY", default=None)
 
+# Dedicated Fernet key for write-only KSeF onboarding tokens. Keep this stable
+# across deploys and rotate it independently from DJANGO_SECRET_KEY.
+ONBOARDING_KSEF_ENCRYPTION_KEY = env("ONBOARDING_KSEF_ENCRYPTION_KEY", default=None)
+
 LAMBDA_TASKS_BASE_HANDLER = env("LAMBDA_TASKS_BASE_HANDLER", default="common.tasks.LambdaTask")
 LAMBDA_TASKS_LOCAL_URL = env("LAMBDA_TASKS_LOCAL_URL", default=None)
 

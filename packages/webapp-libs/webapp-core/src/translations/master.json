@@ -2972,6 +2972,9 @@
   "Onboarding / Customers title": {
     "defaultMessage": "Who usually pays you?"
   },
+  "Onboarding / Edit": {
+    "defaultMessage": "Edit"
+  },
   "Onboarding / Description": {
     "defaultMessage": "Tell us how your business works. You can return to earlier steps."
   },
@@ -3014,6 +3017,9 @@
   "Onboarding / Next": {
     "defaultMessage": "Next"
   },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "Could not update the organization. Please check the fields and try again."
+  },
   "Onboarding / Pricing cost plus": {
     "defaultMessage": "Cost plus margin"
   },
@@ -3034,9 +3040,6 @@
   },
   "Onboarding / Pricing title": {
     "defaultMessage": "How do you make key decisions?"
-  },
-  "Onboarding / Respondent role hint": {
-    "defaultMessage": "This answer describes your work. Your organization access remains Owner."
   },
   "Onboarding / Respondent role label": {
     "defaultMessage": "Your role in the company"
@@ -3092,17 +3095,11 @@
   "Onboarding / Settings title": {
     "defaultMessage": "Business profile"
   },
-  "Onboarding / Step company": {
-    "defaultMessage": "Company"
-  },
   "Onboarding / Step costs": {
     "defaultMessage": "Costs"
   },
   "Onboarding / Step customers": {
     "defaultMessage": "Customers"
-  },
-  "Onboarding / Step data": {
-    "defaultMessage": "Data"
   },
   "Onboarding / Step pricing goal": {
     "defaultMessage": "Pricing & goal"
@@ -3130,6 +3127,9 @@
   },
   "Onboarding / Summary pricing": {
     "defaultMessage": "Pricing"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "Your role"
   },
   "Onboarding / Summary title": {
     "defaultMessage": "Your business profile"

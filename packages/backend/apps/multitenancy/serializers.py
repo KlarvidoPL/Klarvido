@@ -36,10 +36,6 @@ class TenantSerializer(serializers.ModelSerializer):
     # Looser than the model's max_length: input may contain separators ("972-138-23-73") that validate_* strips
     nip = serializers.CharField(required=False, allow_blank=True, max_length=20)
     regon = serializers.CharField(required=False, allow_blank=True, max_length=20)
-    respondent_role = serializers.ChoiceField(
-        choices=('OWNER_MANAGEMENT', 'ACCOUNTING', 'ADVISOR', 'EMPLOYEE'), required=False, write_only=True
-    )
-
     REQUIRED_COMPANY_FIELDS = {
         "nip": _("NIP is required"),
         "company_name": _("Company name is required"),
@@ -91,7 +87,6 @@ class TenantSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         from .permissions import create_system_roles_for_tenant
 
-        respondent_role = validated_data.pop('respondent_role', '')
         validated_data["creator"] = self.context["request"].user
         validated_data["type"] = TenantType.ORGANIZATION
         tenant = super().create(validated_data)
@@ -113,7 +108,7 @@ class TenantSerializer(serializers.ModelSerializer):
                 assigned_by=validated_data["creator"],
             )
 
-        models.OrganizationOnboardingProfile.objects.create(tenant=tenant, respondent_role=respondent_role)
+        models.OrganizationOnboardingProfile.objects.create(tenant=tenant, is_required=True)
 
         return tenant
 
@@ -129,7 +124,6 @@ class TenantSerializer(serializers.ModelSerializer):
             "regon",
             "address",
             "vat_status",
-            "respondent_role",
         )
 
 
@@ -143,7 +137,7 @@ class UpdateTenantSerializer(TenantSerializer):
         return super().validate(attrs)
 
     class Meta(TenantSerializer.Meta):
-        fields = tuple(field for field in TenantSerializer.Meta.fields if field != "respondent_role") + ("tenant_id",)
+        fields = TenantSerializer.Meta.fields + ("tenant_id",)
 
 
 class TenantInvitationActionSerializer(serializers.Serializer):
