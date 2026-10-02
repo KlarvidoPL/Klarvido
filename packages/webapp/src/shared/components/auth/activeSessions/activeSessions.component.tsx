@@ -244,14 +244,19 @@ export const ActiveSessions = () => {
       {/* Current Session */}
       {currentSession && (
         <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2 text-primary">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="shrink-0 rounded-full bg-primary/10 p-2 text-primary">
               {getDeviceIcon(currentSession.deviceType)}
             </div>
-            <div>
-              <div className="mb-1 flex items-center gap-2">
-                <p className="text-sm font-medium">{formatDeviceName(currentSession, intl)}</p>
-                <Badge variant="default" className="text-xs">
+            <div className="min-w-0">
+              <div className="mb-1 flex min-w-0 items-center gap-2">
+                <p
+                  className="min-w-0 truncate text-sm font-medium"
+                  title={formatDeviceName(currentSession, intl)}
+                >
+                  {formatDeviceName(currentSession, intl)}
+                </p>
+                <Badge variant="default" className="shrink-0 whitespace-nowrap text-xs">
                   <FormattedMessage defaultMessage="This device" id="Sessions / This Device Badge" />
                 </Badge>
               </div>
@@ -267,16 +272,22 @@ export const ActiveSessions = () => {
           <div className="space-y-2">
             {otherSessions.map((session) => (
               <div key={session.id} className="flex items-center justify-between rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-muted p-2">{getDeviceIcon(session.deviceType)}</div>
-                  <div>
-                    <p className="mb-1 text-sm font-medium">{formatDeviceName(session, intl)}</p>
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="shrink-0 rounded-full bg-muted p-2">{getDeviceIcon(session.deviceType)}</div>
+                  <div className="min-w-0">
+                    <p
+                      className="mb-1 truncate text-sm font-medium"
+                      title={formatDeviceName(session, intl)}
+                    >
+                      {formatDeviceName(session, intl)}
+                    </p>
                     <SessionDetails session={session} />
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="shrink-0"
                   onClick={() => handleRevokeSession(session)}
                   disabled={revokingId === session.id}
                 >
