@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
@@ -30,7 +30,6 @@ import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCoun
 import { normalizeDigits } from '../../utils/nip';
 import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
 import {
-  organizationNipExistsQuery,
   organizationOnboardingDraftQuery,
   saveOrganizationOnboardingDraftMutation,
 } from '../organizationOnboarding/organizationOnboarding.graphql';
@@ -51,9 +50,6 @@ export const AddTenantForm = () => {
     error: draftError,
     refetch: refetchDraft,
   } = useQuery(organizationOnboardingDraftQuery, { fetchPolicy: 'network-only' });
-  const [checkNip, { loading: checkingNip }] = useLazyQuery(organizationNipExistsQuery, {
-    fetchPolicy: 'network-only',
-  });
   const { lookup, loading: lookupLoading } = useCompanyLookup();
 
   const [step, setStep] = useState<Step>(Step.BASICS);
@@ -123,26 +119,6 @@ export const AddTenantForm = () => {
 
     const country = getValues('country');
     const nip = normalizeTaxId(getValues('nip'), country);
-    try {
-      const result = await checkNip({ variables: { nip, country } });
-      if (result.data?.organizationNipExists) {
-        form.setError('nip', {
-          message: intl.formatMessage({
-            defaultMessage: 'An organization with this NIP already exists in your account.',
-            id: 'Onboarding / Duplicate NIP',
-          }),
-        });
-        return;
-      }
-    } catch {
-      form.setError('nip', {
-        message: intl.formatMessage({
-          defaultMessage: 'Could not verify this NIP. Please try again.',
-          id: 'Onboarding / NIP check failed',
-        }),
-      });
-      return;
-    }
     const lookupKey = `${country}:${nip}`;
     // Only (re)query the registry when the country/NIP changed, so going Back/Next doesn't wipe the user's manual edits
     if (lookupKey !== lookedUpNip) {
@@ -249,7 +225,7 @@ export const AddTenantForm = () => {
                   <Button
                     key="next"
                     type="submit"
-                    disabled={lookupLoading || checkingNip}
+                    disabled={lookupLoading}
                     className="w-full sm:w-fit"
                     icon={lookupLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
                   >

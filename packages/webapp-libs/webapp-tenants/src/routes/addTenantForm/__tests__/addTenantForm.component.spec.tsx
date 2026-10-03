@@ -6,7 +6,6 @@ import { userEvent } from '@testing-library/user-event';
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
 import { render as baseRender } from '../../../tests/utils/rendering';
 import {
-  organizationNipExistsQuery,
   organizationOnboardingDraftQuery,
   saveOrganizationOnboardingDraftMutation,
 } from '../../organizationOnboarding/organizationOnboarding.graphql';
@@ -15,19 +14,13 @@ import { AddTenantForm } from '../addTenantForm.component';
 jest.mock('@sb/webapp-core/services/analytics');
 
 const NIP = '9721382373';
+const SUMMARY_STEP = 6;
 const render: typeof baseRender = (ui, options = {}) =>
   baseRender(ui, {
     ...options,
     apolloMocks: (mocks) => [
       ...mocks,
       composeMockedQueryResult(organizationOnboardingDraftQuery, { data: { organizationOnboardingDraft: null } }),
-      {
-        ...composeMockedQueryResult(organizationNipExistsQuery, {
-          variables: { nip: NIP, country: 'PL' },
-          data: { organizationNipExists: false },
-        }),
-        maxUsageCount: 10,
-      },
       ...(typeof options.apolloMocks === 'function' ? options.apolloMocks([]) : (options.apolloMocks ?? [])),
     ],
   });
@@ -65,9 +58,8 @@ describe('AddTenantForm: Component', () => {
     expect(screen.queryByLabelText(/role in the company/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
     const progress = screen.getByRole('list', { name: 'Onboarding steps' });
-    expect(within(progress).getAllByRole('listitem')).toHaveLength(8);
+    expect(within(progress).getAllByRole('listitem')).toHaveLength(7);
     expect(within(progress).getByText('Organization').closest('li')).toHaveAttribute('aria-current', 'step');
-    expect(within(progress).getByText('KSeF')).toBeInTheDocument();
   });
 
   it('should preselect the only supported country and prefix the NIP with its code', async () => {
@@ -199,24 +191,6 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/regon/i)).toHaveValue('');
   });
 
-  it('rejects a NIP already present under the account before calling MF', async () => {
-    baseRender(<Component />, {
-      apolloMocks: (mocks) => [
-        ...mocks,
-        composeMockedQueryResult(organizationOnboardingDraftQuery, { data: { organizationOnboardingDraft: null } }),
-        composeMockedQueryResult(organizationNipExistsQuery, {
-          variables: { nip: NIP, country: 'PL' },
-          data: { organizationNipExists: true },
-        }),
-      ],
-    });
-    await fillStepOne();
-    expect(
-      await screen.findByText('An organization with this NIP already exists in your account.')
-    ).toBeInTheDocument();
-    expect(screen.queryByLabelText(/company name/i)).not.toBeInTheDocument();
-  });
-
   it('saves a draft after step two and continues to Customers without creating an organization', async () => {
     const company = {
       name: 'new item name',
@@ -232,7 +206,7 @@ describe('AddTenantForm: Component', () => {
       data: {
         saveOrganizationOnboardingDraft: {
           tenant: null,
-          profile: { currentStep: 2, ksefStatus: 'not_connected', completedAt: null },
+          profile: { currentStep: 2, completedAt: null },
         },
       },
     });
@@ -246,7 +220,6 @@ describe('AddTenantForm: Component', () => {
       mainGoal: '',
       currentStep: 2,
       isRequired: true,
-      ksefStatus: 'not_connected',
       completedAt: null,
     };
     render(<Component />, {
@@ -271,7 +244,7 @@ describe('AddTenantForm: Component', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByLabelText(/company name/i)).toHaveValue(company.companyName);
   });
-  it('runs all eight steps and creates the organization only on Summary confirmation', async () => {
+  it('runs all seven steps and creates the organization only on Summary confirmation', async () => {
     const company = {
       name: 'new item name',
       country: 'PL',
@@ -281,7 +254,6 @@ describe('AddTenantForm: Component', () => {
       address: 'Warsaw',
       vatStatus: 'ACTIVE',
     };
-    const token = 'x'.repeat(40);
     const answers = {
       respondentRole: 'ACCOUNTING',
       customerType: 'B2B',
@@ -295,7 +267,6 @@ describe('AddTenantForm: Component', () => {
       ...answers,
       currentStep,
       isRequired: true,
-      ksefStatus: currentStep === 7 ? 'demo' : 'not_connected',
       completedAt: null,
     });
     const query = (currentStep: number, maxUsageCount = 1) => ({
@@ -309,16 +280,15 @@ describe('AddTenantForm: Component', () => {
         variables: { step, ...variables },
         data: {
           saveOrganizationOnboardingDraft: {
-            tenant: step === 7 ? { id: 'created-tenant', name: company.name } : null,
+            tenant: step === SUMMARY_STEP ? { id: 'created-tenant', name: company.name } : null,
             profile: {
-              currentStep: Math.min(step + 1, 7),
-              ksefStatus: step >= 6 ? 'demo' : 'not_connected',
-              completedAt: step === 7 ? '2026-10-03T08:00:00Z' : null,
+              currentStep: Math.min(step + 1, SUMMARY_STEP),
+              completedAt: step === SUMMARY_STEP ? '2026-10-03T08:00:00Z' : null,
             },
           },
         },
       });
-    const create = save(7, { company, ...answers });
+    const create = save(SUMMARY_STEP, { company, ...answers });
     render(<Component />, {
       apolloMocks: [
         lookupMock(company),
@@ -331,9 +301,7 @@ describe('AddTenantForm: Component', () => {
         save(4, { costDrivers: answers.costDrivers }),
         query(5),
         save(5, { pricing: answers.pricing, mainGoal: answers.mainGoal }),
-        query(6),
-        save(6, { ksefToken: token }),
-        query(7),
+        query(SUMMARY_STEP),
         create,
         fillCommonQueryWithUser(),
       ],
@@ -351,13 +319,9 @@ describe('AddTenantForm: Component', () => {
       await screen.findByRole('heading', { name: 'How do you usually set prices?', level: 2 })
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText(/ksef token/i), token);
-    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Your business profile')).toBeInTheDocument();
     expect(create.result).not.toHaveBeenCalled();
     expect(screen.queryByText('Organization added successfully!')).not.toBeInTheDocument();
-    expect(screen.queryByText(token)).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Create organization' }));
     expect(await screen.findByText('Organization added successfully!')).toBeInTheDocument();
     expect(create.result).toHaveBeenCalledTimes(1);

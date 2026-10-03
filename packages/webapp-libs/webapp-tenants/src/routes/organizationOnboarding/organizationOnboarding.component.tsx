@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
@@ -31,7 +31,6 @@ import { useCurrentTenant } from '../../providers';
 import { normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
 import {
-  organizationNipExistsQuery,
   organizationOnboardingDraftQuery,
   organizationOnboardingProfileQuery,
   saveOrganizationOnboardingDraftMutation,
@@ -47,8 +46,6 @@ type Answers = {
   costDrivers: string[];
   pricing: string;
   mainGoal: string;
-  ksefToken: string;
-  ksefDemoConnected: boolean;
 };
 
 const initialAnswers: Answers = {
@@ -58,9 +55,10 @@ const initialAnswers: Answers = {
   costDrivers: [],
   pricing: '',
   mainGoal: '',
-  ksefToken: '',
-  ksefDemoConnected: false,
 };
+
+// Matches the backend SUMMARY_STEP (apps/multitenancy/services/onboarding.py).
+const SUMMARY_STEP = 6;
 
 const ChoiceGroup = ({
   options,
@@ -73,14 +71,14 @@ const ChoiceGroup = ({
   onChange: (values: string[]) => void;
   max?: number;
 }) => {
-  const [optionWidth, setOptionWidth] = useState(192);
+  const [optionWidth, setOptionWidth] = useState(144);
   const measurementRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const labelsKey = options.map(({ label, hint }) => `${label}:${hint ?? ''}`).join('|');
 
   useLayoutEffect(() => {
     const measure = () => {
       const widestLabel = Math.max(...measurementRefs.current.map((element) => element?.offsetWidth ?? 0));
-      setOptionWidth(Math.max(192, widestLabel + 34));
+      setOptionWidth(Math.max(144, widestLabel + 28));
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -97,7 +95,7 @@ const ChoiceGroup = ({
             ref={(element) => {
               measurementRefs.current[index] = element;
             }}
-            className="block w-max whitespace-nowrap text-sm font-medium"
+            className="block w-max whitespace-nowrap text-sm font-normal"
           >
             {option.label}
           </span>
@@ -114,7 +112,7 @@ const ChoiceGroup = ({
             disabled={max > 1 && !active && selected.length >= max}
             style={{ width: optionWidth }}
             className={cn(
-              'min-h-16 max-w-full flex-none rounded-lg border bg-card px-4 py-3 text-left text-sm transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-50',
+              'flex min-h-10 max-w-full flex-none flex-col items-center justify-center rounded-lg border bg-card px-3 py-2 text-center text-sm transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-50',
               active && 'border-primary bg-primary/5 ring-1 ring-primary'
             )}
             onClick={() =>
@@ -129,7 +127,7 @@ const ChoiceGroup = ({
               )
             }
           >
-            <span className="block font-medium">{option.label}</span>
+            <span className="block font-normal">{option.label}</span>
             {option.hint && <span className="mt-1 block text-sm text-muted-foreground">{option.hint}</span>}
           </button>
         );
@@ -144,9 +142,6 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
   const draftQuery = useQuery(organizationOnboardingDraftQuery, { skip: !draftMode, fetchPolicy: 'network-only' });
   const tenant = draftMode ? draftQuery.data?.organizationOnboardingDraft?.companyData : currentTenant;
   const { lookup, loading: lookupLoading } = useCompanyLookup();
-  const [checkNip, { loading: checkingNip }] = useLazyQuery(organizationNipExistsQuery, {
-    fetchPolicy: 'network-only',
-  });
   const [saveDraft, { loading: savingDraft }] = useMutation(saveOrganizationOnboardingDraftMutation);
   const tenantId = draftMode ? '' : (currentTenant?.id ?? '');
   const navigate = useNavigate();
@@ -211,10 +206,8 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
       costDrivers: (profile?.costDrivers ?? []).filter((value): value is string => value !== null),
       pricing: profile?.pricing ?? '',
       mainGoal: profile?.mainGoal ?? '',
-      ksefToken: '',
-      ksefDemoConnected: profile?.ksefStatus === 'demo',
     });
-    setStep(profile?.completedAt ? 7 : Math.max(2, Math.min(profile?.currentStep ?? 2, 7)));
+    setStep(profile?.completedAt ? SUMMARY_STEP : Math.max(2, Math.min(profile?.currentStep ?? 2, SUMMARY_STEP)));
     setLoaded(true);
   }, [data, profile, loaded]);
 
@@ -359,7 +352,6 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
   ];
 
   const update = (patch: Partial<Answers>) => setAnswers((current) => ({ ...current, ...patch }));
-  const tokenLength = Array.from(answers.ksefToken).length;
   const canContinue =
     step < 2
       ? true
@@ -371,9 +363,7 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
             ? answers.costDrivers.length > 0
             : step === 5
               ? !!answers.pricing && !!answers.mainGoal
-              : step === 6
-                ? (answers.ksefDemoConnected && tokenLength === 0) || tokenLength === 40
-                : true;
+              : true;
 
   const onNext = async () => {
     if ((!tenantId && !draftMode) || !canContinue) return;
@@ -385,16 +375,6 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
         if (draftMode) {
           if (step === 0) {
             const nip = normalizeTaxId(values.nip, values.country);
-            const result = await checkNip({ variables: { nip, country: values.country } });
-            if (result.data?.organizationNipExists) {
-              tenantForm.setError('nip', {
-                message: intl.formatMessage({
-                  defaultMessage: 'An organization with this NIP already exists in your account.',
-                  id: 'Onboarding / Duplicate NIP',
-                }),
-              });
-              return;
-            }
             if (nip !== tenant?.nip || values.country !== tenant?.country) {
               const company = await lookup(nip, values.country);
               tenantForm.setValue('companyName', company?.companyName ?? '');
@@ -453,14 +433,10 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
       }
       return;
     }
-    if (step === 6 && answers.ksefDemoConnected && tokenLength === 0) {
-      setStep(7);
-      return;
-    }
     try {
       const variables = {
         step,
-        ...(draftMode && step === 7
+        ...(draftMode && step === SUMMARY_STEP
           ? {
               company: {
                 ...tenantForm.getValues(),
@@ -479,14 +455,12 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
         ...(step === 3 ? { revenueModels: answers.revenueModels } : {}),
         ...(step === 4 ? { costDrivers: answers.costDrivers } : {}),
         ...(step === 5 ? { pricing: answers.pricing, mainGoal: answers.mainGoal } : {}),
-        ...(step === 6 ? { ksefToken: answers.ksefToken } : {}),
       };
       const created = draftMode
         ? (await saveDraft({ variables })).data?.saveOrganizationOnboardingDraft?.tenant
         : (await saveStep({ variables: { ...variables, tenantId } }), null);
-      if (step === 6) update({ ksefToken: '', ksefDemoConnected: true });
-      if (step !== 7 || !draftMode) await refetch();
-      if (step === 7) {
+      if (step !== SUMMARY_STEP || !draftMode) await refetch();
+      if (step === SUMMARY_STEP) {
         await reloadCommonQuery();
         toast({
           description: profile?.isRequired
@@ -513,17 +487,6 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
           )
         )
           setStep(1);
-        if (validationError?.extensions?.['nip']) {
-          const nipErrors = JSON.stringify(validationError.extensions['nip']);
-          if (nipErrors.includes('already exists in your account')) {
-            tenantForm.setError('nip', {
-              message: intl.formatMessage({
-                defaultMessage: 'An organization with this NIP already exists in your account.',
-                id: 'Onboarding / Duplicate NIP',
-              }),
-            });
-          }
-        }
       }
       toast({
         description: intl.formatMessage({
@@ -583,7 +546,7 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
           </CardDescription>
           <OnboardingProgress
             step={step + 1}
-            maxStep={profile?.completedAt ? 8 : Math.max(3, (profile?.currentStep ?? 2) + 1)}
+            maxStep={profile?.completedAt ? SUMMARY_STEP + 1 : Math.max(3, (profile?.currentStep ?? 2) + 1)}
             onStepChange={(nextStep) => setStep(nextStep - 1)}
           />
         </CardHeader>
@@ -613,13 +576,13 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
               {step === 2 && (
                 <>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage
                         defaultMessage="Your role in the company"
                         id="Onboarding / Respondent role label"
                       />
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <FormattedMessage
                         defaultMessage="This answer is descriptive and does not change your organization permissions."
                         id="Onboarding / Respondent role profile hint"
@@ -632,10 +595,10 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                     onChange={([respondentRole]) => update({ respondentRole })}
                   />
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage defaultMessage="Who usually pays you?" id="Onboarding / Customers title" />
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <FormattedMessage
                         defaultMessage="This helps estimate how much sales data future integrations can cover."
                         id="Onboarding / Customers hint"
@@ -652,13 +615,13 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
               {step === 3 && (
                 <>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage
                         defaultMessage="What do customers pay you for?"
                         id="Onboarding / Revenue title"
                       />
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <FormattedMessage defaultMessage="Choose up to two." id="Onboarding / Revenue hint" />
                     </p>
                   </div>
@@ -673,13 +636,13 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
               {step === 4 && (
                 <>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage
                         defaultMessage="Which costs grow with your sales?"
                         id="Onboarding / Costs title"
                       />
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <FormattedMessage defaultMessage="Choose up to three." id="Onboarding / Costs hint" />
                     </p>
                   </div>
@@ -694,7 +657,7 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
               {step === 5 && (
                 <>
                   <div className="space-y-3">
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage
                         defaultMessage="How do you usually set prices?"
                         id="Onboarding / Pricing question"
@@ -707,7 +670,7 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                     />
                   </div>
                   <div className="space-y-3">
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage
                         defaultMessage="What do you most want to keep under control?"
                         id="Onboarding / Goal question"
@@ -721,60 +684,20 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                   </div>
                 </>
               )}
-              {step === 6 && (
+              {step === SUMMARY_STEP && (
                 <>
                   <div>
-                    <h2 className="text-xl font-semibold">
-                      <FormattedMessage defaultMessage="KSeF" id="Onboarding / KSeF title" />
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      <FormattedMessage
-                        defaultMessage="Enter your KSeF token. It will be stored securely and will not appear in the summary."
-                        id="Onboarding / KSeF token help"
-                      />
-                    </p>
-                  </div>
-                  <div className="max-w-lg space-y-2">
-                    <label htmlFor="ksef-token" className="text-sm font-medium">
-                      <FormattedMessage
-                        defaultMessage="KSeF token (exactly 40 characters)"
-                        id="Onboarding / KSeF token input label"
-                      />
-                    </label>
-                    <input
-                      id="ksef-token"
-                      type="password"
-                      autoComplete="off"
-                      value={answers.ksefToken}
-                      onChange={(event) => update({ ksefToken: event.target.value })}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3"
-                    />
-                    <p className="text-sm text-muted-foreground">{tokenLength}/40</p>
-                    {answers.ksefDemoConnected && (
-                      <p className="text-sm text-emerald-700">
-                        <FormattedMessage
-                          defaultMessage="Token saved. Enter a new 40-character value to replace it."
-                          id="Onboarding / KSeF token saved"
-                        />
-                      </p>
-                    )}
-                  </div>
-                </>
-              )}
-              {step === 7 && (
-                <>
-                  <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold">
                       <FormattedMessage defaultMessage="Your business profile" id="Onboarding / Summary title" />
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <FormattedMessage
                         defaultMessage="This is a starting point for future analysis."
                         id="Onboarding / Summary hint"
                       />
                     </p>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <dl className="divide-y rounded-lg border">
                     {[
                       [
                         intl.formatMessage({
@@ -834,32 +757,20 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                         goalOptions.find((option) => option.value === answers.mainGoal)?.label,
                         5,
                       ],
-                      [
-                        'KSeF',
-                        answers.ksefDemoConnected
-                          ? intl.formatMessage({
-                              defaultMessage: 'Token saved',
-                              id: 'Onboarding / Summary token saved',
-                            })
-                          : intl.formatMessage({ defaultMessage: 'Not set', id: 'Onboarding / Summary not set' }),
-                        6,
-                      ],
                     ].map(([label, value, editStep]) => (
-                      <div key={label} className="flex items-start justify-between gap-4 rounded-lg border p-4">
-                        <div>
-                          <div className="text-sm text-muted-foreground">{label}</div>
-                          <div className="font-medium">{value}</div>
-                        </div>
+                      <div key={label} className="grid grid-cols-[7rem_1fr_auto] items-start gap-4 px-4 py-3 text-sm">
+                        <dt className="text-muted-foreground">{label}</dt>
+                        <dd className="min-w-0 break-words">{value}</dd>
                         <button
                           type="button"
-                          className="shrink-0 text-sm font-medium underline-offset-4 hover:underline"
+                          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                           onClick={() => setStep(Number(editStep))}
                         >
                           <FormattedMessage defaultMessage="Edit" id="Onboarding / Edit" />
                         </button>
                       </div>
                     ))}
-                  </div>
+                  </dl>
                 </>
               )}
               {hasTenantError && <div className="text-sm text-destructive">{tenantError}</div>}
@@ -869,7 +780,7 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                     type="button"
                     variant={ButtonVariant.SECONDARY}
                     onClick={onBack}
-                    disabled={saving || savingDraft || updatingTenant || lookupLoading || checkingNip}
+                    disabled={saving || savingDraft || updatingTenant || lookupLoading}
                     icon={<ArrowLeft className="h-4 w-4" />}
                     className="w-full sm:w-fit"
                   >
@@ -878,15 +789,15 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                 )}
                 <Button
                   type="submit"
-                  disabled={saving || savingDraft || updatingTenant || lookupLoading || checkingNip || !canContinue}
+                  disabled={saving || savingDraft || updatingTenant || lookupLoading || !canContinue}
                   className="w-full sm:w-fit"
                   icon={
-                    saving || savingDraft || updatingTenant || lookupLoading || checkingNip ? (
+                    saving || savingDraft || updatingTenant || lookupLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : undefined
                   }
                 >
-                  {step === 7 ? (
+                  {step === SUMMARY_STEP ? (
                     draftMode ? (
                       <FormattedMessage
                         defaultMessage="Create organization"

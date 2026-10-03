@@ -66,7 +66,6 @@ type Query {
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
   ssoDiscover(email: String!): SSODiscoveryResultType
   organizationOnboardingDraft: OrganizationOnboardingProfileType
-  organizationNipExists(nip: String!, country: String!): Boolean
   allTenants(before: String, after: String, first: Int, last: Int): TenantConnection
   tenant(id: ID): TenantType
   organizationOnboardingProfile(tenantId: ID!): OrganizationOnboardingProfileType
@@ -599,7 +598,6 @@ type OrganizationOnboardingProfileType {
   mainGoal: String
   currentStep: Int
   isRequired: Boolean
-  ksefStatus: String
   completedAt: DateTime
 }
 type OnboardingCompanyType {
@@ -1376,9 +1374,7 @@ type ApiMutation {
     "ID of the backup record to restore from"
     backupId: ID!,
     "Strategy for handling conflicting records: SKIP, UPDATE, or FAIL"
-    conflictStrategy: ConflictStrategyEnum!,
-    tenantId: ID!
-  ): RestoreBackupMutation
+    conflictStrategy: ConflictStrategyEnum!,tenantId: ID!  ): RestoreBackupMutation
   "Publish translations for a locale to S3/CDN."
   publishTranslations(input: PublishTranslationsMutationInput!): PublishTranslationsMutationPayload
   "Sync translation keys from master JSON."
@@ -1418,7 +1414,7 @@ type ApiMutation {
   "Delete a passkey."
   deletePasskey(input: DeletePasskeyMutationInput!): DeletePasskeyMutationPayload
   updateTenant(input: UpdateTenantMutationInput!): UpdateTenantMutationPayload
-  saveOrganizationOnboardingStep(costDrivers: [String], customerType: String, ksefToken: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!, tenantId: ID!): SaveOrganizationOnboardingStepMutation
+  saveOrganizationOnboardingStep(costDrivers: [String], customerType: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!, tenantId: ID!): SaveOrganizationOnboardingStepMutation
   "Mutation to delete a tenant from the system."
   deleteTenant(input: DeleteTenantMutationInput!): DeleteTenantMutationPayload
   createTenantInvitation(input: CreateTenantInvitationMutationInput!): CreateTenantInvitationMutationPayload
@@ -1482,7 +1478,7 @@ type ApiMutation {
   - Non-owners cannot modify owner memberships
   """
   removeRoleFromMember(membershipId: ID!, roleId: ID!, tenantId: ID!): RemoveRoleFromMemberMutation
-  saveOrganizationOnboardingDraft(company: OnboardingCompanyInput, costDrivers: [String], customerType: String, ksefToken: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!): SaveOrganizationOnboardingDraftMutation
+  saveOrganizationOnboardingDraft(company: OnboardingCompanyInput, costDrivers: [String], customerType: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!): SaveOrganizationOnboardingDraftMutation
   createTenant(input: CreateTenantMutationInput!): CreateTenantMutationPayload
   acceptTenantInvitation(input: AcceptTenantInvitationMutationInput!): AcceptTenantInvitationMutationPayload
   declineTenantInvitation(input: DeclineTenantInvitationMutationInput!): DeclineTenantInvitationMutationPayload

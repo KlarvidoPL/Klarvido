@@ -32,11 +32,10 @@ const profile = {
   mainGoal: 'PRICING',
   currentStep: 6,
   isRequired: false,
-  ksefStatus: 'not_connected',
   completedAt: null,
 };
 
-const profileMock = (currentStep = 6, ksefDemoConnected = false, isRequired = false) =>
+const profileMock = (currentStep = 6, isRequired = false) =>
   composeMockedQueryResult(organizationOnboardingProfileQuery, {
     variables: { tenantId },
     data: {
@@ -44,7 +43,6 @@ const profileMock = (currentStep = 6, ksefDemoConnected = false, isRequired = fa
         ...profile,
         currentStep,
         isRequired,
-        ksefStatus: ksefDemoConnected ? 'demo' : 'not_connected',
       },
     },
   });
@@ -67,13 +65,13 @@ describe('OrganizationOnboarding', () => {
 
     expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
     const progress = screen.getByRole('list', { name: 'Onboarding steps' });
-    expect(within(progress).getAllByRole('listitem')).toHaveLength(8);
+    expect(within(progress).getAllByRole('listitem')).toHaveLength(7);
     expect(within(progress).getByText('Customers').closest('li')).toHaveAttribute('aria-current', 'step');
     await userEvent.click(screen.getByRole('button', { name: 'Mostly consumers (B2C)' }));
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByTestId('location')).toHaveTextContent('/en/tenant-1/tenant/onboarding');
     expect(screen.getByText('Company details').closest('li')).toHaveAttribute('aria-current', 'step');
-    await userEvent.click(screen.getByRole('button', { name: /3\. Customers/i }));
+    await userEvent.click(within(progress).getByRole('button', { name: /Customers/ }));
     expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Mostly consumers (B2C)' })).toHaveAttribute('aria-pressed', 'true');
   });
@@ -87,30 +85,6 @@ describe('OrganizationOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByText('Who usually pays you?')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Mostly businesses (B2B)' })).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('resumes at the saved step and requires exactly 40 characters for KSeF', async () => {
-    const token = 'x'.repeat(40);
-    const saveMock = composeMockedQueryResult(saveOrganizationOnboardingStepMutation, {
-      variables: { tenantId, step: 6, ksefToken: token },
-      data: { saveOrganizationOnboardingStep: { profile: { ...profile, currentStep: 7, ksefStatus: 'demo' } } },
-    });
-    render(<OrganizationOnboarding />, {
-      TenantWrapper,
-      apolloMocks: (mocks) => [...mocks, profileMock(), saveMock, profileMock(7, true)],
-    });
-
-    expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
-    const next = screen.getByRole('button', { name: /next/i });
-    expect(next).toBeDisabled();
-    await userEvent.type(screen.getByLabelText(/ksef token/i), token.slice(0, 39));
-    expect(next).toBeDisabled();
-    await userEvent.type(screen.getByLabelText(/ksef token/i), token.slice(39));
-    expect(next).toBeEnabled();
-    await userEvent.click(next);
-    expect(await screen.findByText('Your business profile')).toBeInTheDocument();
-    expect(saveMock.result).toHaveBeenCalled();
-    expect(screen.queryByText(token)).not.toBeInTheDocument();
   });
 
   it('loads the saved revenue answer after a reload', async () => {
@@ -163,14 +137,13 @@ describe('OrganizationOnboarding', () => {
     const completedTenant = tenantFactory({ id: tenantId, onboardingRequired: true, onboardingCompleted: true });
     const completedUser = currentUserFactory({ tenants: [completedTenant] });
     const completeMock = composeMockedQueryResult(saveOrganizationOnboardingStepMutation, {
-      variables: { tenantId, step: 7 },
+      variables: { tenantId, step: 6 },
       data: {
         saveOrganizationOnboardingStep: {
           profile: {
             ...profile,
-            currentStep: 7,
+            currentStep: 6,
             isRequired: true,
-            ksefStatus: 'demo',
             completedAt: '2026-10-01T10:00:00Z',
           },
         },
@@ -183,9 +156,9 @@ describe('OrganizationOnboarding', () => {
       },
       apolloMocks: (mocks) => [
         ...mocks,
-        profileMock(7, true, true),
+        profileMock(6, true),
         completeMock,
-        profileMock(7, true, true),
+        profileMock(6, true),
         fillCommonQueryWithUser(completedUser),
       ],
     });
@@ -198,12 +171,10 @@ describe('OrganizationOnboarding', () => {
   });
 
   it('completes the persisted flow from Customers through Summary', async () => {
-    const token = 'k'.repeat(40);
-    const requiredProfile = (currentStep: number, ksefStatus = 'not_connected', completedAt: string | null = null) => ({
+    const requiredProfile = (currentStep: number, completedAt: string | null = null) => ({
       ...profile,
       currentStep,
       isRequired: true,
-      ksefStatus,
       completedAt,
     });
     const saveMock = (
@@ -236,10 +207,8 @@ describe('OrganizationOnboarding', () => {
         queryMock(requiredProfile(5)),
         saveMock(5, { pricing: 'FIXED', mainGoal: 'PRICING' }, requiredProfile(6)),
         queryMock(requiredProfile(6)),
-        saveMock(6, { ksefToken: token }, requiredProfile(7, 'demo')),
-        queryMock(requiredProfile(7, 'demo')),
-        saveMock(7, {}, requiredProfile(7, 'demo', '2026-10-02T08:00:00Z')),
-        queryMock(requiredProfile(7, 'demo', '2026-10-02T08:00:00Z')),
+        saveMock(6, {}, requiredProfile(6, '2026-10-02T08:00:00Z')),
+        queryMock(requiredProfile(6, '2026-10-02T08:00:00Z')),
         fillCommonQueryWithUser(completedUser),
       ],
     });
@@ -254,12 +223,8 @@ describe('OrganizationOnboarding', () => {
       await screen.findByRole('heading', { name: 'How do you usually set prices?', level: 2 })
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText(/ksef token/i), token);
-    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Your business profile')).toBeInTheDocument();
     expect(screen.getByText('Owner / management')).toBeInTheDocument();
-    expect(screen.queryByText(token)).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Confirm profile' }));
     expect(await screen.findByText('Organization added successfully!')).toBeInTheDocument();
   });

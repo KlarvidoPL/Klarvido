@@ -38,7 +38,6 @@ These variables control which platform-specific implementations are used.
 | `ENVIRONMENT_NAME` | | `` | Environment name (local, staging, production) |
 | `CSRF_TRUSTED_ORIGINS` | | `[]` | Trusted origins for CSRF |
 | `HASHID_FIELD_SALT` | ✅ | - | Salt for hashid field encoding |
-| `ONBOARDING_KSEF_ENCRYPTION_KEY` | For organization onboarding | - | Dedicated Fernet key for encrypted, write-only KSeF tokens. Keep stable across backend instances and deployments. |
 
 **Generate secrets:**
 
@@ -52,21 +51,9 @@ openssl rand -hex 32
 
 ### Organization onboarding deployment
 
-Before deploying organization onboarding, configure `ONBOARDING_KSEF_ENCRYPTION_KEY` in your environment's secret store. Generate a separate key for each environment:
+Apply the `multitenancy` migrations `0027` through `0031` before starting the updated backend and deploying the webapp. They add the onboarding profile, the required-flow flag, and account-owned drafts with a constraint requiring exactly one organization or draft owner. Existing organizations are not made mandatory by the default `is_required=False` migration. New organizations are created atomically only after the summary is confirmed. No additional secrets are required.
 
-```bash
-python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-```
-
-The value is a 44-character URL-safe base64 Fernet key. Never use the development key from `packages/backend/.env.shared` in a deployed environment, commit a production key, or include keys or tokens in logs. All backend instances accessing the same database must use the same key. Back up the key securely alongside the database recovery procedure; losing it makes stored tokens unreadable.
-
-Apply the `multitenancy` migrations `0027` through `0030` before starting the updated backend and deploying the webapp. They add the onboarding profile, KSeF status, required-flow flag, and account-owned drafts with a constraint requiring exactly one organization or draft owner. Existing organizations are not made mandatory by the default `is_required=False` migration. New organizations are created atomically only after the summary is confirmed.
-
-**Key rotation:** this release uses a single Fernet key and does not support automatic rotation or multiple decryption keys. Do not replace the configured key while stored ciphertext still uses the old key. Plan a maintenance window, pause token writes, securely retain the old key and a database backup, and re-encrypt all non-empty `OrganizationOnboardingProfile.ksef_demo_token_encrypted` values with a reviewed maintenance tool using the old and new keys. Validate decryption of every converted value without printing plaintext, deploy the new key to all instances, then resume writes. Retain the old key under your backup retention policy because older backups still require it. Changing `DJANGO_SECRET_KEY` does not rotate this key.
-
-**Rollback:** roll back application code without reversing these migrations on a live database. Reversing `0030` is unsafe while unattached drafts exist; reversing `0027` removes onboarding answers and encrypted tokens. Keep the encryption key unchanged during application rollback and use a tested database recovery procedure if schema rollback is necessary.
-
-KSeF token submission currently validates the 40-character length and stores the encrypted value. It does not establish a real KSeF connection or synchronize invoices.
+**Rollback:** roll back application code without reversing these migrations on a live database. Reversing `0030` is unsafe while unattached drafts exist, and reversing `0027` removes onboarding answers. Use a tested database recovery procedure if schema rollback is necessary.
 
 **URL formatting rules:**
 

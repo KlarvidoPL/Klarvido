@@ -27,10 +27,6 @@ export const useCompanyFormErrorMessages = () => {
       nip: {
         ...required(intl.formatMessage({ defaultMessage: 'NIP is required', id: 'Tenant form / NIP required' })),
         invalid_nip: intl.formatMessage({ defaultMessage: 'Invalid NIP number', id: 'Tenant form / NIP invalid' }),
-        duplicate_nip: intl.formatMessage({
-          defaultMessage: 'An organization with this NIP already exists in your account.',
-          id: 'Onboarding / Duplicate NIP',
-        }),
         immutable,
       },
       regon: {

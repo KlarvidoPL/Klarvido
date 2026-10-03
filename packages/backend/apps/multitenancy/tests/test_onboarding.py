@@ -4,37 +4,28 @@ from rest_framework.exceptions import ValidationError
 
 from ..constants import TenantType, TenantUserRole
 from ..models import OrganizationOnboardingProfile, Tenant, TenantMembership
-from ..services.onboarding import decrypt_demo_token, save_onboarding_step
+from ..services.onboarding import save_onboarding_step
 
 
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture(autouse=True)
-def onboarding_encryption_key(settings):
-    settings.ONBOARDING_KSEF_ENCRYPTION_KEY = 'HLKgz3EuGIF4jOIAHFGl5atkYZxugw3trZu00Uex0QI='
-
-
 def test_step_answers_persist_and_completion_requires_every_step(tenant_factory):
     tenant = tenant_factory(type=TenantType.ORGANIZATION)
     with pytest.raises(ValidationError):
-        save_onboarding_step(tenant, 7)
+        save_onboarding_step(tenant, 6)
 
     save_onboarding_step(tenant, 2, respondent_role='OWNER_MANAGEMENT', customer_type='B2B')
     save_onboarding_step(tenant, 3, revenue_models=['PROJECT', 'PRODUCT'])
     save_onboarding_step(tenant, 4, cost_drivers=['MATERIALS'])
-    save_onboarding_step(tenant, 5, pricing='FIXED', main_goal='PRICING')
-    profile = save_onboarding_step(tenant, 6, ksef_token='a' * 40)
-    assert profile.ksef_status == 'demo'
-    assert 'a' * 40 not in profile.ksef_demo_token_encrypted
-    assert decrypt_demo_token(profile.ksef_demo_token_encrypted) == 'a' * 40
-    assert profile.current_step == 7
+    profile = save_onboarding_step(tenant, 5, pricing='FIXED', main_goal='PRICING')
+    assert profile.current_step == 6
 
-    completed = save_onboarding_step(tenant, 7)
+    completed = save_onboarding_step(tenant, 6)
     assert completed.completed_at is not None
     assert completed.revenue_models == ['PROJECT', 'PRODUCT']
     first_completed_at = completed.completed_at
-    assert save_onboarding_step(tenant, 7).completed_at == first_completed_at
+    assert save_onboarding_step(tenant, 6).completed_at == first_completed_at
 
 
 @pytest.mark.parametrize(
@@ -42,7 +33,6 @@ def test_step_answers_persist_and_completion_requires_every_step(tenant_factory)
     [
         (3, {'revenue_models': ['PROJECT', 'PRODUCT', 'TIME']}),
         (4, {'cost_drivers': ['MATERIALS', 'EMPLOYEES', 'TRANSPORT', 'MARKETING']}),
-        (6, {'ksef_token': 'a' * 39}),
     ],
 )
 def test_invalid_answers_are_rejected(tenant_factory, step, answer):
@@ -65,7 +55,7 @@ def test_cannot_skip_steps_or_onboard_personal_tenant(tenant_factory):
 QUERY = '''
 query ($tenantId: ID!) {
   organizationOnboardingProfile(tenantId: $tenantId) {
-    customerType currentStep ksefStatus completedAt
+    customerType currentStep completedAt
   }
 }
 '''
@@ -82,7 +72,7 @@ mutation ($tenantId: ID!, $step: Int!, $respondentRole: String, $customerType: S
 '''
 
 
-def test_owner_can_save_and_read_without_token_in_schema(
+def test_owner_can_save_and_read_onboarding_profile(
     graphene_client, user, tenant_factory, tenant_membership_factory
 ):
     tenant = tenant_factory(type=TenantType.ORGANIZATION)
@@ -100,7 +90,6 @@ def test_owner_can_save_and_read_without_token_in_schema(
     assert 'errors' not in read, read
     assert read['data']['organizationOnboardingProfile'] is not None, read
     assert read['data']['organizationOnboardingProfile']['currentStep'] == 3, read
-    assert 'ksefDemoTokenEncrypted' not in read['data']['organizationOnboardingProfile']
     assert OrganizationOnboardingProfile.objects.get(tenant=tenant).customer_type == 'B2B'
 
 
@@ -116,14 +105,6 @@ def test_other_tenant_cannot_read_or_write(graphene_client, user, tenant_factory
         assert result.get('errors'), result
 
 
-def test_token_is_not_a_graphql_field(graphene_client, user):
-    graphene_client.force_authenticate(user)
-    result = graphene_client.query('''{ __type(name: "OrganizationOnboardingProfileType") { fields { name } } }''')
-    fields = {field['name'] for field in result['data']['__type']['fields']}
-    assert 'ksefStatus' in fields
-    assert 'ksefDemoTokenEncrypted' not in fields
-
-
 DRAFT_COMPANY = {
     'name': 'Draft organization',
     'country': 'PL',
@@ -135,16 +116,16 @@ DRAFT_COMPANY = {
 }
 DRAFT_MUTATION = '''
 mutation ($step: Int!, $company: OnboardingCompanyInput, $respondentRole: String, $customerType: String,
-          $revenueModels: [String], $costDrivers: [String], $pricing: String, $mainGoal: String, $ksefToken: String) {
+          $revenueModels: [String], $costDrivers: [String], $pricing: String, $mainGoal: String) {
   saveOrganizationOnboardingDraft(step: $step, company: $company, respondentRole: $respondentRole,
     customerType: $customerType, revenueModels: $revenueModels, costDrivers: $costDrivers,
-    pricing: $pricing, mainGoal: $mainGoal, ksefToken: $ksefToken) {
-    tenant { id } profile { currentStep ksefStatus completedAt }
+    pricing: $pricing, mainGoal: $mainGoal) {
+    tenant { id } profile { currentStep completedAt }
   }
 }
 '''
 DRAFT_QUERY = '''{ organizationOnboardingDraft {
-  companyData { name nip companyName } respondentRole customerType currentStep ksefStatus
+  companyData { name nip companyName } respondentRole customerType currentStep
 } }'''
 
 
@@ -154,7 +135,6 @@ def complete_draft_answers(client):
         (3, {'revenueModels': ['PROJECT']}),
         (4, {'costDrivers': ['MATERIALS']}),
         (5, {'pricing': 'FIXED', 'mainGoal': 'COSTS'}),
-        (6, {'ksefToken': 'x' * 40}),
     ]:
         result = client.query(DRAFT_MUTATION, variable_values={'step': step, **answers})
         assert 'errors' not in result, result
@@ -172,12 +152,11 @@ def test_draft_creates_organization_only_after_summary(graphene_client, user):
     assert read['data']['organizationOnboardingDraft']['companyData']['nip'] == DRAFT_COMPANY['nip']
     complete_draft_answers(graphene_client)
     draft = OrganizationOnboardingProfile.objects.get(draft_owner=user)
-    assert decrypt_demo_token(draft.ksef_demo_token_encrypted) == 'x' * 40
     assert Tenant.objects.count() == initial_count
     completed = graphene_client.query(
         DRAFT_MUTATION,
         variable_values={
-            'step': 7,
+            'step': 6,
             'company': {**DRAFT_COMPANY, 'name': 'Final corrected name'},
             'respondentRole': 'ACCOUNTING',
             'customerType': 'B2C',
@@ -197,40 +176,16 @@ def test_draft_creates_organization_only_after_summary(graphene_client, user):
     assert draft.tenant.name == 'Final corrected name'
     assert TenantMembership.objects.get(tenant=draft.tenant, user=user).role == TenantUserRole.OWNER
     assert graphene_client.query(DRAFT_QUERY)['data']['organizationOnboardingDraft'] is None
-    repeated = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 7})
+    repeated = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 6})
     assert repeated.get('errors')
     assert Tenant.objects.count() == initial_count + 1
 
 
 def test_draft_is_account_scoped_and_cannot_skip(graphene_client, user, user_factory):
     graphene_client.force_authenticate(user)
-    assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 7}).get('errors')
+    assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 6}).get('errors')
     started = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 1, 'company': DRAFT_COMPANY})
     assert 'errors' not in started, started
-    assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 6, 'ksefToken': 'x' * 40}).get('errors')
+    assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 3, 'revenueModels': ['PROJECT']}).get('errors')
     graphene_client.force_authenticate(user_factory())
     assert graphene_client.query(DRAFT_QUERY)['data']['organizationOnboardingDraft'] is None
-
-
-def test_duplicate_nip_is_account_scoped_and_rechecked_at_finish(
-    graphene_client, user, user_factory, tenant_factory, tenant_membership_factory
-):
-    graphene_client.force_authenticate(user)
-    started = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 1, 'company': DRAFT_COMPANY})
-    assert 'errors' not in started, started
-    complete_draft_answers(graphene_client)
-    existing = tenant_factory(
-        type=TenantType.ORGANIZATION, nip=DRAFT_COMPANY['nip'], country='PL', creator=user_factory()
-    )
-    tenant_membership_factory(tenant=existing, user=user, role=TenantUserRole.MEMBER)
-    duplicate = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 7})
-    assert duplicate.get('errors'), duplicate
-    draft = OrganizationOnboardingProfile.objects.get(draft_owner=user)
-    assert draft.completed_at is None  # transaction rollback, draft retained for correction
-    nip_query = '''query ($nip: String!, $country: String!) { organizationNipExists(nip: $nip, country: $country) }'''
-    values = {'nip': 'PL 972-138-23-73', 'country': 'PL'}
-    assert graphene_client.query(nip_query, variable_values=values)['data']['organizationNipExists'] is True
-    graphene_client.force_authenticate(user_factory())
-    assert graphene_client.query(nip_query, variable_values=values)['data']['organizationNipExists'] is False
-    unrelated = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 1, 'company': DRAFT_COMPANY})
-    assert 'errors' not in unrelated, unrelated

@@ -119,7 +119,7 @@ describe('DynamicIntlProvider: localized validation fallback', () => {
       return (
         <>
           <input aria-label="answer" value={answer} onChange={(event) => setAnswer(event.target.value)} />
-          <FormattedMessage id="Onboarding / Duplicate NIP" />
+          <FormattedMessage id="Onboarding / Save failed" />
         </>
       );
     };
@@ -134,24 +134,24 @@ describe('DynamicIntlProvider: localized validation fallback', () => {
         <Form />
       </DynamicIntlProvider>
     );
-    expect(await screen.findByText('Organizacja z tym NIP-em już istnieje na Twoim koncie.')).toBeInTheDocument();
+    expect(await screen.findByText('Nie udało się zapisać tego kroku. Spróbuj ponownie.')).toBeInTheDocument();
     expect(screen.getByLabelText('answer')).toHaveValue('Unsaved company details');
   });
 
   it.each([
-    [Locale.POLISH, 'Organizacja z tym NIP-em już istnieje na Twoim koncie.'],
-    [Locale.GERMAN, 'Eine Organisation mit dieser NIP existiert bereits in Ihrem Konto.'],
-    [Locale.FRENCH, 'Une organisation avec ce NIP existe déjà dans votre compte.'],
-    [Locale.SPANISH, 'Ya existe una organización con este NIP en tu cuenta.'],
-    [Locale.CHINESE, '你的账户中已存在使用此 NIP 的组织。'],
-    [Locale.HINDI, 'इस NIP वाला संगठन आपके खाते में पहले से मौजूद है।'],
-    [Locale.ARABIC, 'توجد بالفعل مؤسسة بهذا الرقم NIP في حسابك.'],
+    [Locale.POLISH, 'Nie udało się zapisać tego kroku. Spróbuj ponownie.'],
+    [Locale.GERMAN, 'Dieser Schritt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.'],
+    [Locale.FRENCH, 'Impossible d’enregistrer cette étape. Veuillez réessayer.'],
+    [Locale.SPANISH, 'No se pudo guardar este paso. Inténtalo de nuevo.'],
+    [Locale.CHINESE, '无法保存此步骤，请重试。'],
+    [Locale.HINDI, 'यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।'],
+    [Locale.ARABIC, 'تعذّر حفظ هذه الخطوة. يرجى المحاولة مرة أخرى.'],
   ])('keeps warnings in %s when the API is unavailable', async (locale, expected) => {
     render(
       <DynamicIntlProvider locale={locale as Locale}>
         <FormattedMessage
-          id="Onboarding / Duplicate NIP"
-          defaultMessage="An organization with this NIP already exists in your account."
+          id="Onboarding / Save failed"
+          defaultMessage="Could not save this step. Please try again."
         />
       </DynamicIntlProvider>
     );
@@ -163,18 +163,15 @@ describe('DynamicIntlProvider: localized validation fallback', () => {
       ok: true,
       json: () =>
         Promise.resolve({
-          'Onboarding / Duplicate NIP': 'An organization with this NIP already exists in your account.',
           'Onboarding / Save failed': 'Could not save this step. Please try again.',
         }),
     });
     render(
       <DynamicIntlProvider locale={Locale.POLISH}>
-        <FormattedMessage id="Onboarding / Duplicate NIP" />
         <FormattedMessage id="Onboarding / Save failed" />
       </DynamicIntlProvider>
     );
-    expect(await screen.findByText(/Organizacja z tym NIP-em już istnieje na Twoim koncie/)).toBeInTheDocument();
-    expect(await screen.findByText(/Nie udało się zapisać tego kroku/)).toBeInTheDocument();
-    expect(screen.queryByText(/An organization with this NIP/)).not.toBeInTheDocument();
+    expect(await screen.findByText('Nie udało się zapisać tego kroku. Spróbuj ponownie.')).toBeInTheDocument();
+    expect(screen.queryByText(/Could not save this step/)).not.toBeInTheDocument();
   });
 });

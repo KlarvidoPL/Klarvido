@@ -11,7 +11,6 @@ export const organizationOnboardingProfileQuery = gql(/* GraphQL */ `
       mainGoal
       currentStep
       isRequired
-      ksefStatus
       completedAt
     }
   }
@@ -27,7 +26,6 @@ export const saveOrganizationOnboardingStepMutation = gql(/* GraphQL */ `
     $costDrivers: [String]
     $pricing: String
     $mainGoal: String
-    $ksefToken: String
   ) {
     saveOrganizationOnboardingStep(
       tenantId: $tenantId
@@ -38,7 +36,6 @@ export const saveOrganizationOnboardingStepMutation = gql(/* GraphQL */ `
       costDrivers: $costDrivers
       pricing: $pricing
       mainGoal: $mainGoal
-      ksefToken: $ksefToken
     ) {
       profile {
         respondentRole
@@ -49,7 +46,6 @@ export const saveOrganizationOnboardingStepMutation = gql(/* GraphQL */ `
         mainGoal
         currentStep
         isRequired
-        ksefStatus
         completedAt
       }
     }
@@ -95,15 +91,8 @@ export const organizationOnboardingDraftQuery = gql(/* GraphQL */ `
       mainGoal
       currentStep
       isRequired
-      ksefStatus
       completedAt
     }
-  }
-`);
-
-export const organizationNipExistsQuery = gql(/* GraphQL */ `
-  query organizationNipExists($nip: String!, $country: String!) {
-    organizationNipExists(nip: $nip, country: $country)
   }
 `);
 
@@ -117,7 +106,6 @@ export const saveOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
     $costDrivers: [String]
     $pricing: String
     $mainGoal: String
-    $ksefToken: String
   ) {
     saveOrganizationOnboardingDraft(
       step: $step
@@ -128,7 +116,6 @@ export const saveOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
       costDrivers: $costDrivers
       pricing: $pricing
       mainGoal: $mainGoal
-      ksefToken: $ksefToken
     ) {
       tenant {
         id
@@ -136,7 +123,6 @@ export const saveOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
       }
       profile {
         currentStep
-        ksefStatus
         completedAt
       }
     }

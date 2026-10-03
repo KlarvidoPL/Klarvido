@@ -4535,12 +4535,6 @@
   "Welcome Modal / tips title": {
     "defaultMessage": "快速开始"
   },
-  "Onboarding / Duplicate NIP": {
-    "defaultMessage": "你的账户中已存在使用此 NIP 的组织。"
-  },
-  "Onboarding / NIP check failed": {
-    "defaultMessage": "无法验证此 NIP，请重试。"
-  },
   "Onboarding / Save failed": {
     "defaultMessage": "无法保存此步骤，请重试。"
   },
@@ -4558,18 +4552,6 @@
   },
   "Tenant form / Immutable value": {
     "defaultMessage": "此值保存后无法更改。"
-  },
-  "Onboarding / KSeF token help": {
-    "defaultMessage": "请输入你的 KSeF 令牌。令牌将安全存储，不会显示在摘要中。"
-  },
-  "Onboarding / KSeF token input label": {
-    "defaultMessage": "KSeF 令牌（必须为 40 个字符）"
-  },
-  "Onboarding / KSeF token saved": {
-    "defaultMessage": "令牌已保存。输入新的 40 字符值以替换令牌。"
-  },
-  "Onboarding / Summary token saved": {
-    "defaultMessage": "令牌已保存"
   },
   "Onboarding / Revenue hint": {
     "defaultMessage": "最多选择两个答案。"

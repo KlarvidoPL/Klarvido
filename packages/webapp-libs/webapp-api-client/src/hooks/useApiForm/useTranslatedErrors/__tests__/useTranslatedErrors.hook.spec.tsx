@@ -26,11 +26,11 @@ describe('useTranslatedErrors: Hook', () => {
 
 it('uses the latest localized messages and a localized fallback for unknown validation codes', () => {
   const { result, rerender } = renderPlainHook(({ messages }) => useTranslatedErrors(messages), {
-    initialProps: { messages: { nip: { duplicate_nip: 'Duplicate NIP', default: 'Check this value' } } },
+    initialProps: { messages: { nip: { too_long: 'Too long', default: 'Check this value' } } },
   });
-  rerender({ messages: { nip: { duplicate_nip: 'NIP już istnieje', default: 'Sprawdź tę wartość' } } });
-  expect(result.current.translateErrorMessage('nip', { code: 'duplicate_nip', message: 'English backend error' })).toBe(
-    'NIP już istnieje'
+  rerender({ messages: { nip: { too_long: 'Za długie', default: 'Sprawdź tę wartość' } } });
+  expect(result.current.translateErrorMessage('nip', { code: 'too_long', message: 'English backend error' })).toBe(
+    'Za długie'
   );
   expect(result.current.translateErrorMessage('nip', { code: 'unknown', message: 'English backend error' })).toBe(
     'Sprawdź tę wartość'

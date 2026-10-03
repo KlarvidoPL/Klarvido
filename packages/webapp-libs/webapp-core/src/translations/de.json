@@ -4535,12 +4535,6 @@
   "Welcome Modal / tips title": {
     "defaultMessage": "Schnellstart"
   },
-  "Onboarding / Duplicate NIP": {
-    "defaultMessage": "Eine Organisation mit dieser NIP existiert bereits in Ihrem Konto."
-  },
-  "Onboarding / NIP check failed": {
-    "defaultMessage": "Diese NIP konnte nicht überprüft werden. Bitte versuchen Sie es erneut."
-  },
   "Onboarding / Save failed": {
     "defaultMessage": "Dieser Schritt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
   },
@@ -4558,18 +4552,6 @@
   },
   "Tenant form / Immutable value": {
     "defaultMessage": "Dieser Wert kann nach dem Speichern nicht geändert werden."
-  },
-  "Onboarding / KSeF token help": {
-    "defaultMessage": "Geben Sie Ihr KSeF-Token ein. Es wird sicher gespeichert und nicht in der Zusammenfassung angezeigt."
-  },
-  "Onboarding / KSeF token input label": {
-    "defaultMessage": "KSeF-Token (genau 40 Zeichen)"
-  },
-  "Onboarding / KSeF token saved": {
-    "defaultMessage": "Token gespeichert. Geben Sie einen neuen Wert mit 40 Zeichen ein, um es zu ersetzen."
-  },
-  "Onboarding / Summary token saved": {
-    "defaultMessage": "Token gespeichert"
   },
   "Onboarding / Revenue hint": {
     "defaultMessage": "Wählen Sie bis zu zwei Antworten."
