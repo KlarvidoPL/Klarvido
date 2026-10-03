@@ -5,23 +5,25 @@ import { userEvent } from '@testing-library/user-event';
 
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
 import { render as baseRender } from '../../../tests/utils/rendering';
+import { onboardingChoicesMock } from '../../organizationOnboarding/__tests__/onboardingChoices.mock';
 import {
   clearOrganizationOnboardingDraftMutation,
   organizationOnboardingDraftQuery,
   saveOrganizationOnboardingDraftMutation,
 } from '../../organizationOnboarding/organizationOnboarding.graphql';
 import { AddTenantForm } from '../addTenantForm.component';
+import { OnboardingStep } from '../../organizationOnboarding/onboardingSteps';
 
 jest.mock('@sb/webapp-core/services/analytics');
 
 const NIP = '9721382373';
-const SUMMARY_STEP = 6;
 const render: typeof baseRender = (ui, options = {}) =>
   baseRender(ui, {
     ...options,
     apolloMocks: (mocks) => [
       ...mocks,
       composeMockedQueryResult(organizationOnboardingDraftQuery, { data: { organizationOnboardingDraft: null } }),
+      onboardingChoicesMock,
       ...(typeof options.apolloMocks === 'function' ? options.apolloMocks([]) : (options.apolloMocks ?? [])),
     ],
   });
@@ -281,15 +283,15 @@ describe('AddTenantForm: Component', () => {
         variables: { step, ...variables },
         data: {
           saveOrganizationOnboardingDraft: {
-            tenant: step === SUMMARY_STEP ? { id: 'created-tenant', name: company.name } : null,
+            tenant: step === OnboardingStep.SUMMARY ? { id: 'created-tenant', name: company.name } : null,
             profile: {
-              currentStep: Math.min(step + 1, SUMMARY_STEP),
-              completedAt: step === SUMMARY_STEP ? '2026-10-03T08:00:00Z' : null,
+              currentStep: Math.min(step + 1, OnboardingStep.SUMMARY),
+              completedAt: step === OnboardingStep.SUMMARY ? '2026-10-03T08:00:00Z' : null,
             },
           },
         },
       });
-    const create = save(SUMMARY_STEP, { company, ...answers });
+    const create = save(OnboardingStep.SUMMARY, { company, ...answers });
     render(<Component />, {
       apolloMocks: [
         lookupMock(company),
@@ -302,7 +304,7 @@ describe('AddTenantForm: Component', () => {
         save(4, { costDrivers: answers.costDrivers }),
         query(5),
         save(5, { pricing: answers.pricing, mainGoal: answers.mainGoal }),
-        query(SUMMARY_STEP),
+        query(OnboardingStep.SUMMARY),
         create,
         fillCommonQueryWithUser(),
       ],

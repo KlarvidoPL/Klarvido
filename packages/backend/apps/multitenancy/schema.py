@@ -6,8 +6,6 @@ from graphene.types.generic import GenericScalar
 from graphql_relay import to_global_id, from_global_id
 from graphene_django import DjangoObjectType
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
-from django.db.models import Q
 from django.db import transaction
 from django.db import close_old_connections
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
@@ -28,7 +26,7 @@ from . import serializers
 from . import tasks
 from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
-from .services.onboarding import SUMMARY_STEP, save_onboarding_step, save_profile_step
+from .services.onboarding import CHOICES, clear_draft, save_draft_step, save_onboarding_step
 from .validators import validate_tax_id
 from .constants import (
     CompanyCountry as ConstantsCompanyCountry,
@@ -425,6 +423,15 @@ class OrganizationOnboardingProfileType(graphene.ObjectType):
     completed_at = graphene.DateTime()
 
 
+class OrganizationOnboardingChoicesType(graphene.ObjectType):
+    respondent_roles = graphene.List(graphene.String)
+    customer_types = graphene.List(graphene.String)
+    revenue_models = graphene.List(graphene.String)
+    cost_drivers = graphene.List(graphene.String)
+    pricing_models = graphene.List(graphene.String)
+    main_goals = graphene.List(graphene.String)
+
+
 class SaveOrganizationOnboardingStepMutation(graphene.Mutation):
     class Arguments:
         tenant_id = graphene.ID(required=True)
@@ -468,42 +475,12 @@ class SaveOrganizationOnboardingDraftMutation(graphene.Mutation):
     tenant = graphene.Field(TenantType)
 
     @classmethod
-    @transaction.atomic
     def mutate(cls, root, info, step, company=None, **answers):
         user = info.context.user
         if not user.is_authenticated:
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-        get_user_model().objects.select_for_update().get(pk=user.pk)
-        profile = models.OrganizationOnboardingProfile.objects.filter(draft_owner=user).first()
         try:
-            if step == 1:
-                serializer = serializers.TenantSerializer(data=dict(company or {}), context={"request": info.context})
-                serializer.is_valid(raise_exception=True)
-                if profile is None:
-                    profile = models.OrganizationOnboardingProfile(draft_owner=user, is_required=True)
-                profile.company_data = dict(serializer.validated_data)
-                profile.save()
-            else:
-                if profile is None:
-                    raise DRFValidationError({'step': 'Complete the company details first.'})
-                if step == SUMMARY_STEP and company is not None:
-                    serializer = serializers.TenantSerializer(data=dict(company), context={"request": info.context})
-                    serializer.is_valid(raise_exception=True)
-                    profile.company_data = dict(serializer.validated_data)
-                    for answer_step in range(2, 6):
-                        save_profile_step(profile, answer_step, **answers)
-                save_profile_step(profile, step, **answers)
-            tenant = None
-            if step == SUMMARY_STEP:
-                # Validate again under the account lock; create membership and attach the completed profile atomically.
-                serializer = serializers.TenantSerializer(data=profile.company_data, context={"request": info.context})
-                serializer.is_valid(raise_exception=True)
-                tenant = serializer.save()
-                models.OrganizationOnboardingProfile.objects.filter(tenant=tenant).delete()
-                profile.tenant = tenant
-                profile.draft_owner = None
-                profile.company_data = {}
-                profile.save()
+            profile, tenant = save_draft_step(user, step, company=company, context={"request": info.context}, **answers)
         except DRFValidationError as error:
             raise exceptions.GraphQlValidationError(error.detail)
         return cls(profile=profile, tenant=tenant)
@@ -517,8 +494,7 @@ class ClearOrganizationOnboardingDraftMutation(graphene.Mutation):
         user = info.context.user
         if not user.is_authenticated:
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-        # Only the caller's own draft: organization profiles are never touched here.
-        models.OrganizationOnboardingProfile.objects.filter(draft_owner=user).delete()
+        clear_draft(user)
         return cls(ok=True)
 
 
@@ -1495,6 +1471,13 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
 
 class Query(graphene.ObjectType):
     organization_onboarding_draft = graphene.Field(OrganizationOnboardingProfileType)
+    organization_onboarding_choices = graphene.Field(OrganizationOnboardingChoicesType)
+
+    @staticmethod
+    def resolve_organization_onboarding_choices(root, info):
+        if not info.context.user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return OrganizationOnboardingChoicesType(**CHOICES)
 
     @staticmethod
     def resolve_organization_onboarding_draft(root, info):

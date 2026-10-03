@@ -30,16 +30,12 @@ import {
 import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
 import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
+import { OnboardingStep } from '../organizationOnboarding/onboardingSteps';
 import {
   clearOrganizationOnboardingDraftMutation,
   organizationOnboardingDraftQuery,
   saveOrganizationOnboardingDraftMutation,
 } from '../organizationOnboarding/organizationOnboarding.graphql';
-
-enum Step {
-  BASICS = 1,
-  COMPANY_DETAILS = 2,
-}
 
 const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
@@ -56,7 +52,7 @@ export const AddTenantForm = () => {
   const { lookup, loading: lookupLoading } = useCompanyLookup();
   const { toast } = useToast();
 
-  const [step, setStep] = useState<Step>(Step.BASICS);
+  const [step, setStep] = useState<number>(OnboardingStep.ORGANIZATION);
   // null = not looked up yet; true/false = whether MF returned a company for the NIP in the form
   const [companyFound, setCompanyFound] = useState<boolean | null>(null);
   const [lookedUpNip, setLookedUpNip] = useState<string>();
@@ -88,7 +84,7 @@ export const AddTenantForm = () => {
   // Every company field is required: as soon as step 2 opens, flag the ones the register didn't fill (red error on
   // each), and keep "Next" disabled until all of them are filled in and valid
   useEffect(() => {
-    if (step === Step.COMPANY_DETAILS) {
+    if (step === OnboardingStep.COMPANY_DETAILS) {
       trigger([...COMPANY_DETAILS_FIELDS]);
     }
   }, [step, trigger]);
@@ -112,7 +108,7 @@ export const AddTenantForm = () => {
         const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
         const fieldsWithErrors = Object.keys(validationError?.extensions ?? {});
         if (STEP_1_FIELDS.some((field) => fieldsWithErrors.includes(field))) {
-          setStep(Step.BASICS);
+          setStep(OnboardingStep.ORGANIZATION);
         }
       },
     }
@@ -135,7 +131,7 @@ export const AddTenantForm = () => {
       setMissingFields(company ? getMissingCompanyFields(company) : []);
       setLookedUpNip(lookupKey);
     }
-    setStep(Step.COMPANY_DETAILS);
+    setStep(OnboardingStep.COMPANY_DETAILS);
   };
 
   const onSubmit = handleSubmit((formData: TenantFormFields) => {
@@ -160,7 +156,7 @@ export const AddTenantForm = () => {
       await clearDraft();
       await refetchDraft();
       form.reset();
-      setStep(Step.BASICS);
+      setStep(OnboardingStep.ORGANIZATION);
       setCompanyFound(null);
       setLookedUpNip(undefined);
       setMissingFields([]);
@@ -206,7 +202,7 @@ export const AddTenantForm = () => {
               id="Tenant form / AddTenant / Card description"
             />
           </CardDescription>
-          <OnboardingProgress step={step} />
+          <OnboardingProgress step={step + 1} />
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -214,7 +210,7 @@ export const AddTenantForm = () => {
               className="flex flex-col gap-4"
               noValidate
               onSubmit={(event) => {
-                if (step === Step.BASICS) {
+                if (step === OnboardingStep.ORGANIZATION) {
                   event.preventDefault();
                   handleNext();
                   return;
@@ -222,7 +218,7 @@ export const AddTenantForm = () => {
                 onSubmit(event);
               }}
             >
-              {step === Step.BASICS && (
+              {step === OnboardingStep.ORGANIZATION && (
                 <>
                   <DisplayNameField />
                   <CountryField />
@@ -230,7 +226,7 @@ export const AddTenantForm = () => {
                 </>
               )}
 
-              {step === Step.COMPANY_DETAILS && (
+              {step === OnboardingStep.COMPANY_DETAILS && (
                 <>
                   <LookupResultNote found={!!companyFound} missingFields={missingFields} />
                   <CompanyDetailsFields />
@@ -246,7 +242,7 @@ export const AddTenantForm = () => {
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
                 {/* Distinct keys: without them React reuses the same <button> across steps, so clicking Back flips
                     it to type="submit" mid-click and the browser submits the form (= Next) right back to step 2 */}
-                {step === Step.BASICS ? (
+                {step === OnboardingStep.ORGANIZATION ? (
                   <Button
                     key="next"
                     type="submit"
@@ -263,7 +259,7 @@ export const AddTenantForm = () => {
                       key="back"
                       type="button"
                       variant={ButtonVariant.SECONDARY}
-                      onClick={() => setStep(Step.BASICS)}
+                      onClick={() => setStep(OnboardingStep.ORGANIZATION)}
                       disabled={loadingMutation}
                       className="w-full sm:w-fit"
                       icon={<ArrowLeft className="h-4 w-4" />}

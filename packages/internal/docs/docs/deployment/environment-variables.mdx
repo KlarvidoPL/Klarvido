@@ -51,9 +51,9 @@ openssl rand -hex 32
 
 ### Organization onboarding deployment
 
-Apply the `multitenancy` migrations `0027` through `0031` before starting the updated backend and deploying the webapp. They add the onboarding profile, the required-flow flag, and account-owned drafts with a constraint requiring exactly one organization or draft owner. Existing organizations are not made mandatory by the default `is_required=False` migration. New organizations are created atomically only after the summary is confirmed. No additional secrets are required.
+Apply the `multitenancy` migration `0028_organization_onboarding_profile` before starting the updated backend and deploying the webapp. It creates the onboarding profile, which holds the required-flow flag, account-owned drafts, and a constraint requiring exactly one organization or draft owner. Existing organizations are not made mandatory by the default `is_required=False` value. New organizations are created atomically only after the summary is confirmed. No additional secrets are required.
 
-**Rollback:** roll back application code without reversing these migrations on a live database. Reversing `0030` is unsafe while unattached drafts exist, and reversing `0027` removes onboarding answers. Use a tested database recovery procedure if schema rollback is necessary.
+**Rollback:** roll back application code without reversing this migration on a live database. Reversing it removes all onboarding answers and unattached drafts, so use a tested database recovery procedure if schema rollback is necessary.
 
 **URL formatting rules:**
 

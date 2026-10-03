@@ -7,13 +7,14 @@ import { useLocation } from 'react-router';
 
 import currentTenantContext from '../../../providers/currentTenantProvider/currentTenantProvider.context';
 import { tenantFactory } from '../../../tests/factories/tenant';
-import { render } from '../../../tests/utils/rendering';
+import { render as baseRender } from '../../../tests/utils/rendering';
 import { OrganizationOnboarding } from '../organizationOnboarding.component';
 import {
   organizationOnboardingDraftQuery,
   organizationOnboardingProfileQuery,
   saveOrganizationOnboardingStepMutation,
 } from '../organizationOnboarding.graphql';
+import { onboardingChoicesMock } from './onboardingChoices.mock';
 
 const tenantId = 'tenant-1';
 const TenantWrapper = ({ children }: PropsWithChildren) => (
@@ -21,6 +22,16 @@ const TenantWrapper = ({ children }: PropsWithChildren) => (
     {children}
   </currentTenantContext.Provider>
 );
+// Every render needs the answer choices, so they are added to whatever mocks a test supplies.
+const render: typeof baseRender = (ui, options = {}) =>
+  baseRender(ui, {
+    ...options,
+    apolloMocks: (mocks) => [
+      ...mocks,
+      onboardingChoicesMock,
+      ...(typeof options.apolloMocks === 'function' ? options.apolloMocks([]) : (options.apolloMocks ?? [])),
+    ],
+  });
 const LocationProbe = () => <span data-testid="location">{useLocation().pathname}</span>;
 
 const profile = {

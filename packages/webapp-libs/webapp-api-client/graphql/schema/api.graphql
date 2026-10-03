@@ -66,6 +66,7 @@ type Query {
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
   ssoDiscover(email: String!): SSODiscoveryResultType
   organizationOnboardingDraft: OrganizationOnboardingProfileType
+  organizationOnboardingChoices: OrganizationOnboardingChoicesType
   allTenants(before: String, after: String, first: Int, last: Int): TenantConnection
   tenant(id: ID): TenantType
   organizationOnboardingProfile(tenantId: ID!): OrganizationOnboardingProfileType
@@ -608,6 +609,14 @@ type OnboardingCompanyType {
   regon: String
   address: String
   vatStatus: String
+}
+type OrganizationOnboardingChoicesType {
+  respondentRoles: [String]
+  customerTypes: [String]
+  revenueModels: [String]
+  costDrivers: [String]
+  pricingModels: [String]
+  mainGoals: [String]
 }
 type TenantConnection {
   "Pagination data for this connection."
@@ -2365,7 +2374,6 @@ enum PermissionCategory {
   SECURITY
   BILLING
   FEATURES
-  DASHBOARD
 }
 "An enumeration."
 enum DjstripeProductTypeChoices {

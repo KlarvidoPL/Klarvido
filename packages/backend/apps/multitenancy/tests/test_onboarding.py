@@ -1,10 +1,21 @@
 import pytest
+from types import SimpleNamespace
 from graphql_relay import to_global_id
 from rest_framework.exceptions import ValidationError
 
 from ..constants import TenantType, TenantUserRole
 from ..models import OrganizationOnboardingProfile, Tenant, TenantMembership
-from ..services.onboarding import save_onboarding_step
+from ..services.onboarding import (
+    CHOICES,
+    COST_DRIVERS,
+    CUSTOMER_TYPES,
+    MAIN_GOALS,
+    PRICING_MODELS,
+    RESPONDENT_ROLES,
+    REVENUE_MODELS,
+    save_draft_step,
+    save_onboarding_step,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -225,3 +236,59 @@ def test_same_nip_can_be_used_for_another_organization(
     completed = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 6})
     assert 'errors' not in completed, completed
     assert Tenant.objects.filter(nip=DRAFT_COMPANY['nip'], creator=user).count() == 2
+
+
+def test_failed_finish_rolls_back_organization_and_keeps_draft(mocker, user):
+    context = {'request': SimpleNamespace(user=user)}
+    company = {
+        'name': 'Draft organization',
+        'country': 'PL',
+        'nip': DRAFT_COMPANY['nip'],
+        'company_name': 'Draft company',
+        'regon': '123456785',
+        'address': 'Warsaw',
+        'vat_status': 'ACTIVE',
+    }
+    save_draft_step(user, 1, company=company, context=context)
+    for step, answers in [
+        (2, {'respondent_role': 'ACCOUNTING', 'customer_type': 'B2B'}),
+        (3, {'revenue_models': ['PROJECT']}),
+        (4, {'cost_drivers': ['MATERIALS']}),
+        (5, {'pricing': 'FIXED', 'main_goal': 'COSTS'}),
+    ]:
+        save_draft_step(user, step, context=context, **answers)
+
+    # The summary's first save succeeds; the save after the organization is created fails.
+    mocker.patch.object(OrganizationOnboardingProfile, 'save', side_effect=[None, RuntimeError('boom')])
+    with pytest.raises(RuntimeError):
+        save_draft_step(user, 6, context=context)
+
+    assert not Tenant.objects.filter(nip=DRAFT_COMPANY['nip'], creator=user).exists()
+    assert OrganizationOnboardingProfile.objects.filter(draft_owner=user, tenant__isnull=True).exists()
+
+
+def test_unauthenticated_clear_is_rejected(graphene_client):
+    result = graphene_client.query(CLEAR_MUTATION)
+    assert result.get('errors'), result
+
+
+def test_choices_query_exposes_the_service_lists(graphene_client, user):
+    graphene_client.force_authenticate(user)
+    result = graphene_client.query(
+        """
+        {
+          organizationOnboardingChoices {
+            respondentRoles customerTypes revenueModels costDrivers pricingModels mainGoals
+          }
+        }
+        """
+    )
+    assert 'errors' not in result, result
+    choices = result['data']['organizationOnboardingChoices']
+    assert choices['respondentRoles'] == list(RESPONDENT_ROLES)
+    assert choices['customerTypes'] == list(CUSTOMER_TYPES)
+    assert choices['revenueModels'] == list(REVENUE_MODELS)
+    assert choices['costDrivers'] == list(COST_DRIVERS)
+    assert choices['pricingModels'] == list(PRICING_MODELS)
+    assert choices['mainGoals'] == list(MAIN_GOALS)
+    assert CHOICES['respondent_roles'] == RESPONDENT_ROLES

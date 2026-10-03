@@ -136,3 +136,16 @@ export const clearOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
     }
   }
 `);
+
+export const organizationOnboardingChoicesQuery = gql(/* GraphQL */ `
+  query organizationOnboardingChoices {
+    organizationOnboardingChoices {
+      respondentRoles
+      customerTypes
+      revenueModels
+      costDrivers
+      pricingModels
+      mainGoals
+    }
+  }
+`);
