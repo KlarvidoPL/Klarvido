@@ -867,6 +867,31 @@ class TestDeleteTenantMembershipMutation:
             "TenantMembershipType", tenant_membership.id
         )
 
+    def test_delete_tenant_membership_not_accepted_owner_role(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        """A pending (unaccepted) invitation created with the Owner role holds no real access
+        yet and must not trip the "only owners can remove owners" / "cannot remove the last
+        owner" guards meant to protect real, accepted owners - even when there is only one
+        real accepted owner in the tenant."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        pending_owner_invitation = tenant_membership_factory(
+            tenant=tenant, role=TenantUserRole.OWNER, is_accepted=False
+        )
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", pending_owner_invitation.id),
+            },
+        )
+        assert executed["data"]["deleteTenantMembership"]["deletedIds"][0] == to_global_id(
+            "TenantMembershipType", pending_owner_invitation.id
+        )
+
     def test_delete_tenant_membership_with_invalid_id(
         self, graphene_client, user, tenant_factory, tenant_membership_factory
     ):
