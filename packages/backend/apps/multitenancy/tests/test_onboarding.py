@@ -72,9 +72,7 @@ mutation ($tenantId: ID!, $step: Int!, $respondentRole: String, $customerType: S
 '''
 
 
-def test_owner_can_save_and_read_onboarding_profile(
-    graphene_client, user, tenant_factory, tenant_membership_factory
-):
+def test_owner_can_save_and_read_onboarding_profile(graphene_client, user, tenant_factory, tenant_membership_factory):
     tenant = tenant_factory(type=TenantType.ORGANIZATION)
     tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER)
     tenant_id = to_global_id('TenantType', tenant.pk)
@@ -186,7 +184,9 @@ def test_draft_is_account_scoped_and_cannot_skip(graphene_client, user, user_fac
     assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 6}).get('errors')
     started = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 1, 'company': DRAFT_COMPANY})
     assert 'errors' not in started, started
-    assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 3, 'revenueModels': ['PROJECT']}).get('errors')
+    assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 3, 'revenueModels': ['PROJECT']}).get(
+        'errors'
+    )
     graphene_client.force_authenticate(user_factory())
     assert graphene_client.query(DRAFT_QUERY)['data']['organizationOnboardingDraft'] is None
 
@@ -210,3 +210,18 @@ def test_clear_draft_removes_only_the_callers_draft(graphene_client, user, user_
     assert result['data']['clearOrganizationOnboardingDraft']['ok'] is True
     assert graphene_client.query(DRAFT_QUERY)['data']['organizationOnboardingDraft'] is None
     assert OrganizationOnboardingProfile.objects.filter(draft_owner=other).exists()
+
+
+def test_same_nip_can_be_used_for_another_organization(
+    graphene_client, user, tenant_factory, tenant_membership_factory
+):
+    existing = tenant_factory(type=TenantType.ORGANIZATION, nip=DRAFT_COMPANY['nip'], country='PL', creator=user)
+    tenant_membership_factory(tenant=existing, user=user, role=TenantUserRole.OWNER)
+    graphene_client.force_authenticate(user)
+
+    started = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 1, 'company': DRAFT_COMPANY})
+    assert 'errors' not in started, started
+    complete_draft_answers(graphene_client)
+    completed = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 6})
+    assert 'errors' not in completed, completed
+    assert Tenant.objects.filter(nip=DRAFT_COMPANY['nip'], creator=user).count() == 2

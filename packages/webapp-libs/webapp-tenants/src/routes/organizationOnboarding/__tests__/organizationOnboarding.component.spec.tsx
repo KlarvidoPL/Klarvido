@@ -10,6 +10,7 @@ import { tenantFactory } from '../../../tests/factories/tenant';
 import { render } from '../../../tests/utils/rendering';
 import { OrganizationOnboarding } from '../organizationOnboarding.component';
 import {
+  organizationOnboardingDraftQuery,
   organizationOnboardingProfileQuery,
   saveOrganizationOnboardingStepMutation,
 } from '../organizationOnboarding.graphql';
@@ -225,5 +226,71 @@ describe('OrganizationOnboarding', () => {
     expect(screen.getByText('Owner / management')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Confirm profile' }));
     expect(await screen.findByText('Organization added successfully!')).toBeInTheDocument();
+  });
+
+  describe('clearing a draft', () => {
+    const draftMock = composeMockedQueryResult(organizationOnboardingDraftQuery, {
+      data: {
+        organizationOnboardingDraft: {
+          companyData: {
+            name: 'Draft organization',
+            country: 'PL',
+            nip: '9721382373',
+            companyName: 'Draft company',
+            regon: '123456785',
+            address: 'Warsaw',
+            vatStatus: 'ACTIVE',
+          },
+          respondentRole: 'ACCOUNTING',
+          customerType: 'B2B',
+          revenueModels: ['PROJECT'],
+          costDrivers: [],
+          pricing: '',
+          mainGoal: '',
+          currentStep: 3,
+          isRequired: true,
+          completedAt: null,
+        },
+      },
+    });
+
+    it('calls the clear handler only after the user confirms', async () => {
+      const onClearDraft = jest.fn().mockResolvedValue(undefined);
+      render(<OrganizationOnboarding draftMode onClearDraft={onClearDraft} />, {
+        TenantWrapper,
+        apolloMocks: (mocks) => [...mocks, draftMock],
+      });
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Clear draft' }));
+      const dialog = await screen.findByRole('alertdialog');
+      expect(screen.getByText('Clear this draft?')).toBeInTheDocument();
+      expect(onClearDraft).not.toHaveBeenCalled();
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Clear draft' }));
+      expect(onClearDraft).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the draft when the user cancels the confirmation', async () => {
+      const onClearDraft = jest.fn().mockResolvedValue(undefined);
+      render(<OrganizationOnboarding draftMode onClearDraft={onClearDraft} />, {
+        TenantWrapper,
+        apolloMocks: (mocks) => [...mocks, draftMock],
+      });
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Clear draft' }));
+      const dialog = await screen.findByRole('alertdialog');
+      await userEvent.click(within(dialog).getByRole('button', { name: /cancel/i }));
+      expect(onClearDraft).not.toHaveBeenCalled();
+    });
+
+    it('does not offer clearing outside draft mode', async () => {
+      render(<OrganizationOnboarding onClearDraft={jest.fn()} />, {
+        TenantWrapper,
+        apolloMocks: (mocks) => [...mocks, profileMock(2)],
+      });
+
+      expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Clear draft' })).not.toBeInTheDocument();
+    });
   });
 });
