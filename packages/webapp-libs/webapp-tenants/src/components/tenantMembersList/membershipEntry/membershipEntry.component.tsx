@@ -35,6 +35,7 @@ import {
   allOrganizationRolesQuery,
   assignRolesToMemberMutation,
 } from '../../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
+import { getSystemRoleDisplay } from '../../../utils/organizationRoleDisplay';
 import {
   deleteTenantMembershipMutation,
   resendTenantInvitationMutation,
@@ -60,6 +61,7 @@ interface OrganizationRoleInfo {
   color?: string | null;
   isSystemRole?: boolean | null;
   isOwnerRole?: boolean | null;
+  systemRoleType?: string | null;
 }
 
 export type MembershipEntryProps = {
@@ -118,8 +120,15 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
         color: role.color ?? undefined,
         isSystemRole: role.isSystemRole ?? undefined,
         isOwnerRole: role.isOwnerRole ?? undefined,
+        systemRoleType: role.systemRoleType ?? undefined,
       }));
   }, [rolesData]);
+
+  const getRoleDisplayName = useCallback(
+    (role: OrganizationRoleInfo) =>
+      role.isSystemRole ? getSystemRoleDisplay(intl, role.systemRoleType, role.name).name : role.name,
+    [intl]
+  );
 
   const updateSuccessMessage = intl.formatMessage({
     id: 'Membership Entry / UpdateRole / Success message',
@@ -287,7 +296,7 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
                     )}
                   >
                     {role.isOwnerRole && <Crown className="h-3 w-3 mr-1" />}
-                    {role.name}
+                    {getRoleDisplayName(role)}
                   </Badge>
                 ))}
             </div>
@@ -422,7 +431,7 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
                   <RoleColorBadge color={role.color || 'BLUE'} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">{role.name}</span>
+                      <span className="font-medium text-sm">{getRoleDisplayName(role)}</span>
                       {role.isSystemRole && (
                         <Badge variant="secondary" className="text-xs">
                           <FormattedMessage defaultMessage="System" id="Membership Entry / System Badge" />

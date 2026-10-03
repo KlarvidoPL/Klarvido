@@ -101,6 +101,7 @@ import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import { RoutesConfig } from '../../../config/routes';
 import { useGenerateTenantPath, usePermissionCheck } from '../../../hooks';
 import { useCurrentTenant } from '../../../providers';
+import { getSystemRoleDisplay } from '../../../utils/organizationRoleDisplay';
 import {
   allOrganizationRolesQuery,
   allPermissionsQuery,
@@ -434,45 +435,6 @@ const getPermissionDisplay = (
         description: intl.formatMessage({
           defaultMessage: 'Configure backups, trigger manual backups, and manage backup settings',
           id: 'Roles / Permission / backup.manage / Description',
-        }),
-      };
-    default:
-      return { name: fallbackName, description: fallbackDescription };
-  }
-};
-
-// Translated name/description for a system role, keyed by systemRoleType. Custom (non-system)
-// roles always keep their raw freeform name/description - those are user-entered text and must
-// never be auto-translated.
-const getSystemRoleDisplay = (
-  intl: IntlShape,
-  systemRoleType: string | null | undefined,
-  fallbackName: string,
-  fallbackDescription?: string
-): { name: string; description?: string } => {
-  switch (systemRoleType) {
-    case 'OWNER':
-      return {
-        name: intl.formatMessage({ defaultMessage: 'Owner', id: 'Roles / System Role / Owner / Name' }),
-        description: intl.formatMessage({
-          defaultMessage: 'Full access to all organization features',
-          id: 'Roles / System Role / Owner / Description',
-        }),
-      };
-    case 'ADMIN':
-      return {
-        name: intl.formatMessage({ defaultMessage: 'Administrator', id: 'Roles / System Role / Administrator / Name' }),
-        description: intl.formatMessage({
-          defaultMessage: 'Manage organization settings and members',
-          id: 'Roles / System Role / Administrator / Description',
-        }),
-      };
-    case 'MEMBER':
-      return {
-        name: intl.formatMessage({ defaultMessage: 'Member', id: 'Roles / System Role / Member / Name' }),
-        description: intl.formatMessage({
-          defaultMessage: 'View access to organization data',
-          id: 'Roles / System Role / Member / Description',
         }),
       };
     default:
@@ -1353,7 +1315,7 @@ export const TenantRoles = () => {
       <div className="space-y-6">
         {/* Header Card */}
         <Card>
-          <CardHeader className="pb-4">
+          <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">

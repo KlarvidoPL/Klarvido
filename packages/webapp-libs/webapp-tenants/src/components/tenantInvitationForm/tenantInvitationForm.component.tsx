@@ -17,6 +17,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useCurrentTenant } from '../../providers';
 import { allOrganizationRolesQuery } from '../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
+import { getSystemRoleDisplay } from '../../utils/organizationRoleDisplay';
 import { UseTenantInvitationFormHookProps, useTenantInvitationForm } from './tenantInvitationForm.hook';
 
 export type TenantInvitationFormFields = {
@@ -35,6 +36,7 @@ interface OrganizationRole {
   color?: string | null;
   isSystemRole?: boolean | null;
   isOwnerRole?: boolean | null;
+  systemRoleType?: string | null;
 }
 
 // Role color badge component
@@ -80,7 +82,14 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
       color: role.color ?? undefined,
       isSystemRole: role.isSystemRole ?? undefined,
       isOwnerRole: role.isOwnerRole ?? undefined,
+      systemRoleType: role.systemRoleType ?? undefined,
     }));
+
+  const getRoleDisplayName = useCallback(
+    (role: OrganizationRole) =>
+      role.isSystemRole ? getSystemRoleDisplay(intl, role.systemRoleType, role.name).name : role.name,
+    [intl]
+  );
 
   const {
     form: {
@@ -129,8 +138,8 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
       });
     }
     const selectedRoles = availableRoles.filter((r) => selectedRoleIds.includes(r.id));
-    return selectedRoles.map((r) => r.name).join(', ');
-  }, [selectedRoleIds, availableRoles, intl]);
+    return selectedRoles.map((r) => getRoleDisplayName(r)).join(', ');
+  }, [selectedRoleIds, availableRoles, intl, getRoleDisplayName]);
 
   return (
     <Card>
@@ -283,7 +292,7 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                                       {isSelected && <Check className="h-3 w-3" />}
                                     </div>
                                     <RoleColorBadge color={role.color || 'BLUE'} />
-                                    <span className="text-sm">{role.name}</span>
+                                    <span className="text-sm">{getRoleDisplayName(role)}</span>
                                     {role.isSystemRole && (
                                       <span className="text-xs text-muted-foreground">
                                         <FormattedMessage
