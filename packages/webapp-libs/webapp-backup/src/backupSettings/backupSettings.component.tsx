@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client/react';
+import { getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import {
   BackupBackupRecordStatusChoices,
   BackupRestoreRecordStatusChoices,
@@ -24,6 +25,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TabsContent } from '@sb/webapp-core/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sb/webapp-core/components/ui/tooltip';
 import { useToast } from '@sb/webapp-core/toast';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import { BackupStatusBadge } from './backupStatusBadge.component';
 import { RoutesConfig } from '@sb/webapp-tenants/config/routes';
 import { useGenerateTenantPath, usePermissionCheck } from '@sb/webapp-tenants/hooks';
@@ -261,7 +263,8 @@ export const BackupSettings = () => {
         });
       }
     },
-    onError: (error) => toast({ description: error.message, variant: 'destructive' }),
+    onError: (error) =>
+      toast({ description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl), variant: 'destructive' }),
   });
 
   const [triggerBackup, { loading: triggering }] = useMutation(triggerBackupMutation, {
@@ -276,7 +279,8 @@ export const BackupSettings = () => {
         });
       }
     },
-    onError: (error) => toast({ description: error.message, variant: 'destructive' }),
+    onError: (error) =>
+      toast({ description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl), variant: 'destructive' }),
   });
 
   const [downloadBackup, { loading: downloading }] = useMutation(downloadBackupDecryptedMutation, {
@@ -299,7 +303,8 @@ export const BackupSettings = () => {
         });
       }
     },
-    onError: (error) => toast({ description: error.message, variant: 'destructive' }),
+    onError: (error) =>
+      toast({ description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl), variant: 'destructive' }),
   });
 
   const [deleteBackup] = useMutation(deleteBackupMutation, {
@@ -314,7 +319,8 @@ export const BackupSettings = () => {
         });
       }
     },
-    onError: (error) => toast({ description: error.message, variant: 'destructive' }),
+    onError: (error) =>
+      toast({ description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl), variant: 'destructive' }),
   });
 
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
@@ -346,7 +352,8 @@ export const BackupSettings = () => {
         });
       }
     },
-    onError: (error) => toast({ description: error.message, variant: 'destructive' }),
+    onError: (error) =>
+      toast({ description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl), variant: 'destructive' }),
   });
 
   const handleOpenRestoreDialog = (backupId: string) => {

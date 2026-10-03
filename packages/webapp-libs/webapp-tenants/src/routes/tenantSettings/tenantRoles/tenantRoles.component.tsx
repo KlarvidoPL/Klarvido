@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import { ApolloErrorLike, getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { buttonVariants } from '@sb/webapp-core/components/ui/button';
 import {
@@ -14,6 +15,7 @@ import {
 } from '@sb/webapp-core/components/ui/alert-dialog';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import {
   Dialog,
   DialogContent,
@@ -207,10 +209,13 @@ const getCategoryConfig = (
 
 // Translates the known raw-English error strings raised by Create/Update/DeleteOrganizationRole
 // mutations (apps/multitenancy/schema.py) - these are plain graphene mutations, not
-// serializer-based, so their errors arrive as a flat error.message rather than the usual
-// extensions.non_field_errors shape. Unrecognized messages fall back to the raw text.
-const getRoleMutationErrorMessage = (intl: IntlShape, error: Error): string => {
-  const message = error.message;
+// serializer-based, so most of their errors arrive via `extensions` (either as a plain
+// PermissionDenied's message, which is already the real text, or as the `[{message, code}]`
+// shape GraphQlValidationError puts its detail in, since its top-level message is just the
+// exception class name) - see getGraphQLErrorDetail. Unrecognized messages fall back to a
+// translated generic message, never raw backend text.
+const getRoleMutationErrorMessage = (intl: IntlShape, error: ApolloErrorLike): string => {
+  const message = getGraphQLErrorDetail(error) ?? '';
 
   const addPermissionMatch = message.match(/^You cannot add permission '([^']+)' that you don't have\.$/);
   if (addPermissionMatch) {
@@ -308,7 +313,7 @@ const getRoleMutationErrorMessage = (intl: IntlShape, error: Error): string => {
         id: 'Roles / Error / Only owner can reassign to owner role',
       });
     default:
-      return message;
+      return getGenericErrorMessage(intl);
   }
 };
 
@@ -414,7 +419,16 @@ const RoleCard = ({
               'md:opacity-0 md:group-hover:opacity-100 transition-opacity'
             )}>
               {!role.isOwnerRole && (
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={onEdit}
+                  aria-label={intl.formatMessage(
+                    { defaultMessage: 'Edit {name} role', id: 'Roles / Edit Role Button' },
+                    { name: display.name }
+                  )}
+                >
                   <Edit2 className="h-3.5 w-3.5" />
                 </Button>
               )}
@@ -424,6 +438,10 @@ const RoleCard = ({
                   size="icon"
                   className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 dark:text-red-400 dark:hover:text-red-400"
                   onClick={onDelete}
+                  aria-label={intl.formatMessage(
+                    { defaultMessage: 'Delete {name} role', id: 'Roles / Delete Role Button' },
+                    { name: display.name }
+                  )}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

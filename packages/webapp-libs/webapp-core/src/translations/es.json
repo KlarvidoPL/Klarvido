@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "Cancelar"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Algo salió mal. Por favor, inténtalo de nuevo."
+  },
   "Common / Never": {
     "defaultMessage": "Nunca"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "¿Seguro que quieres eliminar el rol \"{name}\"? Esta acción no se puede deshacer."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Eliminar el rol {name}"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Rol eliminado correctamente"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "Modifica los permisos y la configuración del rol"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Editar el rol {name}"
   },
   "Roles / Edit Title": {
     "defaultMessage": "Editar rol"

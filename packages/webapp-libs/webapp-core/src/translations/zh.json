@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "取消"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "出现问题，请重试。"
+  },
   "Common / Never": {
     "defaultMessage": "从不"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "确定要删除角色“{name}”吗？此操作无法撤销。"
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "删除{name}角色"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "角色删除成功"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "修改角色权限和设置"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "编辑{name}角色"
   },
   "Roles / Edit Title": {
     "defaultMessage": "编辑角色"

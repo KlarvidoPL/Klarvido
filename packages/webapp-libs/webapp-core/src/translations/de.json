@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "Abbrechen"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
   "Common / Never": {
     "defaultMessage": "Nie"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "Möchten Sie die Rolle „{name}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Rolle {name} löschen"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Rolle erfolgreich gelöscht"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "Rollenberechtigungen und -einstellungen anpassen"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Rolle {name} bearbeiten"
   },
   "Roles / Edit Title": {
     "defaultMessage": "Rolle bearbeiten"

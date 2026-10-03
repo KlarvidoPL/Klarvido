@@ -11,6 +11,7 @@ import { TenantRoles } from '../tenantRoles.component';
 import {
   allOrganizationRolesQuery,
   allPermissionsQuery,
+  deleteOrganizationRoleMutation,
 } from '../tenantRoles.graphql';
 
 jest.mock('@sb/webapp-tenants/hooks', () => ({
@@ -188,4 +189,46 @@ describe('TenantRoles: Component', () => {
     expect(screen.queryByText(/no custom roles yet/i)).not.toBeInTheDocument();
   });
 
+  it('shows the real backend detail (not the raw "GraphQlValidationError" placeholder) when a role gains a member between load and delete', async () => {
+    // Regression test: the role shows 0 members in this render (the data the user had when they
+    // clicked delete), but by the time the mutation runs, another user has assigned a member to
+    // it - a race condition the backend reports as a GraphQlValidationError, whose real detail
+    // text lives in `extensions` as a list, not in the top-level `message`.
+    const permissionsMock = createPermissionsMock();
+    const rolesMock = createRolesMock([
+      { id: 'role-2', name: 'Project Manager', isSystemRole: false, isOwnerRole: false, memberCount: 0 },
+    ]);
+    const deleteErrorMock = {
+      request: {
+        query: deleteOrganizationRoleMutation,
+        variables: { id: 'role-2', tenantId: TENANT_ID },
+      },
+      result: {
+        errors: [
+          {
+            message: 'GraphQlValidationError',
+            extensions: [
+              {
+                message: 'This role is assigned to 1 member(s). Please provide a replacement role.',
+                code: 'invalid',
+              },
+            ],
+          } as any,
+        ],
+      },
+    };
+
+    renderComponent([permissionsMock, rolesMock, deleteErrorMock]);
+
+    const deleteButton = await screen.findByRole('button', { name: /delete project manager role/i });
+    await userEvent.click(deleteButton);
+
+    const confirmButton = await screen.findByRole('button', { name: /delete role/i });
+    await userEvent.click(confirmButton);
+
+    expect(
+      await screen.findByText(/this role is assigned to 1 member\. please choose a replacement role\./i)
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^GraphQlValidationError$/)).not.toBeInTheDocument();
+  });
 });

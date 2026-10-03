@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "Cancel"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
   "Common / Never": {
     "defaultMessage": "Never"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "Are you sure you want to delete the role \"{name}\"? This action cannot be undone."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Delete {name} role"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Role deleted successfully"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "Modify role permissions and settings"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Edit {name} role"
   },
   "Roles / Edit Title": {
     "defaultMessage": "Edit Role"

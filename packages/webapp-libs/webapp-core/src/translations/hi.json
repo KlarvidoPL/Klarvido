@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "रद्द करें"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।"
+  },
   "Common / Never": {
     "defaultMessage": "कभी नहीं"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "क्या आप वाकई भूमिका \"{name}\" हटाना चाहते हैं? यह क्रिया वापस नहीं की जा सकती।"
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "{name} भूमिका हटाएं"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Role सफलतापूर्वक हटाया गया"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "भूमिका की अनुमतियाँ और सेटिंग्स संशोधित करें"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "{name} भूमिका संपादित करें"
   },
   "Roles / Edit Title": {
     "defaultMessage": "Role संपादित करें"

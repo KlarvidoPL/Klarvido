@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import { TenantMembershipType, TenantUserRole, getFragmentData } from '@sb/webapp-api-client';
+import { ApolloErrorLike, getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import { commonQueryMembershipFragment } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
@@ -24,6 +25,7 @@ import { Skeleton as SkeletonComponent } from '@sb/webapp-core/components/ui/ske
 import { TableCell, TableRow } from '@sb/webapp-core/components/ui/table';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useToast } from '@sb/webapp-core/toast';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import { Check, Crown, GripHorizontal, Hourglass, RefreshCw, Settings2, Trash2, UserCheck } from 'lucide-react';
 import { trim } from 'ramda';
 import { useCallback, useMemo, useState } from 'react';
@@ -44,11 +46,11 @@ import {
 
 // Translates the known raw-English error strings raised by AssignRolesToMemberMutation
 // (apps/multitenancy/schema.py) - same pattern as getRoleMutationErrorMessage in
-// tenantRoles.component.tsx, since this mutation is a plain graphene mutation whose errors
-// arrive as a flat error.message rather than extensions.non_field_errors. Unrecognized
-// messages fall back to the raw text.
-const getAssignRolesErrorMessage = (intl: IntlShape, error: Error): string => {
-  const message = error.message;
+// tenantRoles.component.tsx; see getGraphQLErrorDetail for why this mutation's errors can't
+// be read off error.message directly. Unrecognized messages fall back to a translated
+// generic message, never raw backend text.
+const getAssignRolesErrorMessage = (intl: IntlShape, error: ApolloErrorLike): string => {
+  const message = getGraphQLErrorDetail(error) ?? '';
 
   const missingPermissionsMatch = message.match(
     /^You cannot assign roles with permissions you don't have: (.+)$/
@@ -95,7 +97,7 @@ const getAssignRolesErrorMessage = (intl: IntlShape, error: Error): string => {
         id: 'Membership Entry / Error / Only owner can modify owner roles',
       });
     default:
-      return message;
+      return getGenericErrorMessage(intl);
   }
 };
 

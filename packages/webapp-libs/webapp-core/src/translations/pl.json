@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "Anuluj"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Coś poszło nie tak. Spróbuj ponownie."
+  },
   "Common / Never": {
     "defaultMessage": "Nigdy"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "Czy na pewno chcesz usunąć rolę „{name}”? Tej operacji nie można cofnąć."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Usuń rolę {name}"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Pomyślnie usunięto rolę"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "Zmień uprawnienia i ustawienia roli"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Edytuj rolę {name}"
   },
   "Roles / Edit Title": {
     "defaultMessage": "Edytuj rolę"

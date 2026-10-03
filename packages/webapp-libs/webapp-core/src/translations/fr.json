@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "Annuler"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Une erreur s'est produite. Veuillez réessayer."
+  },
   "Common / Never": {
     "defaultMessage": "Jamais"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "Voulez-vous vraiment supprimer le rôle « {name} » ? Cette action est irréversible."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Supprimer le rôle {name}"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Rôle supprimé avec succès"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "Modifier les autorisations et paramètres du rôle"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Modifier le rôle {name}"
   },
   "Roles / Edit Title": {
     "defaultMessage": "Modifier le rôle"

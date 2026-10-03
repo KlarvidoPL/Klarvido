@@ -1514,6 +1514,9 @@
   "Common / Cancel": {
     "defaultMessage": "إلغاء"
   },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+  },
   "Common / Never": {
     "defaultMessage": "أبدًا"
   },
@@ -3266,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "هل أنت متأكد أنك تريد حذف الدور \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "حذف دور {name}"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "تم حذف الدور بنجاح"
   },
@@ -3295,6 +3301,9 @@
   },
   "Roles / Edit Description": {
     "defaultMessage": "تعديل صلاحيات وإعدادات الدور"
+  },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "تعديل دور {name}"
   },
   "Roles / Edit Title": {
     "defaultMessage": "تعديل الدور"
