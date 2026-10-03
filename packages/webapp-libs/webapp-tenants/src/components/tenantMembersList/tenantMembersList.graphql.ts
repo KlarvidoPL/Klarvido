@@ -19,6 +19,7 @@ export const tenantMembersListQuery = gql(/* GraphQL */ `
           color
           isSystemRole
           isOwnerRole
+          systemRoleType
         }
       }
     }

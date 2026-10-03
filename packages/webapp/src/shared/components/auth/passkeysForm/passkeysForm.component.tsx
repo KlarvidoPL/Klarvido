@@ -338,7 +338,7 @@ export const PasskeysForm = () => {
                       {getAuthenticatorIcon(passkey.authenticatorType)}
                     </div>
                     <div className="min-w-0">
-                      <div className="mb-1 flex min-w-0 items-center gap-2">
+                      <div className="mb-1.5 flex min-w-0 items-center gap-2">
                         <p className="min-w-0 truncate font-medium" title={passkey.name}>
                           {passkey.name}
                         </p>

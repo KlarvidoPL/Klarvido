@@ -202,5 +202,24 @@ describe('InvitationForm: Component', () => {
       expect(toast).toHaveTextContent('Failed to invite user. Please try again.');
       expect(toast).not.toHaveTextContent('Invitation already exists');
     });
+
+    it('should show a translated message when a non-owner tries to invite with the Owner role', async () => {
+      const toast = await setupErrorTest({
+        non_field_errors: [{ message: 'Only organization owners can invite members with the Owner role.', code: 'invalid' }],
+      });
+
+      expect(toast).toHaveTextContent('Only organization owners can invite members with the Owner role.');
+    });
+
+    it('should show a translated message naming the missing permission when the inviter lacks permissions the role grants', async () => {
+      const toast = await setupErrorTest({
+        non_field_errors: [
+          { message: "You cannot invite a member with permissions you don't have: billing.manage", code: 'invalid' },
+        ],
+      });
+
+      expect(toast).toHaveTextContent(/because you don.t have them yourself/i);
+      expect(toast).not.toHaveTextContent("You cannot invite a member with permissions you don't have");
+    });
   });
 });

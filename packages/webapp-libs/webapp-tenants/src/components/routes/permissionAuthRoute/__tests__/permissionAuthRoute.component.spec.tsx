@@ -2,7 +2,7 @@ import { TenantType } from '@sb/webapp-api-client/constants';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { screen } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes, useOutletContext } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../config/routes';
 import { currentUserPermissionsQuery } from '../../../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
@@ -209,6 +209,47 @@ describe('PermissionAuthRoute: Component', () => {
       });
 
       expect(await screen.findByTestId(PLACEHOLDER_TEST_ID)).toBeInTheDocument();
+    });
+  });
+
+  describe('outlet context forwarding', () => {
+    // Regression test: a parent layout route (e.g. ActiveSubscriptionContext) can pass data
+    // down via <Outlet context={...}>. PermissionAuthRoute sits between such a layout and its
+    // children in some route trees, so it must forward that context through its own <Outlet>
+    // rather than rendering a plain one - otherwise descendants reading useOutletContext()
+    // silently get undefined instead of the parent's data.
+    const ParentLayout = () => <Outlet context={{ greeting: 'hello from parent' }} />;
+    const ContextReader = () => {
+      const context = useOutletContext<{ greeting: string } | undefined>();
+      return <span data-testid="context-value">{context?.greeting ?? 'NO CONTEXT'}</span>;
+    };
+
+    const createOutletContextTestRoutes = () => (
+      <Routes>
+        <Route path={RoutesConfig.tenant.settings.general} element={<ParentLayout />}>
+          <Route element={<PermissionAuthRoute permissions="org.settings.view" />}>
+            <Route index element={<ContextReader />} />
+          </Route>
+        </Route>
+      </Routes>
+    );
+
+    it('forwards parent outlet context through to nested routes when access is granted', async () => {
+      const tenant = tenantFactory({ id: TENANT_ID });
+      const user = currentUserFactory({ tenants: [tenant] });
+      const permissionsMock = composeMockedQueryResult(currentUserPermissionsQuery, {
+        variables: { tenantId: TENANT_ID },
+        data: { currentUserPermissions: ['org.settings.view'] },
+      });
+      const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.general, { tenantId: TENANT_ID });
+
+      render(createOutletContextTestRoutes(), {
+        apolloMocks: [fillCommonQueryWithUser(user), permissionsMock],
+        routerProps,
+        TenantWrapper,
+      });
+
+      expect(await screen.findByTestId('context-value')).toHaveTextContent('hello from parent');
     });
   });
 });

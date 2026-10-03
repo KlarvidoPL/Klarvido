@@ -193,7 +193,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
           icon: Wallet,
           roles: [],
           tenantRoles: [],
-          permissions: ['billing.view'],
+          permissions: ['billing.manage'],
           generatePath: () => generateTenantPath(RoutesConfig.finances.paymentConfirm),
         },
         {

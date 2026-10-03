@@ -121,11 +121,11 @@ describe('PasskeysCard: Component', () => {
       expect(await screen.findByText('Admin User')).toBeInTheDocument();
     });
 
-    it('should show Device badge for platform authenticator', async () => {
+    it('should show This device badge for platform authenticator', async () => {
       const { waitForApolloMocks } = renderComponent(true, [createMockPasskey({ authenticatorType: 'platform' })]);
       await waitForApolloMocks();
 
-      expect(await screen.findByText('Device')).toBeInTheDocument();
+      expect(await screen.findByText('This device')).toBeInTheDocument();
     });
 
     it('should show search input when passkeys exist', async () => {
@@ -137,6 +137,27 @@ describe('PasskeysCard: Component', () => {
 
       const searchInput = await screen.findByPlaceholderText(/search by user name or email/i);
       expect(searchInput).toBeInTheDocument();
+    });
+
+    it('should still render an Add my passkey button in the empty state', async () => {
+      renderComponent(true);
+
+      expect(await screen.findByRole('button', { name: /add my passkey/i })).toBeInTheDocument();
+    });
+
+    it('should still render an Add my passkey button alongside the org-wide list', async () => {
+      const { waitForApolloMocks } = renderComponent(true, [createMockPasskey()]);
+      await waitForApolloMocks();
+
+      expect(await screen.findByRole('button', { name: /add my passkey/i })).toBeInTheDocument();
+    });
+
+    it('should open Add Passkey modal when Add my passkey is clicked', async () => {
+      renderComponent(true);
+
+      await userEvent.click(await screen.findByRole('button', { name: /add my passkey/i }));
+
+      expect(await screen.findByLabelText(/give your passkey a name/i)).toBeInTheDocument();
     });
   });
 
