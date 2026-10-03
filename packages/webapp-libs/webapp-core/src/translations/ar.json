@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "إلغاء"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "اكتب {confirmationText} للتأكيد"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "متابعة"
   },
@@ -2918,6 +2921,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "تم رفض دعوتك إلى \"{tenant_name}\" من قِبل \"{name}\""
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "إضافة"
   },
@@ -2995,6 +3007,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "مثال: MacBook Pro، iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "لم يُستخدم مطلقًا"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "توفر Passkeys طريقة أكثر أمانًا وسهولة لتسجيل الدخول باستخدام القياسات الحيوية لجهازك أو مفتاح أمان."
@@ -3974,6 +3989,9 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "لا يمكن التراجع عن هذا الإجراء. سيؤدي إلى حذف مؤسستك نهائيًا من خوادمنا."
   },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "حذف"
+  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "هل أنت متأكد تمامًا؟"
   },
@@ -4012,6 +4030,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "رفض"
+  },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "لم تعد هذه الدعوة صالحة."
   },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "المؤسسة"

@@ -142,6 +142,15 @@ describe('TenantDangerSettings: Component', () => {
 
     // Wait for dialog to open and find Continue button
     const continueButton = await screen.findByRole('button', { name: /continue/i });
+
+    // Continue stays disabled until the exact "DELETE <org name>" confirmation is typed
+    expect(continueButton).toBeDisabled();
+
+    const confirmationInput = screen.getByRole('textbox');
+    await userEvent.type(confirmationInput, 'DELETE name');
+
+    expect(continueButton).not.toBeDisabled();
+
     await userEvent.click(continueButton);
 
     // Wait for the toast (proves mutation completed)

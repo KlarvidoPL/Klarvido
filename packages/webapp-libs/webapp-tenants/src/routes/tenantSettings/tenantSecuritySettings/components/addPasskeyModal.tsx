@@ -187,8 +187,6 @@ export const AddPasskeyModal = ({ closeModal, onSuccess }: AddPasskeyModalProps)
             defaultMessage: 'This authenticator type is not supported.',
             id: 'Add Passkey Modal / Error Not Supported',
           });
-        } else if (error.message) {
-          message = error.message;
         }
       }
       

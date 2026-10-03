@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "Cancel"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "Type {confirmationText} to confirm"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "Continue"
   },
@@ -2918,6 +2921,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "Your invitation to \"{tenant_name}\" has been declined by \"{name}\""
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "Add"
   },
@@ -2995,6 +3007,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "e.g., MacBook Pro, iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "Never used"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Passkeys provide a more secure and convenient way to sign in using your device's biometrics or a security key."
@@ -3974,6 +3989,9 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "This action cannot be undone. This will permanently delete your organization from our servers."
   },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "DELETE"
+  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "Are you absolutely sure?"
   },
@@ -4012,6 +4030,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Decline"
+  },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "This invitation is no longer valid."
   },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "Organization"

@@ -213,15 +213,17 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
                   key={passkey.id}
                   className="flex items-center justify-between rounded-lg border p-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-full bg-primary/10 p-2">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="shrink-0 rounded-full bg-primary/10 p-2">
                       <Fingerprint className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium">{passkey.name}</p>
+                    <div className="min-w-0">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <p className="min-w-0 truncate text-sm font-medium" title={passkey.name}>
+                          {passkey.name}
+                        </p>
                         {passkey.authenticatorType === 'platform' && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="shrink-0 text-xs">
                             <FormattedMessage defaultMessage="Device" id="Passkeys / Device Badge" />
                           </Badge>
                         )}

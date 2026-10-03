@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "取消"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "输入 {confirmationText} 以确认"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "继续"
   },
@@ -2918,6 +2921,15 @@
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "您邀请加入“{tenant_name}”的请求已被“{name}”拒绝"
   },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
+  },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "添加"
   },
@@ -2995,6 +3007,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "例如：MacBook Pro、iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "从未使用"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Passkeys 通过使用设备生物识别或安全密钥，为登录提供更安全、更便捷的方式。"
@@ -3974,6 +3989,9 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "此操作无法撤销。这将从我们的服务器中永久删除您的组织。"
   },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "删除"
+  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "您确定要执行此操作吗？"
   },
@@ -4012,6 +4030,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "拒绝"
+  },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "此邀请已失效。"
   },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "组织"

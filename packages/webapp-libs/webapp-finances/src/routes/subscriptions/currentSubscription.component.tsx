@@ -1,11 +1,12 @@
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Paragraph } from '@sb/webapp-core/components/typography';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sb/webapp-core/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@sb/webapp-core/components/ui/tabs';
 import { useGenerateTenantPath } from '@sb/webapp-tenants/hooks';
 import { CreditCard } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../config/routes';
 import { useActiveSubscriptionQueryLoader } from '../../hooks';
@@ -13,6 +14,7 @@ import { useActiveSubscriptionQueryLoader } from '../../hooks';
 export const Subscriptions = () => {
   const intl = useIntl();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const generateTenantPath = useGenerateTenantPath();
   const activeSubscriptionData = useActiveSubscriptionQueryLoader();
@@ -44,7 +46,7 @@ export const Subscriptions = () => {
         </div>
 
         <Tabs value={location.pathname} className="space-y-6">
-          <TabsList className="flex flex-col gap-2 sm:flex-row sm:gap-2 h-full sm:h-10 sm:w-fit w-full">
+          <TabsList className="hidden gap-2 lg:flex lg:h-10 lg:w-fit">
             <Link to={generateTenantPath(RoutesConfig.subscriptions.index)} replace>
               <TabsTrigger value={generateTenantPath(RoutesConfig.subscriptions.index)}>
                 <FormattedMessage defaultMessage="Current subscription" id="My subscription / Current subscription" />
@@ -61,6 +63,25 @@ export const Subscriptions = () => {
               </TabsTrigger>
             </Link>
           </TabsList>
+
+          <div className="lg:hidden">
+            <Select value={location.pathname} onValueChange={(value) => navigate(value, { replace: true })}>
+              <SelectTrigger className="border-transparent bg-muted">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={generateTenantPath(RoutesConfig.subscriptions.index)}>
+                  <FormattedMessage defaultMessage="Current subscription" id="My subscription / Current subscription" />
+                </SelectItem>
+                <SelectItem value={generateTenantPath(RoutesConfig.subscriptions.paymentMethods.index)}>
+                  <FormattedMessage defaultMessage="Payment methods" id="My subscription / Payment methods" />
+                </SelectItem>
+                <SelectItem value={generateTenantPath(RoutesConfig.subscriptions.transactionHistory.index)}>
+                  <FormattedMessage defaultMessage="Transaction history" id="My subscription / Transaction history" />
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="mt-6">
             <Outlet context={{ ...activeSubscriptionData }} />

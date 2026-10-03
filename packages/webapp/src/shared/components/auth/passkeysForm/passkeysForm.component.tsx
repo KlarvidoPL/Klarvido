@@ -265,8 +265,6 @@ export const PasskeysForm = () => {
             defaultMessage: 'This authenticator type is not supported.',
             id: 'Add Passkey Modal / Error Not Supported',
           });
-        } else if (error.message) {
-          message = error.message;
         }
       }
 
@@ -333,16 +331,18 @@ export const PasskeysForm = () => {
               {passkeys.map((passkey) => (
                 <div
                   key={passkey.id}
-                  className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex items-center justify-between gap-3 rounded-lg border bg-card p-4"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                       {getAuthenticatorIcon(passkey.authenticatorType)}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-medium">{passkey.name}</p>
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
+                      <div className="mb-1 flex min-w-0 items-center gap-2">
+                        <p className="min-w-0 truncate font-medium" title={passkey.name}>
+                          {passkey.name}
+                        </p>
+                        <Badge variant="outline" className="shrink-0 text-xs">
                           {passkey.authenticatorType === 'platform' ? (
                             <FormattedMessage defaultMessage="This device" id="Passkeys / Platform" />
                           ) : (
@@ -352,7 +352,8 @@ export const PasskeysForm = () => {
                             />
                           )}
                         </Badge>
-                        <span>•</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                         <span>
                           <FormattedMessage
                             defaultMessage="Created {date}"
@@ -360,18 +361,18 @@ export const PasskeysForm = () => {
                             values={{ date: intl.formatDate(passkey.createdAt as string) }}
                           />
                         </span>
-                        {passkey.lastUsedAt != null && (
-                          <>
-                            <span>•</span>
-                            <span>
-                              <FormattedMessage
-                                defaultMessage="Last used {date}"
-                                id="Passkeys / Last used date"
-                                values={{ date: intl.formatDate(passkey.lastUsedAt as string) }}
-                              />
-                            </span>
-                          </>
-                        )}
+                        <span>•</span>
+                        <span>
+                          {passkey.lastUsedAt != null ? (
+                            <FormattedMessage
+                              defaultMessage="Last used {date}"
+                              id="Passkeys / Last used date"
+                              values={{ date: intl.formatDate(passkey.lastUsedAt as string) }}
+                            />
+                          ) : (
+                            <FormattedMessage defaultMessage="Never used" id="Passkeys / Never used" />
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -380,7 +381,7 @@ export const PasskeysForm = () => {
                     size="sm"
                     onClick={() => handleDeletePasskey(passkey.id)}
                     disabled={deleting === passkey.id}
-                    className="shrink-0 self-end text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400 sm:self-auto"
+                    className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
                   >
                     {deleting === passkey.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

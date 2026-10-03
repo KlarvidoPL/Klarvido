@@ -49,6 +49,8 @@ pnpm nx run-many --target=lint,type-check --projects=webapp,webapp-tenants,webap
 
 Always scope checks to the package(s) you actually touched (see table of `webapp-libs/*` packages below) — don't run the whole workspace by default.
 
+**Don't run `lint`/`type-check`/`test` proactively after every change.** Only run them when needed to verify a specific change you're unsure about, and if it's unclear whether a run is warranted, ask the user first rather than running it — PR CI already runs the full suite, so local runs should stay narrow and intentional, not duplicated for speed.
+
 ### Backend (Python/Django)
 
 ```sh
