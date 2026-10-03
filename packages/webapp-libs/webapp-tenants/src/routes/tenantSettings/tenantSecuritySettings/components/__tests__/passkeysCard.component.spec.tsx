@@ -121,11 +121,11 @@ describe('PasskeysCard: Component', () => {
       expect(await screen.findByText('Admin User')).toBeInTheDocument();
     });
 
-    it('should show Device badge for platform authenticator', async () => {
+    it('should show This device badge for platform authenticator', async () => {
       const { waitForApolloMocks } = renderComponent(true, [createMockPasskey({ authenticatorType: 'platform' })]);
       await waitForApolloMocks();
 
-      expect(await screen.findByText('Device')).toBeInTheDocument();
+      expect(await screen.findByText('This device')).toBeInTheDocument();
     });
 
     it('should show search input when passkeys exist', async () => {

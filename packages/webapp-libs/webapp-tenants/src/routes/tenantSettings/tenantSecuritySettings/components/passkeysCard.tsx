@@ -10,7 +10,7 @@ import {
 } from '@sb/webapp-core/components/ui/dialog';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { Fingerprint, Key, Loader2, Plus, Search, Trash2, User } from 'lucide-react';
+import { Fingerprint, Key, Loader2, Plus, Search, Smartphone, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -31,6 +31,19 @@ type Passkey = {
 
 export type PasskeysCardProps = {
   canManagePasskeys?: boolean;
+};
+
+// Mirrors the per-type icon shown in the personal Profile passkeys list
+// (packages/webapp/src/shared/components/auth/passkeysForm) for visual consistency.
+const getAuthenticatorIcon = (type: string) => {
+  switch (type) {
+    case 'platform':
+      return <Smartphone className="h-4 w-4" />;
+    case 'cross-platform':
+      return <Key className="h-4 w-4" />;
+    default:
+      return <Fingerprint className="h-4 w-4" />;
+  }
 };
 
 export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) => {
@@ -89,14 +102,6 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
 
   const handleRegistrationSuccess = () => {
     refetch();
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(dateStr));
   };
 
   return (
@@ -211,24 +216,26 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
               {passkeys.map((passkey) => (
                 <div
                   key={passkey.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
+                  className="flex items-center justify-between gap-3 rounded-lg border bg-card p-4"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="shrink-0 rounded-full bg-primary/10 p-2">
-                      <Fingerprint className="h-5 w-5 text-primary" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      {getAuthenticatorIcon(passkey.authenticatorType)}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex min-w-0 items-center gap-2">
+                      <div className="mb-1.5 flex min-w-0 items-center gap-2">
                         <p className="min-w-0 truncate text-sm font-medium" title={passkey.name}>
                           {passkey.name}
                         </p>
-                        {passkey.authenticatorType === 'platform' && (
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            <FormattedMessage defaultMessage="Device" id="Passkeys / Device Badge" />
-                          </Badge>
-                        )}
+                        <Badge variant="outline" className="shrink-0 text-xs">
+                          {passkey.authenticatorType === 'platform' ? (
+                            <FormattedMessage defaultMessage="This device" id="Passkeys / Platform" />
+                          ) : (
+                            <FormattedMessage defaultMessage="Security key" id="Passkeys / Cross-platform" />
+                          )}
+                        </Badge>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                         {/* Show user info for admin view */}
                         {canManagePasskeys && passkey.userEmail != null && (
                           <>
@@ -241,32 +248,32 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
                         )}
                         <span>
                           <FormattedMessage
-                            defaultMessage="Added {date}"
-                            id="Passkeys Card / Added Date"
-                            values={{ date: formatDate(passkey.createdAt as string | null) }}
+                            defaultMessage="Created {date}"
+                            id="Passkeys / Created date"
+                            values={{ date: intl.formatDate(passkey.createdAt as string) }}
                           />
                         </span>
-                        {passkey.lastUsedAt != null && (
-                          <>
-                            <span>•</span>
-                            <span>
-                              <FormattedMessage
-                                defaultMessage="Last used {date}"
-                                id="Passkeys Card / Last Used"
-                                values={{ date: formatDate(passkey.lastUsedAt as string | null) }}
-                              />
-                            </span>
-                          </>
-                        )}
+                        <span>•</span>
+                        <span>
+                          {passkey.lastUsedAt != null ? (
+                            <FormattedMessage
+                              defaultMessage="Last used {date}"
+                              id="Passkeys / Last used date"
+                              values={{ date: intl.formatDate(passkey.lastUsedAt as string) }}
+                            />
+                          ) : (
+                            <FormattedMessage defaultMessage="Never used" id="Passkeys / Never used" />
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm"
                     onClick={() => handleDelete(passkey.id)}
                     disabled={deletingId === passkey.id}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
                   >
                     {deletingId === passkey.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
