@@ -306,13 +306,7 @@ export const ActiveSessions = () => {
       {/* Sign out all other sessions button */}
       {otherSessions.length > 0 && (
         <div className="flex justify-end pt-2">
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleSignOutAllSessions}
-            disabled={revokingAll}
-            className="dark:bg-red-400 dark:hover:bg-red-400/90"
-          >
+          <Button variant="destructive" size="sm" onClick={handleSignOutAllSessions} disabled={revokingAll}>
             {revokingAll && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <XCircle className="mr-2 h-4 w-4" />
             <FormattedMessage defaultMessage="Sign out all other sessions" id="Sessions / Sign Out All Button" />

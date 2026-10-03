@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "取消"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "输入 {confirmationText} 以确认"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "继续"
   },
@@ -3985,6 +3988,9 @@
   },
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "此操作无法撤销。这将从我们的服务器中永久删除您的组织。"
+  },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "删除"
   },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "您确定要执行此操作吗？"

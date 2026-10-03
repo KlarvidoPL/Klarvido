@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "रद्द करें"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "पुष्टि करने के लिए {confirmationText} टाइप करें"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "जारी रखें"
   },
@@ -3985,6 +3988,9 @@
   },
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "यह कार्रवाई वापस नहीं ली जा सकती। इससे आपका संगठन हमारे सर्वरों से स्थायी रूप से हट जाएगा।"
+  },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "हटाएं"
   },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "क्या आप पूरी तरह से सुनिश्चित हैं?"

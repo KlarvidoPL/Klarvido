@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "إلغاء"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "اكتب {confirmationText} للتأكيد"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "متابعة"
   },
@@ -3985,6 +3988,9 @@
   },
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "لا يمكن التراجع عن هذا الإجراء. سيؤدي إلى حذف مؤسستك نهائيًا من خوادمنا."
+  },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "حذف"
   },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "هل أنت متأكد تمامًا؟"

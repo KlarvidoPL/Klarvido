@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "Cancel"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "Type {confirmationText} to confirm"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "Continue"
   },
@@ -3985,6 +3988,9 @@
   },
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "This action cannot be undone. This will permanently delete your organization from our servers."
+  },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "DELETE"
   },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "Are you absolutely sure?"
