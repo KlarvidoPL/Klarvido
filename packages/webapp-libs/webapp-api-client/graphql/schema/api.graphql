@@ -116,6 +116,7 @@ type Query {
 type KsefCredentialType {
   updatedAt: DateTime!
   tokenHint: String
+  tokenName: String
   status: String
   lastVerifiedAt: DateTime
   lastErrorCode: String
