@@ -4855,5 +4855,188 @@
   },
   "Onboarding / Costs hint": {
     "defaultMessage": "Choisissez jusqu’à trois réponses."
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "Retour"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Effacer le brouillon"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Effacer le brouillon"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Toutes les réponses de cette nouvelle organisation seront supprimées. Cette action est irréversible."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Impossible d’effacer ce brouillon. Veuillez réessayer."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Effacer ce brouillon ?"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "Confirmer le profil"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "Temps des salariés"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "Marketing / commissions"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "Matières / marchandises"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "Sous-traitants"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "Technologie / infrastructure"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "Transport / logistique"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "Quels coûts augmentent avec vos ventes ?"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "Principalement des entreprises (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "Principalement des particuliers (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "Entreprises et particuliers"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "Institutions publiques"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "Cela permet d’estimer la part des ventes couverte par les futures intégrations."
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "Qui vous paie le plus souvent ?"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "Décrivez-nous le fonctionnement de votre activité. Vous pouvez revenir aux étapes précédentes."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Modifier"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "Je travaille dur, mais la trésorerie manque"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "Je crains de perdre un client important"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "Les coûts ne cessent d’augmenter"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "Je veux repérer les problèmes tôt"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "Puis-je me permettre d’agrandir mon équipe ?"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "Je ne suis pas sûr de mes prix"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "Qu’est-ce que vous souhaitez le plus maîtriser ?"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "Suivant"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "Coût plus marge"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "Prix fixe / devis"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "Prix individuel par client"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "Comment fixez-vous généralement vos prix ?"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "Abonnement / forfait"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "Temps / unité"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "Votre rôle dans l’entreprise"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "Cette réponse est descriptive et ne modifie pas vos droits dans l’organisation."
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "Commission / résultat"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "Produit / commande"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "Projet / mission"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "Nombre de services"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "Abonnement / service récurrent"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "Temps travaillé"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "Pour quoi vos clients vous paient-ils ?"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "Comptabilité"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "Conseiller"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "Salarié"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "Propriétaire / direction"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "Coûts"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "Clients"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "Prix et objectif"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "Revenus"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "Récapitulatif"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "Étapes de configuration"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "Objectif principal"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "Ce profil sert de point de départ aux analyses futures."
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "Tarification"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "Votre rôle"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "Profil de votre entreprise"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "Configurer votre organisation"
   }
 }

@@ -5035,5 +5035,20 @@
   },
   "Tenant form / Immutable value": {
     "defaultMessage": "This value can't be changed once saved."
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Clear draft"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Clear draft"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "All answers for this new organization will be deleted. This cannot be undone."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Could not clear this draft. Please try again."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Clear this draft?"
   }
 }

@@ -4855,5 +4855,188 @@
   },
   "Onboarding / Costs hint": {
     "defaultMessage": "اختر ثلاث إجابات كحد أقصى."
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "رجوع"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "مسح المسودة"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "مسح المسودة"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "سيتم حذف جميع الإجابات الخاصة بهذه المؤسسة الجديدة. لا يمكن التراجع عن ذلك."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "تعذّر مسح هذه المسودة. يرجى المحاولة مرة أخرى."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "هل تريد مسح هذه المسودة؟"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "تأكيد الملف"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "وقت الموظفين"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "التسويق / العمولات"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "المواد / البضائع"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "المقاولون من الباطن"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "التقنية / البنية التحتية"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "النقل / الخدمات اللوجستية"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "ما التكاليف التي تزداد مع مبيعاتك؟"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "معظمهم شركات (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "معظمهم مستهلكون أفراد (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "شركات ومستهلكون أفراد"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "المؤسسات العامة"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "يساعد ذلك في تقدير حجم بيانات المبيعات التي ستغطيها التكاملات المستقبلية."
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "من يدفع لك عادةً؟"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "أخبرنا كيف يعمل نشاطك. يمكنك الرجوع إلى الخطوات السابقة."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "تعديل"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "أعمل بجد، لكن النقد غير متوفر"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "أقلق من خسارة عميل رئيسي"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "التكاليف في ازدياد مستمر"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "أريد اكتشاف المشكلات مبكرًا"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "هل أستطيع تحمّل توسيع الفريق؟"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "لست متأكدًا من تسعيري"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "ما الذي تريد التحكم فيه أكثر من غيره؟"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "التالي"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "التكلفة زائد الهامش"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "سعر ثابت / عرض سعر"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "سعر فردي لكل عميل"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "كيف تحدد أسعارك عادةً؟"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "اشتراك / باقة"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "الوقت / الوحدة"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "دورك في الشركة"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "هذه الإجابة وصفية فقط ولا تغيّر صلاحياتك في المؤسسة."
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "العمولة / النتيجة"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "المنتج / الطلب"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "المشروع / المهمة"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "عدد الخدمات"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "اشتراك / خدمة متكررة"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "الوقت المُنجَز"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "مقابل ماذا يدفع لك عملاؤك؟"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "المحاسبة"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "مستشار"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "موظف"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "المالك / الإدارة"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "التكاليف"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "العملاء"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "التسعير والهدف"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "الإيرادات"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "الملخص"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "خطوات الإعداد"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "الهدف الرئيسي"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "هذه نقطة انطلاق للتحليلات المستقبلية."
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "التسعير"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "دورك"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "ملف نشاطك التجاري"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "إعداد مؤسستك"
   }
 }
