@@ -4025,6 +4025,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "अस्वीकार करें"
   },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "यह निमंत्रण अब मान्य नहीं है।"
+  },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "संगठन"
   },

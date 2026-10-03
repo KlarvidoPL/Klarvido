@@ -4025,6 +4025,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Odrzuć"
   },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "To zaproszenie jest już nieważne."
+  },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "Organizacja"
   },

@@ -4025,6 +4025,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "拒绝"
   },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "此邀请已失效。"
+  },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "组织"
   },

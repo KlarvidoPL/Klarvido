@@ -4025,6 +4025,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "رفض"
   },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "لم تعد هذه الدعوة صالحة."
+  },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "المؤسسة"
   },

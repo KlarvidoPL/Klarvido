@@ -549,8 +549,11 @@ class DeleteTenantMembershipMutation(mutations.DeleteModelMutation):
             ).exists()
         )
 
-        # Check if target is an owner
-        target_is_owner = (
+        # Check if target is an owner. A pending (not yet accepted) invitation holds no
+        # real access yet, even if it was created with the Owner role - it must never
+        # trip the owner-removal-permission or last-owner checks below, or it becomes
+        # impossible to cancel an Owner-role invitation while only one real owner exists.
+        target_is_owner = obj.is_accepted and (
             obj.role == TenantUserRole.OWNER
             or models.TenantMembershipRole.objects.filter(
                 membership=obj, role__system_role_type=SystemRoleType.OWNER

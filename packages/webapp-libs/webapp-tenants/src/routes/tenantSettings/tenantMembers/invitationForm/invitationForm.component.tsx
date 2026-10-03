@@ -74,9 +74,11 @@ export const InvitationForm = () => {
           },
         },
       });
+      return true;
     } catch {
       // Already surfaced to the user via onError (toast) and the inline form error
       // (error prop below) - swallow here so the rejection doesn't propagate further.
+      return false;
     }
   };
 

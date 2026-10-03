@@ -41,6 +41,11 @@ export const TenantInvitation = () => {
     defaultMessage: 'Invitation declined.',
   });
 
+  const invitationNoLongerValidMessage = intl.formatMessage({
+    id: 'Tenant Invitation / Error message',
+    defaultMessage: 'This invitation is no longer valid.',
+  });
+
   const tenant = tenants.find(
     (t) => getFragmentData(commonQueryMembershipFragment, t?.membership)?.invitationToken === token
   );
@@ -53,6 +58,11 @@ export const TenantInvitation = () => {
       trackEvent('tenantInvitation', 'accept', tenant?.id);
       toast({ description: acceptSuccessMessage, variant: 'success' });
       if (tenant) navigate(generateTenantPath(RoutesConfig.home, { tenantId: tenant?.id }));
+    },
+    onError: () => {
+      reloadCommonQuery();
+      toast({ description: invitationNoLongerValidMessage, variant: 'destructive' });
+      navigate(generateLocalePath(RoutesConfig.home));
     },
   });
 
@@ -73,6 +83,11 @@ export const TenantInvitation = () => {
       reloadCommonQuery();
       trackEvent('tenantInvitation', 'decline', tenant?.id);
       toast({ description: declineSuccessMessage, variant: 'info' });
+      navigate(generateLocalePath(RoutesConfig.home));
+    },
+    onError: () => {
+      reloadCommonQuery();
+      toast({ description: invitationNoLongerValidMessage, variant: 'destructive' });
       navigate(generateLocalePath(RoutesConfig.home));
     },
   });
