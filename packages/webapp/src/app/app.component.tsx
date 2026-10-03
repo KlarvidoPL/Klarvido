@@ -106,11 +106,20 @@ export const App = () => {
                     element={<TransactionsHistoryContent />}
                   />
                 </Route>
-                <Route path={RoutesConfig.subscriptions.currentSubscription.edit} element={<EditSubscription />} />
-                <Route path={RoutesConfig.subscriptions.currentSubscription.cancel} element={<CancelSubscription />} />
-                <Route path={RoutesConfig.subscriptions.paymentMethods.edit} element={<EditPaymentMethod />} />
+                {/* Plan/payment-method changes - require billing.manage, not just billing.view */}
+                <Route element={<PermissionAuthRoute permissions="billing.manage" />}>
+                  <Route path={RoutesConfig.subscriptions.currentSubscription.edit} element={<EditSubscription />} />
+                  <Route
+                    path={RoutesConfig.subscriptions.currentSubscription.cancel}
+                    element={<CancelSubscription />}
+                  />
+                  <Route path={RoutesConfig.subscriptions.paymentMethods.edit} element={<EditPaymentMethod />} />
+                </Route>
               </Route>
-              <Route path={RoutesConfig.finances.paymentConfirm} element={<PaymentConfirm />} />
+              {/* One-time payment flow - also a billing-management action, requires billing.manage */}
+              <Route element={<PermissionAuthRoute permissions="billing.manage" />}>
+                <Route path={RoutesConfig.finances.paymentConfirm} element={<PaymentConfirm />} />
+              </Route>
               <Route path={RoutesConfig.subscriptions.transactionHistory.history} element={<TransactionHistory />} />
             </Route>
             {/* Content Items - protected by features.content.view */}
