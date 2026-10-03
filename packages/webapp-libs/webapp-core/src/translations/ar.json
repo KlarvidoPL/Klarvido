@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "تتيح لك Passkeys تسجيل الدخول بأمان باستخدام بصمة الإصبع أو الوجه أو رقم PIN للجهاز، بدون الحاجة إلى كلمة مرور."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "جهاز"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "لم تقم بتسجيل أي Passkeys بعد. أضف واحدة لتسجيل دخول أسرع وأكثر أمانًا."
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "إضافة مفتاح المرور الخاص بي"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "أضيفت في {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "فشل حذف Passkey. يُرجى المحاولة مرة أخرى."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "تم حذف Passkey بنجاح."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "آخر استخدام في {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "ابحث بالاسم أو البريد الإلكتروني..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "الفوترة"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "لوحة التحكم الرئيسية للتطبيق"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "لوحة التحكم"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "الذكاء الاصطناعي والمستندات وميزات أخرى"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "الميزات"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "أدوات مالية وإدارية"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "لوحة التحكم الإدارية"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "إدارة أعضاء الفريق"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "عرض الفوترة"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "الوصول إلى لوحة التحكم الرئيسية/الصفحة الرئيسية للتطبيق"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "عرض لوحة التحكم"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "الوصول إلى تكامل OpenAI والميزات المعتمدة على الذكاء الاصطناعي واستخدامها"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "عرض المستندات"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "الوصول إلى نظرة عامة على لوحة التحكم الإدارية"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "عرض لوحة التحكم الإدارية"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "إرسال دعوات إلى أعضاء جدد"

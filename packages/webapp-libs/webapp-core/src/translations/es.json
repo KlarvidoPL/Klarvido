@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Las passkeys te permiten iniciar sesión de forma segura usando tu huella digital, rostro o PIN del dispositivo, sin necesidad de contraseña."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Dispositivo"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "Aún no has registrado ninguna passkey. Agrega una para un inicio de sesión más rápido y seguro."
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "Añadir mi passkey"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Agregada el {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "No se pudo eliminar la passkey. Inténtalo de nuevo."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey eliminada correctamente."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Último uso: {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Buscar por nombre de usuario o correo..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "Facturación"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "Panel principal de la aplicación"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "Panel"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "IA, documentos y otras funciones"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "Funciones"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "Herramientas financieras y de gestión"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "Panel de gestión"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "Gestión de miembros del equipo"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "Ver facturación"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "Acceder al panel principal/página de inicio de la aplicación"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "Ver panel"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "Acceder y usar la integración con OpenAI y funciones basadas en IA"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Ver documentos"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "Acceder a la vista general del panel de gestión"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "Ver panel de gestión"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Enviar invitaciones a nuevos miembros"

@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Les passkeys vous permettent de vous connecter en toute sécurité avec votre empreinte digitale, votre visage ou le code PIN de votre appareil, sans mot de passe."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Appareil"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "Vous n’avez pas encore enregistré de passkey. Ajoutez-en une pour une connexion plus rapide et plus sécurisée."
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "Ajouter ma passkey"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Ajoutée le {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "Échec de la suppression de la passkey. Veuillez réessayer."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey supprimée avec succès."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Dernière utilisation le {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Rechercher par nom d’utilisateur ou e‑mail..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "Facturation"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "Tableau de bord principal de l'application"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "Tableau de bord"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "IA, documents et autres fonctionnalités"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "Fonctionnalités"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "Outils financiers et de gestion"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "Tableau de bord de gestion"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "Gestion des membres de l'équipe"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "Afficher la facturation"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "Accéder au tableau de bord/à la page d'accueil principale de l'application"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "Afficher le tableau de bord"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "Accéder et utiliser l'intégration OpenAI et les fonctionnalités basées sur l'IA"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Afficher les documents"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "Accéder à l'aperçu du tableau de bord de gestion"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "Afficher le tableau de bord de gestion"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Envoyer des invitations à de nouveaux membres"

@@ -38,14 +38,12 @@ import { useToast } from '@sb/webapp-core/toast/useToast';
 import { cn } from '@sb/webapp-core/lib/utils';
 import {
   AlertTriangle,
-  BarChart3,
   Check,
   ChevronDown,
   ChevronRight,
   CreditCard,
   Crown,
   Edit2,
-  Layers,
   Lock,
   Minus,
   Plus,
@@ -197,31 +195,12 @@ const getCategoryConfig = (
       id: 'Roles / Category / Features / Description',
     }),
   },
-  DASHBOARD: {
-    label: intl.formatMessage({ defaultMessage: 'Dashboard', id: 'Roles / Category / Dashboard / Label' }),
-    icon: <Layers className="h-4 w-4" />,
-    description: intl.formatMessage({
-      defaultMessage: 'Main application dashboard',
-      id: 'Roles / Category / Dashboard / Description',
-    }),
-  },
   BACKUP: {
     label: intl.formatMessage({ defaultMessage: 'Backup', id: 'Roles / Category / Backup / Label' }),
     icon: <Shield className="h-4 w-4" />,
     description: intl.formatMessage({
       defaultMessage: 'Tenant backup and restore',
       id: 'Roles / Category / Backup / Description',
-    }),
-  },
-  MANAGEMENT: {
-    label: intl.formatMessage({
-      defaultMessage: 'Management Dashboard',
-      id: 'Roles / Category / Management / Label',
-    }),
-    icon: <BarChart3 className="h-4 w-4" />,
-    description: intl.formatMessage({
-      defaultMessage: 'Finance and management tools',
-      id: 'Roles / Category / Management / Description',
     }),
   },
 });
@@ -498,16 +477,7 @@ const PermissionPicker = ({
 
   // Order categories (core first; app-defined from modules appear at end via rest)
   const orderedCategories = useMemo(() => {
-    const order = [
-      'ORGANIZATION',
-      'MEMBERS',
-      'SECURITY',
-      'BILLING',
-      'FEATURES',
-      'DASHBOARD',
-      'BACKUP',
-      'MANAGEMENT',
-    ];
+    const order = ['ORGANIZATION', 'MEMBERS', 'SECURITY', 'BILLING', 'FEATURES', 'BACKUP'];
     const knownFirst = order.filter((cat) => permissionsByCategory[cat]);
     const rest = Object.keys(permissionsByCategory).filter((cat) => !order.includes(cat));
     return [...knownFirst, ...rest];

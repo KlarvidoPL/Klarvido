@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Passkeys let you sign in securely using your fingerprint, face, or device PIN - no password required."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Device"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "You haven't registered any passkeys yet. Add one for faster, more secure sign-in."
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "Add my passkey"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Added {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "Failed to delete passkey. Please try again."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey deleted successfully."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Last used {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Search by user name or email..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "Billing"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "Main application dashboard"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "Dashboard"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "AI, Documents, and other features"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "Features"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "Finance and management tools"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "Management Dashboard"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "Team member management"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "View Billing"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "Access the main app dashboard/home page"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "View Dashboard"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "Access and use OpenAI integration and AI-powered features"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "View Documents"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "Access the management dashboard overview"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "View Management Dashboard"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Send invitations to new members"

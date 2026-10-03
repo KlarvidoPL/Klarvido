@@ -114,7 +114,6 @@ class PermissionCategory(models.TextChoices):
     SECURITY = "security", "Security"
     BILLING = "billing", "Billing"
     FEATURES = "features", "Features"
-    DASHBOARD = "dashboard", "Dashboard"  # Main app Dashboard/Home
 
 
 class RoleColor(models.TextChoices):

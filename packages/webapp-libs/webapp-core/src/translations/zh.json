@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "通行密钥允许您使用指纹、人脸或设备 PIN 安全登录，无需密码。"
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "设备"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "您尚未注册任何通行密钥。添加一个以获得更快速、更安全的登录体验。"
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "添加我的通行密钥"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "添加于 {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "删除 Passkey 失败。请重试。"
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey 删除成功。"
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "上次使用于 {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "按用户名或邮箱搜索…"
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "账单"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "应用程序主仪表盘"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "仪表盘"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "AI、文档及其他功能"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "功能"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "财务与管理工具"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "管理仪表盘"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "团队成员管理"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "查看账单"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "访问应用程序的主仪表盘/主页"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "查看仪表盘"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "访问并使用 OpenAI 集成及 AI 驱动的功能"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "查看文档"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "访问管理仪表盘概览"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "查看管理仪表盘"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "向新成员发送邀请"

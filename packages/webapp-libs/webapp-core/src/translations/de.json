@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Passkeys ermöglichen eine sichere Anmeldung mit Fingerabdruck, Gesicht oder Geräte-PIN – ganz ohne Passwort."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Gerät"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "Sie haben noch keine Passkeys registriert. Fügen Sie einen hinzu, um sich schneller und sicherer anzumelden."
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "Meinen Passkey hinzufügen"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Hinzugefügt am {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "Passkey konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey erfolgreich gelöscht."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Zuletzt verwendet am {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Nach Benutzername oder E-Mail suchen..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "Abrechnung"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "Haupt-Dashboard der Anwendung"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "Dashboard"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "KI, Dokumente und weitere Funktionen"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "Funktionen"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "Finanz- und Verwaltungstools"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "Verwaltungs-Dashboard"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "Verwaltung der Teammitglieder"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "Abrechnung anzeigen"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "Zugriff auf das Haupt-Dashboard/die Startseite der App"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "Dashboard anzeigen"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "Zugriff auf die OpenAI-Integration und KI-gestützte Funktionen nutzen"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Dokumente anzeigen"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "Zugriff auf die Übersicht des Verwaltungs-Dashboards"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "Verwaltungs-Dashboard anzeigen"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Einladungen an neue Mitglieder senden"

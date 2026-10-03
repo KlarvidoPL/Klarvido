@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Klucze dostępu umożliwiają bezpieczne logowanie za pomocą odcisku palca, twarzy lub kodu PIN urządzenia – bez hasła."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Urządzenie"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "Nie zarejestrowano jeszcze żadnych kluczy dostępu. Dodaj jeden, aby logować się szybciej i bezpieczniej."
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "Dodaj mój passkey"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Dodano {date}"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "Nie udało się usunąć passkey. Spróbuj ponownie."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey została pomyślnie usunięta."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Ostatnio użyto {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Szukaj po nazwisku lub e‑mailu..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "Rozliczenia"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "Główny pulpit aplikacji"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "Pulpit"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "SI, dokumenty i inne funkcje"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "Funkcje"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "Narzędzia finansowe i zarządcze"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "Pulpit zarządzania"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "Zarządzanie członkami zespołu"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "Wyświetlanie rozliczeń"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "Dostęp do głównego pulpitu/strony głównej aplikacji"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "Wyświetlanie pulpitu"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "Dostęp i korzystanie z integracji OpenAI oraz funkcji opartych na SI"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Wyświetlanie dokumentów"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "Dostęp do przeglądu pulpitu zarządzania"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "Wyświetlanie pulpitu zarządzania"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Wysyłaj zaproszenia do nowych członków"

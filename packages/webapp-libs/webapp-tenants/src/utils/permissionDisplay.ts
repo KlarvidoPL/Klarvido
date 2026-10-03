@@ -191,25 +191,6 @@ export const getPermissionDisplay = (
           id: 'Roles / Permission / features.crud.manage / Description',
         }),
       };
-    case 'dashboard.view':
-      return {
-        name: intl.formatMessage({ defaultMessage: 'View Dashboard', id: 'Roles / Permission / dashboard.view / Name' }),
-        description: intl.formatMessage({
-          defaultMessage: 'Access the main app dashboard/home page',
-          id: 'Roles / Permission / dashboard.view / Description',
-        }),
-      };
-    case 'management.view':
-      return {
-        name: intl.formatMessage({
-          defaultMessage: 'View Management Dashboard',
-          id: 'Roles / Permission / management.view / Name',
-        }),
-        description: intl.formatMessage({
-          defaultMessage: 'Access the management dashboard overview',
-          id: 'Roles / Permission / management.view / Description',
-        }),
-      };
     case 'backup.view':
       return {
         name: intl.formatMessage({ defaultMessage: 'View Backup Settings', id: 'Roles / Permission / backup.view / Name' }),

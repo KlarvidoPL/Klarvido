@@ -3011,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "पासकी आपको पासवर्ड के बिना, फिंगरप्रिंट, चेहरे या डिवाइस PIN से सुरक्षित रूप से साइन इन करने देती हैं।"
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "डिवाइस"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "आपने अभी तक कोई पासकी रजिस्टर नहीं की है। तेज़ और अधिक सुरक्षित साइन-इन के लिए एक पासकी जोड़ें।"
   },
@@ -3092,17 +3089,11 @@
   "Passkeys Card / Add My Passkey Button": {
     "defaultMessage": "मेरा पासकी जोड़ें"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "{date} को जोड़ा गया"
-  },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "Passkey हटाने में विफल। कृपया दोबारा प्रयास करें।"
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey सफलतापूर्वक हटा दिया गया।"
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "आखिरी बार उपयोग {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "उपयोगकर्ता नाम या ईमेल से खोजें..."
@@ -3200,23 +3191,11 @@
   "Roles / Category / Billing / Label": {
     "defaultMessage": "बिलिंग"
   },
-  "Roles / Category / Dashboard / Description": {
-    "defaultMessage": "मुख्य एप्लिकेशन डैशबोर्ड"
-  },
-  "Roles / Category / Dashboard / Label": {
-    "defaultMessage": "डैशबोर्ड"
-  },
   "Roles / Category / Features / Description": {
     "defaultMessage": "AI, दस्तावेज़ और अन्य सुविधाएं"
   },
   "Roles / Category / Features / Label": {
     "defaultMessage": "सुविधाएं"
-  },
-  "Roles / Category / Management / Description": {
-    "defaultMessage": "वित्त और प्रबंधन उपकरण"
-  },
-  "Roles / Category / Management / Label": {
-    "defaultMessage": "प्रबंधन डैशबोर्ड"
   },
   "Roles / Category / Members / Description": {
     "defaultMessage": "टीम सदस्य प्रबंधन"
@@ -3398,12 +3377,6 @@
   "Roles / Permission / billing.view / Name": {
     "defaultMessage": "बिलिंग देखें"
   },
-  "Roles / Permission / dashboard.view / Description": {
-    "defaultMessage": "मुख्य ऐप डैशबोर्ड/होम पेज तक पहुंचें"
-  },
-  "Roles / Permission / dashboard.view / Name": {
-    "defaultMessage": "डैशबोर्ड देखें"
-  },
   "Roles / Permission / features.ai.use / Description": {
     "defaultMessage": "OpenAI एकीकरण और AI-संचालित सुविधाओं तक पहुंच प्राप्त करें और उपयोग करें"
   },
@@ -3439,12 +3412,6 @@
   },
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "दस्तावेज़ देखें"
-  },
-  "Roles / Permission / management.view / Description": {
-    "defaultMessage": "प्रबंधन डैशबोर्ड अवलोकन तक पहुंचें"
-  },
-  "Roles / Permission / management.view / Name": {
-    "defaultMessage": "प्रबंधन डैशबोर्ड देखें"
   },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "नए सदस्यों को आमंत्रण भेजें"
