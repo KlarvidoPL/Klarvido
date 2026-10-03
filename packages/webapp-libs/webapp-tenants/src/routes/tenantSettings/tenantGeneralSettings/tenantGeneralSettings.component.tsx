@@ -4,7 +4,7 @@ import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast';
-import { Settings } from 'lucide-react';
+import { Building2, Settings } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 
@@ -72,16 +72,23 @@ export const TenantGeneralSettings = () => {
     <div className="space-y-6">
       {isOrganizationType && canEditSettings && (
         <Card>
-          <CardHeader>
-            <CardTitle>
-              <FormattedMessage defaultMessage="Business profile" id="Onboarding / Settings title" />
-            </CardTitle>
-            <CardDescription>
-              <FormattedMessage
-                defaultMessage="Complete or update your organization onboarding answers."
-                id="Onboarding / Settings description"
-              />
-            </CardDescription>
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">
+                  <FormattedMessage defaultMessage="Business profile" id="Onboarding / Settings title" />
+                </CardTitle>
+                <CardDescription className="mt-0.5">
+                  <FormattedMessage
+                    defaultMessage="Complete or update your organization onboarding answers."
+                    id="Onboarding / Settings description"
+                  />
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Link
