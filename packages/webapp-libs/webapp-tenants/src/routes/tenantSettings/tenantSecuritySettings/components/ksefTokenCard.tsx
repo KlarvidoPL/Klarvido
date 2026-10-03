@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/w
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@sb/webapp-core/components/ui/dialog';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { AlertTriangle, CheckCircle2, KeyRound, Loader2, RefreshCw, Trash2, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, KeyRound, Loader2, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { useTenantKsef } from '../../../../hooks/useTenantKsef';
@@ -76,19 +76,23 @@ export const KsefTokenCard = ({ canManageKsef = false }: KsefTokenCardProps) => 
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <KeyRound className="h-5 w-5" />
-              <FormattedMessage id="KSeF / Card title" defaultMessage="KSeF connection" />
-            </CardTitle>
-            <CardDescription>
-              <FormattedMessage
-                id="KSeF / Card description"
-                defaultMessage="The KSeF token lets Klarvido read your company invoices from KSeF."
-              />
-            </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <KeyRound className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">
+                <FormattedMessage id="KSeF / Card title" defaultMessage="KSeF connection" />
+              </CardTitle>
+              <CardDescription className="mt-0.5">
+                <FormattedMessage
+                  id="KSeF / Card description"
+                  defaultMessage="The KSeF token lets Klarvido read your company invoices from KSeF."
+                />
+              </CardDescription>
+            </div>
           </div>
           {credential && (
             <Badge className={STATUS_BADGE_CLASSES[credential.status ?? ''] ?? UNVERIFIED_BADGE_CLASSES}>
@@ -154,13 +158,23 @@ export const KsefTokenCard = ({ canManageKsef = false }: KsefTokenCardProps) => 
             )}
 
             {canManageKsef && (
-              <div className="flex flex-wrap gap-2">
-                <Button variant={ButtonVariant.SECONDARY} onClick={handleTest} disabled={busy}>
-                  {testing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-                  <FormattedMessage id="KSeF / Test connection button" defaultMessage="Test connection" />
+              <div className="flex flex-nowrap gap-2">
+                <Button variant={ButtonVariant.SECONDARY} onClick={handleTest} disabled={busy} className="px-3 sm:px-4">
+                  {testing ? <Loader2 className="h-4 w-4 animate-spin sm:mr-2" /> : <RefreshCw className="h-4 w-4 sm:mr-2" />}
+                  <span className="sr-only sm:not-sr-only">
+                    <FormattedMessage id="KSeF / Test connection button" defaultMessage="Test connection" />
+                  </span>
                 </Button>
-                <Button variant={ButtonVariant.SECONDARY} onClick={() => setIsModalOpen(true)} disabled={busy}>
-                  <FormattedMessage id="KSeF / Replace token button" defaultMessage="Replace token" />
+                <Button
+                  variant={ButtonVariant.SECONDARY}
+                  onClick={() => setIsModalOpen(true)}
+                  disabled={busy}
+                  className="px-3 sm:px-4"
+                >
+                  <KeyRound className="h-4 w-4 sm:mr-2" />
+                  <span className="sr-only sm:not-sr-only">
+                    <FormattedMessage id="KSeF / Replace token button" defaultMessage="Replace token" />
+                  </span>
                 </Button>
                 <ConfirmDialog
                   onContinue={handleDelete}
@@ -173,25 +187,33 @@ export const KsefTokenCard = ({ canManageKsef = false }: KsefTokenCardProps) => 
                     />
                   }
                 >
-                  <ShadcnButton variant="destructive" disabled={busy}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    <FormattedMessage id="KSeF / Remove token button" defaultMessage="Remove" />
+                  <ShadcnButton variant="destructive" disabled={busy} className="px-3 sm:px-4">
+                    <Trash2 className="h-4 w-4 sm:mr-2" />
+                    <span className="sr-only sm:not-sr-only">
+                      <FormattedMessage id="KSeF / Remove token button" defaultMessage="Remove" />
+                    </span>
                   </ShadcnButton>
                 </ConfirmDialog>
               </div>
             )}
           </>
         ) : (
-          <div className="flex flex-col items-start gap-4 rounded-lg border border-dashed p-6">
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+              <KeyRound className="h-7 w-7 text-primary" />
+            </div>
+            <h3 className="mb-1 text-base font-semibold">
+              <FormattedMessage id="KSeF / Empty title" defaultMessage="No KSeF token connected" />
+            </h3>
+            <p className="mb-4 max-w-sm text-sm text-muted-foreground">
               <FormattedMessage
                 id="KSeF / Empty state"
-                defaultMessage="No KSeF token is connected. Connect one to start reading company invoices from KSeF."
+                defaultMessage="Connect a token to start reading your company invoices from KSeF."
               />
             </p>
             {canManageKsef && (
               <Button onClick={() => setIsModalOpen(true)}>
-                <KeyRound className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" />
                 <FormattedMessage id="KSeF / Connect token button" defaultMessage="Connect KSeF token" />
               </Button>
             )}

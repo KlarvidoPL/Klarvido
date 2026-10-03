@@ -2603,6 +2603,9 @@
   "KSeF / Empty state": {
     "defaultMessage": "No KSeF token is connected. Connect one to start reading company invoices from KSeF."
   },
+  "KSeF / Empty title": {
+    "defaultMessage": "No KSeF token connected"
+  },
   "KSeF / Error NIP missing": {
     "defaultMessage": "Add the organization NIP before connecting KSeF."
   },
@@ -2717,8 +2720,8 @@
   "KSeF / Token input label": {
     "defaultMessage": "KSeF token"
   },
-  "KSeF / Token label": {
-    "defaultMessage": "Token"
+  "KSeF / Token name label": {
+    "defaultMessage": "Token name in KSeF"
   },
   "KSeF / Token required": {
     "defaultMessage": "Paste the KSeF token"

@@ -2589,148 +2589,151 @@
     "defaultMessage": "الشروط والأحكام"
   },
   "KSeF / Cancel button": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "إلغاء"
   },
   "KSeF / Card description": {
-    "defaultMessage": "The KSeF token lets Klarvido read your company invoices from KSeF."
+    "defaultMessage": "يتيح رمز KSeF لـ Klarvido قراءة فواتير شركتك من KSeF."
   },
   "KSeF / Card title": {
-    "defaultMessage": "KSeF connection"
+    "defaultMessage": "اتصال KSeF"
   },
   "KSeF / Connect token button": {
-    "defaultMessage": "Connect KSeF token"
+    "defaultMessage": "ربط رمز KSeF"
   },
   "KSeF / Empty state": {
-    "defaultMessage": "No KSeF token is connected. Connect one to start reading company invoices from KSeF."
+    "defaultMessage": "اربط رمزًا لبدء قراءة فواتير شركتك من KSeF."
+  },
+  "KSeF / Empty title": {
+    "defaultMessage": "لم يتم ربط أي رمز KSeF"
   },
   "KSeF / Error NIP missing": {
-    "defaultMessage": "Add the organization NIP before connecting KSeF."
+    "defaultMessage": "أضف رقم NIP الخاص بالمؤسسة قبل ربط KSeF."
   },
   "KSeF / Error country not supported": {
-    "defaultMessage": "KSeF is only available for Polish organizations."
+    "defaultMessage": "KSeF متاح فقط للمؤسسات البولندية."
   },
   "KSeF / Error decryption failed": {
-    "defaultMessage": "The saved token cannot be read. Replace it with a new token."
+    "defaultMessage": "لا يمكن قراءة الرمز المحفوظ. استبدله برمز جديد."
   },
   "KSeF / Error encryption not configured": {
-    "defaultMessage": "The KSeF connection is not available on this server. Contact support."
+    "defaultMessage": "اتصال KSeF غير متاح على هذا الخادم. تواصل مع الدعم."
   },
   "KSeF / Error generic": {
-    "defaultMessage": "Something went wrong while connecting KSeF. Try again."
+    "defaultMessage": "حدث خطأ أثناء الاتصال بـ KSeF. حاول مرة أخرى."
   },
   "KSeF / Error invalid token": {
-    "defaultMessage": "KSeF did not accept this token. Check that it is copied correctly and was not revoked."
+    "defaultMessage": "لم يقبل KSeF هذا الرمز. تحقق من أنه نُسخ بشكل صحيح ولم يتم إلغاؤه."
   },
   "KSeF / Error no permissions": {
-    "defaultMessage": "This token has no permissions for the company. Generate a new token with invoice read access."
+    "defaultMessage": "لا يملك هذا الرمز أذونات لشركتك. أنشئ رمزًا جديدًا مع إذن قراءة الفواتير."
   },
   "KSeF / Error service unavailable": {
-    "defaultMessage": "KSeF could not be reached right now. Try again later."
+    "defaultMessage": "تعذر الوصول إلى KSeF حاليًا. حاول لاحقًا."
   },
   "KSeF / Error token empty": {
-    "defaultMessage": "Paste the KSeF token before saving."
+    "defaultMessage": "الصق رمز KSeF قبل الحفظ."
   },
   "KSeF / Invalid hint": {
-    "defaultMessage": "KSeF no longer accepts this token. Replace it with a new one."
+    "defaultMessage": "لم يعد KSeF يقبل هذا الرمز. استبدله برمز جديد."
   },
   "KSeF / Last verified label": {
-    "defaultMessage": "Last verified"
+    "defaultMessage": "آخر تحقق"
   },
   "KSeF / Loading": {
-    "defaultMessage": "Loading KSeF connection..."
+    "defaultMessage": "جارٍ تحميل اتصال KSeF..."
   },
   "KSeF / Modal description sr": {
-    "defaultMessage": "Instructions for generating and pasting a KSeF token"
+    "defaultMessage": "تعليمات لإنشاء رمز KSeF ولصقه"
   },
   "KSeF / Modal subtitle": {
-    "defaultMessage": "Connect a KSeF token so invoices can be read from KSeF"
+    "defaultMessage": "اربط رمز KSeF لقراءة الفواتير من KSeF"
   },
   "KSeF / Modal title": {
-    "defaultMessage": "Connect KSeF"
+    "defaultMessage": "ربط KSeF"
   },
   "KSeF / Modal title sr": {
-    "defaultMessage": "Connect KSeF"
+    "defaultMessage": "ربط KSeF"
   },
   "KSeF / Never verified": {
-    "defaultMessage": "Never"
+    "defaultMessage": "أبدًا"
   },
   "KSeF / Remove dialog description": {
-    "defaultMessage": "Klarvido will stop reading invoices from KSeF until a new token is connected."
+    "defaultMessage": "سيتوقف Klarvido عن قراءة الفواتير من KSeF حتى يتم ربط رمز جديد."
   },
   "KSeF / Remove dialog title": {
-    "defaultMessage": "Remove KSeF token"
+    "defaultMessage": "إزالة رمز KSeF"
   },
   "KSeF / Remove token button": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "إزالة"
   },
   "KSeF / Removed toast": {
-    "defaultMessage": "KSeF token removed."
+    "defaultMessage": "تمت إزالة رمز KSeF."
   },
   "KSeF / Replace token button": {
-    "defaultMessage": "Replace token"
+    "defaultMessage": "استبدال الرمز"
   },
   "KSeF / Saved toast": {
-    "defaultMessage": "KSeF token verified and saved."
+    "defaultMessage": "تم التحقق من رمز KSeF وحفظه."
   },
   "KSeF / Saved unverified toast": {
-    "defaultMessage": "Token saved. KSeF could not be reached, so it is not verified yet. Test the connection later."
+    "defaultMessage": "تم حفظ الرمز. تعذر الوصول إلى KSeF، لذلك لم يتم التحقق منه بعد. اختبر الاتصال لاحقًا."
   },
   "KSeF / Status invalid": {
-    "defaultMessage": "Token rejected"
+    "defaultMessage": "تم رفض الرمز"
   },
   "KSeF / Status unverified": {
-    "defaultMessage": "Not verified"
+    "defaultMessage": "لم يتم التحقق"
   },
   "KSeF / Status valid": {
-    "defaultMessage": "Connected"
+    "defaultMessage": "متصل"
   },
   "KSeF / Step 1 description": {
-    "defaultMessage": "Log in to KSeF with an account that is authorized for your company."
+    "defaultMessage": "سجّل الدخول إلى KSeF بحساب مخوّل لشركتك."
   },
   "KSeF / Step 1 title": {
-    "defaultMessage": "Open the KSeF web application"
+    "defaultMessage": "فتح تطبيق KSeF على الويب"
   },
   "KSeF / Step 2 description": {
-    "defaultMessage": "Open the Tokens section and generate a new token. Grant only the invoice read permission (InvoiceRead). Do not grant write permissions."
+    "defaultMessage": "افتح قسم الرموز (Tokens) وأنشئ رمزًا جديدًا. امنح إذن قراءة الفواتير فقط (InvoiceRead). لا تمنح أذونات الكتابة."
   },
   "KSeF / Step 2 title": {
-    "defaultMessage": "Generate a new token"
+    "defaultMessage": "إنشاء رمز جديد"
   },
   "KSeF / Step 3 description": {
-    "defaultMessage": "KSeF shows the token only once. Copy it right away, before closing that window."
+    "defaultMessage": "يعرض KSeF الرمز مرة واحدة فقط. انسخه فورًا قبل إغلاق هذه النافذة."
   },
   "KSeF / Step 3 title": {
-    "defaultMessage": "Copy the token"
+    "defaultMessage": "نسخ الرمز"
   },
   "KSeF / Step 4 description": {
-    "defaultMessage": "We check the token with KSeF before saving it. Stored tokens are encrypted and never shown again."
+    "defaultMessage": "نتحقق من الرمز مع KSeF قبل حفظه. يتم تشفير الرموز المحفوظة ولا تُعرض مرة أخرى أبدًا."
   },
   "KSeF / Step 4 title": {
-    "defaultMessage": "Paste it below"
+    "defaultMessage": "الصقه أدناه"
   },
   "KSeF / Test connection button": {
-    "defaultMessage": "Test connection"
+    "defaultMessage": "اختبار الاتصال"
   },
   "KSeF / Test passed toast": {
-    "defaultMessage": "KSeF token is valid."
+    "defaultMessage": "رمز KSeF صالح."
   },
   "KSeF / Token input label": {
-    "defaultMessage": "KSeF token"
+    "defaultMessage": "رمز KSeF"
   },
-  "KSeF / Token label": {
-    "defaultMessage": "Token"
+  "KSeF / Token name label": {
+    "defaultMessage": "اسم الرمز في KSeF"
   },
   "KSeF / Token required": {
-    "defaultMessage": "Paste the KSeF token"
+    "defaultMessage": "الصق رمز KSeF"
   },
   "KSeF / Token security note": {
-    "defaultMessage": "The token is encrypted before it is stored and cannot be viewed again after saving."
+    "defaultMessage": "يتم تشفير الرمز قبل حفظه ولا يمكن عرضه مرة أخرى بعد الحفظ."
   },
   "KSeF / Unverified hint": {
-    "defaultMessage": "KSeF could not be reached when the token was saved. Test the connection to verify it."
+    "defaultMessage": "تعذر الوصول إلى KSeF عند حفظ الرمز. اختبر الاتصال للتحقق منه."
   },
   "KSeF / Verify and save button": {
-    "defaultMessage": "Verify and save"
+    "defaultMessage": "تحقق واحفظ"
   },
   "Login form / error / authentication failed": {
     "defaultMessage": "بيانات اعتماد مصادقة غير صحيحة."
