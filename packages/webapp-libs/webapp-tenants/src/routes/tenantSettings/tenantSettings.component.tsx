@@ -30,6 +30,10 @@ export const TenantSettings = () => {
   const { hasPermission: canViewActivityLogs, loading: loadingLogs } = usePermissionCheck('security.logs.view');
   const { hasPermission: canViewBackup, loading: loadingBackup } = usePermissionCheck('backup.view');
 
+  // KSeF is the only Security-tab card for non-Security roles, and it is Polish-only
+  const canSeeKsefCard = canViewKsef && currentTenant?.country === 'PL';
+  const canViewSecurityTab = canViewSecurity || canSeeKsefCard;
+
   const isLoading = loadingMembers || loadingRoles || loadingSettings || loadingBilling || loadingSecurity || loadingKsef || loadingLogs || loadingBackup;
 
   // Determine the first available tab based on permissions
@@ -39,15 +43,13 @@ export const TenantSettings = () => {
     if (canViewRoles) tabs.push({ path: RoutesConfig.tenant.settings.roles, permission: 'org.roles.view' });
     if (canViewSettings) tabs.push({ path: RoutesConfig.tenant.settings.general, permission: 'org.settings.view' });
     if (canViewBilling) tabs.push({ path: FinancesRoutesConfig.subscriptions.index, permission: 'billing.view' });
-    // KSeF is the only Security-tab card for non-Security roles, and it is Polish-only
-    const canSeeKsefCard = canViewKsef && currentTenant?.country === 'PL';
-    if (canViewSecurity || canSeeKsefCard) {
+    if (canViewSecurityTab) {
       tabs.push({ path: RoutesConfig.tenant.settings.security, permission: canViewSecurity ? 'security.view' : 'security.ksef.view' });
     }
     if (canViewActivityLogs) tabs.push({ path: RoutesConfig.tenant.settings.activityLogs, permission: 'security.logs.view' });
     if (canViewBackup) tabs.push({ path: RoutesConfig.tenant.settings.backup, permission: 'backup.view' });
     return tabs;
-  }, [canViewMembers, canViewRoles, canViewSettings, canViewBilling, canViewSecurity, canViewKsef, currentTenant?.country, canViewActivityLogs, canViewBackup]);
+  }, [canViewMembers, canViewRoles, canViewSettings, canViewBilling, canViewSecurityTab, canViewSecurity, canViewActivityLogs, canViewBackup]);
 
   // Redirect to first available tab if current path is not accessible
   useEffect(() => {
@@ -114,7 +116,7 @@ export const TenantSettings = () => {
                 </TabsTrigger>
               </Link>
             )}
-            {canViewSecurity && (
+            {canViewSecurityTab && (
               <Link to={generateTenantPath(RoutesConfig.tenant.settings.security)} replace>
                 <TabsTrigger value={generateTenantPath(RoutesConfig.tenant.settings.security)}>
                   <FormattedMessage defaultMessage="Security" id="Tenant settings / Security" />
@@ -163,7 +165,7 @@ export const TenantSettings = () => {
                     <FormattedMessage defaultMessage="Subscription" id="Tenant settings / Subscription" />
                   </SelectItem>
                 )}
-                {canViewSecurity && (
+                {canViewSecurityTab && (
                   <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.security)}>
                     <FormattedMessage defaultMessage="Security" id="Tenant settings / Security" />
                   </SelectItem>
