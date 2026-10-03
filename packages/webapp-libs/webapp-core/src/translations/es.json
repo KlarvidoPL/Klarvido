@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Ver documentos"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "Acceder a la vista general del panel de gestión"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "Ver panel de gestión"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Enviar invitaciones a nuevos miembros"
   },

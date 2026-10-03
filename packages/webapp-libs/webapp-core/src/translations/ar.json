@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "عرض المستندات"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "الوصول إلى نظرة عامة على لوحة التحكم الإدارية"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "عرض لوحة التحكم الإدارية"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "إرسال دعوات إلى أعضاء جدد"
   },

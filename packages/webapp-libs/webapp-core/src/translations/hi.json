@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "दस्तावेज़ देखें"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "प्रबंधन डैशबोर्ड अवलोकन तक पहुंचें"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "प्रबंधन डैशबोर्ड देखें"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "नए सदस्यों को आमंत्रण भेजें"
   },

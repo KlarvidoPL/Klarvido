@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Afficher les documents"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "Accéder à l'aperçu du tableau de bord de gestion"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "Afficher le tableau de bord de gestion"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Envoyer des invitations à de nouveaux membres"
   },

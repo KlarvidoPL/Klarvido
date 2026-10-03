@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Dokumente anzeigen"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "Zugriff auf die Übersicht des Verwaltungs-Dashboards"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "Verwaltungs-Dashboard anzeigen"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Einladungen an neue Mitglieder senden"
   },

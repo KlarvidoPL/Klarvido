@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { Button } from '@sb/webapp-core/components/buttons';
+import { buttonVariants } from '@sb/webapp-core/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -421,6 +422,17 @@ const getPermissionDisplay = (
           id: 'Roles / Permission / dashboard.view / Description',
         }),
       };
+    case 'management.view':
+      return {
+        name: intl.formatMessage({
+          defaultMessage: 'View Management Dashboard',
+          id: 'Roles / Permission / management.view / Name',
+        }),
+        description: intl.formatMessage({
+          defaultMessage: 'Access the management dashboard overview',
+          id: 'Roles / Permission / management.view / Description',
+        }),
+      };
     case 'backup.view':
       return {
         name: intl.formatMessage({ defaultMessage: 'View Backup Settings', id: 'Roles / Permission / backup.view / Name' }),
@@ -549,10 +561,10 @@ const RoleCard = ({
                 </Button>
               )}
               {!role.isSystemRole && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 dark:text-red-400 dark:hover:text-red-400"
                   onClick={onDelete}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -1162,8 +1174,8 @@ const DeleteRoleDialog = ({
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-destructive/10">
-              <Trash2 className="h-5 w-5 text-destructive" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-destructive/10 dark:bg-red-400/10">
+              <Trash2 className="h-5 w-5 text-destructive dark:text-red-400" />
             </div>
             <AlertDialogTitle className="text-lg">
               <FormattedMessage defaultMessage="Delete Role" id="Roles / Delete Title" />
@@ -1179,8 +1191,8 @@ const DeleteRoleDialog = ({
                 />
               </p>
               {hasAffectedMembers && (
-                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-sm font-medium text-destructive">
+                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 space-y-3 dark:bg-red-400/10 dark:border-red-400/20">
+                  <div className="flex items-center gap-2 text-sm font-medium text-destructive dark:text-red-400">
                     <Users className="h-4 w-4" />
                     <FormattedMessage
                       defaultMessage="This role is assigned to {count} member(s)"
@@ -1228,7 +1240,7 @@ const DeleteRoleDialog = ({
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading || (hasAffectedMembers && !replacementRoleId)}
-            className="bg-destructive hover:bg-destructive/90"
+            className={buttonVariants({ variant: 'destructive' })}
           >
             {loading ? (
               <FormattedMessage defaultMessage="Deleting..." id="Roles / Deleting Button" />

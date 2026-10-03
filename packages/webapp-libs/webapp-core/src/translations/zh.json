@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "查看文档"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "访问管理仪表盘概览"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "查看管理仪表盘"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "向新成员发送邀请"
   },

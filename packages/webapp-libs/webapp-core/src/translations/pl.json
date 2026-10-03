@@ -3398,6 +3398,12 @@
   "Roles / Permission / features.documents.view / Name": {
     "defaultMessage": "Wyświetlanie dokumentów"
   },
+  "Roles / Permission / management.view / Description": {
+    "defaultMessage": "Dostęp do przeglądu pulpitu zarządzania"
+  },
+  "Roles / Permission / management.view / Name": {
+    "defaultMessage": "Wyświetlanie pulpitu zarządzania"
+  },
   "Roles / Permission / members.invite / Description": {
     "defaultMessage": "Wysyłaj zaproszenia do nowych członków"
   },
