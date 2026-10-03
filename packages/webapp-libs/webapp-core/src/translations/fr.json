@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "Aucun module disponible"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "Vous n'avez pas la permission de gérer les paramètres de sauvegarde"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "Aucune restauration pour le moment"
   },

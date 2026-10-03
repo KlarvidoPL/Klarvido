@@ -138,11 +138,13 @@ const ModuleModelsList = ({
   excludedModels,
   onExcludedModelsChange,
   updating,
+  canManage,
 }: {
   moduleId: string;
   excludedModels: string[];
   onExcludedModelsChange: (models: string[]) => void;
   updating: boolean;
+  canManage: boolean;
 }) => {
   const { data: currentTenant } = useCurrentTenant();
   const tenantId = currentTenant?.id ?? '';
@@ -180,7 +182,7 @@ const ModuleModelsList = ({
                   onExcludedModelsChange([...excludedModels, model.fullName]);
                 }
               }}
-              disabled={updating}
+              disabled={updating || !canManage}
             />
             <Label htmlFor={`include-${model.fullName}`} className="flex-1 cursor-pointer text-sm font-normal">
               {model.displayName} <span className="text-xs text-muted-foreground">({model.fullName})</span>
@@ -198,7 +200,7 @@ export const BackupSettings = () => {
   const { data: currentTenant } = useCurrentTenant();
   const generateTenantPath = useGenerateTenantPath();
   const tenantId = currentTenant?.id ?? '';
-  const { hasPermission: canAccess } = usePermissionCheck('backup.manage');
+  const { hasPermission: canManage } = usePermissionCheck('backup.manage');
 
   const [enabled, setEnabled] = useState(false);
   const [backupIntervalDays, setBackupIntervalDays] = useState(1);
@@ -216,7 +218,7 @@ export const BackupSettings = () => {
 
   const { data: modulesData, loading: modulesLoading } = useQuery(availableBackupModulesQuery, {
     variables: { tenantId },
-    skip: !canAccess || !tenantId,
+    skip: !tenantId,
   });
 
   useEffect(() => {
@@ -442,20 +444,6 @@ export const BackupSettings = () => {
     return () => clearInterval(interval);
   }, [hasProcessingRestores, refetchRestoreRecords]);
 
-  if (!canAccess) {
-    return (
-      <TabsContent value={generateTenantPath(RoutesConfig.tenant.settings.backup)}>
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">
-              <FormattedMessage defaultMessage="You don't have permission to manage backup settings" id="Backup Settings / No Permission" />
-            </p>
-          </CardContent>
-        </Card>
-      </TabsContent>
-    );
-  }
-
   return (
     <TabsContent value={generateTenantPath(RoutesConfig.tenant.settings.backup)}>
       <div className="space-y-6">
@@ -504,7 +492,7 @@ export const BackupSettings = () => {
                       <FormattedMessage defaultMessage="Automatically backup tenant data" id="Backup Settings / Enable Description" />
                     </p>
                   </div>
-                  <Switch checked={enabled} onCheckedChange={handleEnabledChange} disabled={updating} />
+                  <Switch checked={enabled} onCheckedChange={handleEnabledChange} disabled={updating || !canManage} />
                 </div>
 
                 {enabled && (
@@ -519,7 +507,7 @@ export const BackupSettings = () => {
                         min="1"
                         value={String(backupIntervalDays)}
                         onChange={(e) => setBackupIntervalDays(parseInt(e.target.value, 10) || 1)}
-                        disabled={updating}
+                        disabled={updating || !canManage}
                       />
                       <p className="text-sm text-muted-foreground">
                         <FormattedMessage defaultMessage="How often to create backups (minimum 1 day)" id="Backup Settings / Interval Description" />
@@ -536,7 +524,7 @@ export const BackupSettings = () => {
                         min="1"
                         value={String(retentionDays)}
                         onChange={(e) => setRetentionDays(parseInt(e.target.value, 10) || 1)}
-                        disabled={updating}
+                        disabled={updating || !canManage}
                       />
                       <p className="text-sm text-muted-foreground">
                         <FormattedMessage defaultMessage="How long to keep backup files (minimum 1 day)" id="Backup Settings / Retention Description" />
@@ -585,7 +573,7 @@ export const BackupSettings = () => {
                                           setSelectedModels(selectedModels.filter((model) => !model.startsWith(module.id + '.')));
                                         }
                                       }}
-                                      disabled={updating}
+                                      disabled={updating || !canManage}
                                     />
                                     <div className="flex-1 flex items-center justify-between">
                                       <Label htmlFor={`module-${module.id}`} className="flex-1 cursor-pointer font-normal">
@@ -621,6 +609,7 @@ export const BackupSettings = () => {
                                       excludedModels={excludedModels}
                                       onExcludedModelsChange={setExcludedModels}
                                       updating={updating}
+                                      canManage={canManage}
                                     />
                                   )}
                                 </div>
@@ -661,7 +650,7 @@ export const BackupSettings = () => {
                                   id={`user-${userId}`}
                                   checked={selectedUserIds.includes(userId)}
                                   onCheckedChange={() => toggleUser(userId)}
-                                  disabled={updating}
+                                  disabled={updating || !canManage}
                                 />
                                 <Label htmlFor={`user-${userId}`} className="flex-1 cursor-pointer text-sm font-normal">
                                   {displayName}
@@ -673,7 +662,7 @@ export const BackupSettings = () => {
                       </div>
                     </div>
 
-                    <Button onClick={handleSave} disabled={updating}>
+                    <Button onClick={handleSave} disabled={updating || !canManage}>
                       {updating ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -701,19 +690,21 @@ export const BackupSettings = () => {
                   <FormattedMessage defaultMessage="View and manage your backup files" id="Backup Settings / History Description" />
                 </CardDescription>
               </div>
-              <Button onClick={handleTriggerBackup} disabled={triggering || !enabled} variant="outline">
-                {triggering ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    <FormattedMessage defaultMessage="Triggering..." id="Backup Settings / Triggering" />
-                  </>
-                ) : (
-                  <>
-                    <FileArchive className="mr-2 h-4 w-4" />
-                    <FormattedMessage defaultMessage="Trigger Backup" id="Backup Settings / Trigger Button" />
-                  </>
-                )}
-              </Button>
+              {canManage && (
+                <Button onClick={handleTriggerBackup} disabled={triggering || !enabled} variant="outline">
+                  {triggering ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <FormattedMessage defaultMessage="Triggering..." id="Backup Settings / Triggering" />
+                    </>
+                  ) : (
+                    <>
+                      <FileArchive className="mr-2 h-4 w-4" />
+                      <FormattedMessage defaultMessage="Trigger Backup" id="Backup Settings / Trigger Button" />
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -768,20 +759,24 @@ export const BackupSettings = () => {
                                 >
                                   <Download className="h-3.5 w-3.5" />
                                 </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleOpenRestoreDialog(backup.id)}
-                                  disabled={restoring}
-                                  title={intl.formatMessage({ defaultMessage: 'Restore from this backup', id: 'Backup Settings / Restore Tooltip' })}
-                                >
-                                  <RotateCcw className="h-3.5 w-3.5" />
-                                </Button>
+                                {canManage && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleOpenRestoreDialog(backup.id)}
+                                    disabled={restoring}
+                                    title={intl.formatMessage({ defaultMessage: 'Restore from this backup', id: 'Backup Settings / Restore Tooltip' })}
+                                  >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                  </Button>
+                                )}
                               </>
                             )}
-                            <Button size="sm" variant="outline" onClick={() => backup?.id && handleDeleteBackup(backup.id)}>
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
+                            {canManage && (
+                              <Button size="sm" variant="outline" onClick={() => backup?.id && handleDeleteBackup(backup.id)}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

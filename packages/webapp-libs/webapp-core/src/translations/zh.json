@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "没有可用模块"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "您没有权限管理备份设置"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "暂无恢复记录"
   },

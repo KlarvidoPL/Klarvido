@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "لا توجد وحدات متاحة"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "ليس لديك إذن لإدارة إعدادات النسخ الاحتياطي"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "لا توجد عمليات استعادة بعد"
   },

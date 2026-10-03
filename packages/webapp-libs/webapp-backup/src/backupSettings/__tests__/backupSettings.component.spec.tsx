@@ -27,12 +27,17 @@ import { BackupSettings } from '../backupSettings.component';
 const MOCKED_TENANT_ID = 'tenant-backup-test-1';
 const BACKUP_TAB_VALUE = 'en/tenant-backup-test-1/tenant/settings/backup';
 
+let mockCanManage = true;
+
 jest.mock('@sb/webapp-tenants/hooks', () => {
   const actual = jest.requireActual('@sb/webapp-tenants/hooks');
   return {
     ...actual,
     PermissionGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    usePermissionCheck: () => ({ hasPermission: true, loading: false }),
+    usePermissionCheck: (code: string) => ({
+      hasPermission: code === 'backup.manage' ? mockCanManage : true,
+      loading: false,
+    }),
     useGenerateTenantPath: () => () => BACKUP_TAB_VALUE,
   };
 });
@@ -46,6 +51,10 @@ const BackupSettingsWithTabs = () => (
 
 describe('BackupSettings: Component', () => {
   const Component = () => <BackupSettingsWithTabs />;
+
+  beforeEach(() => {
+    mockCanManage = true;
+  });
 
   const defaultMocks = (overrides: {
     config?: ReturnType<typeof backupConfigFactory> | null;
@@ -135,4 +144,18 @@ describe('BackupSettings: Component', () => {
     });
   });
 
+  it('renders backup history for a view-only user instead of an empty/no-permission page', async () => {
+    mockCanManage = false;
+    const records = [backupRecordFactory()];
+    render(<Component />, {
+      apolloMocks: (mocks: readonly MockedResponse[]) => [...defaultMocks({ records }), ...mocks],
+      routerProps: createMockRouterProps(RoutesConfig.tenant.settings.backup, { tenantId: MOCKED_TENANT_ID }),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Backup History/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/No backups yet/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Trigger Backup/i })).not.toBeInTheDocument();
+  });
 });

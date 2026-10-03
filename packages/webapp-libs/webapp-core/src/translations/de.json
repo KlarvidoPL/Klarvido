@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "Keine Module verfügbar"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "Sie haben keine Berechtigung, die Sicherungseinstellungen zu verwalten"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "Noch keine Wiederherstellungen"
   },

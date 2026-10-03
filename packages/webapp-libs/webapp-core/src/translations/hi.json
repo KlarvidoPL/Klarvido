@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "कोई मॉड्यूल उपलब्ध नहीं"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "आपके पास बैकअप सेटिंग्स प्रबंधित करने की अनुमति नहीं है"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "अभी तक कोई पुनर्स्थापन नहीं"
   },
