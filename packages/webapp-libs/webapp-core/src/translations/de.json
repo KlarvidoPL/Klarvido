@@ -3626,6 +3626,18 @@
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "Organisationseinstellungen anzeigen"
   },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "KSeF-Token hinzufügen, testen, ersetzen und entfernen"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "KSeF-Verbindung verwalten"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "Prüfen, ob ein KSeF-Token verbunden ist und wann es zuletzt geprüft wurde"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "KSeF-Verbindung anzeigen"
+  },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "Aktivitätsprotokolle als CSV oder andere Formate exportieren"
   },

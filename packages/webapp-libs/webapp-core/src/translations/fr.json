@@ -3626,6 +3626,18 @@
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "Afficher les paramètres de l'organisation"
   },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "Ajouter, tester, remplacer ou supprimer le jeton KSeF"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "Gérer la connexion KSeF"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "Voir si un jeton KSeF est connecté et date de sa dernière vérification"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "Afficher la connexion KSeF"
+  },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "Exporter les journaux d'activité au format CSV ou autres"
   },

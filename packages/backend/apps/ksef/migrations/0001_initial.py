@@ -15,7 +15,7 @@ def add_ksef_permissions(apps, schema_editor):
     OrganizationRole = apps.get_model('multitenancy', 'OrganizationRole')
     OrganizationRolePermission = apps.get_model('multitenancy', 'OrganizationRolePermission')
 
-    ksef_codes = ['ksef.view', 'ksef.manage']
+    ksef_codes = ['security.ksef.view', 'security.ksef.manage']
     for perm_def in get_all_permissions():
         if perm_def.code in ksef_codes:
             category_value = getattr(perm_def.category, 'value', perm_def.category)

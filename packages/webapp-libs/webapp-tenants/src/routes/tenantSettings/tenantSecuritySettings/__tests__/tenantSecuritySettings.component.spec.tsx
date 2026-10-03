@@ -52,6 +52,7 @@ describe('TenantSecuritySettings: Component', () => {
       });
       const commonQueryMock = fillCommonQueryWithUser(user);
       const permissionsMock = createPermissionsMock([
+        'security.view',
         'security.sso.manage',
         'security.passkeys.manage',
         'security.logs.view',
@@ -77,6 +78,7 @@ describe('TenantSecuritySettings: Component', () => {
       });
       const commonQueryMock = fillCommonQueryWithUser(user);
       const permissionsMock = createPermissionsMock([
+        'security.view',
         'security.sso.manage',
         'security.passkeys.manage',
         'security.logs.view',
@@ -102,6 +104,7 @@ describe('TenantSecuritySettings: Component', () => {
       });
       const commonQueryMock = fillCommonQueryWithUser(user);
       const permissionsMock = createPermissionsMock([
+        'security.view',
         'security.sso.manage',
         'security.passkeys.manage',
         'security.logs.view',
@@ -127,6 +130,7 @@ describe('TenantSecuritySettings: Component', () => {
       });
       const commonQueryMock = fillCommonQueryWithUser(user);
       const permissionsMock = createPermissionsMock([
+        'security.view',
         'security.sso.manage',
         'security.passkeys.manage',
         'security.logs.view',
@@ -156,8 +160,8 @@ describe('TenantSecuritySettings: Component', () => {
         tenants: [tenant],
       });
       const commonQueryMock = fillCommonQueryWithUser(user);
-      // No SSO permissions
-      const permissionsMock = createPermissionsMock([]);
+      // Can view security settings but cannot manage SSO
+      const permissionsMock = createPermissionsMock(['security.view']);
 
       const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.security, {
         tenantId: MOCKED_TENANT_ID,
@@ -178,8 +182,8 @@ describe('TenantSecuritySettings: Component', () => {
         tenants: [tenant],
       });
       const commonQueryMock = fillCommonQueryWithUser(user);
-      // No logs permission
-      const permissionsMock = createPermissionsMock([]);
+      // Can view security settings but not the activity log
+      const permissionsMock = createPermissionsMock(['security.view']);
 
       const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.security, {
         tenantId: MOCKED_TENANT_ID,

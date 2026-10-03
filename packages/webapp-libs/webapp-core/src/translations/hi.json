@@ -3626,6 +3626,18 @@
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "संगठन सेटिंग्स देखें"
   },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "KSeF टोकन जोड़ें, जाँचें, बदलें या हटाएँ"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "KSeF कनेक्शन प्रबंधित करें"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "देखें कि KSeF टोकन कनेक्ट है या नहीं और उसका अंतिम सत्यापन कब हुआ"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "KSeF कनेक्शन देखें"
+  },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "गतिविधि लॉग को CSV या अन्य प्रारूपों में निर्यात करें"
   },

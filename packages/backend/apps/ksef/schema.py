@@ -61,7 +61,7 @@ class KsefQuery(graphene.ObjectType):
     )
 
     @staticmethod
-    @permission_classes(IsTenantMemberAccess, requires("ksef.view"))
+    @permission_classes(IsTenantMemberAccess, requires("security.ksef.view"))
     def resolve_ksef_credential(root, info, tenant_id, **kwargs):
         return services.get_credential(get_checked_tenant(info))
 
@@ -112,9 +112,11 @@ class DeleteKsefTokenMutation(graphene.Mutation):
         return cls(ok=True)
 
 
+# Changing the token also requires security.ksef.view: the card can only be used by roles that can see the connection.
+KSEF_MANAGE = requires("security.ksef.view", "security.ksef.manage", mode="all")
+
+
 class KsefMutation(graphene.ObjectType):
-    set_ksef_token = permission_classes(IsTenantMemberAccess, requires("ksef.manage"))(SetKsefTokenMutation.Field())
-    test_ksef_token = permission_classes(IsTenantMemberAccess, requires("ksef.manage"))(TestKsefTokenMutation.Field())
-    delete_ksef_token = permission_classes(IsTenantMemberAccess, requires("ksef.manage"))(
-        DeleteKsefTokenMutation.Field()
-    )
+    set_ksef_token = permission_classes(IsTenantMemberAccess, KSEF_MANAGE)(SetKsefTokenMutation.Field())
+    test_ksef_token = permission_classes(IsTenantMemberAccess, KSEF_MANAGE)(TestKsefTokenMutation.Field())
+    delete_ksef_token = permission_classes(IsTenantMemberAccess, KSEF_MANAGE)(DeleteKsefTokenMutation.Field())

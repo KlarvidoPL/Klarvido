@@ -11,6 +11,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../config/routes';
 import { useGenerateTenantPath, usePermissionCheck } from '../../hooks';
+import { useCurrentTenant } from '../../providers';
 
 export const TenantSettings = () => {
   const intl = useIntl();
@@ -24,10 +25,12 @@ export const TenantSettings = () => {
   const { hasPermission: canViewSettings, loading: loadingSettings } = usePermissionCheck('org.settings.view');
   const { hasPermission: canViewBilling, loading: loadingBilling } = usePermissionCheck('billing.view');
   const { hasPermission: canViewSecurity, loading: loadingSecurity } = usePermissionCheck('security.view');
+  const { hasPermission: canViewKsef, loading: loadingKsef } = usePermissionCheck('security.ksef.view');
+  const { data: currentTenant } = useCurrentTenant();
   const { hasPermission: canViewActivityLogs, loading: loadingLogs } = usePermissionCheck('security.logs.view');
   const { hasPermission: canViewBackup, loading: loadingBackup } = usePermissionCheck('backup.view');
 
-  const isLoading = loadingMembers || loadingRoles || loadingSettings || loadingBilling || loadingSecurity || loadingLogs || loadingBackup;
+  const isLoading = loadingMembers || loadingRoles || loadingSettings || loadingBilling || loadingSecurity || loadingKsef || loadingLogs || loadingBackup;
 
   // Determine the first available tab based on permissions
   const availableTabs = useMemo(() => {
@@ -36,11 +39,15 @@ export const TenantSettings = () => {
     if (canViewRoles) tabs.push({ path: RoutesConfig.tenant.settings.roles, permission: 'org.roles.view' });
     if (canViewSettings) tabs.push({ path: RoutesConfig.tenant.settings.general, permission: 'org.settings.view' });
     if (canViewBilling) tabs.push({ path: FinancesRoutesConfig.subscriptions.index, permission: 'billing.view' });
-    if (canViewSecurity) tabs.push({ path: RoutesConfig.tenant.settings.security, permission: 'security.view' });
+    // KSeF is the only Security-tab card for non-Security roles, and it is Polish-only
+    const canSeeKsefCard = canViewKsef && currentTenant?.country === 'PL';
+    if (canViewSecurity || canSeeKsefCard) {
+      tabs.push({ path: RoutesConfig.tenant.settings.security, permission: canViewSecurity ? 'security.view' : 'security.ksef.view' });
+    }
     if (canViewActivityLogs) tabs.push({ path: RoutesConfig.tenant.settings.activityLogs, permission: 'security.logs.view' });
     if (canViewBackup) tabs.push({ path: RoutesConfig.tenant.settings.backup, permission: 'backup.view' });
     return tabs;
-  }, [canViewMembers, canViewRoles, canViewSettings, canViewBilling, canViewSecurity, canViewActivityLogs, canViewBackup]);
+  }, [canViewMembers, canViewRoles, canViewSettings, canViewBilling, canViewSecurity, canViewKsef, currentTenant?.country, canViewActivityLogs, canViewBackup]);
 
   // Redirect to first available tab if current path is not accessible
   useEffect(() => {

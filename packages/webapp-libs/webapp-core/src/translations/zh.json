@@ -3626,6 +3626,18 @@
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "查看组织设置"
   },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "添加、测试、替换或移除 KSeF 令牌"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "管理 KSeF 连接"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "查看是否已连接 KSeF 令牌以及上次验证时间"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "查看 KSeF 连接"
+  },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "将活动日志导出为 CSV 或其他格式"
   },

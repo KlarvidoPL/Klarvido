@@ -3626,6 +3626,18 @@
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "عرض إعدادات المؤسسة"
   },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "إضافة رمز KSeF أو اختباره أو استبداله أو إزالته"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "إدارة اتصال KSeF"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "عرض ما إذا كان رمز KSeF متصلًا ووقت آخر تحقق منه"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "عرض اتصال KSeF"
+  },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "تصدير سجلات النشاط بصيغة CSV أو صيغ أخرى"
   },
