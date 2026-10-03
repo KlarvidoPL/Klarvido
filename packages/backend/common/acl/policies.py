@@ -143,41 +143,6 @@ class TenantDependentAccess(AccessPolicy):
         except Exception:
             return False
 
-    def is_request_from_tenant_owner(self, request, view, action) -> bool:
-        """
-        Check if user has owner-level access via legacy role, RBAC, or permissions.
-
-        Returns True if ANY of these conditions are met:
-        1. Legacy: request.user_role is OWNER
-        2. RBAC: User has a role with SystemRoleType.OWNER
-        3. RBAC: User has a role with is_owner_role=True
-        4. Permissions: User has owner-equivalent permissions (org.roles.manage, org.delete)
-        """
-        # 0. Superuser bypass: owner-equivalent access to every tenant.
-        if getattr(getattr(request, "user", None), "is_superuser", False):
-            return True
-
-        # 1. Check legacy role first (fast path)
-        if request.user_role in TenantRoles.Owner:
-            return True
-
-        # 2-4. Check RBAC
-        rbac_info = self._get_user_rbac_info(request)
-
-        # SystemRoleType.OWNER
-        if rbac_info["system_role_type"] == "OWNER":
-            return True
-
-        # is_owner_role flag
-        if rbac_info["is_owner_role"]:
-            return True
-
-        # Owner-equivalent permissions
-        return bool(
-            rbac_info["permissions"]
-            and any(perm in rbac_info["permissions"] for perm in self.OWNER_EQUIVALENT_PERMISSIONS)
-        )
-
     def is_request_from_tenant_admin(self, request, view, action) -> bool:
         """
         Check if user has admin-level access (or higher) via legacy role, RBAC, or permissions.
@@ -230,25 +195,6 @@ class TenantDependentAccess(AccessPolicy):
         # 2. Check RBAC - any role means they're a member
         rbac_info = self._get_user_rbac_info(request)
         return bool(rbac_info["has_roles"])
-
-
-class IsTenantOwnerAccess(TenantDependentAccess):
-    """
-    Access policy requiring Owner-level access.
-
-    Allows access if user has:
-    - Legacy TenantUserRole.OWNER
-    - OR RBAC role with SystemRoleType.OWNER
-    """
-
-    statements = [
-        make_statement(
-            principal=Principal.Authenticated,
-            action=Action.Any,
-            effect=Effect.Allow,
-            condition=["is_request_from_tenant_owner"],
-        )
-    ]
 
 
 class IsTenantAdminAccess(TenantDependentAccess):

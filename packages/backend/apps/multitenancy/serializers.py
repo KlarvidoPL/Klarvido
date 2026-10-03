@@ -227,8 +227,10 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
         """
         Validate the invitation data.
 
-        Note: Permission checks (members.invite) are handled at the mutation level
-        via @permission_classes(policies.IsTenantOwnerAccess) on TenantOwnerMutation.
+        Note: Permission checks (members.invite) are handled at the mutation level via
+        requires("members.invite") on create_tenant_invitation, combined with the
+        @permission_classes(policies.IsTenantAdminAccess) class-level gate on TenantOwnerMutation
+        (apps/multitenancy/schema.py).
         """
         email = BaseUserManager.normalize_email(attrs["email"])
         request = self.context.get("request")
