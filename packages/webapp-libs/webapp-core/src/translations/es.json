@@ -3311,8 +3311,14 @@
   "Roles / Error / Cannot modify owner role": {
     "defaultMessage": "El rol de Propietario no se puede modificar."
   },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "No puedes reasignar miembros a un rol de reemplazo que incluya el/los permiso(s) \"{permissions}\" porque tú mismo no los tienes. Pide a un propietario o administrador de la organización que te los conceda primero."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "No tienes permiso para gestionar los roles de la organización."
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "Solo los propietarios de la organización pueden reasignar miembros al rol de Propietario."
   },
   "Roles / Error / Replacement role same as deleted": {
     "defaultMessage": "El rol de reemplazo no puede ser el mismo que el rol que se está eliminando."

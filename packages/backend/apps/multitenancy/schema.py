@@ -1025,6 +1025,36 @@ class DeleteOrganizationRoleMutation(graphene.Mutation):
             if replacement_role.pk == role.pk:
                 raise exceptions.GraphQlValidationError("Replacement role cannot be the same as the deleted role.")
 
+            # SECURITY CHECK: Reassigning affected members to the replacement role is itself a
+            # role grant, so it must obey the same privilege-escalation rules as
+            # AssignRolesToMemberMutation - otherwise deleting a role is a backdoor to hand
+            # members a role (e.g. Owner) the acting user couldn't otherwise assign.
+            acting_user_membership = models.TenantMembership.objects.filter(
+                user=user, tenant=tenant, is_accepted=True
+            ).first()
+            is_acting_user_owner = models.is_superuser_bypass_eligible(user) or bool(
+                acting_user_membership
+                and (
+                    acting_user_membership.role == TenantUserRole.OWNER
+                    or models.TenantMembershipRole.objects.filter(
+                        membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
+                    ).exists()
+                )
+            )
+
+            if replacement_role.is_owner_role and not is_acting_user_owner:
+                raise PermissionDenied("Only organization owners can assign the Owner role.")
+
+            if not is_acting_user_owner:
+                user_permissions = models.get_user_permissions_for_tenant(user, tenant)
+                replacement_permissions = set(replacement_role.permissions.values_list("code", flat=True))
+                missing_permissions = replacement_permissions - user_permissions
+                if missing_permissions:
+                    permissions_list = ", ".join(list(missing_permissions)[:3])
+                    raise PermissionDenied(
+                        f"You cannot assign roles with permissions you don't have: {permissions_list}"
+                    )
+
             with transaction.atomic():
                 # Reassign members to replacement role
                 for mr in affected_members:

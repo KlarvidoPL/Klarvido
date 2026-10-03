@@ -15,7 +15,7 @@ from ..constants import (
     SystemRoleType,
     VatStatus,
 )
-from ..models import ActionLog, Tenant, TenantMembership, TenantMembershipRole, OrganizationRole
+from ..models import ActionLog, Tenant, TenantMembership, TenantMembershipRole, OrganizationRole, Permission
 from ..permissions import create_system_roles_for_tenant
 from ..services.mf_whitelist import CompanyDetails
 
@@ -2029,6 +2029,137 @@ class TestAssignRolesToMemberMutationSuperuserBypass:
 
         assert "errors" not in executed, executed.get("errors")
         assert executed["data"]["assignRolesToMember"]["ok"] is True
+        assert TenantMembershipRole.objects.filter(
+            membership=target_membership, role__system_role_type=SystemRoleType.OWNER
+        ).exists()
+
+
+class TestDeleteOrganizationRoleMutationReplacementRoleSecurity:
+    """Regression coverage for a privilege-escalation gap: reassigning affected members to a
+    replacement role on delete is itself a role grant, so it must obey the same rules as
+    AssignRolesToMemberMutation (only owners can grant the Owner role; non-owners can't grant
+    permissions they don't have themselves). Before this fix, deleting a role let any member
+    with only org.roles.manage pick Owner (or any other role) as the replacement and have it
+    silently applied with no check at all."""
+
+    MUTATION = '''
+        mutation DeleteOrganizationRole($id: ID!, $tenantId: ID!, $replacementRoleId: ID) {
+          deleteOrganizationRole(id: $id, tenantId: $tenantId, replacementRoleId: $replacementRoleId) {
+            ok
+            affectedMemberCount
+          }
+        }
+    '''
+
+    def _setup_acting_member_with_role_manage_permission(self, tenant, user_factory, tenant_membership_factory):
+        """A non-owner member whose only privilege is org.roles.manage - enough to call the
+        mutation at all, but nothing that should let them grant Owner or other permissions."""
+        acting_user = user_factory()
+        acting_membership = tenant_membership_factory(
+            user=acting_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+        manager_role = OrganizationRole.objects.create(tenant=tenant, name="Role Manager", description="")
+        manager_role.permissions.set([Permission.objects.get(code="org.roles.manage")])
+        TenantMembershipRole.objects.create(membership=acting_membership, role=manager_role, assigned_by=acting_user)
+        return acting_user
+
+    def test_non_owner_cannot_use_role_deletion_to_grant_owner_role(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        acting_user = self._setup_acting_member_with_role_manage_permission(
+            tenant, user_factory, tenant_membership_factory
+        )
+
+        role_to_delete = OrganizationRole.objects.create(tenant=tenant, name="Custom", description="")
+        target_user = user_factory()
+        target_membership = tenant_membership_factory(
+            user=target_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+        TenantMembershipRole.objects.create(membership=target_membership, role=role_to_delete, assigned_by=acting_user)
+        owner_role = OrganizationRole.objects.get(tenant=tenant, system_role_type=SystemRoleType.OWNER)
+
+        graphene_client.force_authenticate(acting_user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.MEMBER)
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={
+                "id": to_global_id("OrganizationRoleType", role_to_delete.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "replacementRoleId": to_global_id("OrganizationRoleType", owner_role.id),
+            },
+        )
+
+        assert executed["errors"][0]["message"] == "Only organization owners can assign the Owner role."
+        assert OrganizationRole.objects.filter(pk=role_to_delete.pk).exists()
+        assert not TenantMembershipRole.objects.filter(
+            membership=target_membership, role__system_role_type=SystemRoleType.OWNER
+        ).exists()
+
+    def test_non_owner_cannot_use_role_deletion_to_grant_permissions_they_lack(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        acting_user = self._setup_acting_member_with_role_manage_permission(
+            tenant, user_factory, tenant_membership_factory
+        )
+
+        role_to_delete = OrganizationRole.objects.create(tenant=tenant, name="Custom", description="")
+        target_user = user_factory()
+        target_membership = tenant_membership_factory(
+            user=target_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+        TenantMembershipRole.objects.create(membership=target_membership, role=role_to_delete, assigned_by=acting_user)
+
+        # Replacement role grants billing.manage, which the acting user doesn't have themselves.
+        replacement_role = OrganizationRole.objects.create(tenant=tenant, name="Billing Manager", description="")
+        replacement_role.permissions.set([Permission.objects.get(code="billing.manage")])
+
+        graphene_client.force_authenticate(acting_user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.MEMBER)
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={
+                "id": to_global_id("OrganizationRoleType", role_to_delete.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "replacementRoleId": to_global_id("OrganizationRoleType", replacement_role.id),
+            },
+        )
+
+        assert (
+            executed["errors"][0]["message"]
+            == "You cannot assign roles with permissions you don't have: billing.manage"
+        )
+        assert OrganizationRole.objects.filter(pk=role_to_delete.pk).exists()
+        assert not TenantMembershipRole.objects.filter(membership=target_membership, role=replacement_role).exists()
+
+    def test_owner_can_delete_role_and_reassign_members_to_owner_role(
+        self, graphene_client, user, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER, is_accepted=True)
+
+        role_to_delete = OrganizationRole.objects.create(tenant=tenant, name="Custom", description="")
+        target_user = user_factory()
+        target_membership = tenant_membership_factory(
+            user=target_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+        TenantMembershipRole.objects.create(membership=target_membership, role=role_to_delete, assigned_by=user)
+        owner_role = OrganizationRole.objects.get(tenant=tenant, system_role_type=SystemRoleType.OWNER)
+
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={
+                "id": to_global_id("OrganizationRoleType", role_to_delete.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "replacementRoleId": to_global_id("OrganizationRoleType", owner_role.id),
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["deleteOrganizationRole"]["ok"] is True
         assert TenantMembershipRole.objects.filter(
             membership=target_membership, role__system_role_type=SystemRoleType.OWNER
         ).exists()

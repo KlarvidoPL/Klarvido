@@ -3311,8 +3311,14 @@
   "Roles / Error / Cannot modify owner role": {
     "defaultMessage": "لا يمكن تعديل دور المالك."
   },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "لا يمكنك إعادة تعيين الأعضاء إلى دور بديل يتضمن صلاحية (صلاحيات) \"{permissions}\" لأنك لا تملكها بنفسك. اطلب من مالك المؤسسة أو المسؤول منحك إياها أولاً."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "ليس لديك صلاحية لإدارة أدوار المؤسسة."
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "يمكن فقط لمالكي المؤسسة إعادة تعيين الأعضاء إلى دور المالك."
   },
   "Roles / Error / Replacement role same as deleted": {
     "defaultMessage": "لا يمكن أن يكون الدور البديل هو نفسه الدور الذي يتم حذفه."

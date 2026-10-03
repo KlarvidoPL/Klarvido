@@ -3311,8 +3311,14 @@
   "Roles / Error / Cannot modify owner role": {
     "defaultMessage": "无法修改所有者角色。"
   },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "您无法将成员重新分配到包含“{permissions}”权限的替代角色，因为您自己没有这些权限。请先让组织所有者或管理员授予您这些权限。"
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "您没有管理组织角色的权限。"
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "只有组织所有者才能将成员重新分配为所有者角色。"
   },
   "Roles / Error / Replacement role same as deleted": {
     "defaultMessage": "替换角色不能与要删除的角色相同。"

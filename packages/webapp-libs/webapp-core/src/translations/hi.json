@@ -3311,8 +3311,14 @@
   "Roles / Error / Cannot modify owner role": {
     "defaultMessage": "स्वामी भूमिका में बदलाव नहीं किया जा सकता।"
   },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "आप सदस्यों को ऐसी प्रतिस्थापन भूमिका पर पुनः असाइन नहीं कर सकते जिसमें \"{permissions}\" अनुमति(याँ) शामिल हों, क्योंकि आपके पास स्वयं ये नहीं हैं। पहले किसी संगठन स्वामी या व्यवस्थापक से उन्हें प्राप्त करने के लिए कहें।"
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "आपके पास संगठन की भूमिकाओं को प्रबंधित करने की अनुमति नहीं है।"
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "केवल संगठन के स्वामी ही सदस्यों को स्वामी भूमिका पर पुनः असाइन कर सकते हैं।"
   },
   "Roles / Error / Replacement role same as deleted": {
     "defaultMessage": "प्रतिस्थापन भूमिका हटाई जा रही भूमिका के समान नहीं हो सकती।"

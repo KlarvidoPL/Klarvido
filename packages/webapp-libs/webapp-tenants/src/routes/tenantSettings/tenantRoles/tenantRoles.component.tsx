@@ -265,6 +265,22 @@ const getRoleMutationErrorMessage = (intl: IntlShape, error: Error): string => {
     );
   }
 
+  const replacementPermissionsMatch = message.match(/^You cannot assign roles with permissions you don't have: (.+)$/);
+  if (replacementPermissionsMatch) {
+    const permissions = replacementPermissionsMatch[1]
+      .split(', ')
+      .map((code) => getPermissionDisplay(intl, code, code).name)
+      .join(', ');
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t reassign members to a replacement role that includes the "{permissions}" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first.',
+        id: 'Roles / Error / Cannot reassign to replacement role with permissions not owned',
+      },
+      { permissions }
+    );
+  }
+
   switch (message) {
     case "You don't have permission to manage organization roles.":
       return intl.formatMessage({
@@ -285,6 +301,11 @@ const getRoleMutationErrorMessage = (intl: IntlShape, error: Error): string => {
       return intl.formatMessage({
         defaultMessage: 'The replacement role can’t be the same as the role being deleted.',
         id: 'Roles / Error / Replacement role same as deleted',
+      });
+    case 'Only organization owners can assign the Owner role.':
+      return intl.formatMessage({
+        defaultMessage: 'Only organization owners can reassign members to the Owner role.',
+        id: 'Roles / Error / Only owner can reassign to owner role',
       });
     default:
       return message;

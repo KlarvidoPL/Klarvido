@@ -3311,8 +3311,14 @@
   "Roles / Error / Cannot modify owner role": {
     "defaultMessage": "Die Rolle „Inhaber“ kann nicht geändert werden."
   },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "Sie können Mitglieder nicht einer Ersatzrolle zuweisen, die die Berechtigung(en) \"{permissions}\" enthält, da Sie diese selbst nicht besitzen. Bitten Sie einen Organisationsinhaber oder Administrator, sie Ihnen zuerst zu erteilen."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "Sie haben keine Berechtigung, Organisationsrollen zu verwalten."
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "Nur Organisationsinhaber können Mitglieder der Rolle „Inhaber“ zuweisen."
   },
   "Roles / Error / Replacement role same as deleted": {
     "defaultMessage": "Die Ersatzrolle darf nicht mit der zu löschenden Rolle identisch sein."
