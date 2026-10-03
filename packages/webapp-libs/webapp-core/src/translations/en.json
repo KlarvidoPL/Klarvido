@@ -3305,6 +3305,30 @@
   "Roles / Edit Title": {
     "defaultMessage": "Edit Role"
   },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "You can’t grant the \"{permission}\" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first."
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "You can’t create a role with the \"{permission}\" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first."
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "System roles can’t be deleted."
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "The Owner role can’t be modified."
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "You don't have permission to manage organization roles."
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "The replacement role can’t be the same as the role being deleted."
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role."
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "A role named \"{name}\" already exists. Choose a different name."
+  },
   "Roles / Load Error": {
     "defaultMessage": "Failed to load roles. Please try again."
   },

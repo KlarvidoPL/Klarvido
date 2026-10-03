@@ -3305,6 +3305,30 @@
   "Roles / Edit Title": {
     "defaultMessage": "تعديل الدور"
   },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "لا يمكنك منح صلاحية \"{permission}\" لأنك لا تملكها بنفسك. اطلب من مالك المؤسسة أو المسؤول منحك إياها أولاً."
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "لا يمكنك إنشاء دور بصلاحية \"{permission}\" لأنك لا تملكها بنفسك. اطلب من مالك المؤسسة أو المسؤول منحك إياها أولاً."
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "لا يمكن حذف الأدوار النظامية."
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "لا يمكن تعديل دور المالك."
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "ليس لديك صلاحية لإدارة أدوار المؤسسة."
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "لا يمكن أن يكون الدور البديل هو نفسه الدور الذي يتم حذفه."
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "هذا الدور مُسند إلى {count, plural, one {# عضو} other {# أعضاء}}. يُرجى اختيار دور بديل."
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "يوجد بالفعل دور باسم \"{name}\". اختر اسمًا مختلفًا."
+  },
   "Roles / Load Error": {
     "defaultMessage": "تعذّر تحميل الأدوار. يرجى المحاولة مرة أخرى."
   },

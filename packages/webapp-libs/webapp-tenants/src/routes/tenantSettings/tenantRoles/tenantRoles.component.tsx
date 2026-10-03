@@ -454,6 +454,92 @@ const getPermissionDisplay = (
   }
 };
 
+// Translates the known raw-English error strings raised by Create/Update/DeleteOrganizationRole
+// mutations (apps/multitenancy/schema.py) - these are plain graphene mutations, not
+// serializer-based, so their errors arrive as a flat error.message rather than the usual
+// extensions.non_field_errors shape. Unrecognized messages fall back to the raw text.
+const getRoleMutationErrorMessage = (intl: IntlShape, error: Error): string => {
+  const message = error.message;
+
+  const addPermissionMatch = message.match(/^You cannot add permission '([^']+)' that you don't have\.$/);
+  if (addPermissionMatch) {
+    const permission = getPermissionDisplay(intl, addPermissionMatch[1], addPermissionMatch[1]).name;
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t grant the "{permission}" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first.',
+        id: 'Roles / Error / Cannot add permission not owned',
+      },
+      { permission }
+    );
+  }
+
+  const createPermissionMatch = message.match(
+    /^You cannot create a role with permission '([^']+)' that you don't have\.$/
+  );
+  if (createPermissionMatch) {
+    const permission = getPermissionDisplay(intl, createPermissionMatch[1], createPermissionMatch[1]).name;
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t create a role with the "{permission}" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first.',
+        id: 'Roles / Error / Cannot create role with permission not owned',
+      },
+      { permission }
+    );
+  }
+
+  const nameExistsMatch = message.match(/^A role with the name '(.+)' already exists\.$/);
+  if (nameExistsMatch) {
+    return intl.formatMessage(
+      {
+        defaultMessage: 'A role named "{name}" already exists. Choose a different name.',
+        id: 'Roles / Error / Role name exists',
+      },
+      { name: nameExistsMatch[1] }
+    );
+  }
+
+  const assignedMembersMatch = message.match(
+    /^This role is assigned to (\d+) member\(s\)\. Please provide a replacement role\.$/
+  );
+  if (assignedMembersMatch) {
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role.',
+        id: 'Roles / Error / Role assigned to members',
+      },
+      { count: Number(assignedMembersMatch[1]) }
+    );
+  }
+
+  switch (message) {
+    case "You don't have permission to manage organization roles.":
+      return intl.formatMessage({
+        defaultMessage: "You don't have permission to manage organization roles.",
+        id: 'Roles / Error / No manage roles permission',
+      });
+    case 'Cannot modify the Owner role.':
+      return intl.formatMessage({
+        defaultMessage: 'The Owner role can’t be modified.',
+        id: 'Roles / Error / Cannot modify owner role',
+      });
+    case 'Cannot delete system roles.':
+      return intl.formatMessage({
+        defaultMessage: 'System roles can’t be deleted.',
+        id: 'Roles / Error / Cannot delete system role',
+      });
+    case 'Replacement role cannot be the same as the deleted role.':
+      return intl.formatMessage({
+        defaultMessage: 'The replacement role can’t be the same as the role being deleted.',
+        id: 'Roles / Error / Replacement role same as deleted',
+      });
+    default:
+      return message;
+  }
+};
+
 interface Permission {
   id: string;
   code: string;
@@ -869,7 +955,7 @@ const RoleEditorDialog = ({
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getRoleMutationErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 
@@ -886,7 +972,7 @@ const RoleEditorDialog = ({
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getRoleMutationErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 
@@ -1142,7 +1228,7 @@ const DeleteRoleDialog = ({
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getRoleMutationErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 

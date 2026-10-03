@@ -3305,6 +3305,30 @@
   "Roles / Edit Title": {
     "defaultMessage": "编辑角色"
   },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "您无法授予“{permission}”权限，因为您自己没有该权限。请先让组织所有者或管理员将该权限授予您。"
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "您无法创建具有“{permission}”权限的角色，因为您自己没有该权限。请先让组织所有者或管理员将该权限授予您。"
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "系统角色无法删除。"
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "无法修改所有者角色。"
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "您没有管理组织角色的权限。"
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "替换角色不能与要删除的角色相同。"
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "此角色已分配给 {count} 位成员。请选择一个替换角色。"
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "名为“{name}”的角色已存在。请选择其他名称。"
+  },
   "Roles / Load Error": {
     "defaultMessage": "角色加载失败，请重试。"
   },

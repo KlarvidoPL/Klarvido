@@ -3305,6 +3305,30 @@
   "Roles / Edit Title": {
     "defaultMessage": "Rolle bearbeiten"
   },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "Sie können die Berechtigung „{permission}“ nicht vergeben, da Sie sie selbst nicht besitzen. Bitten Sie einen Organisationsinhaber oder -administrator, sie Ihnen zuerst zuzuweisen."
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "Sie können keine Rolle mit der Berechtigung „{permission}“ erstellen, da Sie sie selbst nicht besitzen. Bitten Sie einen Organisationsinhaber oder -administrator, sie Ihnen zuerst zuzuweisen."
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "Systemrollen können nicht gelöscht werden."
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "Die Rolle „Inhaber“ kann nicht geändert werden."
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "Sie haben keine Berechtigung, Organisationsrollen zu verwalten."
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "Die Ersatzrolle darf nicht mit der zu löschenden Rolle identisch sein."
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "Diese Rolle ist {count, plural, one {einem Mitglied} other {# Mitgliedern}} zugewiesen. Bitte wählen Sie eine Ersatzrolle."
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "Eine Rolle namens „{name}“ existiert bereits. Wählen Sie einen anderen Namen."
+  },
   "Roles / Load Error": {
     "defaultMessage": "Rollen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
   },

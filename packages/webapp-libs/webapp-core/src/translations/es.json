@@ -3305,6 +3305,30 @@
   "Roles / Edit Title": {
     "defaultMessage": "Editar rol"
   },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "No puedes conceder el permiso \"{permission}\" porque tú mismo no lo tienes. Pide a un propietario o administrador de la organización que te lo conceda primero."
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "No puedes crear un rol con el permiso \"{permission}\" porque tú mismo no lo tienes. Pide a un propietario o administrador de la organización que te lo conceda primero."
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "Los roles del sistema no se pueden eliminar."
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "El rol de Propietario no se puede modificar."
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "No tienes permiso para gestionar los roles de la organización."
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "El rol de reemplazo no puede ser el mismo que el rol que se está eliminando."
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "Este rol está asignado a {count, plural, one {# miembro} other {# miembros}}. Elige un rol de reemplazo."
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "Ya existe un rol llamado \"{name}\". Elige un nombre diferente."
+  },
   "Roles / Load Error": {
     "defaultMessage": "No se pudieron cargar los roles. Inténtalo de nuevo."
   },

@@ -3305,6 +3305,30 @@
   "Roles / Edit Title": {
     "defaultMessage": "Role संपादित करें"
   },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "आप '{permission}' अनुमति प्रदान नहीं कर सकते क्योंकि यह आपके पास स्वयं नहीं है। पहले किसी संगठन स्वामी या व्यवस्थापक से यह अनुमति प्राप्त करें।"
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "आप '{permission}' अनुमति वाली भूमिका नहीं बना सकते क्योंकि यह आपके पास स्वयं नहीं है। पहले किसी संगठन स्वामी या व्यवस्थापक से यह अनुमति प्राप्त करें।"
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "सिस्टम भूमिकाओं को हटाया नहीं जा सकता।"
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "स्वामी भूमिका में बदलाव नहीं किया जा सकता।"
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "आपके पास संगठन की भूमिकाओं को प्रबंधित करने की अनुमति नहीं है।"
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "प्रतिस्थापन भूमिका हटाई जा रही भूमिका के समान नहीं हो सकती।"
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "यह भूमिका {count, plural, one {# सदस्य} other {# सदस्यों}} को सौंपी गई है। कृपया एक प्रतिस्थापन भूमिका चुनें।"
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "'{name}' नाम की भूमिका पहले से मौजूद है। कोई दूसरा नाम चुनें।"
+  },
   "Roles / Load Error": {
     "defaultMessage": "भूमिकाएं लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।"
   },
