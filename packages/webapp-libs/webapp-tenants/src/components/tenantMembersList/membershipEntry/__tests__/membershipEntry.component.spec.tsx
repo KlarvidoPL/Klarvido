@@ -273,6 +273,76 @@ describe('MembershipEntry: Component', () => {
     expect(toast).toHaveTextContent(/roles were updated successfully/i);
   });
 
+  it('should show a translated message (not the raw "GraphQlValidationError" placeholder) when assigning roles fails', async () => {
+    // AssignRolesToMemberMutation is a plain graphene mutation, not a SerializerMutation - its
+    // errors arrive with the real detail in `extensions` as a list, while the top-level
+    // `message` is just the exception class name. Regression coverage for the same class of bug
+    // fixed for the role-delete flow (getGraphQLErrorDetail/getGenericErrorMessage).
+    const membership = membershipFactory({
+      id: MOCKED_MEMBERSHIP_ID,
+      invitationAccepted: true,
+      userEmail: 'member@example.com',
+      organizationRoles: [{ id: 'role-1', name: 'Admin Role', color: 'BLUE', isSystemRole: false, isOwnerRole: false }],
+    });
+    const currentUserMembership = membershipFactory({ id: 'current-user-membership', role: TenantUserRole.OWNER });
+    const user = currentUserFactory({
+      tenants: [tenantFactory({ id: MOCKED_TENANT_ID, membership: currentUserMembership })],
+    });
+    const commonQueryMock = fillCommonQueryWithUser(user);
+    const rolesMock = composeMockedQueryResult(allOrganizationRolesQuery, {
+      variables: { tenantId: MOCKED_TENANT_ID },
+      data: {
+        allOrganizationRoles: {
+          edges: [
+            { node: { id: 'role-1', name: 'Admin Role', description: null, color: 'BLUE', systemRoleType: null, isSystemRole: false, isOwnerRole: false, memberCount: 1, permissions: [] } },
+            { node: { id: 'role-2', name: 'Owner Role', description: null, color: 'PURPLE', systemRoleType: null, isSystemRole: false, isOwnerRole: true, memberCount: 1, permissions: [] } },
+          ],
+        },
+      },
+    });
+    const assignErrorMock = {
+      request: {
+        query: assignRolesToMemberMutation,
+        variables: { membershipId: MOCKED_MEMBERSHIP_ID, tenantId: MOCKED_TENANT_ID, roleIds: ['role-1', 'role-2'] },
+      },
+      result: {
+        errors: [
+          {
+            message: 'GraphQlValidationError',
+            extensions: [{ message: 'Only organization owners can assign the Owner role.', code: 'invalid' }],
+          } as any,
+        ],
+      },
+    };
+
+    const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.members, { tenantId: MOCKED_TENANT_ID });
+
+    render(<Component membership={membership} />, {
+      apolloMocks: [commonQueryMock, rolesMock, assignErrorMock],
+      routerProps,
+    });
+
+    expect(await screen.findByText(/Yes/i)).toBeInTheDocument();
+
+    const buttons = screen.getAllByRole('button');
+    const actionsButton = buttons.find((b) => !b.textContent?.includes('Resend'));
+    await userEvent.click(actionsButton!);
+
+    const manageRolesItem = await screen.findByRole('menuitem', { name: /manage roles/i });
+    await userEvent.click(manageRolesItem);
+
+    expect(await screen.findByText(/Manage Roles/i)).toBeInTheDocument();
+
+    const ownerRole = await screen.findByText('Owner Role');
+    await userEvent.click(ownerRole);
+
+    const saveButton = await screen.findByRole('button', { name: /Save Roles/i });
+    await userEvent.click(saveButton);
+
+    const toast = await screen.findByTestId('toast-1');
+    expect(toast).toHaveTextContent('Only organization owners can assign the Owner role.');
+  });
+
   it('should commit delete mutation when delete is confirmed', async () => {
     const membership = membershipFactory({
       id: MOCKED_MEMBERSHIP_ID,
