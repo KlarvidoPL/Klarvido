@@ -23,7 +23,9 @@ from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from apps.sso.enforcement import filter_tenants_for_password_session
 from . import models
+from . import notifications
 from . import serializers
+from . import tasks
 from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
 from .services.onboarding import save_onboarding_step, save_profile_step
@@ -536,6 +538,12 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
     class Meta:
         model = models.Tenant
 
+    class Input:
+        id = graphene.String()
+        # Resolved by TenantUserRoleMiddleware (with the membership check) into info.context.tenant - it never falls
+        # back to the generic `id`, so without this the requires("org.delete") check has no tenant to evaluate
+        tenant_id = graphene.String(required=True)
+
     @classmethod
     def mutate_and_get_payload(cls, root, info, id, **kwargs):
         """
@@ -546,11 +554,35 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
 
         Raises:
             GraphQlValidationError: If deletion encounters validation errors.
+            PermissionDenied: If no tenant was resolved, or `id` names a different tenant than the checked one.
         """
         tenant = info.context.tenant
+        if not tenant:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            _, pk = from_global_id(id or "")
+        except (TypeError, ValueError):
+            pk = None
+        if str(pk) != str(tenant.pk):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
         if tenant.type == ConstantsTenantType.DEFAULT:
             raise exceptions.GraphQlValidationError("Cannot delete default type tenant.")
+
+        # Gathered before the delete, since the cascade removes the memberships and the rows holding these paths
+        tenant_pk = str(tenant.pk)
+        tenant_name = tenant.name
+        deleter = info.context.user
+        members = [
+            membership.user
+            for membership in tenant.user_memberships.filter(is_accepted=True, user__isnull=False).select_related(
+                "user__profile"
+            )
+        ]
+        file_paths = [
+            *tenant.backuprecord_set.exclude(file_path="").values_list("file_path", flat=True),
+            *tenant.action_log_exports.exclude(file_path="").values_list("file_path", flat=True),
+        ]
 
         with transaction.atomic():
             log_delete(
@@ -575,6 +607,12 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
                 logger.warning(f"Failed to cancel subscription for tenant {tenant.pk} during deletion: {e}")
 
             tenant.delete()
+
+            # Only once the delete is committed: remove its files from storage and tell the members
+            transaction.on_commit(lambda: tasks.delete_tenant_files.delay(file_paths, tenant_pk))
+            transaction.on_commit(
+                lambda: notifications.send_tenant_deleted_notifications(tenant_name, deleter, members)
+            )
 
         close_old_connections()
 
@@ -650,8 +688,11 @@ class DeleteTenantMembershipMutation(mutations.DeleteModelMutation):
             ).exists()
         )
 
-        # Check if target is an owner
-        target_is_owner = (
+        # Check if target is an owner. A pending (not yet accepted) invitation holds no
+        # real access yet, even if it was created with the Owner role - it must never
+        # trip the owner-removal-permission or last-owner checks below, or it becomes
+        # impossible to cancel an Owner-role invitation while only one real owner exists.
+        target_is_owner = obj.is_accepted and (
             obj.role == TenantUserRole.OWNER
             or models.TenantMembershipRole.objects.filter(
                 membership=obj, role__system_role_type=SystemRoleType.OWNER

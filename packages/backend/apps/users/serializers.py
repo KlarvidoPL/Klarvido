@@ -12,6 +12,8 @@ from rest_framework import exceptions, serializers, validators
 from rest_framework_simplejwt import serializers as jwt_serializers, tokens as jwt_tokens, exceptions as jwt_exceptions
 from rest_framework_simplejwt.serializers import PasswordField
 from rest_framework_simplejwt.settings import api_settings as jwt_api_settings
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from rest_framework_simplejwt.utils import get_md5_hash_password
 from common.decorators import context_user_required
 
 from . import models, tokens, jwt, notifications
@@ -319,11 +321,31 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
         except (jwt_exceptions.InvalidToken, jwt_exceptions.TokenError):
             self.fail("invalid_token")
 
+        # Only refresh tokens this database issued itself. A token signed with the
+        # right key but never recorded as outstanding here was minted elsewhere -
+        # typically before the database was wiped, when its user ID belonged to a
+        # different account (IDs start over after a wipe).
+        old_jti = refresh.get("jti")
+        if not old_jti or not OutstandingToken.objects.filter(jti=old_jti).exists():
+            self.fail("invalid_token")
+
+        # ...and only for the account it was issued to (CHECK_REVOKE_TOKEN: the
+        # user's password-hash fingerprint must still match - also ends every
+        # session once the password is changed or reset).
+        user = (
+            get_user_model()
+            .objects.filter(**{jwt_api_settings.USER_ID_FIELD: refresh.get(jwt_api_settings.USER_ID_CLAIM)})
+            .first()
+        )
+        if not user or not user.is_active:
+            self.fail("invalid_token")
+        if refresh.get(jwt_api_settings.REVOKE_TOKEN_CLAIM) != get_md5_hash_password(user.password):
+            self.fail("invalid_token")
+
         # Reject the refresh if the session it belongs to has been revoked
         # (e.g. via "Sign out" on another device in Active Sessions). Without
         # this check, revoking a session only hides it from the session list
         # - the device itself would keep minting new access tokens forever.
-        old_jti = refresh.get("jti")
         from apps.sso.models import SSOSession
 
         session = SSOSession.objects.filter(refresh_token_jti=old_jti).first() if old_jti else None
@@ -337,17 +359,16 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
                 except AttributeError:
                     pass
 
-            user = get_user_model().objects.get(id=refresh[jwt_api_settings.USER_ID_CLAIM])
             auth_method = refresh.get('auth_method', 'password')
             new_refresh = jwt_tokens.RefreshToken.for_user(user)
             new_refresh['auth_method'] = auth_method
             new_refresh.access_token['auth_method'] = auth_method
 
             # Rotation mints a brand new refresh token (new jti) - re-point the
-            # session's link so it stays revocable after this refresh too.
+            # session's link so it stays revocable after this refresh too, and
+            # extend its expiry / last activity along with it.
             if session:
-                session.refresh_token_jti = new_refresh.get("jti")
-                session.save(update_fields=["refresh_token_jti"])
+                session.extend(new_refresh.get("jti"))
 
             return {"access": str(new_refresh.access_token), "refresh": str(new_refresh)}
 

@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch, MagicMock, PropertyMock
 from apps.backup.models import BackupConfig, BackupRecord
 from apps.backup.schema import DownloadBackupDecryptedMutation
 from apps.multitenancy.models import Tenant
+from rest_framework.exceptions import PermissionDenied
 
 
 pytestmark = pytest.mark.django_db
@@ -110,12 +111,15 @@ class TestDownloadBackupDecryptedMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
             # Execute mutation (need to use global ID)
             from graphql_relay import to_global_id
 
             backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-            result = DownloadBackupDecryptedMutation.mutate(None, info, backup_id=backup_global_id)
+            result = DownloadBackupDecryptedMutation.mutate(
+                None, info, backup_id=backup_global_id, tenant_id=str(tenant.id)
+            )
 
             # Verify result
             assert result.ok is True
@@ -157,12 +161,15 @@ class TestDownloadBackupDecryptedMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
             # Execute mutation (need to use global ID)
             from graphql_relay import to_global_id
 
             backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-            result = DownloadBackupDecryptedMutation.mutate(None, info, backup_id=backup_global_id)
+            result = DownloadBackupDecryptedMutation.mutate(
+                None, info, backup_id=backup_global_id, tenant_id=str(tenant.id)
+            )
 
             # Verify result (should return as-is for unencrypted)
             assert result.ok is True
@@ -192,12 +199,15 @@ class TestDownloadBackupDecryptedMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
         # Execute mutation (need to use global ID)
         from graphql_relay import to_global_id
 
         backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-        result = DownloadBackupDecryptedMutation.mutate(None, info, backup_id=backup_global_id)
+        result = DownloadBackupDecryptedMutation.mutate(
+            None, info, backup_id=backup_global_id, tenant_id=str(tenant.id)
+        )
 
         # Verify error
         assert result.ok is False
@@ -241,12 +251,15 @@ class TestDownloadBackupDecryptedMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
         # Execute mutation (need to use global ID)
         from graphql_relay import to_global_id
 
         backup_global_id = to_global_id('BackupRecordType', str(backup_record.id))
-        result = DownloadBackupDecryptedMutation.mutate(None, info, backup_id=backup_global_id)
+        result = DownloadBackupDecryptedMutation.mutate(
+            None, info, backup_id=backup_global_id, tenant_id=str(tenant.id)
+        )
 
         # Verify error
         assert result.ok is False
@@ -275,14 +288,11 @@ class TestDownloadBackupDecryptedMutation:
         from graphql_relay import to_global_id
 
         backup_id = to_global_id('BackupRecordType', str(backup_record.id))
-        # The mutation catches GraphQLError and returns it as an error result
-        result = DownloadBackupDecryptedMutation.mutate(None, info, backup_id=backup_id)
+        # No organization was resolved for the request (not signed in / not a member): refused outright
+        with pytest.raises(PermissionDenied):
+            DownloadBackupDecryptedMutation.mutate(None, info, backup_id=backup_id, tenant_id=str(tenant.id))
 
-        # Verify error result
-        assert result.ok is False
-        assert "Authentication" in result.error or "required" in result.error.lower()
-
-    def test_download_backup_decrypted_backup_not_found(self, user, mock_storage):
+    def test_download_backup_decrypted_backup_not_found(self, tenant, user, mock_storage):
         """Test downloading non-existent backup."""
 
         # Create GraphQL context
@@ -295,12 +305,15 @@ class TestDownloadBackupDecryptedMutation:
 
             info = MagicMock()
             info.context = MockContext(user)
+            info.context.tenant = tenant
 
         # Execute mutation with invalid ID (use global ID format)
         from graphql_relay import to_global_id
 
         invalid_global_id = to_global_id('BackupRecordType', '999999')
-        result = DownloadBackupDecryptedMutation.mutate(None, info, backup_id=invalid_global_id)
+        result = DownloadBackupDecryptedMutation.mutate(
+            None, info, backup_id=invalid_global_id, tenant_id=str(tenant.id)
+        )
 
         # Verify error
         assert result.ok is False

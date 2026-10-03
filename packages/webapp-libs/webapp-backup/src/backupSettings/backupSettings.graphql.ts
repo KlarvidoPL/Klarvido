@@ -81,8 +81,8 @@ export const updateBackupConfigMutation = gql(/* GraphQL */ `
 `);
 
 export const deleteBackupMutation = gql(/* GraphQL */ `
-  mutation deleteBackupMutation($backupId: ID!) {
-    deleteBackup(backupId: $backupId) {
+  mutation deleteBackupMutation($backupId: ID!, $tenantId: ID!) {
+    deleteBackup(backupId: $backupId, tenantId: $tenantId) {
       ok
       error
     }
@@ -100,8 +100,8 @@ export const triggerBackupMutation = gql(/* GraphQL */ `
 `);
 
 export const downloadBackupDecryptedMutation = gql(/* GraphQL */ `
-  mutation downloadBackupDecryptedMutation($backupId: ID!) {
-    downloadBackupDecrypted(backupId: $backupId) {
+  mutation downloadBackupDecryptedMutation($backupId: ID!, $tenantId: ID!) {
+    downloadBackupDecrypted(backupId: $backupId, tenantId: $tenantId) {
       ok
       content
       error
@@ -110,8 +110,8 @@ export const downloadBackupDecryptedMutation = gql(/* GraphQL */ `
 `);
 
 export const restoreBackupMutation = gql(/* GraphQL */ `
-  mutation restoreBackupMutation($backupId: ID!, $conflictStrategy: ConflictStrategyEnum!) {
-    restoreBackup(backupId: $backupId, conflictStrategy: $conflictStrategy) {
+  mutation restoreBackupMutation($backupId: ID!, $conflictStrategy: ConflictStrategyEnum!, $tenantId: ID!) {
+    restoreBackup(backupId: $backupId, conflictStrategy: $conflictStrategy, tenantId: $tenantId) {
       ok
       error
       restoreId

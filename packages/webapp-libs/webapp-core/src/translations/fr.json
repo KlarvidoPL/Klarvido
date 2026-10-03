@@ -1523,6 +1523,9 @@
   "Confirm Dialog / Cancel label": {
     "defaultMessage": "Annuler"
   },
+  "Confirm Dialog / Confirmation input label": {
+    "defaultMessage": "Tapez {confirmationText} pour confirmer"
+  },
   "Confirm Dialog / Continue label": {
     "defaultMessage": "Continuer"
   },
@@ -2246,6 +2249,27 @@
   "Email / Subscription Error / Title": {
     "defaultMessage": "Nous n’avons pas pu traiter votre paiement"
   },
+  "Email / TenantDeleted / Button": {
+    "defaultMessage": "Aller sur Klarvido"
+  },
+  "Email / TenantDeleted / Data removed": {
+    "defaultMessage": "Toutes ses données, y compris les sauvegardes et les fichiers, ont été définitivement supprimées et ne peuvent pas être restaurées."
+  },
+  "Email / TenantDeleted / Preheader": {
+    "defaultMessage": "L’organisation « {tenantName} » a été supprimée"
+  },
+  "Email / TenantDeleted / Subject": {
+    "defaultMessage": "L’organisation « {tenantName} » a été supprimée"
+  },
+  "Email / TenantDeleted / Text deleter": {
+    "defaultMessage": "Vous avez supprimé l’organisation « {tenantName} ». Si ce n’était pas vous, changez immédiatement votre mot de passe et contactez-nous."
+  },
+  "Email / TenantDeleted / Text member": {
+    "defaultMessage": "L’organisation « {tenantName} » a été supprimée par {deletedBy}. Vous n’y avez plus accès."
+  },
+  "Email / TenantDeleted / Title": {
+    "defaultMessage": "Organisation supprimée"
+  },
   "Email / TenantInvitation / Preheader": {
     "defaultMessage": "Rejoignez l’équipe et commencez à collaborer dès aujourd’hui"
   },
@@ -2885,6 +2909,9 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "Connexion SSO désactivée"
   },
+  "Notifications / Tenant / Deleted": {
+    "defaultMessage": "L’organisation « {tenant_name} » a été supprimée par « {name} »"
+  },
   "Notifications / Tenant / Invitation Accepted": {
     "defaultMessage": "Votre invitation à « {tenant_name} » a été acceptée par « {name} »"
   },
@@ -2893,6 +2920,15 @@
   },
   "Notifications / Tenant / Invitation Declined": {
     "defaultMessage": "Votre invitation à « {tenant_name} » a été refusée par « {name} »"
+  },
+  "OAuth / Callback / Error title": {
+    "defaultMessage": "Authentication Failed"
+  },
+  "OAuth / Callback / Loading": {
+    "defaultMessage": "Completing sign in..."
+  },
+  "OAuth / Callback / Return to login": {
+    "defaultMessage": "Return to login"
   },
   "OIDC Form / Add Domain Button": {
     "defaultMessage": "Ajouter"
@@ -2971,6 +3007,9 @@
   },
   "Passkeys / Name placeholder": {
     "defaultMessage": "p. ex. MacBook Pro, iPhone 15"
+  },
+  "Passkeys / Never used": {
+    "defaultMessage": "Jamais utilisée"
   },
   "Passkeys / No passkeys description": {
     "defaultMessage": "Les passkeys offrent un moyen plus sûr et plus pratique de vous connecter en utilisant la biométrie de votre appareil ou une clé de sécurité."
@@ -3704,26 +3743,20 @@
   "Sessions / All Sessions Revoked": {
     "defaultMessage": "Toutes les autres sessions ont été déconnectées."
   },
+  "Sessions / Browser on OS": {
+    "defaultMessage": "{browser} sur {os}"
+  },
   "Sessions / Current": {
     "defaultMessage": "Actuelle"
-  },
-  "Sessions / Current Session": {
-    "defaultMessage": "Session actuelle"
-  },
-  "Sessions / Days ago": {
-    "defaultMessage": "Il y a {days} jours"
   },
   "Sessions / Description": {
     "defaultMessage": "Gérez vos sessions de connexion actives sur tous vos appareils"
   },
-  "Sessions / Hours ago": {
-    "defaultMessage": "Il y a {hours} heures"
-  },
   "Sessions / Last active": {
     "defaultMessage": "Actif {time}"
   },
-  "Sessions / Minutes ago": {
-    "defaultMessage": "Il y a {minutes} minutes"
+  "Sessions / Last active relative": {
+    "defaultMessage": "Dernière activité {time}"
   },
   "Sessions / No Other Sessions": {
     "defaultMessage": "Aucune autre session active. Vous êtes connecté uniquement sur cet appareil."
@@ -3776,11 +3809,17 @@
   "Sessions / Sign out all": {
     "defaultMessage": "Se déconnecter de tous les appareils"
   },
+  "Sessions / Signed in date": {
+    "defaultMessage": "Connecté le {date}"
+  },
   "Sessions / This Device Badge": {
     "defaultMessage": "Cet appareil"
   },
   "Sessions / Title": {
     "defaultMessage": "Sessions actives"
+  },
+  "Sessions / Unknown device": {
+    "defaultMessage": "Appareil inconnu"
   },
   "Sidebar / Administration section": {
     "defaultMessage": "Administration"
@@ -3950,6 +3989,9 @@
   "Tenant Danger Settings / Danger Zone / Confirm Dialog / Tenant Delete Description": {
     "defaultMessage": "Cette action est irréversible. Cela supprimera définitivement votre organisation de nos serveurs."
   },
+  "Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword": {
+    "defaultMessage": "SUPPRIMER"
+  },
   "Tenant General Settings / Danger Zone / Confirm Dialog / Tenant Delete Button": {
     "defaultMessage": "Êtes-vous absolument sûr ?"
   },
@@ -3988,6 +4030,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Refuser"
+  },
+  "Tenant Invitation / Error message": {
+    "defaultMessage": "Cette invitation n'est plus valide."
   },
   "Tenant Invitation / Organization label": {
     "defaultMessage": "Organisation"

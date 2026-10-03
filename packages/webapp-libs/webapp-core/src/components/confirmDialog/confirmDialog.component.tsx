@@ -1,5 +1,5 @@
 import { VariantProps } from 'class-variance-authority';
-import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useState } from 'react';
+import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -15,6 +15,8 @@ import {
   AlertDialogTrigger,
 } from '../ui/alert-dialog';
 import { buttonVariants } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 export interface ConfirmDialogProps extends PropsWithChildren {
   onContinue: (e: MouseEvent<HTMLButtonElement>) => void;
@@ -28,6 +30,13 @@ export interface ConfirmDialogProps extends PropsWithChildren {
   open?: boolean;
   /** Controlled open change handler */
   onOpenChange?: (open: boolean) => void;
+  /**
+   * When provided, the user must type this exact text before Continue becomes enabled.
+   * Intended for highly destructive actions (e.g. "DELETE my-org-name").
+   */
+  confirmationText?: string;
+  /** Overrides the default "Type {confirmationText} to confirm" label. */
+  confirmationLabel?: ReactNode;
 }
 
 export const ConfirmDialog = ({
@@ -41,13 +50,26 @@ export const ConfirmDialog = ({
   variant = 'default',
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
+  confirmationText,
+  confirmationLabel,
 }: ConfirmDialogProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
-  
+  const [confirmationInput, setConfirmationInput] = useState('');
+
   // Support both controlled and uncontrolled modes
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
   const setOpen = isControlled ? (controlledOnOpenChange || (() => {})) : setInternalOpen;
+
+  // Reset the typed confirmation whenever the dialog closes, so reopening starts fresh.
+  useEffect(() => {
+    if (!open) {
+      setConfirmationInput('');
+    }
+  }, [open]);
+
+  const isConfirmationRequired = confirmationText !== undefined;
+  const isConfirmed = !isConfirmationRequired || confirmationInput === confirmationText;
 
   const onClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -82,11 +104,35 @@ export const ConfirmDialog = ({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
         </AlertDialogHeader>
+        {isConfirmationRequired && (
+          <div className="space-y-2">
+            <Label htmlFor="confirm-dialog-confirmation-input">
+              {confirmationLabel ?? (
+                <FormattedMessage
+                  id="Confirm Dialog / Confirmation input label"
+                  defaultMessage="Type {confirmationText} to confirm"
+                  values={{ confirmationText: <strong>{confirmationText}</strong> }}
+                />
+              )}
+            </Label>
+            <Input
+              id="confirm-dialog-confirmation-input"
+              value={confirmationInput}
+              onChange={(e) => setConfirmationInput(e.target.value)}
+              autoComplete="off"
+              autoFocus
+            />
+          </div>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>
             {cancelLabel ?? <FormattedMessage id="Confirm Dialog / Cancel label" defaultMessage="Cancel" />}
           </AlertDialogCancel>
-          <AlertDialogAction className={buttonVariants({ variant })} onClick={handleContinue}>
+          <AlertDialogAction
+            className={buttonVariants({ variant })}
+            onClick={handleContinue}
+            disabled={!isConfirmed}
+          >
             {continueLabel ?? <FormattedMessage id="Confirm Dialog / Continue label" defaultMessage="Continue" />}
           </AlertDialogAction>
         </AlertDialogFooter>

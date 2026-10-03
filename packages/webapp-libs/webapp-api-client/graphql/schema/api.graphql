@@ -1366,17 +1366,18 @@ type ApiMutation {
   "Create or update backup configuration for a tenant."
   updateBackupConfig(input: BackupConfigInput!): UpdateBackupConfigMutation
   "Delete a backup record and its file."
-  deleteBackup(backupId: ID!): DeleteBackupMutation
+  deleteBackup(backupId: ID!, tenantId: ID!): DeleteBackupMutation
   "Manually trigger a backup for a tenant."
   triggerBackup(tenantId: ID!): TriggerBackupMutation
   "Download a backup file with decryption applied in-memory."
-  downloadBackupDecrypted(backupId: ID!): DownloadBackupDecryptedMutation
+  downloadBackupDecrypted(backupId: ID!, tenantId: ID!): DownloadBackupDecryptedMutation
   "Trigger a backup restoration for a tenant."
   restoreBackup(
     "ID of the backup record to restore from"
     backupId: ID!,
     "Strategy for handling conflicting records: SKIP, UPDATE, or FAIL"
-    conflictStrategy: ConflictStrategyEnum!
+    conflictStrategy: ConflictStrategyEnum!,
+    tenantId: ID!
   ): RestoreBackupMutation
   "Publish translations for a locale to S3/CDN."
   publishTranslations(input: PublishTranslationsMutationInput!): PublishTranslationsMutationPayload
@@ -3009,6 +3010,7 @@ input UpdateTenantMutationInput {
 }
 input DeleteTenantMutationInput {
   id: String
+  tenantId: String!
   clientMutationId: String
 }
 input CreateTenantInvitationMutationInput {

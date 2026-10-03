@@ -448,6 +448,18 @@ class SSOSession(TimestampedMixin, models.Model):
         self.save(update_fields=["is_active", "revoked_at", "revoked_reason"])
         self.blacklist_refresh_token()
 
+    def extend(self, refresh_token_jti: str):
+        """
+        Keep this session in step with its refresh token, called on every token refresh.
+
+        Rotation mints a brand new refresh token (new jti, fresh lifetime), so re-point the link to keep the session
+        revocable, move its expiry to the new token's - the session then lives exactly as long as the device can stay
+        logged in - and record the activity (last_activity_at is auto_now, but only saved when listed).
+        """
+        self.refresh_token_jti = refresh_token_jti
+        self.expires_at = timezone.now() + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
+        self.save(update_fields=["refresh_token_jti", "expires_at", "last_activity_at"])
+
     def blacklist_refresh_token(self):
         """Blacklist the outstanding refresh token linked to this session, if any."""
         if not self.refresh_token_jti:

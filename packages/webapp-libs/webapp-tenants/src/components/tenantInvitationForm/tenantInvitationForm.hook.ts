@@ -5,19 +5,19 @@ import { TenantInvitationFormFields } from './tenantInvitationForm.component';
 
 export type UseTenantInvitationFormHookProps = {
   initialData?: TenantInvitationFormFields | null;
-  onSubmit: (formData: TenantInvitationFormFields) => void;
+  onSubmit: (formData: TenantInvitationFormFields) => boolean | void | Promise<boolean | void>;
   error?: Error;
 };
 
 export const useTenantInvitationForm = ({ error, onSubmit, initialData }: UseTenantInvitationFormHookProps) => {
-  const form = useApiForm<TenantInvitationFormFields>({
+  const apiForm = useApiForm<TenantInvitationFormFields>({
     defaultValues: {
       email: initialData?.email ?? '',
       organizationRoleIds: initialData?.organizationRoleIds ?? [],
     },
   });
 
-  const { handleSubmit, setApolloGraphQLResponseErrors } = form;
+  const { handleSubmit, setApolloGraphQLResponseErrors, form: rhfForm } = apiForm;
 
   useEffect(() => {
     if (error && 'graphQLErrors' in error) {
@@ -25,7 +25,12 @@ export const useTenantInvitationForm = ({ error, onSubmit, initialData }: UseTen
     }
   }, [error, setApolloGraphQLResponseErrors]);
 
-  const handleFormSubmit = handleSubmit((formData: TenantInvitationFormFields) => onSubmit(formData));
+  const handleFormSubmit = handleSubmit(async (formData: TenantInvitationFormFields) => {
+    const succeeded = await onSubmit(formData);
+    if (succeeded !== false) {
+      rhfForm.reset();
+    }
+  });
 
-  return { ...form, handleFormSubmit };
+  return { ...apiForm, handleFormSubmit };
 };

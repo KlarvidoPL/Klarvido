@@ -1,5 +1,6 @@
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Paragraph } from '@sb/webapp-core/components/typography';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sb/webapp-core/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@sb/webapp-core/components/ui/tabs';
 import { RoutesConfig as FinancesRoutesConfig } from '@sb/webapp-finances/config/routes';
 import { Building2 } from 'lucide-react';
@@ -77,7 +78,7 @@ export const TenantSettings = () => {
         </div>
 
         <Tabs value={location.pathname} className="space-y-6">
-          <TabsList className="flex flex-col gap-2 sm:flex-row sm:gap-2 h-full sm:h-10 sm:w-fit w-full">
+          <TabsList className="hidden gap-2 lg:flex lg:h-10 lg:w-fit">
             {canViewMembers && (
               <Link to={generateTenantPath(RoutesConfig.tenant.settings.members)} replace>
                 <TabsTrigger value={generateTenantPath(RoutesConfig.tenant.settings.members)}>
@@ -128,6 +129,51 @@ export const TenantSettings = () => {
               </Link>
             )}
           </TabsList>
+
+          <div className="lg:hidden">
+            <Select value={location.pathname} onValueChange={(value) => navigate(value, { replace: true })}>
+              <SelectTrigger className="border-transparent bg-muted">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {canViewMembers && (
+                  <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.members)}>
+                    <FormattedMessage defaultMessage="Members" id="Tenant settings / Members" />
+                  </SelectItem>
+                )}
+                {canViewRoles && (
+                  <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.roles)}>
+                    <FormattedMessage defaultMessage="Roles" id="Tenant settings / Roles" />
+                  </SelectItem>
+                )}
+                {canViewSettings && (
+                  <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.general)}>
+                    <FormattedMessage defaultMessage="General" id="Tenant settings / General" />
+                  </SelectItem>
+                )}
+                {canViewBilling && (
+                  <SelectItem value={generateTenantPath(FinancesRoutesConfig.subscriptions.index)}>
+                    <FormattedMessage defaultMessage="Subscription" id="Tenant settings / Subscription" />
+                  </SelectItem>
+                )}
+                {canViewSecurity && (
+                  <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.security)}>
+                    <FormattedMessage defaultMessage="Security" id="Tenant settings / Security" />
+                  </SelectItem>
+                )}
+                {canViewActivityLogs && (
+                  <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.activityLogs)}>
+                    <FormattedMessage defaultMessage="Activity Logs" id="Tenant settings / Activity Logs" />
+                  </SelectItem>
+                )}
+                {canViewBackup && (
+                  <SelectItem value={generateTenantPath(RoutesConfig.tenant.settings.backup)}>
+                    <FormattedMessage defaultMessage="Backups" id="Tenant settings / Backups" />
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="mt-6">
             <Outlet />

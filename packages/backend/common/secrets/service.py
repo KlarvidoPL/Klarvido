@@ -62,6 +62,10 @@ class SecretsService:
         """Generate a standardized secret name."""
         return f"{self.prefix}/{tenant_id}/{secret_type}"
 
+    def delete_secret_by_name(self, tenant_id: str, secret_type: str, force: bool = False) -> bool:
+        """Delete a secret by tenant ID and secret type (convenience method, see delete_secret)."""
+        return self.delete_secret(self._get_secret_name(tenant_id, secret_type), force=force)
+
     def store_secret(
         self,
         tenant_id: str,

@@ -54,7 +54,7 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
 
         {isEnabled ? (
           <div className="rounded-lg border bg-card p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
                   <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -100,7 +100,7 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="shrink-0 self-end text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400 sm:self-auto"
+                  className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
                 >
                   <ShieldOff className="mr-2 h-4 w-4" />
                   <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Disable button" />
