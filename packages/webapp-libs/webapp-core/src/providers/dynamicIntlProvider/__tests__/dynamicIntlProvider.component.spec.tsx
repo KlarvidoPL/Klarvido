@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, screen } from '@testing-library/react';
-import { ReactNode } from 'react';
+import { fireEvent, renderHook, screen } from '@testing-library/react';
+import { ReactNode, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Locale } from '../../../config/i18n';
@@ -111,6 +111,31 @@ describe('DynamicIntlProvider: localized validation fallback', () => {
   beforeEach(() => {
     mockFetch.mockReset();
     mockFetch.mockResolvedValue({ ok: false, status: 503 });
+  });
+
+  it('preserves unsaved form answers when changing language', async () => {
+    const Form = () => {
+      const [answer, setAnswer] = useState('');
+      return (
+        <>
+          <input aria-label="answer" value={answer} onChange={(event) => setAnswer(event.target.value)} />
+          <FormattedMessage id="Onboarding / Duplicate NIP" />
+        </>
+      );
+    };
+    const { rerender } = render(
+      <DynamicIntlProvider locale={Locale.ENGLISH}>
+        <Form />
+      </DynamicIntlProvider>
+    );
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Unsaved company details' } });
+    rerender(
+      <DynamicIntlProvider locale={Locale.POLISH}>
+        <Form />
+      </DynamicIntlProvider>
+    );
+    expect(await screen.findByText('Organizacja z tym NIP-em już istnieje na Twoim koncie.')).toBeInTheDocument();
+    expect(screen.getByLabelText('answer')).toHaveValue('Unsaved company details');
   });
 
   it.each([

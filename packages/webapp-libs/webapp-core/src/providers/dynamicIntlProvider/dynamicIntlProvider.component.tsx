@@ -86,11 +86,11 @@ export const DynamicIntlProvider = ({ locale, children, onError, translationsBas
   const messages = useMemo((): TranslationMessages => {
     // Start with bundled translations as base
     const mergedMessages: TranslationMessages = {
-      ...(bundled?.locale === locale ? bundled.messages : translationMessages[DEFAULT_LOCALE]),
+      ...(bundled?.messages ?? translationMessages[DEFAULT_LOCALE]),
     };
 
     // Apply remote translations if available and no error
-    if (translationsConfig.useRemoteTranslations && remoteMessages && !isError) {
+    if (bundled?.locale === locale && translationsConfig.useRemoteTranslations && remoteMessages && !isError) {
       Object.entries(remoteMessages).forEach(([key, value]) => {
         // The API returns the English default for untranslated keys. Keep the local translation instead.
         if (
@@ -103,7 +103,7 @@ export const DynamicIntlProvider = ({ locale, children, onError, translationsBas
     }
 
     // Apply development overrides (highest priority)
-    if (isDevMode && Object.keys(overrides).length > 0) {
+    if (bundled?.locale === locale && isDevMode && Object.keys(overrides).length > 0) {
       Object.entries(overrides).forEach(([key, value]) => {
         if (value !== undefined) {
           mergedMessages[key] = value;
@@ -131,10 +131,11 @@ export const DynamicIntlProvider = ({ locale, children, onError, translationsBas
     };
   }, [onError, isDevMode]);
 
-  if (bundled?.locale !== locale) return null;
+  // Keep mounted forms and their state while loading the next language.
+  if (!bundled) return null;
 
   return (
-    <IntlProvider locale={locale} messages={messages} defaultLocale={DEFAULT_LOCALE} onError={handleError}>
+    <IntlProvider locale={bundled.locale} messages={messages} defaultLocale={DEFAULT_LOCALE} onError={handleError}>
       {children}
     </IntlProvider>
   );
