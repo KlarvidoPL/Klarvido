@@ -23,16 +23,22 @@ import {
   fillUpdateBackupConfigMutation,
 } from '../../tests/factories';
 import { BackupSettings } from '../backupSettings.component';
+import { triggerBackupMutation } from '../backupSettings.graphql';
 
 const MOCKED_TENANT_ID = 'tenant-backup-test-1';
 const BACKUP_TAB_VALUE = 'en/tenant-backup-test-1/tenant/settings/backup';
+
+let mockCanManage = true;
 
 jest.mock('@sb/webapp-tenants/hooks', () => {
   const actual = jest.requireActual('@sb/webapp-tenants/hooks');
   return {
     ...actual,
     PermissionGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    usePermissionCheck: () => ({ hasPermission: true, loading: false }),
+    usePermissionCheck: (code: string) => ({
+      hasPermission: code === 'backup.manage' ? mockCanManage : true,
+      loading: false,
+    }),
     useGenerateTenantPath: () => () => BACKUP_TAB_VALUE,
   };
 });
@@ -46,6 +52,10 @@ const BackupSettingsWithTabs = () => (
 
 describe('BackupSettings: Component', () => {
   const Component = () => <BackupSettingsWithTabs />;
+
+  beforeEach(() => {
+    mockCanManage = true;
+  });
 
   const defaultMocks = (overrides: {
     config?: ReturnType<typeof backupConfigFactory> | null;
@@ -135,4 +145,54 @@ describe('BackupSettings: Component', () => {
     });
   });
 
+  it('shows a translated message (not the raw "GraphQlValidationError" placeholder) when triggering a backup fails', async () => {
+    // Regression coverage for the same class of bug fixed for the role-delete flow: a GraphQL
+    // error whose real detail lives in `extensions` as a list, not in the top-level `message`
+    // (which this backend hardcodes to the exception class name for GraphQlValidationError).
+    const triggerErrorMock = {
+      request: {
+        query: triggerBackupMutation,
+        variables: { tenantId: MOCKED_TENANT_ID },
+      },
+      result: {
+        errors: [
+          {
+            message: 'GraphQlValidationError',
+            extensions: [{ message: 'Backup is already in progress.', code: 'invalid' }],
+          } as any,
+        ],
+      },
+    };
+
+    render(<Component />, {
+      apolloMocks: (mocks: readonly MockedResponse[]) => [
+        ...defaultMocks({ config: backupConfigFactory({ enabled: true }) }),
+        ...mocks,
+        triggerErrorMock,
+      ],
+      routerProps: createMockRouterProps(RoutesConfig.tenant.settings.backup, { tenantId: MOCKED_TENANT_ID }),
+    });
+
+    const triggerButton = await screen.findByRole('button', { name: /Trigger Backup/i });
+    await waitFor(() => expect(triggerButton).not.toBeDisabled(), { timeout: 3000 });
+    await userEvent.click(triggerButton);
+
+    expect(await screen.findByText('Backup is already in progress.')).toBeInTheDocument();
+    expect(screen.queryByText(/^GraphQlValidationError$/)).not.toBeInTheDocument();
+  });
+
+  it('renders backup history for a view-only user instead of an empty/no-permission page', async () => {
+    mockCanManage = false;
+    const records = [backupRecordFactory()];
+    render(<Component />, {
+      apolloMocks: (mocks: readonly MockedResponse[]) => [...defaultMocks({ records }), ...mocks],
+      routerProps: createMockRouterProps(RoutesConfig.tenant.settings.backup, { tenantId: MOCKED_TENANT_ID }),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Backup History/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/No backups yet/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Trigger Backup/i })).not.toBeInTheDocument();
+  });
 });

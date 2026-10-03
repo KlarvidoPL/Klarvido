@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "No hay módulos disponibles"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "No tienes permiso para administrar la configuración de copias de seguridad"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "Aún no hay restauraciones"
   },
@@ -1516,6 +1513,9 @@
   },
   "Common / Cancel": {
     "defaultMessage": "Cancelar"
+  },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Algo salió mal. Por favor, inténtalo de nuevo."
   },
   "Common / Never": {
     "defaultMessage": "Nunca"
@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "No se pudo eliminar la organización."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "Debe asignarse al menos un rol."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "No puedes asignar un rol que incluya el/los permiso(s) \"{permissions}\" porque tú mismo no lo(s) tienes. Pide a un propietario o administrador de la organización que te lo(s) conceda primero."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "El rol de Propietario no se puede quitar: debe haber al menos un propietario en la organización."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "No tienes permiso para editar los roles de los miembros."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "Solo los propietarios de la organización pueden asignar el rol de Propietario."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "Solo los propietarios pueden modificar los roles de otros propietarios."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Selecciona qué roles asignar a {name}"
   },
@@ -2660,6 +2678,9 @@
   "Membership Entry / ResendInvitation / Success message": {
     "defaultMessage": "La invitación se reenvió correctamente."
   },
+  "Membership Entry / Roles load error": {
+    "defaultMessage": "No se pudieron cargar los roles. Inténtalo de nuevo."
+  },
   "Membership Entry / Save Roles": {
     "defaultMessage": "Guardar roles"
   },
@@ -2668,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "Sistema"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "No se pudo cambiar el rol del usuario."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "El rol del usuario se actualizó correctamente."
@@ -2993,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Las passkeys te permiten iniciar sesión de forma segura usando tu huella digital, rostro o PIN del dispositivo, sin necesidad de contraseña."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Dispositivo"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "Aún no has registrado ninguna passkey. Agrega una para un inicio de sesión más rápido y seguro."
   },
@@ -3071,17 +3086,14 @@
   "Passkeys Card / Add Another Button": {
     "defaultMessage": "Agregar otra passkey"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Agregada el {date}"
+  "Passkeys Card / Add My Passkey Button": {
+    "defaultMessage": "Añadir mi passkey"
   },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "No se pudo eliminar la passkey. Inténtalo de nuevo."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey eliminada correctamente."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Último uso: {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Buscar por nombre de usuario o correo..."
@@ -3167,6 +3179,69 @@
   "Roles / Cancel Button": {
     "defaultMessage": "Cancelar"
   },
+  "Roles / Category / Backup / Description": {
+    "defaultMessage": "Copia de seguridad y restauración de la organización"
+  },
+  "Roles / Category / Backup / Label": {
+    "defaultMessage": "Copia de seguridad"
+  },
+  "Roles / Category / Billing / Description": {
+    "defaultMessage": "Gestión de suscripciones y pagos"
+  },
+  "Roles / Category / Billing / Label": {
+    "defaultMessage": "Facturación"
+  },
+  "Roles / Category / Features / Description": {
+    "defaultMessage": "IA, documentos y otras funciones"
+  },
+  "Roles / Category / Features / Label": {
+    "defaultMessage": "Funciones"
+  },
+  "Roles / Category / Members / Description": {
+    "defaultMessage": "Gestión de miembros del equipo"
+  },
+  "Roles / Category / Members / Label": {
+    "defaultMessage": "Miembros"
+  },
+  "Roles / Category / Organization / Description": {
+    "defaultMessage": "Configuración y ajustes de la organización"
+  },
+  "Roles / Category / Organization / Label": {
+    "defaultMessage": "Organización"
+  },
+  "Roles / Category / Security / Description": {
+    "defaultMessage": "Configuración de seguridad y autenticación"
+  },
+  "Roles / Category / Security / Label": {
+    "defaultMessage": "Seguridad"
+  },
+  "Roles / Color / Blue": {
+    "defaultMessage": "Azul"
+  },
+  "Roles / Color / Gray": {
+    "defaultMessage": "Gris"
+  },
+  "Roles / Color / Green": {
+    "defaultMessage": "Verde"
+  },
+  "Roles / Color / Orange": {
+    "defaultMessage": "Naranja"
+  },
+  "Roles / Color / Pink": {
+    "defaultMessage": "Rosa"
+  },
+  "Roles / Color / Purple": {
+    "defaultMessage": "Morado"
+  },
+  "Roles / Color / Red": {
+    "defaultMessage": "Rojo"
+  },
+  "Roles / Color / Teal": {
+    "defaultMessage": "Turquesa"
+  },
+  "Roles / Color / Yellow": {
+    "defaultMessage": "Amarillo"
+  },
   "Roles / Color Label": {
     "defaultMessage": "Color"
   },
@@ -3194,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "¿Seguro que quieres eliminar el rol \"{name}\"? Esta acción no se puede deshacer."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Eliminar el rol {name}"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Rol eliminado correctamente"
   },
@@ -3212,6 +3290,9 @@
   "Roles / Description Label": {
     "defaultMessage": "Descripción"
   },
+  "Roles / Description Optional Suffix": {
+    "defaultMessage": "(opcional)"
+  },
   "Roles / Description Placeholder": {
     "defaultMessage": "Describe para qué es este rol..."
   },
@@ -3221,8 +3302,47 @@
   "Roles / Edit Description": {
     "defaultMessage": "Modifica los permisos y la configuración del rol"
   },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Editar el rol {name}"
+  },
   "Roles / Edit Title": {
     "defaultMessage": "Editar rol"
+  },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "No puedes conceder el permiso \"{permission}\" porque tú mismo no lo tienes. Pide a un propietario o administrador de la organización que te lo conceda primero."
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "No puedes crear un rol con el permiso \"{permission}\" porque tú mismo no lo tienes. Pide a un propietario o administrador de la organización que te lo conceda primero."
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "Los roles del sistema no se pueden eliminar."
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "El rol de Propietario no se puede modificar."
+  },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "No puedes reasignar miembros a un rol de reemplazo que incluya el/los permiso(s) \"{permissions}\" porque tú mismo no los tienes. Pide a un propietario o administrador de la organización que te los conceda primero."
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "No tienes permiso para gestionar los roles de la organización."
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "Solo los propietarios de la organización pueden reasignar miembros al rol de Propietario."
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "El rol de reemplazo no puede ser el mismo que el rol que se está eliminando."
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "Este rol está asignado a {count, plural, one {# miembro} other {# miembros}}. Elige un rol de reemplazo."
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "Ya existe un rol llamado \"{name}\". Elige un nombre diferente."
+  },
+  "Roles / Load Error": {
+    "defaultMessage": "No se pudieron cargar los roles. Inténtalo de nuevo."
+  },
+  "Roles / Load Error Retry": {
+    "defaultMessage": "Reintentar"
   },
   "Roles / Member singular": {
     "defaultMessage": "miembro"
@@ -3244,6 +3364,150 @@
   },
   "Roles / No Custom Roles Description": {
     "defaultMessage": "Crea roles personalizados para afinar el acceso y los permisos de los miembros"
+  },
+  "Roles / Permission / backup.manage / Description": {
+    "defaultMessage": "Configura copias de seguridad, inícialas manualmente y gestiona sus ajustes"
+  },
+  "Roles / Permission / backup.manage / Name": {
+    "defaultMessage": "Gestionar copias de seguridad"
+  },
+  "Roles / Permission / backup.view / Description": {
+    "defaultMessage": "Ver la configuración y el historial de copias de seguridad"
+  },
+  "Roles / Permission / backup.view / Name": {
+    "defaultMessage": "Ver configuración de copias de seguridad"
+  },
+  "Roles / Permission / billing.manage / Description": {
+    "defaultMessage": "Cambia el plan de suscripción, actualiza los métodos de pago y gestiona la facturación"
+  },
+  "Roles / Permission / billing.manage / Name": {
+    "defaultMessage": "Gestionar facturación"
+  },
+  "Roles / Permission / billing.view / Description": {
+    "defaultMessage": "Ver el estado de la suscripción, facturas y métodos de pago"
+  },
+  "Roles / Permission / billing.view / Name": {
+    "defaultMessage": "Ver facturación"
+  },
+  "Roles / Permission / features.ai.use / Description": {
+    "defaultMessage": "Acceder y usar la integración con OpenAI y funciones basadas en IA"
+  },
+  "Roles / Permission / features.ai.use / Name": {
+    "defaultMessage": "Usar funciones de IA"
+  },
+  "Roles / Permission / features.content.view / Description": {
+    "defaultMessage": "Ver elementos de contenido del CMS"
+  },
+  "Roles / Permission / features.content.view / Name": {
+    "defaultMessage": "Ver elementos de contenido"
+  },
+  "Roles / Permission / features.crud.manage / Description": {
+    "defaultMessage": "Crear, editar y eliminar elementos de demostración CRUD"
+  },
+  "Roles / Permission / features.crud.manage / Name": {
+    "defaultMessage": "Gestionar elementos de demostración CRUD"
+  },
+  "Roles / Permission / features.crud.view / Description": {
+    "defaultMessage": "Ver elementos de demostración CRUD"
+  },
+  "Roles / Permission / features.crud.view / Name": {
+    "defaultMessage": "Ver elementos de demostración CRUD"
+  },
+  "Roles / Permission / features.documents.manage / Description": {
+    "defaultMessage": "Subir, editar y eliminar documentos"
+  },
+  "Roles / Permission / features.documents.manage / Name": {
+    "defaultMessage": "Gestionar documentos"
+  },
+  "Roles / Permission / features.documents.view / Description": {
+    "defaultMessage": "Ver documentos subidos"
+  },
+  "Roles / Permission / features.documents.view / Name": {
+    "defaultMessage": "Ver documentos"
+  },
+  "Roles / Permission / members.invite / Description": {
+    "defaultMessage": "Enviar invitaciones a nuevos miembros"
+  },
+  "Roles / Permission / members.invite / Name": {
+    "defaultMessage": "Invitar miembros"
+  },
+  "Roles / Permission / members.remove / Description": {
+    "defaultMessage": "Eliminar miembros de la organización"
+  },
+  "Roles / Permission / members.remove / Name": {
+    "defaultMessage": "Eliminar miembros"
+  },
+  "Roles / Permission / members.roles.edit / Description": {
+    "defaultMessage": "Cambiar los roles asignados a los miembros existentes"
+  },
+  "Roles / Permission / members.roles.edit / Name": {
+    "defaultMessage": "Editar roles de miembros"
+  },
+  "Roles / Permission / members.view / Description": {
+    "defaultMessage": "Ver la lista de miembros de la organización y sus roles"
+  },
+  "Roles / Permission / members.view / Name": {
+    "defaultMessage": "Ver miembros"
+  },
+  "Roles / Permission / org.delete / Description": {
+    "defaultMessage": "Eliminar permanentemente la organización y todos sus datos"
+  },
+  "Roles / Permission / org.delete / Name": {
+    "defaultMessage": "Eliminar organización"
+  },
+  "Roles / Permission / org.roles.manage / Description": {
+    "defaultMessage": "Crear, editar y eliminar roles personalizados"
+  },
+  "Roles / Permission / org.roles.manage / Name": {
+    "defaultMessage": "Gestionar roles de la organización"
+  },
+  "Roles / Permission / org.roles.view / Description": {
+    "defaultMessage": "Ver los roles definidos y sus permisos"
+  },
+  "Roles / Permission / org.roles.view / Name": {
+    "defaultMessage": "Ver roles de la organización"
+  },
+  "Roles / Permission / org.settings.edit / Description": {
+    "defaultMessage": "Modificar el nombre de la organización, el correo de facturación y la configuración general"
+  },
+  "Roles / Permission / org.settings.edit / Name": {
+    "defaultMessage": "Editar configuración de la organización"
+  },
+  "Roles / Permission / org.settings.view / Description": {
+    "defaultMessage": "Ver el nombre de la organización, el correo de facturación y la configuración general"
+  },
+  "Roles / Permission / org.settings.view / Name": {
+    "defaultMessage": "Ver configuración de la organización"
+  },
+  "Roles / Permission / security.logs.export / Description": {
+    "defaultMessage": "Exportar registros de actividad a CSV u otros formatos"
+  },
+  "Roles / Permission / security.logs.export / Name": {
+    "defaultMessage": "Exportar registros de actividad"
+  },
+  "Roles / Permission / security.logs.view / Description": {
+    "defaultMessage": "Ver los registros de auditoría de las acciones realizadas en la organización"
+  },
+  "Roles / Permission / security.logs.view / Name": {
+    "defaultMessage": "Ver registros de actividad"
+  },
+  "Roles / Permission / security.passkeys.manage / Description": {
+    "defaultMessage": "Ver y gestionar las políticas de claves de acceso (passkeys) de la organización"
+  },
+  "Roles / Permission / security.passkeys.manage / Name": {
+    "defaultMessage": "Gestionar claves de acceso"
+  },
+  "Roles / Permission / security.sso.manage / Description": {
+    "defaultMessage": "Configurar conexiones de inicio de sesión único (SSO) y aprovisionamiento SCIM"
+  },
+  "Roles / Permission / security.sso.manage / Name": {
+    "defaultMessage": "Gestionar SSO"
+  },
+  "Roles / Permission / security.view / Description": {
+    "defaultMessage": "Ver conexiones SSO, claves de acceso y configuraciones de seguridad"
+  },
+  "Roles / Permission / security.view / Name": {
+    "defaultMessage": "Ver configuración de seguridad"
   },
   "Roles / Permission Required": {
     "defaultMessage": "Se requiere al menos un permiso"
@@ -3277,6 +3541,24 @@
   },
   "Roles / System Badge": {
     "defaultMessage": "Sistema"
+  },
+  "Roles / System Role / Administrator / Description": {
+    "defaultMessage": "Gestionar la configuración de la organización y los miembros"
+  },
+  "Roles / System Role / Administrator / Name": {
+    "defaultMessage": "Administrador"
+  },
+  "Roles / System Role / Member / Description": {
+    "defaultMessage": "Acceso de solo lectura a los datos de la organización"
+  },
+  "Roles / System Role / Member / Name": {
+    "defaultMessage": "Miembro"
+  },
+  "Roles / System Role / Owner / Description": {
+    "defaultMessage": "Acceso completo a todas las funciones de la organización"
+  },
+  "Roles / System Role / Owner / Name": {
+    "defaultMessage": "Propietario"
   },
   "Roles / System Roles Header": {
     "defaultMessage": "Roles del sistema"
@@ -4043,8 +4325,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Miembros"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "No puedes invitar a un miembro con un rol que incluya el/los permiso(s) \"{permissions}\" porque tú mismo no lo(s) tienes. Pide a un propietario o administrador de la organización que te lo(s) conceda primero."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "No se pudo invitar al usuario. Inténtalo de nuevo."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "Solo los propietarios de la organización pueden invitar a nuevos miembros con el rol de Propietario."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "¡Usuario invitado correctamente!"
@@ -4379,11 +4667,20 @@
   "Tenant invitation form / Roles label": {
     "defaultMessage": "Roles:"
   },
+  "Tenant invitation form / Roles load error": {
+    "defaultMessage": "No se pudieron cargar los roles. Inténtalo de nuevo."
+  },
+  "Tenant invitation form / Roles loading": {
+    "defaultMessage": "Cargando..."
+  },
   "Tenant invitation form / Roles placeholder": {
     "defaultMessage": "Seleccionar roles"
   },
   "Tenant invitation form / Submit button": {
     "defaultMessage": "Invitar"
+  },
+  "Tenant invitation form / System role suffix": {
+    "defaultMessage": "(Sistema)"
   },
   "Tenant members list / Actions": {
     "defaultMessage": "Acciones"

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import { TenantMembershipType, TenantUserRole, getFragmentData } from '@sb/webapp-api-client';
+import { ApolloErrorLike, getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import { commonQueryMembershipFragment } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
@@ -24,10 +25,11 @@ import { Skeleton as SkeletonComponent } from '@sb/webapp-core/components/ui/ske
 import { TableCell, TableRow } from '@sb/webapp-core/components/ui/table';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useToast } from '@sb/webapp-core/toast';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import { Check, Crown, GripHorizontal, Hourglass, RefreshCw, Settings2, Trash2, UserCheck } from 'lucide-react';
 import { trim } from 'ramda';
 import { useCallback, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { usePermissionCheck } from '../../../hooks';
 import { useCurrentTenant } from '../../../providers';
@@ -35,10 +37,69 @@ import {
   allOrganizationRolesQuery,
   assignRolesToMemberMutation,
 } from '../../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
+import { getSystemRoleDisplay } from '../../../utils/organizationRoleDisplay';
+import { getPermissionDisplay } from '../../../utils/permissionDisplay';
 import {
   deleteTenantMembershipMutation,
   resendTenantInvitationMutation,
 } from './membershipEntry.graphql';
+
+// Translates the known raw-English error strings raised by AssignRolesToMemberMutation
+// (apps/multitenancy/schema.py) - same pattern as getRoleMutationErrorMessage in
+// tenantRoles.component.tsx; see getGraphQLErrorDetail for why this mutation's errors can't
+// be read off error.message directly. Unrecognized messages fall back to a translated
+// generic message, never raw backend text.
+const getAssignRolesErrorMessage = (intl: IntlShape, error: ApolloErrorLike): string => {
+  const message = getGraphQLErrorDetail(error) ?? '';
+
+  const missingPermissionsMatch = message.match(
+    /^You cannot assign roles with permissions you don't have: (.+)$/
+  );
+  if (missingPermissionsMatch) {
+    const permissions = missingPermissionsMatch[1]
+      .split(', ')
+      .map((code) => getPermissionDisplay(intl, code, code).name)
+      .join(', ');
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t assign a role that includes the "{permissions}" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first.',
+        id: 'Membership Entry / Error / Cannot assign permissions not owned',
+      },
+      { permissions }
+    );
+  }
+
+  switch (message) {
+    case "You don't have permission to edit member roles.":
+      return intl.formatMessage({
+        defaultMessage: "You don't have permission to edit member roles.",
+        id: 'Membership Entry / Error / No edit member roles permission',
+      });
+    case 'At least one role must be assigned.':
+      return intl.formatMessage({
+        defaultMessage: 'At least one role must be assigned.',
+        id: 'Membership Entry / Error / At least one role required',
+      });
+    case 'Only organization owners can assign the Owner role.':
+      return intl.formatMessage({
+        defaultMessage: 'Only organization owners can assign the Owner role.',
+        id: 'Membership Entry / Error / Only owner can assign owner role',
+      });
+    case 'Cannot remove the Owner role: there must be at least one owner in the organization.':
+      return intl.formatMessage({
+        defaultMessage: "The Owner role can’t be removed: there must be at least one owner in the organization.",
+        id: 'Membership Entry / Error / Cannot remove last owner',
+      });
+    case 'Only owners can modify the roles of other owners.':
+      return intl.formatMessage({
+        defaultMessage: 'Only owners can modify the roles of other owners.',
+        id: 'Membership Entry / Error / Only owner can modify owner roles',
+      });
+    default:
+      return getGenericErrorMessage(intl);
+  }
+};
 
 // Role color mapping
 const ROLE_COLOR_CLASSES: Record<string, string> = {
@@ -60,6 +121,7 @@ interface OrganizationRoleInfo {
   color?: string | null;
   isSystemRole?: boolean | null;
   isOwnerRole?: boolean | null;
+  systemRoleType?: string | null;
 }
 
 export type MembershipEntryProps = {
@@ -102,7 +164,7 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
   const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(new Set());
 
   // Fetch all organization roles for role assignment
-  const { data: rolesData } = useQuery(allOrganizationRolesQuery, {
+  const { data: rolesData, error: rolesError } = useQuery(allOrganizationRolesQuery, {
     variables: { tenantId },
     skip: !tenantId,
   });
@@ -118,17 +180,19 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
         color: role.color ?? undefined,
         isSystemRole: role.isSystemRole ?? undefined,
         isOwnerRole: role.isOwnerRole ?? undefined,
+        systemRoleType: role.systemRoleType ?? undefined,
       }));
   }, [rolesData]);
+
+  const getRoleDisplayName = useCallback(
+    (role: OrganizationRoleInfo) =>
+      role.isSystemRole ? getSystemRoleDisplay(intl, role.systemRoleType, role.name).name : role.name,
+    [intl]
+  );
 
   const updateSuccessMessage = intl.formatMessage({
     id: 'Membership Entry / UpdateRole / Success message',
     defaultMessage: 'The user roles were updated successfully!',
-  });
-
-  const updateFailMessage = intl.formatMessage({
-    id: 'Membership Entry / UpdateRole / Fail message',
-    defaultMessage: 'Unable to change the user roles.',
   });
 
   const deleteSuccessMessage = intl.formatMessage({
@@ -157,8 +221,8 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
       setRolesDialogOpen(false);
       onAfterUpdate?.();
     },
-    onError: () => {
-      toast({ description: updateFailMessage, variant: 'destructive' });
+    onError: (error) => {
+      toast({ description: getAssignRolesErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 
@@ -287,7 +351,7 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
                     )}
                   >
                     {role.isOwnerRole && <Crown className="h-3 w-3 mr-1" />}
-                    {role.name}
+                    {getRoleDisplayName(role)}
                   </Badge>
                 ))}
             </div>
@@ -387,6 +451,14 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
           </DialogHeader>
 
           <div className="space-y-2 max-h-64 overflow-y-auto py-4">
+            {rolesError && (
+              <p className="text-sm text-destructive dark:text-red-400">
+                <FormattedMessage
+                  defaultMessage="Failed to load roles. Please try again."
+                  id="Membership Entry / Roles load error"
+                />
+              </p>
+            )}
             {availableRoles.map((role) => {
               const isSelected = selectedRoleIds.has(role.id);
 
@@ -414,7 +486,7 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
                   <RoleColorBadge color={role.color || 'BLUE'} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">{role.name}</span>
+                      <span className="font-medium text-sm">{getRoleDisplayName(role)}</span>
                       {role.isSystemRole && (
                         <Badge variant="secondary" className="text-xs">
                           <FormattedMessage defaultMessage="System" id="Membership Entry / System Badge" />

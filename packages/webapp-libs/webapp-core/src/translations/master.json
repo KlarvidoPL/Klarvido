@@ -1235,9 +1235,6 @@
   "Backup Settings / No Modules": {
     "defaultMessage": "No modules available"
   },
-  "Backup Settings / No Permission": {
-    "defaultMessage": "You don't have permission to manage backup settings"
-  },
   "Backup Settings / No Restorations": {
     "defaultMessage": "No restorations yet"
   },
@@ -1516,6 +1513,9 @@
   },
   "Common / Cancel": {
     "defaultMessage": "Cancel"
+  },
+  "Common / Errors / Generic fallback": {
+    "defaultMessage": "Something went wrong. Please try again."
   },
   "Common / Never": {
     "defaultMessage": "Never"
@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "Unable to delete the organization."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "At least one role must be assigned."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "You can’t assign a role that includes the \"{permissions}\" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "The Owner role can’t be removed: there must be at least one owner in the organization."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "You don't have permission to edit member roles."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "Only organization owners can assign the Owner role."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "Only owners can modify the roles of other owners."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Select which roles to assign to {name}"
   },
@@ -2660,6 +2678,9 @@
   "Membership Entry / ResendInvitation / Success message": {
     "defaultMessage": "Invitation was resent successfully!"
   },
+  "Membership Entry / Roles load error": {
+    "defaultMessage": "Failed to load roles. Please try again."
+  },
   "Membership Entry / Save Roles": {
     "defaultMessage": "Save Roles"
   },
@@ -2668,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "System"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "Unable to change the user roles."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "The user roles were updated successfully!"
@@ -2993,9 +3011,6 @@
   "Passkeys / Description": {
     "defaultMessage": "Passkeys let you sign in securely using your fingerprint, face, or device PIN - no password required."
   },
-  "Passkeys / Device Badge": {
-    "defaultMessage": "Device"
-  },
   "Passkeys / Empty state": {
     "defaultMessage": "You haven't registered any passkeys yet. Add one for faster, more secure sign-in."
   },
@@ -3071,17 +3086,14 @@
   "Passkeys Card / Add Another Button": {
     "defaultMessage": "Add another passkey"
   },
-  "Passkeys Card / Added Date": {
-    "defaultMessage": "Added {date}"
+  "Passkeys Card / Add My Passkey Button": {
+    "defaultMessage": "Add my passkey"
   },
   "Passkeys Card / Delete Error": {
     "defaultMessage": "Failed to delete passkey. Please try again."
   },
   "Passkeys Card / Delete Success": {
     "defaultMessage": "Passkey deleted successfully."
-  },
-  "Passkeys Card / Last Used": {
-    "defaultMessage": "Last used {date}"
   },
   "Passkeys Card / Search Placeholder": {
     "defaultMessage": "Search by user name or email..."
@@ -3167,6 +3179,69 @@
   "Roles / Cancel Button": {
     "defaultMessage": "Cancel"
   },
+  "Roles / Category / Backup / Description": {
+    "defaultMessage": "Tenant backup and restore"
+  },
+  "Roles / Category / Backup / Label": {
+    "defaultMessage": "Backup"
+  },
+  "Roles / Category / Billing / Description": {
+    "defaultMessage": "Subscription and payment management"
+  },
+  "Roles / Category / Billing / Label": {
+    "defaultMessage": "Billing"
+  },
+  "Roles / Category / Features / Description": {
+    "defaultMessage": "AI, Documents, and other features"
+  },
+  "Roles / Category / Features / Label": {
+    "defaultMessage": "Features"
+  },
+  "Roles / Category / Members / Description": {
+    "defaultMessage": "Team member management"
+  },
+  "Roles / Category / Members / Label": {
+    "defaultMessage": "Members"
+  },
+  "Roles / Category / Organization / Description": {
+    "defaultMessage": "Organization settings and configuration"
+  },
+  "Roles / Category / Organization / Label": {
+    "defaultMessage": "Organization"
+  },
+  "Roles / Category / Security / Description": {
+    "defaultMessage": "Security and authentication settings"
+  },
+  "Roles / Category / Security / Label": {
+    "defaultMessage": "Security"
+  },
+  "Roles / Color / Blue": {
+    "defaultMessage": "Blue"
+  },
+  "Roles / Color / Gray": {
+    "defaultMessage": "Gray"
+  },
+  "Roles / Color / Green": {
+    "defaultMessage": "Green"
+  },
+  "Roles / Color / Orange": {
+    "defaultMessage": "Orange"
+  },
+  "Roles / Color / Pink": {
+    "defaultMessage": "Pink"
+  },
+  "Roles / Color / Purple": {
+    "defaultMessage": "Purple"
+  },
+  "Roles / Color / Red": {
+    "defaultMessage": "Red"
+  },
+  "Roles / Color / Teal": {
+    "defaultMessage": "Teal"
+  },
+  "Roles / Color / Yellow": {
+    "defaultMessage": "Yellow"
+  },
   "Roles / Color Label": {
     "defaultMessage": "Color"
   },
@@ -3194,6 +3269,9 @@
   "Roles / Delete Confirmation": {
     "defaultMessage": "Are you sure you want to delete the role \"{name}\"? This action cannot be undone."
   },
+  "Roles / Delete Role Button": {
+    "defaultMessage": "Delete {name} role"
+  },
   "Roles / Delete Success": {
     "defaultMessage": "Role deleted successfully"
   },
@@ -3212,6 +3290,9 @@
   "Roles / Description Label": {
     "defaultMessage": "Description"
   },
+  "Roles / Description Optional Suffix": {
+    "defaultMessage": "(optional)"
+  },
   "Roles / Description Placeholder": {
     "defaultMessage": "Describe what this role is for..."
   },
@@ -3221,8 +3302,47 @@
   "Roles / Edit Description": {
     "defaultMessage": "Modify role permissions and settings"
   },
+  "Roles / Edit Role Button": {
+    "defaultMessage": "Edit {name} role"
+  },
   "Roles / Edit Title": {
     "defaultMessage": "Edit Role"
+  },
+  "Roles / Error / Cannot add permission not owned": {
+    "defaultMessage": "You can’t grant the \"{permission}\" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first."
+  },
+  "Roles / Error / Cannot create role with permission not owned": {
+    "defaultMessage": "You can’t create a role with the \"{permission}\" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first."
+  },
+  "Roles / Error / Cannot delete system role": {
+    "defaultMessage": "System roles can’t be deleted."
+  },
+  "Roles / Error / Cannot modify owner role": {
+    "defaultMessage": "The Owner role can’t be modified."
+  },
+  "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
+    "defaultMessage": "You can’t reassign members to a replacement role that includes the \"{permissions}\" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first."
+  },
+  "Roles / Error / No manage roles permission": {
+    "defaultMessage": "You don't have permission to manage organization roles."
+  },
+  "Roles / Error / Only owner can reassign to owner role": {
+    "defaultMessage": "Only organization owners can reassign members to the Owner role."
+  },
+  "Roles / Error / Replacement role same as deleted": {
+    "defaultMessage": "The replacement role can’t be the same as the role being deleted."
+  },
+  "Roles / Error / Role assigned to members": {
+    "defaultMessage": "This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role."
+  },
+  "Roles / Error / Role name exists": {
+    "defaultMessage": "A role named \"{name}\" already exists. Choose a different name."
+  },
+  "Roles / Load Error": {
+    "defaultMessage": "Failed to load roles. Please try again."
+  },
+  "Roles / Load Error Retry": {
+    "defaultMessage": "Retry"
   },
   "Roles / Member singular": {
     "defaultMessage": "member"
@@ -3244,6 +3364,150 @@
   },
   "Roles / No Custom Roles Description": {
     "defaultMessage": "Create custom roles to fine-tune member access and permissions"
+  },
+  "Roles / Permission / backup.manage / Description": {
+    "defaultMessage": "Configure backups, trigger manual backups, and manage backup settings"
+  },
+  "Roles / Permission / backup.manage / Name": {
+    "defaultMessage": "Manage Backups"
+  },
+  "Roles / Permission / backup.view / Description": {
+    "defaultMessage": "View backup configuration and history"
+  },
+  "Roles / Permission / backup.view / Name": {
+    "defaultMessage": "View Backup Settings"
+  },
+  "Roles / Permission / billing.manage / Description": {
+    "defaultMessage": "Change subscription plan, update payment methods, and manage billing"
+  },
+  "Roles / Permission / billing.manage / Name": {
+    "defaultMessage": "Manage Billing"
+  },
+  "Roles / Permission / billing.view / Description": {
+    "defaultMessage": "View subscription status, invoices, and payment methods"
+  },
+  "Roles / Permission / billing.view / Name": {
+    "defaultMessage": "View Billing"
+  },
+  "Roles / Permission / features.ai.use / Description": {
+    "defaultMessage": "Access and use OpenAI integration and AI-powered features"
+  },
+  "Roles / Permission / features.ai.use / Name": {
+    "defaultMessage": "Use AI Features"
+  },
+  "Roles / Permission / features.content.view / Description": {
+    "defaultMessage": "View content items from CMS"
+  },
+  "Roles / Permission / features.content.view / Name": {
+    "defaultMessage": "View Content Items"
+  },
+  "Roles / Permission / features.crud.manage / Description": {
+    "defaultMessage": "Create, edit, and delete CRUD demo items"
+  },
+  "Roles / Permission / features.crud.manage / Name": {
+    "defaultMessage": "Manage CRUD Demo Items"
+  },
+  "Roles / Permission / features.crud.view / Description": {
+    "defaultMessage": "View CRUD demo items"
+  },
+  "Roles / Permission / features.crud.view / Name": {
+    "defaultMessage": "View CRUD Demo Items"
+  },
+  "Roles / Permission / features.documents.manage / Description": {
+    "defaultMessage": "Upload, edit, and delete documents"
+  },
+  "Roles / Permission / features.documents.manage / Name": {
+    "defaultMessage": "Manage Documents"
+  },
+  "Roles / Permission / features.documents.view / Description": {
+    "defaultMessage": "View uploaded documents"
+  },
+  "Roles / Permission / features.documents.view / Name": {
+    "defaultMessage": "View Documents"
+  },
+  "Roles / Permission / members.invite / Description": {
+    "defaultMessage": "Send invitations to new members"
+  },
+  "Roles / Permission / members.invite / Name": {
+    "defaultMessage": "Invite Members"
+  },
+  "Roles / Permission / members.remove / Description": {
+    "defaultMessage": "Remove members from the organization"
+  },
+  "Roles / Permission / members.remove / Name": {
+    "defaultMessage": "Remove Members"
+  },
+  "Roles / Permission / members.roles.edit / Description": {
+    "defaultMessage": "Change roles assigned to existing members"
+  },
+  "Roles / Permission / members.roles.edit / Name": {
+    "defaultMessage": "Edit Member Roles"
+  },
+  "Roles / Permission / members.view / Description": {
+    "defaultMessage": "View the list of organization members and their roles"
+  },
+  "Roles / Permission / members.view / Name": {
+    "defaultMessage": "View Members"
+  },
+  "Roles / Permission / org.delete / Description": {
+    "defaultMessage": "Permanently delete the organization and all its data"
+  },
+  "Roles / Permission / org.delete / Name": {
+    "defaultMessage": "Delete Organization"
+  },
+  "Roles / Permission / org.roles.manage / Description": {
+    "defaultMessage": "Create, edit, and delete custom roles"
+  },
+  "Roles / Permission / org.roles.manage / Name": {
+    "defaultMessage": "Manage Organization Roles"
+  },
+  "Roles / Permission / org.roles.view / Description": {
+    "defaultMessage": "View defined roles and their permissions"
+  },
+  "Roles / Permission / org.roles.view / Name": {
+    "defaultMessage": "View Organization Roles"
+  },
+  "Roles / Permission / org.settings.edit / Description": {
+    "defaultMessage": "Modify organization name, billing email, and general settings"
+  },
+  "Roles / Permission / org.settings.edit / Name": {
+    "defaultMessage": "Edit Organization Settings"
+  },
+  "Roles / Permission / org.settings.view / Description": {
+    "defaultMessage": "View organization name, billing email, and general settings"
+  },
+  "Roles / Permission / org.settings.view / Name": {
+    "defaultMessage": "View Organization Settings"
+  },
+  "Roles / Permission / security.logs.export / Description": {
+    "defaultMessage": "Export activity logs to CSV or other formats"
+  },
+  "Roles / Permission / security.logs.export / Name": {
+    "defaultMessage": "Export Activity Logs"
+  },
+  "Roles / Permission / security.logs.view / Description": {
+    "defaultMessage": "View audit logs of actions performed in the organization"
+  },
+  "Roles / Permission / security.logs.view / Name": {
+    "defaultMessage": "View Activity Logs"
+  },
+  "Roles / Permission / security.passkeys.manage / Description": {
+    "defaultMessage": "View and manage organization passkey policies"
+  },
+  "Roles / Permission / security.passkeys.manage / Name": {
+    "defaultMessage": "Manage Passkeys"
+  },
+  "Roles / Permission / security.sso.manage / Description": {
+    "defaultMessage": "Configure Single Sign-On connections and SCIM provisioning"
+  },
+  "Roles / Permission / security.sso.manage / Name": {
+    "defaultMessage": "Manage SSO"
+  },
+  "Roles / Permission / security.view / Description": {
+    "defaultMessage": "View SSO connections, passkeys, and security configurations"
+  },
+  "Roles / Permission / security.view / Name": {
+    "defaultMessage": "View Security Settings"
   },
   "Roles / Permission Required": {
     "defaultMessage": "At least one permission is required"
@@ -3277,6 +3541,24 @@
   },
   "Roles / System Badge": {
     "defaultMessage": "System"
+  },
+  "Roles / System Role / Administrator / Description": {
+    "defaultMessage": "Manage organization settings and members"
+  },
+  "Roles / System Role / Administrator / Name": {
+    "defaultMessage": "Administrator"
+  },
+  "Roles / System Role / Member / Description": {
+    "defaultMessage": "View access to organization data"
+  },
+  "Roles / System Role / Member / Name": {
+    "defaultMessage": "Member"
+  },
+  "Roles / System Role / Owner / Description": {
+    "defaultMessage": "Full access to all organization features"
+  },
+  "Roles / System Role / Owner / Name": {
+    "defaultMessage": "Owner"
   },
   "Roles / System Roles Header": {
     "defaultMessage": "System Roles"
@@ -4043,8 +4325,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Members"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "You can’t invite a member with a role that includes the \"{permissions}\" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "Failed to invite user. Please try again."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "Only organization owners can invite members with the Owner role."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "User invited successfully!"
@@ -4379,11 +4667,20 @@
   "Tenant invitation form / Roles label": {
     "defaultMessage": "Roles:"
   },
+  "Tenant invitation form / Roles load error": {
+    "defaultMessage": "Failed to load roles. Please try again."
+  },
+  "Tenant invitation form / Roles loading": {
+    "defaultMessage": "Loading..."
+  },
   "Tenant invitation form / Roles placeholder": {
     "defaultMessage": "Select roles"
   },
   "Tenant invitation form / Submit button": {
     "defaultMessage": "Invite"
+  },
+  "Tenant invitation form / System role suffix": {
+    "defaultMessage": "(System)"
   },
   "Tenant members list / Actions": {
     "defaultMessage": "Actions"

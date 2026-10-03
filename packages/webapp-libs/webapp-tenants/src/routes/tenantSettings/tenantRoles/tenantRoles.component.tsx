@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import { ApolloErrorLike, getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import { Button } from '@sb/webapp-core/components/buttons';
+import { buttonVariants } from '@sb/webapp-core/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,6 +15,7 @@ import {
 } from '@sb/webapp-core/components/ui/alert-dialog';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import {
   Dialog,
   DialogContent,
@@ -36,14 +39,13 @@ import { TabsContent } from '@sb/webapp-core/components/ui/tabs';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { cn } from '@sb/webapp-core/lib/utils';
 import {
-  BarChart3,
+  AlertTriangle,
   Check,
   ChevronDown,
   ChevronRight,
   CreditCard,
   Crown,
   Edit2,
-  Layers,
   Lock,
   Minus,
   Plus,
@@ -95,11 +97,13 @@ const SimpleCheckbox = ({
   </CheckboxPrimitive.Root>
 );
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { RoutesConfig } from '../../../config/routes';
 import { useGenerateTenantPath, usePermissionCheck } from '../../../hooks';
 import { useCurrentTenant } from '../../../providers';
+import { getSystemRoleDisplay } from '../../../utils/organizationRoleDisplay';
+import { getPermissionDisplay } from '../../../utils/permissionDisplay';
 import {
   allOrganizationRolesQuery,
   allPermissionsQuery,
@@ -110,55 +114,207 @@ import {
 
 // Role color options with better visual design
 const ROLE_COLORS = [
-  { value: 'BLUE', label: 'Blue', className: 'bg-blue-500', ring: 'ring-blue-500/30' },
-  { value: 'GREEN', label: 'Green', className: 'bg-emerald-500', ring: 'ring-emerald-500/30' },
-  { value: 'RED', label: 'Red', className: 'bg-rose-500', ring: 'ring-rose-500/30' },
-  { value: 'YELLOW', label: 'Yellow', className: 'bg-amber-500', ring: 'ring-amber-500/30' },
-  { value: 'PURPLE', label: 'Purple', className: 'bg-violet-500', ring: 'ring-violet-500/30' },
-  { value: 'ORANGE', label: 'Orange', className: 'bg-orange-500', ring: 'ring-orange-500/30' },
-  { value: 'PINK', label: 'Pink', className: 'bg-pink-500', ring: 'ring-pink-500/30' },
-  { value: 'TEAL', label: 'Teal', className: 'bg-teal-500', ring: 'ring-teal-500/30' },
-  { value: 'GRAY', label: 'Gray', className: 'bg-slate-500', ring: 'ring-slate-500/30' },
+  { value: 'BLUE', className: 'bg-blue-500', ring: 'ring-blue-500/30' },
+  { value: 'GREEN', className: 'bg-emerald-500', ring: 'ring-emerald-500/30' },
+  { value: 'RED', className: 'bg-rose-500', ring: 'ring-rose-500/30' },
+  { value: 'YELLOW', className: 'bg-amber-500', ring: 'ring-amber-500/30' },
+  { value: 'PURPLE', className: 'bg-violet-500', ring: 'ring-violet-500/30' },
+  { value: 'ORANGE', className: 'bg-orange-500', ring: 'ring-orange-500/30' },
+  { value: 'PINK', className: 'bg-pink-500', ring: 'ring-pink-500/30' },
+  { value: 'TEAL', className: 'bg-teal-500', ring: 'ring-teal-500/30' },
+  { value: 'GRAY', className: 'bg-slate-500', ring: 'ring-slate-500/30' },
 ] as const;
 
-// Permission category configuration (UPPERCASE keys; API returns lowercase, normalized via toCategoryKey)
-const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ReactNode; description: string }> = {
+// Translated display name for a role color value (ROLE_COLORS above only carries styling)
+const getRoleColorLabel = (intl: IntlShape, value: string): string => {
+  switch (value) {
+    case 'BLUE':
+      return intl.formatMessage({ defaultMessage: 'Blue', id: 'Roles / Color / Blue' });
+    case 'GREEN':
+      return intl.formatMessage({ defaultMessage: 'Green', id: 'Roles / Color / Green' });
+    case 'RED':
+      return intl.formatMessage({ defaultMessage: 'Red', id: 'Roles / Color / Red' });
+    case 'YELLOW':
+      return intl.formatMessage({ defaultMessage: 'Yellow', id: 'Roles / Color / Yellow' });
+    case 'PURPLE':
+      return intl.formatMessage({ defaultMessage: 'Purple', id: 'Roles / Color / Purple' });
+    case 'ORANGE':
+      return intl.formatMessage({ defaultMessage: 'Orange', id: 'Roles / Color / Orange' });
+    case 'PINK':
+      return intl.formatMessage({ defaultMessage: 'Pink', id: 'Roles / Color / Pink' });
+    case 'TEAL':
+      return intl.formatMessage({ defaultMessage: 'Teal', id: 'Roles / Color / Teal' });
+    case 'GRAY':
+      return intl.formatMessage({ defaultMessage: 'Gray', id: 'Roles / Color / Gray' });
+    default:
+      return value;
+  }
+};
+
+// Permission category configuration (UPPERCASE keys; API returns lowercase, normalized via toCategoryKey).
+// Built from `intl` rather than a static object so labels/descriptions are translated; categories not
+// covered here (a future app-registered category) fall back to the untranslated API text - same as before.
+const getCategoryConfig = (
+  intl: IntlShape
+): Record<string, { label: string; icon: React.ReactNode; description: string }> => ({
   ORGANIZATION: {
-    label: 'Organization',
+    label: intl.formatMessage({ defaultMessage: 'Organization', id: 'Roles / Category / Organization / Label' }),
     icon: <Settings className="h-4 w-4" />,
-    description: 'Organization settings and configuration',
+    description: intl.formatMessage({
+      defaultMessage: 'Organization settings and configuration',
+      id: 'Roles / Category / Organization / Description',
+    }),
   },
   MEMBERS: {
-    label: 'Members',
+    label: intl.formatMessage({ defaultMessage: 'Members', id: 'Roles / Category / Members / Label' }),
     icon: <Users className="h-4 w-4" />,
-    description: 'Team member management',
+    description: intl.formatMessage({
+      defaultMessage: 'Team member management',
+      id: 'Roles / Category / Members / Description',
+    }),
   },
   SECURITY: {
-    label: 'Security',
+    label: intl.formatMessage({ defaultMessage: 'Security', id: 'Roles / Category / Security / Label' }),
     icon: <Lock className="h-4 w-4" />,
-    description: 'Security and authentication settings',
+    description: intl.formatMessage({
+      defaultMessage: 'Security and authentication settings',
+      id: 'Roles / Category / Security / Description',
+    }),
   },
   BILLING: {
-    label: 'Billing',
+    label: intl.formatMessage({ defaultMessage: 'Billing', id: 'Roles / Category / Billing / Label' }),
     icon: <CreditCard className="h-4 w-4" />,
-    description: 'Subscription and payment management',
+    description: intl.formatMessage({
+      defaultMessage: 'Subscription and payment management',
+      id: 'Roles / Category / Billing / Description',
+    }),
   },
   FEATURES: {
-    label: 'Features',
+    label: intl.formatMessage({ defaultMessage: 'Features', id: 'Roles / Category / Features / Label' }),
     icon: <Sparkles className="h-4 w-4" />,
-    description: 'AI, Documents, and other features',
+    description: intl.formatMessage({
+      defaultMessage: 'AI, Documents, and other features',
+      id: 'Roles / Category / Features / Description',
+    }),
   },
-  DASHBOARD: {
-    label: 'Dashboard',
-    icon: <Layers className="h-4 w-4" />,
-    description: 'Main application dashboard',
+  BACKUP: {
+    label: intl.formatMessage({ defaultMessage: 'Backup', id: 'Roles / Category / Backup / Label' }),
+    icon: <Shield className="h-4 w-4" />,
+    description: intl.formatMessage({
+      defaultMessage: 'Tenant backup and restore',
+      id: 'Roles / Category / Backup / Description',
+    }),
   },
-  MANAGEMENT: {
-    label: 'Management Dashboard',
-    icon: <BarChart3 className="h-4 w-4" />,
-    description: 'Finance and management tools',
-  },
-  // App-defined categories (e.g. BACKUP from backup/permissions.py) use the fallback below: label from key, Shield icon
+});
+
+// Translates the known raw-English error strings raised by Create/Update/DeleteOrganizationRole
+// mutations (apps/multitenancy/schema.py) - these are plain graphene mutations, not
+// serializer-based, so most of their errors arrive via `extensions` (either as a plain
+// PermissionDenied's message, which is already the real text, or as the `[{message, code}]`
+// shape GraphQlValidationError puts its detail in, since its top-level message is just the
+// exception class name) - see getGraphQLErrorDetail. Unrecognized messages fall back to a
+// translated generic message, never raw backend text.
+const getRoleMutationErrorMessage = (intl: IntlShape, error: ApolloErrorLike): string => {
+  const message = getGraphQLErrorDetail(error) ?? '';
+
+  const addPermissionMatch = message.match(/^You cannot add permission '([^']+)' that you don't have\.$/);
+  if (addPermissionMatch) {
+    const permission = getPermissionDisplay(intl, addPermissionMatch[1], addPermissionMatch[1]).name;
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t grant the "{permission}" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first.',
+        id: 'Roles / Error / Cannot add permission not owned',
+      },
+      { permission }
+    );
+  }
+
+  const createPermissionMatch = message.match(
+    /^You cannot create a role with permission '([^']+)' that you don't have\.$/
+  );
+  if (createPermissionMatch) {
+    const permission = getPermissionDisplay(intl, createPermissionMatch[1], createPermissionMatch[1]).name;
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t create a role with the "{permission}" permission because you don’t have it yourself. Ask an organization owner or admin to grant it to you first.',
+        id: 'Roles / Error / Cannot create role with permission not owned',
+      },
+      { permission }
+    );
+  }
+
+  const nameExistsMatch = message.match(/^A role with the name '(.+)' already exists\.$/);
+  if (nameExistsMatch) {
+    return intl.formatMessage(
+      {
+        defaultMessage: 'A role named "{name}" already exists. Choose a different name.',
+        id: 'Roles / Error / Role name exists',
+      },
+      { name: nameExistsMatch[1] }
+    );
+  }
+
+  const assignedMembersMatch = message.match(
+    /^This role is assigned to (\d+) member\(s\)\. Please provide a replacement role\.$/
+  );
+  if (assignedMembersMatch) {
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role.',
+        id: 'Roles / Error / Role assigned to members',
+      },
+      { count: Number(assignedMembersMatch[1]) }
+    );
+  }
+
+  const replacementPermissionsMatch = message.match(/^You cannot assign roles with permissions you don't have: (.+)$/);
+  if (replacementPermissionsMatch) {
+    const permissions = replacementPermissionsMatch[1]
+      .split(', ')
+      .map((code) => getPermissionDisplay(intl, code, code).name)
+      .join(', ');
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t reassign members to a replacement role that includes the "{permissions}" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first.',
+        id: 'Roles / Error / Cannot reassign to replacement role with permissions not owned',
+      },
+      { permissions }
+    );
+  }
+
+  switch (message) {
+    case "You don't have permission to manage organization roles.":
+      return intl.formatMessage({
+        defaultMessage: "You don't have permission to manage organization roles.",
+        id: 'Roles / Error / No manage roles permission',
+      });
+    case 'Cannot modify the Owner role.':
+      return intl.formatMessage({
+        defaultMessage: 'The Owner role can’t be modified.',
+        id: 'Roles / Error / Cannot modify owner role',
+      });
+    case 'Cannot delete system roles.':
+      return intl.formatMessage({
+        defaultMessage: 'System roles can’t be deleted.',
+        id: 'Roles / Error / Cannot delete system role',
+      });
+    case 'Replacement role cannot be the same as the deleted role.':
+      return intl.formatMessage({
+        defaultMessage: 'The replacement role can’t be the same as the role being deleted.',
+        id: 'Roles / Error / Replacement role same as deleted',
+      });
+    case 'Only organization owners can assign the Owner role.':
+      return intl.formatMessage({
+        defaultMessage: 'Only organization owners can reassign members to the Owner role.',
+        id: 'Roles / Error / Only owner can reassign to owner role',
+      });
+    default:
+      return getGenericErrorMessage(intl);
+  }
 };
 
 interface Permission {
@@ -176,7 +332,7 @@ interface OrganizationRole {
   name: string;
   description?: string;
   color: string;
-  systemRoleType?: string;
+  systemRoleType?: string | null;
   isSystemRole: boolean;
   isOwnerRole: boolean;
   memberCount: number;
@@ -205,6 +361,9 @@ const RoleCard = ({
   canManage?: boolean;
 }) => {
   const intl = useIntl();
+  const display = role.isSystemRole
+    ? getSystemRoleDisplay(intl, role.systemRoleType, role.name, role.description)
+    : { name: role.name, description: role.description };
 
   return (
     <Card className={cn(
@@ -217,15 +376,15 @@ const RoleCard = ({
         'absolute top-0 left-0 right-0 h-1',
         ROLE_COLORS.find((c) => c.value.toUpperCase() === role.color?.toUpperCase())?.className || 'bg-blue-500'
       )} />
-      
+
       <CardHeader className="pt-5 pb-3 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0 flex-1">
             <div className={cn(
               'flex items-center justify-center rounded-lg p-2.5 shrink-0',
               'bg-gradient-to-br',
-              role.isOwnerRole 
-                ? 'from-violet-100 to-violet-50 dark:from-violet-900/30 dark:to-violet-950/30' 
+              role.isOwnerRole
+                ? 'from-violet-100 to-violet-50 dark:from-violet-900/30 dark:to-violet-950/30'
                 : 'from-muted to-muted/50'
             )}>
               {role.isOwnerRole ? (
@@ -237,7 +396,7 @@ const RoleCard = ({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <CardTitle className="text-base font-semibold truncate">
-                  {role.name}
+                  {display.name}
                 </CardTitle>
                 {role.isSystemRole && !role.isOwnerRole && (
                   <Badge variant="secondary" className="text-[10px] font-medium px-1.5 py-0 h-5">
@@ -245,14 +404,14 @@ const RoleCard = ({
                   </Badge>
                 )}
               </div>
-              {role.description && (
+              {display.description && (
                 <CardDescription className="mt-1 text-xs line-clamp-2">
-                  {role.description}
+                  {display.description}
                 </CardDescription>
               )}
             </div>
           </div>
-          
+
           {/* Actions - visible on hover on desktop, always visible on mobile */}
           {canManage && (
             <div className={cn(
@@ -260,16 +419,29 @@ const RoleCard = ({
               'md:opacity-0 md:group-hover:opacity-100 transition-opacity'
             )}>
               {!role.isOwnerRole && (
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={onEdit}
+                  aria-label={intl.formatMessage(
+                    { defaultMessage: 'Edit {name} role', id: 'Roles / Edit Role Button' },
+                    { name: display.name }
+                  )}
+                >
                   <Edit2 className="h-3.5 w-3.5" />
                 </Button>
               )}
               {!role.isSystemRole && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 dark:text-red-400 dark:hover:text-red-400"
                   onClick={onDelete}
+                  aria-label={intl.formatMessage(
+                    { defaultMessage: 'Delete {name} role', id: 'Roles / Delete Role Button' },
+                    { name: display.name }
+                  )}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -323,6 +495,8 @@ const PermissionPicker = ({
   onSelectionChange: (ids: Set<string>) => void;
   disabled?: boolean;
 }) => {
+  const intl = useIntl();
+  const categoryConfig = useMemo(() => getCategoryConfig(intl), [intl]);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['ORGANIZATION', 'MEMBERS', 'FEATURES'])
   );
@@ -342,15 +516,7 @@ const PermissionPicker = ({
 
   // Order categories (core first; app-defined from modules appear at end via rest)
   const orderedCategories = useMemo(() => {
-    const order = [
-      'ORGANIZATION',
-      'MEMBERS',
-      'SECURITY',
-      'BILLING',
-      'FEATURES',
-      'DASHBOARD',
-      'MANAGEMENT',
-    ];
+    const order = ['ORGANIZATION', 'MEMBERS', 'SECURITY', 'BILLING', 'FEATURES', 'BACKUP'];
     const knownFirst = order.filter((cat) => permissionsByCategory[cat]);
     const rest = Object.keys(permissionsByCategory).filter((cat) => !order.includes(cat));
     return [...knownFirst, ...rest];
@@ -396,7 +562,7 @@ const PermissionPicker = ({
           {orderedCategories.map((category, index) => {
             const permissions = permissionsByCategory[category];
             const firstPerm = permissions?.[0];
-            const config = CATEGORY_CONFIG[category] || {
+            const config = categoryConfig[category] || {
               label: firstPerm?.categoryLabel ?? category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()),
               icon: <Shield className="h-4 w-4" />,
               description: firstPerm?.categoryDescription ?? '',
@@ -465,32 +631,35 @@ const PermissionPicker = ({
                 
                 {isExpanded && (
                   <div className="ml-3 pl-3 border-l-2 border-border/50 space-y-0.5 py-1">
-                    {permissions.map((perm) => (
-                      <label
-                        key={perm.id}
-                        className={cn(
-                          'flex items-start gap-3 px-3 py-2 rounded-md cursor-pointer',
-                          'transition-colors hover:bg-accent/50',
-                          selectedPermissionIds.has(perm.id) && 'bg-accent/30',
-                          disabled && 'opacity-50 cursor-not-allowed'
-                        )}
-                      >
-                        <SimpleCheckbox
-                          checked={selectedPermissionIds.has(perm.id)}
-                          onCheckedChange={() => !disabled && togglePermission(perm.id)}
-                          disabled={disabled}
-                          className="mt-0.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className="font-medium text-sm">{perm.name}</span>
-                          {perm.description && (
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                              {perm.description}
-                            </p>
+                    {permissions.map((perm) => {
+                      const permDisplay = getPermissionDisplay(intl, perm.code, perm.name, perm.description);
+                      return (
+                        <label
+                          key={perm.id}
+                          className={cn(
+                            'flex items-start gap-3 px-3 py-2 rounded-md cursor-pointer',
+                            'transition-colors hover:bg-accent/50',
+                            selectedPermissionIds.has(perm.id) && 'bg-accent/30',
+                            disabled && 'opacity-50 cursor-not-allowed'
                           )}
-                        </div>
-                      </label>
-                    ))}
+                        >
+                          <SimpleCheckbox
+                            checked={selectedPermissionIds.has(perm.id)}
+                            onCheckedChange={() => !disabled && togglePermission(perm.id)}
+                            disabled={disabled}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium text-sm">{permDisplay.name}</span>
+                            {permDisplay.description && (
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                {permDisplay.description}
+                              </p>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -567,7 +736,7 @@ const RoleEditorDialog = ({
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getRoleMutationErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 
@@ -584,7 +753,7 @@ const RoleEditorDialog = ({
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getRoleMutationErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 
@@ -700,7 +869,7 @@ const RoleEditorDialog = ({
                       <SelectValue>
                         <div className="flex items-center gap-2">
                           <RoleColorBadge color={color} size="sm" />
-                          <span className="text-sm">{ROLE_COLORS.find((c) => c.value === color)?.label}</span>
+                          <span className="text-sm">{getRoleColorLabel(intl, color)}</span>
                         </div>
                       </SelectValue>
                     </SelectTrigger>
@@ -709,7 +878,7 @@ const RoleEditorDialog = ({
                         <SelectItem key={c.value} value={c.value}>
                           <div className="flex items-center gap-2">
                             <RoleColorBadge color={c.value} size="sm" />
-                            <span>{c.label}</span>
+                            <span>{getRoleColorLabel(intl, c.value)}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -721,7 +890,9 @@ const RoleEditorDialog = ({
               <div className="space-y-2">
                 <Label htmlFor="role-description" className="text-sm font-medium">
                   <FormattedMessage defaultMessage="Description" id="Roles / Description Label" />
-                  <span className="text-muted-foreground font-normal ml-1">(optional)</span>
+                  <span className="text-muted-foreground font-normal ml-1">
+                    <FormattedMessage defaultMessage="(optional)" id="Roles / Description Optional Suffix" />
+                  </span>
                 </Label>
                 <textarea
                   id="role-description"
@@ -838,7 +1009,7 @@ const DeleteRoleDialog = ({
       onOpenChange(false);
     },
     onError: (error) => {
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getRoleMutationErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 
@@ -870,8 +1041,8 @@ const DeleteRoleDialog = ({
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-destructive/10">
-              <Trash2 className="h-5 w-5 text-destructive" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-destructive/10 dark:bg-red-400/10">
+              <Trash2 className="h-5 w-5 text-destructive dark:text-red-400" />
             </div>
             <AlertDialogTitle className="text-lg">
               <FormattedMessage defaultMessage="Delete Role" id="Roles / Delete Title" />
@@ -887,8 +1058,8 @@ const DeleteRoleDialog = ({
                 />
               </p>
               {hasAffectedMembers && (
-                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-sm font-medium text-destructive">
+                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 space-y-3 dark:bg-red-400/10 dark:border-red-400/20">
+                  <div className="flex items-center gap-2 text-sm font-medium text-destructive dark:text-red-400">
                     <Users className="h-4 w-4" />
                     <FormattedMessage
                       defaultMessage="This role is assigned to {count} member(s)"
@@ -936,7 +1107,7 @@ const DeleteRoleDialog = ({
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading || (hasAffectedMembers && !replacementRoleId)}
-            className="bg-destructive hover:bg-destructive/90"
+            className={buttonVariants({ variant: 'destructive' })}
           >
             {loading ? (
               <FormattedMessage defaultMessage="Deleting..." id="Roles / Deleting Button" />
@@ -971,6 +1142,7 @@ export const TenantRoles = () => {
   const {
     data: rolesData,
     loading: rolesLoading,
+    error: rolesError,
     refetch: refetchRoles,
   } = useQuery(allOrganizationRolesQuery, {
     variables: { tenantId },
@@ -1006,7 +1178,9 @@ export const TenantRoles = () => {
   }, []);
 
   const handleSuccess = useCallback(() => {
-    refetchRoles();
+    // Errors land in `rolesError` via the hook's own state; swallow here to avoid an
+    // unhandled rejection since refetch() rejects on GraphQL errors.
+    refetchRoles().catch(() => undefined);
   }, [refetchRoles]);
 
   const isLoading = permissionsLoading || rolesLoading;
@@ -1020,7 +1194,7 @@ export const TenantRoles = () => {
       <div className="space-y-6">
         {/* Header Card */}
         <Card>
-          <CardHeader className="pb-4">
+          <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -1067,6 +1241,21 @@ export const TenantRoles = () => {
               </div>
             </div>
           </div>
+        ) : rolesError ? (
+          <Card className="border-destructive/50">
+            <CardContent className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+              <AlertTriangle className="h-8 w-8 text-destructive dark:text-red-400" />
+              <p className="text-sm text-muted-foreground max-w-[300px]">
+                <FormattedMessage
+                  defaultMessage="Failed to load roles. Please try again."
+                  id="Roles / Load Error"
+                />
+              </p>
+              <Button variant="outline" onClick={() => refetchRoles()}>
+                <FormattedMessage defaultMessage="Retry" id="Roles / Load Error Retry" />
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-8">
             {/* System Roles */}

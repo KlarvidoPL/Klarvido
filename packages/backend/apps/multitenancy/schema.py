@@ -125,6 +125,11 @@ class OrganizationRoleType(DjangoObjectType):
     def resolve_id(self, info):
         return to_global_id("OrganizationRoleType", self.id)
 
+    def resolve_system_role_type(self, info):
+        # Custom roles store '' (not None) as the "no system type" sentinel - the enum has
+        # no member for '', so it must be converted to None before graphene serializes it.
+        return self.system_role_type or None
+
     def resolve_is_system_role(self, info):
         return self.is_system_role
 
@@ -538,15 +543,20 @@ class DeleteTenantMembershipMutation(mutations.DeleteModelMutation):
         if not is_self_removal and not models.user_has_permission(user, tenant, "members.remove"):
             raise PermissionDenied("You don't have permission to remove members.")
 
-        # Get acting user's owner status
+        # Get acting user's owner status. The superuser cross-tenant bypass grants
+        # owner-equivalent access without a real membership row - OR it in the same way
+        # get_user_permissions_for_tenant already does for the general permission set.
         acting_user_membership = models.TenantMembership.objects.filter(
             user=user, tenant=tenant, is_accepted=True
         ).first()
-        is_acting_user_owner = acting_user_membership and (
-            acting_user_membership.role == TenantUserRole.OWNER
-            or models.TenantMembershipRole.objects.filter(
-                membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
-            ).exists()
+        is_acting_user_owner = models.is_superuser_bypass_eligible(user) or bool(
+            acting_user_membership
+            and (
+                acting_user_membership.role == TenantUserRole.OWNER
+                or models.TenantMembershipRole.objects.filter(
+                    membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
+                ).exists()
+            )
         )
 
         # Check if target is an owner. A pending (not yet accepted) invitation holds no
@@ -1015,6 +1025,36 @@ class DeleteOrganizationRoleMutation(graphene.Mutation):
             if replacement_role.pk == role.pk:
                 raise exceptions.GraphQlValidationError("Replacement role cannot be the same as the deleted role.")
 
+            # SECURITY CHECK: Reassigning affected members to the replacement role is itself a
+            # role grant, so it must obey the same privilege-escalation rules as
+            # AssignRolesToMemberMutation - otherwise deleting a role is a backdoor to hand
+            # members a role (e.g. Owner) the acting user couldn't otherwise assign.
+            acting_user_membership = models.TenantMembership.objects.filter(
+                user=user, tenant=tenant, is_accepted=True
+            ).first()
+            is_acting_user_owner = models.is_superuser_bypass_eligible(user) or bool(
+                acting_user_membership
+                and (
+                    acting_user_membership.role == TenantUserRole.OWNER
+                    or models.TenantMembershipRole.objects.filter(
+                        membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
+                    ).exists()
+                )
+            )
+
+            if replacement_role.is_owner_role and not is_acting_user_owner:
+                raise PermissionDenied("Only organization owners can assign the Owner role.")
+
+            if not is_acting_user_owner:
+                user_permissions = models.get_user_permissions_for_tenant(user, tenant)
+                replacement_permissions = set(replacement_role.permissions.values_list("code", flat=True))
+                missing_permissions = replacement_permissions - user_permissions
+                if missing_permissions:
+                    permissions_list = ", ".join(list(missing_permissions)[:3])
+                    raise PermissionDenied(
+                        f"You cannot assign roles with permissions you don't have: {permissions_list}"
+                    )
+
             with transaction.atomic():
                 # Reassign members to replacement role
                 for mr in affected_members:
@@ -1090,15 +1130,21 @@ class AssignRolesToMemberMutation(graphene.Mutation):
         # Get user's permissions and owner status for validation
         user_permissions = models.get_user_permissions_for_tenant(user, tenant)
 
-        # Check if the acting user is an owner
+        # Check if the acting user is an owner. The superuser cross-tenant bypass grants
+        # owner-equivalent access without a real membership row (see
+        # is_superuser_bypass_eligible), so it must be OR'd in here the same way
+        # get_user_permissions_for_tenant already does for the general permission set.
         acting_user_membership = models.TenantMembership.objects.filter(
             user=user, tenant=tenant, is_accepted=True
         ).first()
-        is_acting_user_owner = acting_user_membership and (
-            acting_user_membership.role == TenantUserRole.OWNER
-            or models.TenantMembershipRole.objects.filter(
-                membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
-            ).exists()
+        is_acting_user_owner = models.is_superuser_bypass_eligible(user) or bool(
+            acting_user_membership
+            and (
+                acting_user_membership.role == TenantUserRole.OWNER
+                or models.TenantMembershipRole.objects.filter(
+                    membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
+                ).exists()
+            )
         )
 
         # Check if target membership currently has owner role
@@ -1231,15 +1277,20 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
         if not mr:
             raise exceptions.GraphQlValidationError("This role is not assigned to the member.")
 
-        # Get acting user's owner status
+        # Get acting user's owner status. The superuser cross-tenant bypass grants
+        # owner-equivalent access without a real membership row - OR it in the same way
+        # get_user_permissions_for_tenant already does for the general permission set.
         acting_user_membership = models.TenantMembership.objects.filter(
             user=user, tenant=tenant, is_accepted=True
         ).first()
-        is_acting_user_owner = acting_user_membership and (
-            acting_user_membership.role == TenantUserRole.OWNER
-            or models.TenantMembershipRole.objects.filter(
-                membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
-            ).exists()
+        is_acting_user_owner = models.is_superuser_bypass_eligible(user) or bool(
+            acting_user_membership
+            and (
+                acting_user_membership.role == TenantUserRole.OWNER
+                or models.TenantMembershipRole.objects.filter(
+                    membership=acting_user_membership, role__system_role_type=SystemRoleType.OWNER
+                ).exists()
+            )
         )
 
         # Check if target has owner role

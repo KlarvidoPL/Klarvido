@@ -266,14 +266,6 @@ PERMISSIONS: List[PermissionDefinition] = [
         category=PermissionCategory.FEATURES,
         sort_order=60,
     ),
-    # ============ Dashboard Permissions (Main App Dashboard/Home) ============
-    PermissionDefinition(
-        code="dashboard.view",
-        name="View Dashboard",
-        description="Access the main app dashboard/home page",
-        category=PermissionCategory.DASHBOARD,
-        sort_order=10,
-    ),
 ]
 
 
@@ -335,8 +327,6 @@ ROLE_TEMPLATE_PERMISSIONS = {
         "features.content.view",
         "features.crud.view",
         "features.crud.manage",
-        # Dashboard (main app)
-        "dashboard.view",
     ],
     SystemRoleType.MEMBER: [
         # Organization (view only)
@@ -351,8 +341,6 @@ ROLE_TEMPLATE_PERMISSIONS = {
         "features.documents.view",
         "features.content.view",
         "features.crud.view",
-        # Dashboard (main app)
-        "dashboard.view",
     ],
 }
 

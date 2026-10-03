@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client/react';
+import { getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Form, FormControl, FormField, FormItem, Input } from '@sb/webapp-core/components/forms';
@@ -6,6 +7,7 @@ import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Paragraph } from '@sb/webapp-core/components/typography';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { useToast } from '@sb/webapp-core/toast/useToast';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import { Bot, Send, Sparkles, User } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -59,7 +61,7 @@ export const SaasIdeas = () => {
     onError: (error) => {
       console.error('GraphQL Error:', error);
       console.error('Error details:', JSON.stringify(error, null, 2));
-      toast({ description: error.message, variant: 'destructive' });
+      toast({ description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl), variant: 'destructive' });
       setIsTyping(false);
     },
     onCompleted: (data) => {

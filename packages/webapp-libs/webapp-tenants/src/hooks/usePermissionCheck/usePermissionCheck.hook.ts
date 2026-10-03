@@ -19,7 +19,7 @@ import { currentUserPermissionsQuery } from '../../routes/tenantSettings/tenantR
  * const { hasAnyPermission } = usePermissionCheck(['dashboard.projects.edit', 'dashboard.projects.view']);
  *
  * // Check if user has all permissions
- * const { hasAllPermissions } = usePermissionCheck(['dashboard.view', 'dashboard.projects.edit']);
+ * const { hasAllPermissions } = usePermissionCheck(['org.settings.view', 'org.settings.edit']);
  */
 export const usePermissionCheck = (
   permissions: string | string[] = [],
@@ -129,10 +129,7 @@ export type PermissionCode =
   | 'features.content.view'
   | 'features.crud.view'
   | 'features.crud.manage'
-  // Dashboard (main app)
-  | 'dashboard.view'
   // Management Dashboard
-  | 'management.view'
   | 'management.analytics.view'
   | 'management.clients.view'
   | 'management.clients.edit'
@@ -169,6 +166,5 @@ export type PermissionCode =
   | 'security.*'
   | 'billing.*'
   | 'features.*'
-  | 'dashboard.*'
   | 'management.*'
   | 'backup.*';

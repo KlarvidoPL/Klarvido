@@ -1,9 +1,11 @@
 import { useMutation } from '@apollo/client/react';
+import { getGraphQLErrorDetail } from '@sb/webapp-api-client/api';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { Switch } from '@sb/webapp-core/components/ui/switch';
 import { useToast } from '@sb/webapp-core/toast';
+import { getGenericErrorMessage } from '@sb/webapp-core/utils/graphQLErrorMessage';
 import { Activity, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -39,7 +41,7 @@ export const LoggingSettingsCard = () => {
           defaultMessage: 'Error',
           id: 'Activity Logs / Error title',
         }),
-        description: error.message,
+        description: getGraphQLErrorDetail(error) ?? getGenericErrorMessage(intl),
       });
     },
   });

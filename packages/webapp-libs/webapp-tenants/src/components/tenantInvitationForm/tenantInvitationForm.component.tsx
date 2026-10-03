@@ -17,6 +17,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useCurrentTenant } from '../../providers';
 import { allOrganizationRolesQuery } from '../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
+import { getSystemRoleDisplay } from '../../utils/organizationRoleDisplay';
 import { UseTenantInvitationFormHookProps, useTenantInvitationForm } from './tenantInvitationForm.hook';
 
 export type TenantInvitationFormFields = {
@@ -35,6 +36,7 @@ interface OrganizationRole {
   color?: string | null;
   isSystemRole?: boolean | null;
   isOwnerRole?: boolean | null;
+  systemRoleType?: string | null;
 }
 
 // Role color badge component
@@ -61,7 +63,11 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch organization roles for this tenant
-  const { data: rolesData, loading: rolesLoading } = useQuery(allOrganizationRolesQuery, {
+  const {
+    data: rolesData,
+    loading: rolesLoading,
+    error: rolesError,
+  } = useQuery(allOrganizationRolesQuery, {
     variables: { tenantId },
     skip: !tenantId,
   });
@@ -76,7 +82,14 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
       color: role.color ?? undefined,
       isSystemRole: role.isSystemRole ?? undefined,
       isOwnerRole: role.isOwnerRole ?? undefined,
+      systemRoleType: role.systemRoleType ?? undefined,
     }));
+
+  const getRoleDisplayName = useCallback(
+    (role: OrganizationRole) =>
+      role.isSystemRole ? getSystemRoleDisplay(intl, role.systemRoleType, role.name).name : role.name,
+    [intl]
+  );
 
   const {
     form: {
@@ -125,8 +138,8 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
       });
     }
     const selectedRoles = availableRoles.filter((r) => selectedRoleIds.includes(r.id));
-    return selectedRoles.map((r) => r.name).join(', ');
-  }, [selectedRoleIds, availableRoles, intl]);
+    return selectedRoles.map((r) => getRoleDisplayName(r)).join(', ');
+  }, [selectedRoleIds, availableRoles, intl, getRoleDisplayName]);
 
   return (
     <Card>
@@ -227,14 +240,26 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                             'text-muted-foreground': !selectedRoleIds || selectedRoleIds.length === 0,
                           })}
                         >
-                          {rolesLoading ? 'Loading...' : getSelectedRolesDisplay()}
+                          {rolesLoading
+                          ? intl.formatMessage({
+                              defaultMessage: 'Loading...',
+                              id: 'Tenant invitation form / Roles loading',
+                            })
+                          : getSelectedRolesDisplay()}
                         </span>
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </button>
 
                       {rolesDropdownOpen && (
                         <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover p-2 shadow-md">
-                          {availableRoles.length === 0 ? (
+                          {rolesError ? (
+                            <p className="py-2 text-center text-sm text-destructive dark:text-red-400">
+                              <FormattedMessage
+                                defaultMessage="Failed to load roles. Please try again."
+                                id="Tenant invitation form / Roles load error"
+                              />
+                            </p>
+                          ) : availableRoles.length === 0 ? (
                             <p className="py-2 text-center text-sm text-muted-foreground">
                               <FormattedMessage
                                 defaultMessage="No roles available"
@@ -267,9 +292,14 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                                       {isSelected && <Check className="h-3 w-3" />}
                                     </div>
                                     <RoleColorBadge color={role.color || 'BLUE'} />
-                                    <span className="text-sm">{role.name}</span>
+                                    <span className="text-sm">{getRoleDisplayName(role)}</span>
                                     {role.isSystemRole && (
-                                      <span className="text-xs text-muted-foreground">(System)</span>
+                                      <span className="text-xs text-muted-foreground">
+                                        <FormattedMessage
+                                          defaultMessage="(System)"
+                                          id="Tenant invitation form / System role suffix"
+                                        />
+                                      </span>
                                     )}
                                   </button>
                                 );
