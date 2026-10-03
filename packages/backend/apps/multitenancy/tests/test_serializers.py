@@ -128,6 +128,46 @@ class TestCreateTenantInvitationSerializer:
         assert "permissions you don't have" in error_text
         assert "billing.manage" in error_text
 
+    def test_cannot_invite_with_legacy_owner_role_as_non_owner(
+        self, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """
+        SECURITY: The legacy 'role' field is a separate input from organization_role_ids and
+        bypasses it entirely, so without its own Owner-role check a non-owner inviter could
+        hand a brand new member the legacy OWNER role directly - which every Owner-gate in the
+        app treats as a valid "is owner" signal, granting real owner-bypass privileges with no
+        check at all.
+        """
+        tenant = tenant_factory(name="Test Tenant", type=TenantType.ORGANIZATION)
+        inviter = user_factory()
+        tenant_membership_factory(user=inviter, tenant=tenant, role=TenantUserRole.ADMIN, is_accepted=True)
+
+        data = {
+            "email": "new_user@example.com",
+            "role": TenantUserRole.OWNER,
+            "tenant_id": str(tenant.id),
+        }
+        serializer = CreateTenantInvitationSerializer(data=data, context={'request': Mock(tenant=tenant, user=inviter)})
+
+        assert not serializer.is_valid()
+        assert "Only organization owners can invite members with the Owner role." in str(
+            serializer.errors['non_field_errors'][0]
+        )
+        assert not TenantMembership.objects.get_not_accepted().filter(tenant=tenant, role=TenantUserRole.OWNER).exists()
+
+    def test_owner_can_invite_with_legacy_owner_role(self, user, tenant_factory, tenant_membership_factory):
+        tenant = tenant_factory(name="Test Tenant", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
+
+        data = {
+            "email": "new_user@example.com",
+            "role": TenantUserRole.OWNER,
+            "tenant_id": str(tenant.id),
+        }
+        serializer = CreateTenantInvitationSerializer(data=data, context={'request': Mock(tenant=tenant, user=user)})
+
+        assert serializer.is_valid(), serializer.errors
+
     def test_owner_can_invite_with_role_granting_any_permission(self, user, tenant_factory, tenant_membership_factory):
         """An owner inviter is exempt from the permission-coverage check."""
         tenant = tenant_factory(name="Test Tenant", type=TenantType.ORGANIZATION)

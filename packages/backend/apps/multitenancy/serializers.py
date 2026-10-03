@@ -259,32 +259,40 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
                 _("This user cannot be a member of this organization."), code="user_cannot_be_invited"
             )
 
+        # Check if inviter is an owner (needed for owner role assignment validation, for both
+        # the legacy role field below and organization_role_ids further down). The superuser
+        # cross-tenant bypass grants owner-equivalent access without a real membership row -
+        # OR it in the same way get_user_permissions_for_tenant already does for the general
+        # permission set.
+        inviter = request.user if request else None
+        is_inviter_owner = False
+        if inviter:
+            inviter_membership = models.TenantMembership.objects.filter(
+                user=inviter, tenant=tenant, is_accepted=True
+            ).first()
+            is_inviter_owner = models.is_superuser_bypass_eligible(inviter) or bool(
+                inviter_membership
+                and (
+                    inviter_membership.role == TenantUserRole.OWNER
+                    or models.TenantMembershipRole.objects.filter(
+                        membership=inviter_membership, role__system_role_type=SystemRoleType.OWNER
+                    ).exists()
+                )
+            )
+
+        # SECURITY: Only owners can invite with the legacy Owner role too - this field bypasses
+        # organization_role_ids entirely, so without this check a non-owner with just
+        # members.invite could hand a brand new member real owner-bypass privileges (the legacy
+        # role field is treated as a valid "is owner" signal throughout the app) with no check
+        # at all, same class of gap as organization_role_ids below.
+        if attrs.get("role") == TenantUserRole.OWNER and not is_inviter_owner:
+            raise serializers.ValidationError(_("Only organization owners can invite members with the Owner role."))
+
         # Validate and decode organization role IDs if provided
         org_role_ids = attrs.get("organization_role_ids", [])
         if org_role_ids:
             valid_roles = {str(r.id): r for r in models.OrganizationRole.objects.filter(tenant=tenant)}
             decoded_role_ids = []
-
-            # Check if inviter is an owner (needed for owner role assignment validation).
-            # The superuser cross-tenant bypass grants owner-equivalent access without a
-            # real membership row - OR it in the same way get_user_permissions_for_tenant
-            # already does for the general permission set below.
-            inviter = request.user if request else None
-            is_inviter_owner = False
-            if inviter:
-                inviter_membership = models.TenantMembership.objects.filter(
-                    user=inviter, tenant=tenant, is_accepted=True
-                ).first()
-                is_inviter_owner = models.is_superuser_bypass_eligible(inviter) or bool(
-                    inviter_membership
-                    and (
-                        inviter_membership.role == TenantUserRole.OWNER
-                        or models.TenantMembershipRole.objects.filter(
-                            membership=inviter_membership, role__system_role_type=SystemRoleType.OWNER
-                        ).exists()
-                    )
-                )
-
             inviter_permissions = models.get_user_permissions_for_tenant(inviter, tenant) if inviter else set()
 
             for role_id in org_role_ids:
@@ -443,11 +451,14 @@ class UpdateTenantMembershipSerializer(serializers.ModelSerializer):
             acting_membership = models.TenantMembership.objects.filter(
                 user=acting_user, tenant=tenant, is_accepted=True
             ).first()
-            is_acting_user_owner = acting_membership and (
-                acting_membership.role == TenantUserRole.OWNER
-                or models.TenantMembershipRole.objects.filter(
-                    membership=acting_membership, role__system_role_type=SystemRoleType.OWNER
-                ).exists()
+            is_acting_user_owner = models.is_superuser_bypass_eligible(acting_user) or bool(
+                acting_membership
+                and (
+                    acting_membership.role == TenantUserRole.OWNER
+                    or models.TenantMembershipRole.objects.filter(
+                        membership=acting_membership, role__system_role_type=SystemRoleType.OWNER
+                    ).exists()
+                )
             )
             if not is_acting_user_owner:
                 raise exceptions.PermissionDenied("permission_denied")
@@ -471,11 +482,22 @@ class UpdateTenantMembershipSerializer(serializers.ModelSerializer):
                     membership=acting_membership, role__system_role_type=SystemRoleType.OWNER
                 ).exists()
             )
-            is_acting_user_owner = is_acting_user_legacy_owner or is_acting_user_rbac_owner
+            is_acting_user_owner = (
+                models.is_superuser_bypass_eligible(acting_user)
+                or is_acting_user_legacy_owner
+                or is_acting_user_rbac_owner
+            )
 
             # SECURITY: Only owners can modify owner memberships
             if is_currently_owner and not is_acting_user_owner:
                 raise exceptions.PermissionDenied("Only owners can modify the role of other owners.")
+
+            # SECURITY: Only owners can promote a member to Owner. Without this, a non-owner
+            # with just members.roles.edit could set another member's legacy role straight to
+            # OWNER - which every Owner-gate in the app (this one included) treats as a valid
+            # "is owner" signal, handing that member real owner-bypass privileges everywhere.
+            if new_role == TenantUserRole.OWNER and not is_currently_owner and not is_acting_user_owner:
+                raise exceptions.PermissionDenied("Only organization owners can assign the Owner role.")
 
         # SECURITY: Prevent demoting the last owner
         if is_currently_owner and new_role != TenantUserRole.OWNER:

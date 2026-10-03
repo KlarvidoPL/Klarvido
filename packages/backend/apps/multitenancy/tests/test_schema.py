@@ -1328,6 +1328,72 @@ class TestUpdateTenantMembershipMutation:
         assert action_log is not None
         assert action_log.actor_type == ActionActorType.USER
 
+    def test_non_owner_cannot_promote_another_member_to_owner_via_legacy_role(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """Regression coverage for a privilege-escalation gap: the legacy
+        TenantMembership.role field is treated as a valid "is owner" signal throughout
+        the app (AssignRolesToMemberMutation, invite flow, DeleteOrganizationRoleMutation,
+        this mutation itself, ...), but nothing stopped a non-owner with just
+        members.roles.edit from setting another member's legacy role straight to OWNER -
+        instantly handing that member real owner-bypass privileges everywhere, without ever
+        passing any of those checks legitimately."""
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        acting_user = user_factory()
+        acting_membership = tenant_membership_factory(
+            user=acting_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+        # Replace the test factory's auto-assigned Member RBAC role with a custom role
+        # granting only members.roles.edit, matching a real non-owner "role manager" admin.
+        TenantMembershipRole.objects.filter(membership=acting_membership).delete()
+        manager_role = OrganizationRole.objects.create(tenant=tenant, name="Role Manager", description="")
+        manager_role.permissions.set([Permission.objects.get(code="members.roles.edit")])
+        TenantMembershipRole.objects.create(membership=acting_membership, role=manager_role, assigned_by=acting_user)
+
+        target_user = user_factory()
+        target_membership = tenant_membership_factory(
+            user=target_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+
+        graphene_client.force_authenticate(acting_user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.MEMBER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", target_membership.id),
+                "role": "OWNER",
+            },
+        )
+
+        assert executed["errors"][0]["message"] == "Only organization owners can assign the Owner role."
+        target_membership.refresh_from_db()
+        assert target_membership.role != TenantUserRole.OWNER
+
+    def test_owner_can_promote_another_member_to_owner(
+        self, graphene_client, user, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER, is_accepted=True)
+        target_user = user_factory()
+        target_membership = tenant_membership_factory(
+            user=target_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = self.mutate(
+            graphene_client,
+            {
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "id": to_global_id("TenantMembershipType", target_membership.id),
+                "role": "OWNER",
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["updateTenantMembership"]["tenantMembership"]["role"] == TenantUserRole.OWNER
+
     @classmethod
     def mutate(cls, graphene_client, data):
         return graphene_client.mutate(cls.MUTATION, variable_values={'input': data})
