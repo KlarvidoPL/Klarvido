@@ -6,6 +6,8 @@ from graphene.types.generic import GenericScalar
 from graphql_relay import to_global_id, from_global_id
 from graphene_django import DjangoObjectType
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.db import transaction
 from django.db import close_old_connections
 from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
@@ -24,7 +26,7 @@ from . import models
 from . import serializers
 from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
-from .services.onboarding import save_onboarding_step
+from .services.onboarding import save_onboarding_step, save_profile_step
 from .validators import validate_tax_id
 from .constants import (
     CompanyCountry as ConstantsCompanyCountry,
@@ -383,7 +385,28 @@ class CreateTenantMutation(mutations.CreateModelMutation):
         edge_class = TenantConnection.Edge
 
 
+class OnboardingCompanyInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
+    country = graphene.String(required=True)
+    nip = graphene.String(required=True)
+    company_name = graphene.String(required=True)
+    regon = graphene.String(required=True)
+    address = graphene.String(required=True)
+    vat_status = graphene.String(required=True)
+
+
+class OnboardingCompanyType(graphene.ObjectType):
+    name = graphene.String()
+    country = graphene.String()
+    nip = graphene.String()
+    company_name = graphene.String()
+    regon = graphene.String()
+    address = graphene.String()
+    vat_status = graphene.String()
+
+
 class OrganizationOnboardingProfileType(graphene.ObjectType):
+    company_data = graphene.Field(OnboardingCompanyType)
     respondent_role = graphene.String()
     customer_type = graphene.String()
     revenue_models = graphene.List(graphene.String)
@@ -423,6 +446,63 @@ class SaveOrganizationOnboardingStepMutation(graphene.Mutation):
         except DRFValidationError as error:
             raise exceptions.GraphQlValidationError(error.detail)
         return cls(profile=profile)
+
+
+class SaveOrganizationOnboardingDraftMutation(graphene.Mutation):
+    class Arguments:
+        step = graphene.Int(required=True)
+        company = OnboardingCompanyInput()
+        respondent_role = graphene.String()
+        customer_type = graphene.String()
+        revenue_models = graphene.List(graphene.String)
+        cost_drivers = graphene.List(graphene.String)
+        pricing = graphene.String()
+        main_goal = graphene.String()
+        ksef_token = graphene.String()
+
+    profile = graphene.Field(OrganizationOnboardingProfileType)
+    tenant = graphene.Field(TenantType)
+
+    @classmethod
+    @transaction.atomic
+    def mutate(cls, root, info, step, company=None, **answers):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        get_user_model().objects.select_for_update().get(pk=user.pk)
+        profile = models.OrganizationOnboardingProfile.objects.filter(draft_owner=user).first()
+        try:
+            if step == 1:
+                serializer = serializers.TenantSerializer(data=dict(company or {}), context={"request": info.context})
+                serializer.is_valid(raise_exception=True)
+                if profile is None:
+                    profile = models.OrganizationOnboardingProfile(draft_owner=user, is_required=True)
+                profile.company_data = dict(serializer.validated_data)
+                profile.save()
+            else:
+                if profile is None:
+                    raise DRFValidationError({'step': 'Complete the company details first.'})
+                if step == 7 and company is not None:
+                    serializer = serializers.TenantSerializer(data=dict(company), context={"request": info.context})
+                    serializer.is_valid(raise_exception=True)
+                    profile.company_data = dict(serializer.validated_data)
+                    for answer_step in range(2, 6):
+                        save_profile_step(profile, answer_step, **answers)
+                save_profile_step(profile, step, **answers)
+            tenant = None
+            if step == 7:
+                # Validate again under the account lock; create membership and attach the completed profile atomically.
+                serializer = serializers.TenantSerializer(data=profile.company_data, context={"request": info.context})
+                serializer.is_valid(raise_exception=True)
+                tenant = serializer.save()
+                models.OrganizationOnboardingProfile.objects.filter(tenant=tenant).delete()
+                profile.tenant = tenant
+                profile.draft_owner = None
+                profile.company_data = {}
+                profile.save()
+        except DRFValidationError as error:
+            raise exceptions.GraphQlValidationError(error.detail)
+        return cls(profile=profile, tenant=tenant)
 
 
 @action_logged(entity_type="tenant", action_type=ActionType.UPDATE)
@@ -1312,6 +1392,32 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
 
 
 class Query(graphene.ObjectType):
+    organization_onboarding_draft = graphene.Field(OrganizationOnboardingProfileType)
+    organization_nip_exists = graphene.Boolean(
+        nip=graphene.String(required=True), country=graphene.String(required=True)
+    )
+
+    @staticmethod
+    def resolve_organization_onboarding_draft(root, info):
+        if not info.context.user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return models.OrganizationOnboardingProfile.objects.filter(draft_owner=info.context.user).first()
+
+    @staticmethod
+    def resolve_organization_nip_exists(root, info, nip, country):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            nip = validate_tax_id(nip, country)
+        except DRFValidationError as error:
+            raise exceptions.GraphQlValidationError({'nip': error.detail})
+        return (
+            models.Tenant.objects.filter(type=ConstantsTenantType.ORGANIZATION, country=country, nip=nip)
+            .filter(Q(creator=user) | Q(user_memberships__user=user, user_memberships__is_accepted=True))
+            .exists()
+        )
+
     all_tenants = graphene.relay.ConnectionField(TenantConnection)
     tenant = graphene.Field(TenantType, id=graphene.ID())
     organization_onboarding_profile = graphene.Field(
@@ -1551,6 +1657,7 @@ class Mutation(graphene.ObjectType):
     - delete_tenant_membership: Requires members.remove permission
     """
 
+    save_organization_onboarding_draft = SaveOrganizationOnboardingDraftMutation.Field()
     create_tenant = CreateTenantMutation.Field()
     accept_tenant_invitation = AcceptTenantInvitationMutation.Field()
     decline_tenant_invitation = DeclineTenantInvitationMutation.Field()

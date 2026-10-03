@@ -3,6 +3,7 @@ from rest_framework import serializers, exceptions
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from graphql_relay import to_global_id, from_global_id
@@ -82,9 +83,31 @@ class TenantSerializer(serializers.ModelSerializer):
 
         if errors:
             raise serializers.ValidationError(errors)
+        self.validate_duplicate_nip(attrs)
         return attrs
 
+    def validate_duplicate_nip(self, attrs):
+        nip = attrs.get("nip")
+        if not nip:
+            return
+        user = self.context["request"].user
+        organizations = models.Tenant.objects.filter(
+            type=TenantType.ORGANIZATION,
+            country=attrs.get("country", getattr(self.instance, "country", CompanyCountry.POLAND)),
+            nip=nip,
+        ).filter(Q(creator=user) | Q(user_memberships__user=user, user_memberships__is_accepted=True))
+        if self.instance:
+            organizations = organizations.exclude(pk=self.instance.pk)
+        if organizations.exists():
+            raise serializers.ValidationError(
+                {"nip": _("An organization with this NIP already exists in your account.")}
+            )
+
+    @transaction.atomic
     def create(self, validated_data):
+        # Serialize creations for one account so concurrent submissions cannot add the same NIP twice.
+        get_user_model().objects.select_for_update().get(pk=self.context["request"].user.pk)
+        self.validate_duplicate_nip(validated_data)
         from .permissions import create_system_roles_for_tenant
 
         validated_data["creator"] = self.context["request"].user

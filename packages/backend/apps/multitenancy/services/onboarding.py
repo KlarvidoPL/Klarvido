@@ -51,6 +51,10 @@ def save_onboarding_step(tenant, step, **answers):
         raise ValidationError({'tenant': 'Onboarding is available only for organizations.'})
 
     profile, _ = OrganizationOnboardingProfile.objects.get_or_create(tenant=tenant)
+    return save_profile_step(profile, step, **answers)
+
+
+def save_profile_step(profile, step, **answers):
     if step > profile.current_step:
         raise ValidationError({'step': 'Complete the previous onboarding steps first.'})
     if step == 2:

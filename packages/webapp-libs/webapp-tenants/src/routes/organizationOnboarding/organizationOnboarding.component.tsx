@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
 import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
@@ -8,6 +8,7 @@ import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { cn } from '@sb/webapp-core/lib/utils';
+import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast';
 import { ArrowLeft, ArrowRight, Building2, Loader2 } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -24,11 +25,15 @@ import {
 import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import { useGenerateTenantPath } from '../../hooks';
+import { useCompanyLookup } from '../../hooks/useCompanyLookup';
 import { useCurrentTenant } from '../../providers';
 import { normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
 import {
+  organizationNipExistsQuery,
+  organizationOnboardingDraftQuery,
   organizationOnboardingProfileQuery,
+  saveOrganizationOnboardingDraftMutation,
   saveOrganizationOnboardingStepMutation,
   updateOnboardingTenantMutation,
 } from './organizationOnboarding.graphql';
@@ -72,8 +77,14 @@ const ChoiceGroup = ({
   const labelsKey = options.map(({ label, hint }) => `${label}:${hint ?? ''}`).join('|');
 
   useLayoutEffect(() => {
-    const widestLabel = Math.max(...measurementRefs.current.map((element) => element?.offsetWidth ?? 0));
-    setOptionWidth(Math.max(192, widestLabel + 32));
+    const measure = () => {
+      const widestLabel = Math.max(...measurementRefs.current.map((element) => element?.offsetWidth ?? 0));
+      setOptionWidth(Math.max(192, widestLabel + 34));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    measurementRefs.current.forEach((element) => element && observer.observe(element));
+    return () => observer.disconnect();
   }, [labelsKey]);
 
   return (
@@ -126,9 +137,16 @@ const ChoiceGroup = ({
   );
 };
 
-export const OrganizationOnboarding = () => {
-  const { data: tenant } = useCurrentTenant();
-  const tenantId = tenant?.id ?? '';
+export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: boolean }) => {
+  const { data: currentTenant } = useCurrentTenant();
+  const draftQuery = useQuery(organizationOnboardingDraftQuery, { skip: !draftMode, fetchPolicy: 'network-only' });
+  const tenant = draftMode ? draftQuery.data?.organizationOnboardingDraft?.companyData : currentTenant;
+  const { lookup, loading: lookupLoading } = useCompanyLookup();
+  const [checkNip, { loading: checkingNip }] = useLazyQuery(organizationNipExistsQuery, {
+    fetchPolicy: 'network-only',
+  });
+  const [saveDraft, { loading: savingDraft }] = useMutation(saveOrganizationOnboardingDraftMutation);
+  const tenantId = draftMode ? '' : (currentTenant?.id ?? '');
   const navigate = useNavigate();
   const tenantPath = useGenerateTenantPath();
   const intl = useIntl();
@@ -137,11 +155,13 @@ export const OrganizationOnboarding = () => {
   const [step, setStep] = useState(2);
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [loaded, setLoaded] = useState(false);
-  const { data, loading, error, refetch } = useQuery(organizationOnboardingProfileQuery, {
+  const tenantQuery = useQuery(organizationOnboardingProfileQuery, {
     variables: { tenantId },
-    skip: !tenantId,
+    skip: draftMode || !tenantId,
     fetchPolicy: 'network-only',
   });
+  const { loading, error, refetch } = draftMode ? draftQuery : tenantQuery;
+  const data = draftMode ? draftQuery.data : tenantQuery.data;
   const [saveStep, { loading: saving }] = useMutation(saveOrganizationOnboardingStepMutation);
   const [updateTenant, { loading: updatingTenant }] = useMutation(updateOnboardingTenantMutation);
   const {
@@ -161,10 +181,13 @@ export const OrganizationOnboarding = () => {
       vatStatus: tenant?.vatStatus ?? '',
     },
   });
-  const profile = data?.organizationOnboardingProfile;
+  const profile = draftMode
+    ? draftQuery.data?.organizationOnboardingDraft
+    : tenantQuery.data?.organizationOnboardingProfile;
   const initializedTenantId = useRef<string | undefined>(undefined);
+  const sourceId = draftMode ? 'draft' : tenantId;
   useEffect(() => {
-    if (!tenant || initializedTenantId.current === tenant.id) return;
+    if (!tenant || initializedTenantId.current === sourceId) return;
     tenantForm.reset({
       name: tenant.name ?? '',
       country: tenant.country ?? '',
@@ -174,8 +197,8 @@ export const OrganizationOnboarding = () => {
       address: tenant.address ?? '',
       vatStatus: tenant.vatStatus ?? '',
     });
-    initializedTenantId.current = tenant.id;
-  }, [tenant, tenantForm]);
+    initializedTenantId.current = sourceId;
+  }, [tenant, tenantForm, sourceId]);
   useEffect(() => {
     if (!data || loaded) return;
     setAnswers({
@@ -350,12 +373,48 @@ export const OrganizationOnboarding = () => {
                 : true;
 
   const onNext = async () => {
-    if (!tenantId || !canContinue) return;
+    if ((!tenantId && !draftMode) || !canContinue) return;
     if (step < 2) {
       const fields = step === 0 ? (['name', 'country', 'nip'] as const) : COMPANY_DETAILS_FIELDS;
       if (!(await tenantForm.trigger([...fields]))) return;
       const values = tenantForm.getValues();
       try {
+        if (draftMode) {
+          if (step === 0) {
+            const nip = normalizeTaxId(values.nip, values.country);
+            const result = await checkNip({ variables: { nip, country: values.country } });
+            if (result.data?.organizationNipExists) {
+              tenantForm.setError('nip', {
+                message: intl.formatMessage({
+                  defaultMessage: 'An organization with this NIP already exists in your account.',
+                  id: 'Onboarding / Duplicate NIP',
+                }),
+              });
+              return;
+            }
+            if (nip !== tenant?.nip || values.country !== tenant?.country) {
+              const company = await lookup(nip, values.country);
+              tenantForm.setValue('companyName', company?.companyName ?? '');
+              tenantForm.setValue('regon', company?.regon ?? '');
+              tenantForm.setValue('address', company?.address ?? '');
+              tenantForm.setValue('vatStatus', company?.vatStatus ?? '');
+            }
+          } else {
+            await saveDraft({
+              variables: {
+                step: 1,
+                company: {
+                  ...values,
+                  nip: normalizeTaxId(values.nip, values.country),
+                  regon: normalizeDigits(values.regon),
+                },
+              },
+            });
+            await refetch();
+          }
+          setStep(step + 1);
+          return;
+        }
         await updateTenant({
           variables: {
             input: {
@@ -396,19 +455,34 @@ export const OrganizationOnboarding = () => {
       return;
     }
     try {
-      await saveStep({
-        variables: {
-          tenantId,
-          step,
-          ...(step === 2 ? { respondentRole: answers.respondentRole, customerType: answers.customerType } : {}),
-          ...(step === 3 ? { revenueModels: answers.revenueModels } : {}),
-          ...(step === 4 ? { costDrivers: answers.costDrivers } : {}),
-          ...(step === 5 ? { pricing: answers.pricing, mainGoal: answers.mainGoal } : {}),
-          ...(step === 6 ? { ksefToken: answers.ksefToken } : {}),
-        },
-      });
+      const variables = {
+        step,
+        ...(draftMode && step === 7
+          ? {
+              company: {
+                ...tenantForm.getValues(),
+                nip: normalizeTaxId(tenantForm.getValues('nip'), tenantForm.getValues('country')),
+                regon: normalizeDigits(tenantForm.getValues('regon')),
+              },
+              respondentRole: answers.respondentRole,
+              customerType: answers.customerType,
+              revenueModels: answers.revenueModels,
+              costDrivers: answers.costDrivers,
+              pricing: answers.pricing,
+              mainGoal: answers.mainGoal,
+            }
+          : {}),
+        ...(step === 2 ? { respondentRole: answers.respondentRole, customerType: answers.customerType } : {}),
+        ...(step === 3 ? { revenueModels: answers.revenueModels } : {}),
+        ...(step === 4 ? { costDrivers: answers.costDrivers } : {}),
+        ...(step === 5 ? { pricing: answers.pricing, mainGoal: answers.mainGoal } : {}),
+        ...(step === 6 ? { ksefToken: answers.ksefToken } : {}),
+      };
+      const created = draftMode
+        ? (await saveDraft({ variables })).data?.saveOrganizationOnboardingDraft?.tenant
+        : (await saveStep({ variables: { ...variables, tenantId } }), null);
       if (step === 6) update({ ksefToken: '', ksefDemoConnected: true });
-      await refetch();
+      if (step !== 7 || !draftMode) await refetch();
       if (step === 7) {
         await reloadCommonQuery();
         toast({
@@ -420,9 +494,34 @@ export const OrganizationOnboarding = () => {
             : intl.formatMessage({ defaultMessage: 'Onboarding completed', id: 'Onboarding / Completed' }),
           variant: 'success',
         });
-        navigate(tenantPath(RoutesConfig.home));
+        if (created) trackEvent('tenant', 'add', created.id);
+        navigate(tenantPath(RoutesConfig.home, created ? { tenantId: created.id } : undefined));
       } else setStep(step + 1);
-    } catch {
+    } catch (mutationError) {
+      const graphQLErrors = extractGraphQLErrors(mutationError);
+      if (graphQLErrors) {
+        setApolloGraphQLResponseErrors(graphQLErrors);
+        const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
+        const fieldsWithErrors = Object.keys(validationError?.extensions ?? {});
+        if (['name', 'country', 'nip'].some((field) => fieldsWithErrors.includes(field))) setStep(0);
+        else if (
+          ['companyName', 'company_name', 'regon', 'address', 'vatStatus', 'vat_status'].some((field) =>
+            fieldsWithErrors.includes(field)
+          )
+        )
+          setStep(1);
+        if (validationError?.extensions?.['nip']) {
+          const nipErrors = JSON.stringify(validationError.extensions['nip']);
+          if (nipErrors.includes('already exists in your account')) {
+            tenantForm.setError('nip', {
+              message: intl.formatMessage({
+                defaultMessage: 'An organization with this NIP already exists in your account.',
+                id: 'Onboarding / Duplicate NIP',
+              }),
+            });
+          }
+        }
+      }
       toast({
         description: intl.formatMessage({
           defaultMessage: 'Could not save this step. Please try again.',
@@ -460,13 +559,24 @@ export const OrganizationOnboarding = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
-            <FormattedMessage defaultMessage="Set up your organization" id="Onboarding / Title" />
+            {draftMode ? (
+              <FormattedMessage defaultMessage="Add Organization" id="Tenant form / AddTenant / Card title" />
+            ) : (
+              <FormattedMessage defaultMessage="Set up your organization" id="Onboarding / Title" />
+            )}
           </CardTitle>
           <CardDescription>
-            <FormattedMessage
-              defaultMessage="Tell us how your business works. You can return to earlier steps."
-              id="Onboarding / Description"
-            />
+            {draftMode ? (
+              <FormattedMessage
+                defaultMessage="Enter the details for your new organization"
+                id="Tenant form / AddTenant / Card description"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Tell us how your business works. You can return to earlier steps."
+                id="Onboarding / Description"
+              />
+            )}
           </CardDescription>
           <OnboardingProgress
             step={step + 1}
@@ -487,14 +597,14 @@ export const OrganizationOnboarding = () => {
               {step === 0 && (
                 <>
                   <DisplayNameField />
-                  <CountryField locked={!!tenant?.country} />
-                  <NipField locked={!!tenant?.nip} />
+                  <CountryField locked={!draftMode && !!tenant?.country} />
+                  <NipField locked={!draftMode && !!tenant?.nip} />
                 </>
               )}
               {step === 1 && (
                 <CompanyDetailsFields
-                  regonLocked={!!tenant?.regon}
-                  showLockHint={!!tenant?.country || !!tenant?.nip || !!tenant?.regon}
+                  regonLocked={!draftMode && !!tenant?.regon}
+                  showLockHint={!draftMode && (!!tenant?.country || !!tenant?.nip || !!tenant?.regon)}
                 />
               )}
               {step === 2 && (
@@ -688,6 +798,8 @@ export const OrganizationOnboarding = () => {
                           tenantForm.getValues('companyName'),
                           tenantForm.getValues('nip'),
                           tenantForm.getValues('regon'),
+                          tenantForm.getValues('address'),
+                          tenantForm.getValues('vatStatus'),
                         ]
                           .filter(Boolean)
                           .join(' · '),
@@ -762,7 +874,7 @@ export const OrganizationOnboarding = () => {
                     type="button"
                     variant={ButtonVariant.SECONDARY}
                     onClick={onBack}
-                    disabled={saving || updatingTenant}
+                    disabled={saving || savingDraft || updatingTenant || lookupLoading || checkingNip}
                     icon={<ArrowLeft className="h-4 w-4" />}
                     className="w-full sm:w-fit"
                   >
@@ -771,12 +883,23 @@ export const OrganizationOnboarding = () => {
                 )}
                 <Button
                   type="submit"
-                  disabled={saving || updatingTenant || !canContinue}
+                  disabled={saving || savingDraft || updatingTenant || lookupLoading || checkingNip || !canContinue}
                   className="w-full sm:w-fit"
-                  icon={saving || updatingTenant ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
+                  icon={
+                    saving || savingDraft || updatingTenant || lookupLoading || checkingNip ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : undefined
+                  }
                 >
                   {step === 7 ? (
-                    <FormattedMessage defaultMessage="Confirm profile" id="Onboarding / Confirm" />
+                    draftMode ? (
+                      <FormattedMessage
+                        defaultMessage="Create organization"
+                        id="Tenant form / AddTenant / Submit button"
+                      />
+                    ) : (
+                      <FormattedMessage defaultMessage="Confirm profile" id="Onboarding / Confirm" />
+                    )
                   ) : (
                     <>
                       <FormattedMessage defaultMessage="Next" id="Onboarding / Next" />

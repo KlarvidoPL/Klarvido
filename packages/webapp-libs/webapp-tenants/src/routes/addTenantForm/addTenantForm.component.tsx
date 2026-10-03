@@ -1,17 +1,14 @@
-import { useMutation } from '@apollo/client/react';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
 import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
-import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { cn } from '@sb/webapp-core/lib/utils';
-import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { useNavigate } from 'react-router';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import {
   COMPANY_DETAILS_FIELDS,
@@ -22,8 +19,6 @@ import {
 } from '../../components/companyDetailsFields';
 import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
-import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
-import { useGenerateTenantPath } from '../../hooks';
 import {
   CompanyDetails,
   getMissingCompanyFields,
@@ -32,7 +27,12 @@ import {
 } from '../../hooks/useCompanyLookup';
 import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
-import { addTenantMutation } from './addTenantForm.graphql';
+import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
+import {
+  organizationNipExistsQuery,
+  organizationOnboardingDraftQuery,
+  saveOrganizationOnboardingDraftMutation,
+} from '../organizationOnboarding/organizationOnboarding.graphql';
 
 enum Step {
   BASICS = 1,
@@ -42,9 +42,16 @@ enum Step {
 const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
 export const AddTenantForm = () => {
-  const generateTenantPath = useGenerateTenantPath();
-  const navigate = useNavigate();
-  const { reload: reloadCommonQuery } = useCommonQuery();
+  const intl = useIntl();
+  const {
+    data: draft,
+    loading: draftLoading,
+    error: draftError,
+    refetch: refetchDraft,
+  } = useQuery(organizationOnboardingDraftQuery, { fetchPolicy: 'network-only' });
+  const [checkNip, { loading: checkingNip }] = useLazyQuery(organizationNipExistsQuery, {
+    fetchPolicy: 'network-only',
+  });
   const { lookup, loading: lookupLoading } = useCompanyLookup();
 
   const [step, setStep] = useState<Step>(Step.BASICS);
@@ -76,7 +83,7 @@ export const AddTenantForm = () => {
   } = form;
 
   // Every company field is required: as soon as step 2 opens, flag the ones the register didn't fill (red error on
-  // each), and keep "Create organization" disabled until all of them are filled in and valid
+  // each), and keep "Next" disabled until all of them are filled in and valid
   useEffect(() => {
     if (step === Step.COMPANY_DETAILS) {
       trigger([...COMPANY_DETAILS_FIELDS]);
@@ -87,36 +94,52 @@ export const AddTenantForm = () => {
     (field, index) => !companyValues[index] || !!errors[field]
   );
 
-  const [commitTenantFormMutation, { loading: loadingMutation }] = useMutation(addTenantMutation, {
-    onCompleted: async (data) => {
-      const id = data?.createTenant?.tenantEdge?.node?.id;
-      await reloadCommonQuery();
+  const [commitTenantFormMutation, { loading: loadingMutation }] = useMutation(
+    saveOrganizationOnboardingDraftMutation,
+    {
+      onCompleted: async () => {
+        await refetchDraft();
+      },
+      onError: (error) => {
+        const graphQLErrors = extractGraphQLErrors(error);
+        if (!graphQLErrors) return;
+        setApolloGraphQLResponseErrors(graphQLErrors);
 
-      trackEvent('tenant', 'add', id);
-
-      navigate(generateTenantPath(TenantRoutesConfig.tenant.onboarding, { tenantId: id! }), {
-        state: { organizationCreated: true },
-      });
-    },
-    onError: (error) => {
-      const graphQLErrors = extractGraphQLErrors(error);
-      if (!graphQLErrors) return;
-      setApolloGraphQLResponseErrors(graphQLErrors);
-
-      // Name/NIP errors can only be fixed on the first step
-      const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
-      const fieldsWithErrors = Object.keys(validationError?.extensions ?? {});
-      if (STEP_1_FIELDS.some((field) => fieldsWithErrors.includes(field))) {
-        setStep(Step.BASICS);
-      }
-    },
-  });
+        // Name/NIP errors can only be fixed on the first step
+        const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
+        const fieldsWithErrors = Object.keys(validationError?.extensions ?? {});
+        if (STEP_1_FIELDS.some((field) => fieldsWithErrors.includes(field))) {
+          setStep(Step.BASICS);
+        }
+      },
+    }
+  );
 
   const handleNext = async () => {
     if (!(await trigger([...STEP_1_FIELDS]))) return;
 
     const country = getValues('country');
     const nip = normalizeTaxId(getValues('nip'), country);
+    try {
+      const result = await checkNip({ variables: { nip, country } });
+      if (result.data?.organizationNipExists) {
+        form.setError('nip', {
+          message: intl.formatMessage({
+            defaultMessage: 'An organization with this NIP already exists in your account.',
+            id: 'Onboarding / Duplicate NIP',
+          }),
+        });
+        return;
+      }
+    } catch {
+      form.setError('nip', {
+        message: intl.formatMessage({
+          defaultMessage: 'Could not verify this NIP. Please try again.',
+          id: 'Onboarding / NIP check failed',
+        }),
+      });
+      return;
+    }
     const lookupKey = `${country}:${nip}`;
     // Only (re)query the registry when the country/NIP changed, so going Back/Next doesn't wipe the user's manual edits
     if (lookupKey !== lookedUpNip) {
@@ -135,7 +158,8 @@ export const AddTenantForm = () => {
   const onSubmit = handleSubmit((formData: TenantFormFields) => {
     commitTenantFormMutation({
       variables: {
-        input: {
+        step: 1,
+        company: {
           name: formData.name,
           country: formData.country,
           nip: normalizeTaxId(formData.nip, formData.country),
@@ -147,6 +171,22 @@ export const AddTenantForm = () => {
       },
     });
   });
+
+  if (draftLoading)
+    return (
+      <PageLayout>
+        <Loader2 className="mx-auto my-8 animate-spin" />
+      </PageLayout>
+    );
+  if (draftError)
+    return (
+      <PageLayout>
+        <p className="p-8 text-destructive">
+          <FormattedMessage defaultMessage="Could not load the business profile." id="Onboarding / Load failed" />
+        </p>
+      </PageLayout>
+    );
+  if (draft?.organizationOnboardingDraft) return <OrganizationOnboarding draftMode />;
 
   return (
     <PageLayout>
@@ -206,7 +246,7 @@ export const AddTenantForm = () => {
                   <Button
                     key="next"
                     type="submit"
-                    disabled={lookupLoading}
+                    disabled={lookupLoading || checkingNip}
                     className="w-full sm:w-fit"
                     icon={lookupLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
                   >
@@ -232,10 +272,7 @@ export const AddTenantForm = () => {
                       disabled={loadingMutation || companyDetailsIncomplete}
                       className="w-full sm:w-fit"
                     >
-                      <FormattedMessage
-                        defaultMessage="Create organization"
-                        id="Tenant form / AddTenant / Submit button"
-                      />
+                      <FormattedMessage defaultMessage="Next" id="Tenant form / AddTenant / Next button" />
                     </Button>
                   </>
                 )}

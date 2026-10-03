@@ -4705,5 +4705,11 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Quick start"
+  },
+  "Onboarding / Duplicate NIP": {
+    "defaultMessage": "An organization with this NIP already exists in your account."
+  },
+  "Onboarding / NIP check failed": {
+    "defaultMessage": "Could not verify this NIP. Please try again."
   }
 }

@@ -294,6 +294,7 @@ export type ApiMutation = {
   revokeSession?: Maybe<RevokeSessionMutation>;
   /** Rollback to a previous translation version. */
   rollbackTranslations?: Maybe<RollbackTranslationsMutationPayload>;
+  saveOrganizationOnboardingDraft?: Maybe<SaveOrganizationOnboardingDraftMutation>;
   saveOrganizationOnboardingStep?: Maybe<SaveOrganizationOnboardingStepMutation>;
   /**
    * Mutation to send a message to the AI assistant.
@@ -604,6 +605,19 @@ export type ApiMutationRevokeSessionArgs = {
 
 export type ApiMutationRollbackTranslationsArgs = {
   input: RollbackTranslationsMutationInput;
+};
+
+
+export type ApiMutationSaveOrganizationOnboardingDraftArgs = {
+  company?: InputMaybe<OnboardingCompanyInput>;
+  costDrivers?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  customerType?: InputMaybe<Scalars['String']['input']>;
+  ksefToken?: InputMaybe<Scalars['String']['input']>;
+  mainGoal?: InputMaybe<Scalars['String']['input']>;
+  pricing?: InputMaybe<Scalars['String']['input']>;
+  respondentRole?: InputMaybe<Scalars['String']['input']>;
+  revenueModels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  step: Scalars['Int']['input'];
 };
 
 
@@ -2743,8 +2757,30 @@ export type ObtainTokenMutationPayload = {
   refresh?: Maybe<Scalars['String']['output']>;
 };
 
+export type OnboardingCompanyInput = {
+  address: Scalars['String']['input'];
+  companyName: Scalars['String']['input'];
+  country: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  nip: Scalars['String']['input'];
+  regon: Scalars['String']['input'];
+  vatStatus: Scalars['String']['input'];
+};
+
+export type OnboardingCompanyType = {
+  __typename?: 'OnboardingCompanyType';
+  address?: Maybe<Scalars['String']['output']>;
+  companyName?: Maybe<Scalars['String']['output']>;
+  country?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  nip?: Maybe<Scalars['String']['output']>;
+  regon?: Maybe<Scalars['String']['output']>;
+  vatStatus?: Maybe<Scalars['String']['output']>;
+};
+
 export type OrganizationOnboardingProfileType = {
   __typename?: 'OrganizationOnboardingProfileType';
+  companyData?: Maybe<OnboardingCompanyType>;
   completedAt?: Maybe<Scalars['DateTime']['output']>;
   costDrivers?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   currentStep?: Maybe<Scalars['Int']['output']>;
@@ -3012,6 +3048,8 @@ export type Query = {
   myPasskeys?: Maybe<PasskeyConnection>;
   mySessions?: Maybe<SsoSessionConnection>;
   node?: Maybe<Node>;
+  organizationNipExists?: Maybe<Scalars['Boolean']['output']>;
+  organizationOnboardingDraft?: Maybe<OrganizationOnboardingProfileType>;
   organizationOnboardingProfile?: Maybe<OrganizationOnboardingProfileType>;
   organizationRole?: Maybe<OrganizationRoleType>;
   paymentIntent?: Maybe<StripePaymentIntentType>;
@@ -3287,6 +3325,12 @@ export type QueryMySessionsArgs = {
 
 export type QueryNodeArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryOrganizationNipExistsArgs = {
+  country: Scalars['String']['input'];
+  nip: Scalars['String']['input'];
 };
 
 
@@ -3718,6 +3762,12 @@ export type SsoSessionType = Node & {
   location: Scalars['String']['output'];
   operatingSystem: Scalars['String']['output'];
   sessionId: Scalars['String']['output'];
+};
+
+export type SaveOrganizationOnboardingDraftMutation = {
+  __typename?: 'SaveOrganizationOnboardingDraftMutation';
+  profile?: Maybe<OrganizationOnboardingProfileType>;
+  tenant?: Maybe<TenantType>;
 };
 
 export type SaveOrganizationOnboardingStepMutation = {
@@ -5842,6 +5892,34 @@ export type UpdateOnboardingTenantMutationVariables = Exact<{
 
 export type UpdateOnboardingTenantMutation = { __typename?: 'ApiMutation', updateTenant?: { __typename?: 'UpdateTenantMutationPayload', tenant?: { __typename?: 'TenantType', id: string, name?: string | null, country?: string | null, nip?: string | null, companyName?: string | null, regon?: string | null, address?: string | null, vatStatus?: string | null, onboardingRequired: boolean, onboardingCompleted: boolean } | null } | null };
 
+export type OrganizationOnboardingDraftQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OrganizationOnboardingDraftQuery = { __typename?: 'Query', organizationOnboardingDraft?: { __typename?: 'OrganizationOnboardingProfileType', respondentRole?: string | null, customerType?: string | null, revenueModels?: Array<string | null> | null, costDrivers?: Array<string | null> | null, pricing?: string | null, mainGoal?: string | null, currentStep?: number | null, isRequired?: boolean | null, ksefStatus?: string | null, completedAt?: any | null, companyData?: { __typename?: 'OnboardingCompanyType', name?: string | null, country?: string | null, nip?: string | null, companyName?: string | null, regon?: string | null, address?: string | null, vatStatus?: string | null } | null } | null };
+
+export type OrganizationNipExistsQueryVariables = Exact<{
+  nip: Scalars['String']['input'];
+  country: Scalars['String']['input'];
+}>;
+
+
+export type OrganizationNipExistsQuery = { __typename?: 'Query', organizationNipExists?: boolean | null };
+
+export type SaveOrganizationOnboardingDraftOperationMutationVariables = Exact<{
+  step: Scalars['Int']['input'];
+  company?: InputMaybe<OnboardingCompanyInput>;
+  respondentRole?: InputMaybe<Scalars['String']['input']>;
+  customerType?: InputMaybe<Scalars['String']['input']>;
+  revenueModels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  costDrivers?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  pricing?: InputMaybe<Scalars['String']['input']>;
+  mainGoal?: InputMaybe<Scalars['String']['input']>;
+  ksefToken?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type SaveOrganizationOnboardingDraftOperationMutation = { __typename?: 'ApiMutation', saveOrganizationOnboardingDraft?: { __typename?: 'SaveOrganizationOnboardingDraftMutation', tenant?: { __typename?: 'TenantType', id: string, name?: string | null } | null, profile?: { __typename?: 'OrganizationOnboardingProfileType', currentStep?: number | null, ksefStatus?: string | null, completedAt?: any | null } | null } | null };
+
 export type AcceptTenantInvitationMutationMutationVariables = Exact<{
   input: AcceptTenantInvitationMutationInput;
 }>;
@@ -6226,6 +6304,9 @@ export const AddTenantMutationDocument = {"kind":"Document","definitions":[{"kin
 export const OrganizationOnboardingProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"organizationOnboardingProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organizationOnboardingProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"respondentRole"}},{"kind":"Field","name":{"kind":"Name","value":"customerType"}},{"kind":"Field","name":{"kind":"Name","value":"revenueModels"}},{"kind":"Field","name":{"kind":"Name","value":"costDrivers"}},{"kind":"Field","name":{"kind":"Name","value":"pricing"}},{"kind":"Field","name":{"kind":"Name","value":"mainGoal"}},{"kind":"Field","name":{"kind":"Name","value":"currentStep"}},{"kind":"Field","name":{"kind":"Name","value":"isRequired"}},{"kind":"Field","name":{"kind":"Name","value":"ksefStatus"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}}]}}]}}]} as unknown as DocumentNode<OrganizationOnboardingProfileQuery, OrganizationOnboardingProfileQueryVariables>;
 export const SaveOnboardingStepOperationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"saveOnboardingStepOperation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"step"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"respondentRole"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"customerType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"revenueModels"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"costDrivers"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pricing"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mainGoal"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ksefToken"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"saveOrganizationOnboardingStep"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"step"},"value":{"kind":"Variable","name":{"kind":"Name","value":"step"}}},{"kind":"Argument","name":{"kind":"Name","value":"respondentRole"},"value":{"kind":"Variable","name":{"kind":"Name","value":"respondentRole"}}},{"kind":"Argument","name":{"kind":"Name","value":"customerType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"customerType"}}},{"kind":"Argument","name":{"kind":"Name","value":"revenueModels"},"value":{"kind":"Variable","name":{"kind":"Name","value":"revenueModels"}}},{"kind":"Argument","name":{"kind":"Name","value":"costDrivers"},"value":{"kind":"Variable","name":{"kind":"Name","value":"costDrivers"}}},{"kind":"Argument","name":{"kind":"Name","value":"pricing"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pricing"}}},{"kind":"Argument","name":{"kind":"Name","value":"mainGoal"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mainGoal"}}},{"kind":"Argument","name":{"kind":"Name","value":"ksefToken"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ksefToken"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"profile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"respondentRole"}},{"kind":"Field","name":{"kind":"Name","value":"customerType"}},{"kind":"Field","name":{"kind":"Name","value":"revenueModels"}},{"kind":"Field","name":{"kind":"Name","value":"costDrivers"}},{"kind":"Field","name":{"kind":"Name","value":"pricing"}},{"kind":"Field","name":{"kind":"Name","value":"mainGoal"}},{"kind":"Field","name":{"kind":"Name","value":"currentStep"}},{"kind":"Field","name":{"kind":"Name","value":"isRequired"}},{"kind":"Field","name":{"kind":"Name","value":"ksefStatus"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}}]}}]}}]}}]} as unknown as DocumentNode<SaveOnboardingStepOperationMutation, SaveOnboardingStepOperationMutationVariables>;
 export const UpdateOnboardingTenantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateOnboardingTenant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateTenantMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTenant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"nip"}},{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"regon"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"vatStatus"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingRequired"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingCompleted"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateOnboardingTenantMutation, UpdateOnboardingTenantMutationVariables>;
+export const OrganizationOnboardingDraftDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"organizationOnboardingDraft"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organizationOnboardingDraft"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"nip"}},{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"regon"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"vatStatus"}}]}},{"kind":"Field","name":{"kind":"Name","value":"respondentRole"}},{"kind":"Field","name":{"kind":"Name","value":"customerType"}},{"kind":"Field","name":{"kind":"Name","value":"revenueModels"}},{"kind":"Field","name":{"kind":"Name","value":"costDrivers"}},{"kind":"Field","name":{"kind":"Name","value":"pricing"}},{"kind":"Field","name":{"kind":"Name","value":"mainGoal"}},{"kind":"Field","name":{"kind":"Name","value":"currentStep"}},{"kind":"Field","name":{"kind":"Name","value":"isRequired"}},{"kind":"Field","name":{"kind":"Name","value":"ksefStatus"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}}]}}]}}]} as unknown as DocumentNode<OrganizationOnboardingDraftQuery, OrganizationOnboardingDraftQueryVariables>;
+export const OrganizationNipExistsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"organizationNipExists"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"nip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"country"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organizationNipExists"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"nip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"nip"}}},{"kind":"Argument","name":{"kind":"Name","value":"country"},"value":{"kind":"Variable","name":{"kind":"Name","value":"country"}}}]}]}}]} as unknown as DocumentNode<OrganizationNipExistsQuery, OrganizationNipExistsQueryVariables>;
+export const SaveOrganizationOnboardingDraftOperationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"saveOrganizationOnboardingDraftOperation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"step"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"company"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OnboardingCompanyInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"respondentRole"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"customerType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"revenueModels"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"costDrivers"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pricing"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mainGoal"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ksefToken"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"saveOrganizationOnboardingDraft"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"step"},"value":{"kind":"Variable","name":{"kind":"Name","value":"step"}}},{"kind":"Argument","name":{"kind":"Name","value":"company"},"value":{"kind":"Variable","name":{"kind":"Name","value":"company"}}},{"kind":"Argument","name":{"kind":"Name","value":"respondentRole"},"value":{"kind":"Variable","name":{"kind":"Name","value":"respondentRole"}}},{"kind":"Argument","name":{"kind":"Name","value":"customerType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"customerType"}}},{"kind":"Argument","name":{"kind":"Name","value":"revenueModels"},"value":{"kind":"Variable","name":{"kind":"Name","value":"revenueModels"}}},{"kind":"Argument","name":{"kind":"Name","value":"costDrivers"},"value":{"kind":"Variable","name":{"kind":"Name","value":"costDrivers"}}},{"kind":"Argument","name":{"kind":"Name","value":"pricing"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pricing"}}},{"kind":"Argument","name":{"kind":"Name","value":"mainGoal"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mainGoal"}}},{"kind":"Argument","name":{"kind":"Name","value":"ksefToken"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ksefToken"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"profile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentStep"}},{"kind":"Field","name":{"kind":"Name","value":"ksefStatus"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}}]}}]}}]}}]} as unknown as DocumentNode<SaveOrganizationOnboardingDraftOperationMutation, SaveOrganizationOnboardingDraftOperationMutationVariables>;
 export const AcceptTenantInvitationMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"acceptTenantInvitationMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AcceptTenantInvitationMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"acceptTenantInvitation"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<AcceptTenantInvitationMutationMutation, AcceptTenantInvitationMutationMutationVariables>;
 export const DeclineTenantInvitationMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"declineTenantInvitationMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeclineTenantInvitationMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"declineTenantInvitation"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<DeclineTenantInvitationMutationMutation, DeclineTenantInvitationMutationMutationVariables>;
 export const AllActionLogsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"allActionLogsQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"actionType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"actorEmail"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fromDatetime"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"toDatetime"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allActionLogs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityType"}}},{"kind":"Argument","name":{"kind":"Name","value":"actionType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"actionType"}}},{"kind":"Argument","name":{"kind":"Name","value":"actorEmail"},"value":{"kind":"Variable","name":{"kind":"Name","value":"actorEmail"}}},{"kind":"Argument","name":{"kind":"Name","value":"fromDatetime"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fromDatetime"}}},{"kind":"Argument","name":{"kind":"Name","value":"toDatetime"},"value":{"kind":"Variable","name":{"kind":"Name","value":"toDatetime"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"actionLogFragment"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"actionLogFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ActionLogType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"actionType"}},{"kind":"Field","name":{"kind":"Name","value":"entityType"}},{"kind":"Field","name":{"kind":"Name","value":"entityId"}},{"kind":"Field","name":{"kind":"Name","value":"entityName"}},{"kind":"Field","name":{"kind":"Name","value":"actorType"}},{"kind":"Field","name":{"kind":"Name","value":"actorEmail"}},{"kind":"Field","name":{"kind":"Name","value":"changes"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]} as unknown as DocumentNode<AllActionLogsQueryQuery, AllActionLogsQueryQueryVariables>;

@@ -1627,7 +1627,9 @@
       "Onboarding / Title": "Set up your organization",
       "Onboarding / Edit": "Edit",
       "Onboarding / Organization save failed": "Could not update the organization. Please check the fields and try again.",
-      "Onboarding / Summary role": "Your role"
+      "Onboarding / Summary role": "Your role",
+      "Onboarding / Duplicate NIP": "An organization with this NIP already exists in your account.",
+      "Onboarding / NIP check failed": "Could not verify this NIP. Please try again."
     },
     "pl": {
       "AI Assistant / Accessing data": "Łączenie ze źródłami danych",
@@ -3198,7 +3200,9 @@
       "Onboarding / Title": "Skonfiguruj organizację",
       "Onboarding / Edit": "Edytuj",
       "Onboarding / Organization save failed": "Nie udało się zaktualizować organizacji. Sprawdź pola i spróbuj ponownie.",
-      "Onboarding / Summary role": "Twoja rola"
+      "Onboarding / Summary role": "Twoja rola",
+      "Onboarding / Duplicate NIP": "Organizacja z tym NIP-em już istnieje na Twoim koncie.",
+      "Onboarding / NIP check failed": "Nie udało się sprawdzić NIP-u. Spróbuj ponownie."
     },
     "de": {
       "AI Assistant / Accessing data": "Zugriff auf Datenquellen",

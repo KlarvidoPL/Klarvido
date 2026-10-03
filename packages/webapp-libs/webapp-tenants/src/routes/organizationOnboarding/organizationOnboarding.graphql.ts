@@ -74,3 +74,71 @@ export const updateOnboardingTenantMutation = gql(/* GraphQL */ `
     }
   }
 `);
+
+export const organizationOnboardingDraftQuery = gql(/* GraphQL */ `
+  query organizationOnboardingDraft {
+    organizationOnboardingDraft {
+      companyData {
+        name
+        country
+        nip
+        companyName
+        regon
+        address
+        vatStatus
+      }
+      respondentRole
+      customerType
+      revenueModels
+      costDrivers
+      pricing
+      mainGoal
+      currentStep
+      isRequired
+      ksefStatus
+      completedAt
+    }
+  }
+`);
+
+export const organizationNipExistsQuery = gql(/* GraphQL */ `
+  query organizationNipExists($nip: String!, $country: String!) {
+    organizationNipExists(nip: $nip, country: $country)
+  }
+`);
+
+export const saveOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
+  mutation saveOrganizationOnboardingDraftOperation(
+    $step: Int!
+    $company: OnboardingCompanyInput
+    $respondentRole: String
+    $customerType: String
+    $revenueModels: [String]
+    $costDrivers: [String]
+    $pricing: String
+    $mainGoal: String
+    $ksefToken: String
+  ) {
+    saveOrganizationOnboardingDraft(
+      step: $step
+      company: $company
+      respondentRole: $respondentRole
+      customerType: $customerType
+      revenueModels: $revenueModels
+      costDrivers: $costDrivers
+      pricing: $pricing
+      mainGoal: $mainGoal
+      ksefToken: $ksefToken
+    ) {
+      tenant {
+        id
+        name
+      }
+      profile {
+        currentStep
+        ksefStatus
+        completedAt
+      }
+    }
+  }
+`);

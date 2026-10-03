@@ -65,6 +65,8 @@ type Query {
   mySessions(before: String, after: String, first: Int, last: Int): SSOSessionConnection
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
   ssoDiscover(email: String!): SSODiscoveryResultType
+  organizationOnboardingDraft: OrganizationOnboardingProfileType
+  organizationNipExists(nip: String!, country: String!): Boolean
   allTenants(before: String, after: String, first: Int, last: Int): TenantConnection
   tenant(id: ID): TenantType
   organizationOnboardingProfile(tenantId: ID!): OrganizationOnboardingProfileType
@@ -587,6 +589,28 @@ type SSODiscoveryConnectionType {
   tenantName: String
   loginUrl: String
 }
+type OrganizationOnboardingProfileType {
+  companyData: OnboardingCompanyType
+  respondentRole: String
+  customerType: String
+  revenueModels: [String]
+  costDrivers: [String]
+  pricing: String
+  mainGoal: String
+  currentStep: Int
+  isRequired: Boolean
+  ksefStatus: String
+  completedAt: DateTime
+}
+type OnboardingCompanyType {
+  name: String
+  country: String
+  nip: String
+  companyName: String
+  regon: String
+  address: String
+  vatStatus: String
+}
 type TenantConnection {
   "Pagination data for this connection."
   pageInfo: PageInfo!
@@ -599,18 +623,6 @@ type TenantEdge {
   node: TenantType
   "A cursor for use in pagination"
   cursor: String!
-}
-type OrganizationOnboardingProfileType {
-  respondentRole: String
-  customerType: String
-  revenueModels: [String]
-  costDrivers: [String]
-  pricing: String
-  mainGoal: String
-  currentStep: Int
-  isRequired: Boolean
-  ksefStatus: String
-  completedAt: DateTime
 }
 "Connection class for paginated ActionLog lists."
 type ActionLogConnection {
@@ -1469,6 +1481,7 @@ type ApiMutation {
   - Non-owners cannot modify owner memberships
   """
   removeRoleFromMember(membershipId: ID!, roleId: ID!, tenantId: ID!): RemoveRoleFromMemberMutation
+  saveOrganizationOnboardingDraft(company: OnboardingCompanyInput, costDrivers: [String], customerType: String, ksefToken: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!): SaveOrganizationOnboardingDraftMutation
   createTenant(input: CreateTenantMutationInput!): CreateTenantMutationPayload
   acceptTenantInvitation(input: AcceptTenantInvitationMutationInput!): AcceptTenantInvitationMutationPayload
   declineTenantInvitation(input: DeclineTenantInvitationMutationInput!): DeclineTenantInvitationMutationPayload
@@ -1867,6 +1880,10 @@ SECURITY:
 type RemoveRoleFromMemberMutation {
   membership: TenantMembershipType
   ok: Boolean
+}
+type SaveOrganizationOnboardingDraftMutation {
+  profile: OrganizationOnboardingProfileType
+  tenant: TenantType
 }
 type CreateTenantMutationPayload {
   tenant: TenantType
@@ -3012,6 +3029,15 @@ input UpdateTenantMembershipMutationInput {
   tenantId: String!
   role: TenantUserRole!
   clientMutationId: String
+}
+input OnboardingCompanyInput {
+  name: String!
+  country: String!
+  nip: String!
+  companyName: String!
+  regon: String!
+  address: String!
+  vatStatus: String!
 }
 input CreateTenantMutationInput {
   name: String!

@@ -127,7 +127,17 @@ class Tenant(TimestampedMixin, models.Model):
 class OrganizationOnboardingProfile(TimestampedMixin, models.Model):
     """Answers supplied during organization onboarding, kept separate from registry data."""
 
-    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, related_name="onboarding_profile")
+    tenant = models.OneToOneField(
+        Tenant, on_delete=models.CASCADE, related_name="onboarding_profile", null=True, blank=True
+    )
+    draft_owner = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="organization_onboarding_draft",
+        null=True,
+        blank=True,
+    )
+    company_data = models.JSONField(default=dict, blank=True)
     respondent_role = models.CharField(max_length=40, blank=True, default="")
     customer_type = models.CharField(max_length=40, blank=True, default="")
     revenue_models = models.JSONField(default=list, blank=True)
@@ -140,8 +150,19 @@ class OrganizationOnboardingProfile(TimestampedMixin, models.Model):
     ksef_status = models.CharField(max_length=20, default="not_connected")
     completed_at = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    Q(tenant__isnull=False, draft_owner__isnull=True)
+                    | Q(tenant__isnull=True, draft_owner__isnull=False)
+                ),
+                name="onboarding_tenant_or_draft_owner",
+            )
+        ]
+
     def __str__(self):
-        return f"Onboarding profile for {self.tenant}"
+        return "Organization onboarding profile"
 
 
 class TenantMembership(TimestampedMixin, models.Model):
