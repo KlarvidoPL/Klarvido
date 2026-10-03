@@ -84,7 +84,9 @@ type Query {
     search: String,before: String, after: String, first: Int, last: Int  ): ActionLogConnection
   allPermissions(
     "Filter by category"
-    category: PermissionCategory,before: String, after: String, first: Int, last: Int  ): PermissionConnection
+    category: PermissionCategory,
+    "Only permissions the organization's country can use"
+    tenantId: ID,before: String, after: String, first: Int, last: Int  ): PermissionConnection
   allOrganizationRoles(tenantId: ID!, before: String, after: String, first: Int, last: Int): OrganizationRoleConnection
   organizationRole(id: ID!): OrganizationRoleType
   "Get all permission codes for the current user in a tenant"

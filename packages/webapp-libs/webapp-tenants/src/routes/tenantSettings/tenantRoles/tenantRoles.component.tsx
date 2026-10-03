@@ -1135,8 +1135,11 @@ export const TenantRoles = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<OrganizationRole | null>(null);
 
-  // Fetch permissions (global query, no tenant required)
-  const { data: permissionsData, loading: permissionsLoading } = useQuery(allPermissionsQuery);
+  // Fetch the permissions this organization's country can use
+  const { data: permissionsData, loading: permissionsLoading } = useQuery(allPermissionsQuery, {
+    variables: { tenantId },
+    skip: !tenantId,
+  });
 
   // Fetch roles
   const {

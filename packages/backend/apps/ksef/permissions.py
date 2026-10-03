@@ -5,7 +5,7 @@ them with the rest of the security settings.
 
 from typing import List
 
-from apps.multitenancy.constants import PermissionCategory, SystemRoleType
+from apps.multitenancy.constants import CompanyCountry, PermissionCategory, SystemRoleType
 from apps.multitenancy.permissions import (
     PermissionDefinition,
     register_app_permissions,
@@ -23,6 +23,7 @@ KSEF_PERMISSIONS: List[PermissionDefinition] = [
         description='View whether a KSeF token is connected and when it was last verified',
         category=PermissionCategory.SECURITY,
         sort_order=15,
+        countries=(CompanyCountry.POLAND,),
     ),
     PermissionDefinition(
         code='security.ksef.manage',
@@ -30,6 +31,7 @@ KSEF_PERMISSIONS: List[PermissionDefinition] = [
         description='Add, test, replace or remove the KSeF token',
         category=PermissionCategory.SECURITY,
         sort_order=16,
+        countries=(CompanyCountry.POLAND,),
     ),
 ]
 

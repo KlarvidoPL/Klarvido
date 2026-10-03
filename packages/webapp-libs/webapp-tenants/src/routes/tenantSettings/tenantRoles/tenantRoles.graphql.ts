@@ -1,11 +1,11 @@
 import { gql } from '@sb/webapp-api-client/graphql';
 
 /**
- * Query to get all available permissions
+ * Query to get the permissions an organization can use (filtered by the organization's country)
  */
 export const allPermissionsQuery = gql(/* GraphQL */ `
-  query allPermissionsQuery {
-    allPermissions {
+  query allPermissionsQuery($tenantId: ID) {
+    allPermissions(tenantId: $tenantId) {
       edges {
         node {
           id
