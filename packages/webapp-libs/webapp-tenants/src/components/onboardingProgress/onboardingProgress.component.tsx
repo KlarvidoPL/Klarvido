@@ -1,8 +1,6 @@
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useIntl } from 'react-intl';
 
-import './onboardingProgress.css';
-
 export const OnboardingProgress = ({
   step,
   maxStep = step,
@@ -20,45 +18,55 @@ export const OnboardingProgress = ({
     intl.formatMessage({ defaultMessage: 'Revenue', id: 'Onboarding / Step revenue' }),
     intl.formatMessage({ defaultMessage: 'Costs', id: 'Onboarding / Step costs' }),
     intl.formatMessage({ defaultMessage: 'Pricing & goal', id: 'Onboarding / Step pricing goal' }),
-    intl.formatMessage({ defaultMessage: 'KSeF', id: 'Onboarding / KSeF title' }),
     intl.formatMessage({ defaultMessage: 'Summary', id: 'Onboarding / Step summary' }),
   ];
 
   return (
-    <div className="onboarding-progress">
-      <ol
-        className="onboarding-progress__grid grid auto-rows-fr gap-2 pt-4"
-        aria-label={intl.formatMessage({ defaultMessage: 'Onboarding steps', id: 'Onboarding / Steps label' })}
-      >
-        {steps.map((label, index) => {
-          const number = index + 1;
-          return (
-            <li
-              key={number}
-              aria-current={number === step ? 'step' : undefined}
+    // Always a single row: connectors shrink to fill whatever width is left, the dots never shrink.
+    // Labels appear from 2xl up, where the full row fits; below that they stay screen-reader only.
+    <ol
+      className="flex items-center pt-4 text-sm"
+      aria-label={intl.formatMessage({ defaultMessage: 'Onboarding steps', id: 'Onboarding / Steps label' })}
+    >
+      {steps.map((label, index) => {
+        const number = index + 1;
+        const isCurrent = number === step;
+        const isDone = number < step;
+        return (
+          <li
+            key={number}
+            aria-current={isCurrent ? 'step' : undefined}
+            className={cn('flex items-center', index < steps.length - 1 && 'flex-1')}
+          >
+            <button
+              type="button"
+              title={label}
+              disabled={!onStepChange || number > maxStep || isCurrent}
+              onClick={() => onStepChange?.(number)}
               className={cn(
-                'onboarding-progress__step h-12 min-w-0 rounded-lg border text-center',
-                number === step
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : number < step
-                    ? 'border-primary/30 text-foreground'
-                    : 'text-muted-foreground'
+                'flex shrink-0 items-center gap-2 whitespace-nowrap disabled:cursor-default',
+                isCurrent || isDone ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
-              <button
-                type="button"
-                disabled={!onStepChange || number > maxStep || number === step}
-                onClick={() => onStepChange?.(number)}
-                className="flex h-full min-w-0 w-full items-center justify-center whitespace-nowrap px-1 disabled:cursor-default"
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'flex h-6 w-6 items-center justify-center rounded-full border text-xs font-medium',
+                  isCurrent
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : isDone
+                      ? 'border-primary/40'
+                      : 'border-border'
+                )}
               >
-                <span className="whitespace-nowrap font-semibold [hyphens:none]">
-                  {number}. <span className="font-normal">{label}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
+                {number}
+              </span>
+              <span className="sr-only 2xl:not-sr-only">{label}</span>
+            </button>
+            {index < steps.length - 1 && <div aria-hidden="true" className="mx-1.5 h-px min-w-2 flex-1 bg-border sm:mx-2" />}
+          </li>
+        );
+      })}
+    </ol>
   );
 };
