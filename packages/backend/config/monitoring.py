@@ -39,6 +39,8 @@ def init(dsn, environment_name, traces_sample_rate):
         integrations=[DjangoIntegration()],
         traces_sample_rate=traces_sample_rate,
         send_default_pii=True,
+        # Local variables of every stack frame would otherwise be sent, including plaintext KSeF tokens
+        include_local_variables=False,
         environment=environment_name,
         ignore_errors=[InvalidToken],
     )
