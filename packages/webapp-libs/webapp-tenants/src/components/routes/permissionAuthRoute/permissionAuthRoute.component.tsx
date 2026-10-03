@@ -1,5 +1,5 @@
 import { TenantType } from '@sb/webapp-api-client/constants';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useOutletContext } from 'react-router-dom';
 
 import { usePermissionCheck, PermissionCode } from '../../../hooks/usePermissionCheck';
 import { useGenerateTenantPath } from '../../../hooks/useGenerateTenantPath';
@@ -58,6 +58,10 @@ export const PermissionAuthRoute = ({
   const { hasPermission, hasAnyPermission, hasAllPermissions, loading } = usePermissionCheck(permissions);
   const generateTenantPath = useGenerateTenantPath();
   const { data: currentTenant } = useCurrentTenant();
+  // Forward whatever outlet context a parent layout route (e.g. ActiveSubscriptionContext)
+  // passed down - rendering a plain <Outlet /> here would otherwise shadow it with
+  // undefined for any descendant route nested through this permission check.
+  const outletContext = useOutletContext();
 
   // Show nothing while loading permissions
   if (loading) {
@@ -75,7 +79,7 @@ export const PermissionAuthRoute = ({
     permissionsArray.length === 1 ? hasPermission : mode === 'all' ? hasAllPermissions : hasAnyPermission;
 
   if (hasAccess) {
-    return <Outlet />;
+    return <Outlet context={outletContext} />;
   }
 
   // Determine where to redirect
