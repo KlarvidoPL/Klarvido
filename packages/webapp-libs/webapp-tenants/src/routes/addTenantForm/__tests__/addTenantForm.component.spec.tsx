@@ -6,6 +6,7 @@ import { userEvent } from '@testing-library/user-event';
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
 import { render as baseRender } from '../../../tests/utils/rendering';
 import {
+  clearOrganizationOnboardingDraftMutation,
   organizationOnboardingDraftQuery,
   saveOrganizationOnboardingDraftMutation,
 } from '../../organizationOnboarding/organizationOnboarding.graphql';
@@ -325,5 +326,65 @@ describe('AddTenantForm: Component', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Create organization' }));
     expect(await screen.findByText('Organization added successfully!')).toBeInTheDocument();
     expect(create.result).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears a saved draft and returns to a blank first step', async () => {
+    const company = {
+      name: 'new item name',
+      country: 'PL',
+      nip: NIP,
+      companyName: 'ACME SP. Z O.O.',
+      regon: '123456785',
+      address: 'Warsaw',
+      vatStatus: 'ACTIVE',
+    };
+    const savedDraft = {
+      companyData: company,
+      respondentRole: '',
+      customerType: '',
+      revenueModels: [],
+      costDrivers: [],
+      pricing: '',
+      mainGoal: '',
+      currentStep: 2,
+      isRequired: true,
+      completedAt: null,
+    };
+    const draftQuery = (maxUsageCount: number, draft: typeof savedDraft | null) => ({
+      ...composeMockedQueryResult(organizationOnboardingDraftQuery, { data: { organizationOnboardingDraft: draft } }),
+      maxUsageCount,
+    });
+
+    render(<Component />, {
+      apolloMocks: () => [
+        lookupMock(company),
+        composeMockedQueryResult(saveOrganizationOnboardingDraftMutation, {
+          variables: { step: 1, company },
+          data: {
+            saveOrganizationOnboardingDraft: { tenant: null, profile: { currentStep: 2, completedAt: null } },
+          },
+        }),
+        draftQuery(2, savedDraft),
+        composeMockedQueryResult(clearOrganizationOnboardingDraftMutation, {
+          variables: {},
+          data: { clearOrganizationOnboardingDraft: { ok: true } },
+        }),
+        draftQuery(1, null),
+      ],
+    });
+
+    await fillStepOne(company.name, NIP);
+    await screen.findByDisplayValue(company.companyName);
+    await userEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Clear draft' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Clear draft' }));
+
+    expect(await screen.findByPlaceholderText('Display name')).toHaveValue('');
+    expect(screen.getByLabelText(/nip/i)).toHaveValue('');
+    const progress = screen.getByRole('list', { name: 'Onboarding steps' });
+    expect(within(progress).getAllByRole('listitem')[0]).toHaveAttribute('aria-current', 'step');
   });
 });

@@ -293,4 +293,24 @@ describe('OrganizationOnboarding', () => {
       expect(screen.queryByRole('button', { name: 'Clear draft' })).not.toBeInTheDocument();
     });
   });
+
+  it('lists each answer on the summary with its own edit action', async () => {
+    render(<OrganizationOnboarding />, {
+      TenantWrapper,
+      apolloMocks: (mocks) => [...mocks, profileMock(6)],
+    });
+
+    expect(await screen.findByText('Your business profile')).toBeInTheDocument();
+    expect(screen.getAllByRole('term')).toHaveLength(8);
+    expect(screen.queryByText('KSeF')).not.toBeInTheDocument();
+
+    const roleRow = screen.getByText('Your role', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(within(roleRow).getByRole('definition')).toHaveTextContent('Owner / management');
+
+    const customersRow = screen.getByText('Customers', { selector: 'dt' }).parentElement as HTMLElement;
+    expect(within(customersRow).getByRole('definition')).toHaveTextContent('Mostly businesses (B2B)');
+
+    await userEvent.click(within(roleRow).getByRole('button', { name: 'Edit' }));
+    expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+  });
 });
