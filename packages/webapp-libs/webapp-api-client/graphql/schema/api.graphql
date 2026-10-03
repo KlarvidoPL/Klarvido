@@ -36,6 +36,8 @@ that will be handled by the multipart request spec
 """
 scalar Upload
 type Query {
+  "KSeF token status for a tenant (never the token itself)"
+  ksefCredential(tenantId: ID!): KsefCredentialType
   "Get backup configuration for a tenant"
   backupConfig(tenantId: ID!): BackupConfigType
   "Get backup records for a tenant"
@@ -109,6 +111,14 @@ type Query {
     "The ID of the object"
     id: ID!
   ): Node
+}
+"Metadata about the stored KSeF token. The token itself is intentionally not a field."
+type KsefCredentialType {
+  updatedAt: DateTime!
+  tokenHint: String
+  status: String
+  lastVerifiedAt: DateTime
+  lastErrorCode: String
 }
 "GraphQL type for BackupConfig."
 type BackupConfigType implements Node {
@@ -1336,6 +1346,11 @@ type FileFieldType {
   name: String
 }
 type ApiMutation {
+  "Verify a KSeF token with KSeF, then store it encrypted. An invalid token is never stored."
+  setKsefToken(tenantId: ID!, token: String!): KsefCredentialResult
+  "Check the stored KSeF token with KSeF again."
+  testKsefToken(tenantId: ID!): KsefCredentialResult
+  deleteKsefToken(tenantId: ID!): DeleteKsefTokenMutation
   "Create or update backup configuration for a tenant."
   updateBackupConfig(input: BackupConfigInput!): UpdateBackupConfigMutation
   "Delete a backup record and its file."
@@ -1349,9 +1364,7 @@ type ApiMutation {
     "ID of the backup record to restore from"
     backupId: ID!,
     "Strategy for handling conflicting records: SKIP, UPDATE, or FAIL"
-    conflictStrategy: ConflictStrategyEnum!,
-    tenantId: ID!
-  ): RestoreBackupMutation
+    conflictStrategy: ConflictStrategyEnum!,tenantId: ID!  ): RestoreBackupMutation
   "Publish translations for a locale to S3/CDN."
   publishTranslations(input: PublishTranslationsMutationInput!): PublishTranslationsMutationPayload
   "Sync translation keys from master JSON."
@@ -1502,6 +1515,15 @@ type ApiMutation {
   deleteDocumentDemoItem(input: DeleteDocumentDemoItemMutationInput!): DeleteDocumentDemoItemMutationPayload
   createFavoriteContentfulDemoItem(input: CreateFavoriteContentfulDemoItemMutationInput!): CreateFavoriteContentfulDemoItemMutationPayload
   deleteFavoriteContentfulDemoItem(input: DeleteFavoriteContentfulDemoItemMutationInput!): DeleteFavoriteContentfulDemoItemMutationPayload
+}
+type KsefCredentialResult {
+  ok: Boolean
+  errorCode: String
+  ksefCredential: KsefCredentialType
+}
+type DeleteKsefTokenMutation {
+  ok: Boolean
+  errorCode: String
 }
 "Create or update backup configuration for a tenant."
 type UpdateBackupConfigMutation {
@@ -2329,7 +2351,6 @@ enum PermissionCategory {
   SECURITY
   BILLING
   FEATURES
-  DASHBOARD
 }
 "An enumeration."
 enum DjstripeProductTypeChoices {

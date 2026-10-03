@@ -197,6 +197,9 @@ services:
 
       # Per-tenant backup export encryption (apps.backup) - Fernet key, DB-fallback mode (no AWS Secrets Manager on VPS)
       - BACKUP_MASTER_KEY=${BACKUP_MASTER_KEY:-}
+      # KSeF token connection (apps.ksef) - test | demo | prod, and AES key(s) encrypting stored KSeF tokens
+      - KSEF_ENVIRONMENT=${KSEF_ENVIRONMENT:-test}
+      - KSEF_ENCRYPTION_KEYS=${KSEF_ENCRYPTION_KEYS:-}
 
       # Email (SMTP)
       - EMAIL_HOST=${EMAIL_HOST:-}
@@ -340,6 +343,9 @@ services:
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
       - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME:-}
       - BACKUP_MASTER_KEY=${BACKUP_MASTER_KEY:-}
+      # KSeF token connection (apps.ksef) - test | demo | prod, and AES key(s) encrypting stored KSeF tokens
+      - KSEF_ENVIRONMENT=${KSEF_ENVIRONMENT:-test}
+      - KSEF_ENCRYPTION_KEYS=${KSEF_ENCRYPTION_KEYS:-}
     volumes:
       - media_data:/app/media
     networks:

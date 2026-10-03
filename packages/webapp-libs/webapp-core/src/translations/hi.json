@@ -2588,6 +2588,150 @@
   "Home / t&c link": {
     "defaultMessage": "टर्म्स और कंडीशंस"
   },
+  "KSeF / Cancel button": {
+    "defaultMessage": "Cancel"
+  },
+  "KSeF / Card description": {
+    "defaultMessage": "The KSeF token lets Klarvido read your company invoices from KSeF."
+  },
+  "KSeF / Card title": {
+    "defaultMessage": "KSeF connection"
+  },
+  "KSeF / Connect token button": {
+    "defaultMessage": "Connect KSeF token"
+  },
+  "KSeF / Empty state": {
+    "defaultMessage": "No KSeF token is connected. Connect one to start reading company invoices from KSeF."
+  },
+  "KSeF / Error NIP missing": {
+    "defaultMessage": "Add the organization NIP before connecting KSeF."
+  },
+  "KSeF / Error country not supported": {
+    "defaultMessage": "KSeF is only available for Polish organizations."
+  },
+  "KSeF / Error decryption failed": {
+    "defaultMessage": "The saved token cannot be read. Replace it with a new token."
+  },
+  "KSeF / Error encryption not configured": {
+    "defaultMessage": "The KSeF connection is not available on this server. Contact support."
+  },
+  "KSeF / Error generic": {
+    "defaultMessage": "Something went wrong while connecting KSeF. Try again."
+  },
+  "KSeF / Error invalid token": {
+    "defaultMessage": "KSeF did not accept this token. Check that it is copied correctly and was not revoked."
+  },
+  "KSeF / Error no permissions": {
+    "defaultMessage": "This token has no permissions for the company. Generate a new token with invoice read access."
+  },
+  "KSeF / Error service unavailable": {
+    "defaultMessage": "KSeF could not be reached right now. Try again later."
+  },
+  "KSeF / Error token empty": {
+    "defaultMessage": "Paste the KSeF token before saving."
+  },
+  "KSeF / Invalid hint": {
+    "defaultMessage": "KSeF no longer accepts this token. Replace it with a new one."
+  },
+  "KSeF / Last verified label": {
+    "defaultMessage": "Last verified"
+  },
+  "KSeF / Loading": {
+    "defaultMessage": "Loading KSeF connection..."
+  },
+  "KSeF / Modal description sr": {
+    "defaultMessage": "Instructions for generating and pasting a KSeF token"
+  },
+  "KSeF / Modal subtitle": {
+    "defaultMessage": "Connect a KSeF token so invoices can be read from KSeF"
+  },
+  "KSeF / Modal title": {
+    "defaultMessage": "Connect KSeF"
+  },
+  "KSeF / Modal title sr": {
+    "defaultMessage": "Connect KSeF"
+  },
+  "KSeF / Never verified": {
+    "defaultMessage": "Never"
+  },
+  "KSeF / Remove dialog description": {
+    "defaultMessage": "Klarvido will stop reading invoices from KSeF until a new token is connected."
+  },
+  "KSeF / Remove dialog title": {
+    "defaultMessage": "Remove KSeF token"
+  },
+  "KSeF / Remove token button": {
+    "defaultMessage": "Remove"
+  },
+  "KSeF / Removed toast": {
+    "defaultMessage": "KSeF token removed."
+  },
+  "KSeF / Replace token button": {
+    "defaultMessage": "Replace token"
+  },
+  "KSeF / Saved toast": {
+    "defaultMessage": "KSeF token verified and saved."
+  },
+  "KSeF / Saved unverified toast": {
+    "defaultMessage": "Token saved. KSeF could not be reached, so it is not verified yet. Test the connection later."
+  },
+  "KSeF / Status invalid": {
+    "defaultMessage": "Token rejected"
+  },
+  "KSeF / Status unverified": {
+    "defaultMessage": "Not verified"
+  },
+  "KSeF / Status valid": {
+    "defaultMessage": "Connected"
+  },
+  "KSeF / Step 1 description": {
+    "defaultMessage": "Log in to KSeF with an account that is authorized for your company."
+  },
+  "KSeF / Step 1 title": {
+    "defaultMessage": "Open the KSeF web application"
+  },
+  "KSeF / Step 2 description": {
+    "defaultMessage": "Open the Tokens section and generate a new token. Grant only the invoice read permission (InvoiceRead). Do not grant write permissions."
+  },
+  "KSeF / Step 2 title": {
+    "defaultMessage": "Generate a new token"
+  },
+  "KSeF / Step 3 description": {
+    "defaultMessage": "KSeF shows the token only once. Copy it right away, before closing that window."
+  },
+  "KSeF / Step 3 title": {
+    "defaultMessage": "Copy the token"
+  },
+  "KSeF / Step 4 description": {
+    "defaultMessage": "We check the token with KSeF before saving it. Stored tokens are encrypted and never shown again."
+  },
+  "KSeF / Step 4 title": {
+    "defaultMessage": "Paste it below"
+  },
+  "KSeF / Test connection button": {
+    "defaultMessage": "Test connection"
+  },
+  "KSeF / Test passed toast": {
+    "defaultMessage": "KSeF token is valid."
+  },
+  "KSeF / Token input label": {
+    "defaultMessage": "KSeF token"
+  },
+  "KSeF / Token label": {
+    "defaultMessage": "Token"
+  },
+  "KSeF / Token required": {
+    "defaultMessage": "Paste the KSeF token"
+  },
+  "KSeF / Token security note": {
+    "defaultMessage": "The token is encrypted before it is stored and cannot be viewed again after saving."
+  },
+  "KSeF / Unverified hint": {
+    "defaultMessage": "KSeF could not be reached when the token was saved. Test the connection to verify it."
+  },
+  "KSeF / Verify and save button": {
+    "defaultMessage": "Verify and save"
+  },
   "Login form / error / authentication failed": {
     "defaultMessage": "गलत प्रमाणीकरण जानकारी।"
   },
