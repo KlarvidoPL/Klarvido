@@ -36,7 +36,6 @@ class TenantSerializer(serializers.ModelSerializer):
     # Looser than the model's max_length: input may contain separators ("972-138-23-73") that validate_* strips
     nip = serializers.CharField(required=False, allow_blank=True, max_length=20)
     regon = serializers.CharField(required=False, allow_blank=True, max_length=20)
-
     REQUIRED_COMPANY_FIELDS = {
         "nip": _("NIP is required"),
         "company_name": _("Company name is required"),
@@ -109,11 +108,23 @@ class TenantSerializer(serializers.ModelSerializer):
                 assigned_by=validated_data["creator"],
             )
 
+        models.OrganizationOnboardingProfile.objects.create(tenant=tenant, is_required=True)
+
         return tenant
 
     class Meta:
         model = models.Tenant
-        fields = ("id", "name", "billing_email", "country", "nip", "company_name", "regon", "address", "vat_status")
+        fields = (
+            "id",
+            "name",
+            "billing_email",
+            "country",
+            "nip",
+            "company_name",
+            "regon",
+            "address",
+            "vat_status",
+        )
 
 
 class UpdateTenantSerializer(TenantSerializer):

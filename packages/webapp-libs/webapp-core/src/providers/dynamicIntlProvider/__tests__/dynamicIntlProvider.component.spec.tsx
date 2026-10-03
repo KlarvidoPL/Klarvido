@@ -1,11 +1,11 @@
-import { renderHook, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
+import { fireEvent, renderHook, screen } from '@testing-library/react';
+import { ReactNode, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Locale } from '../../../config/i18n';
-import { DynamicIntlProvider } from '../dynamicIntlProvider.component';
 import { render } from '../../../tests/utils/rendering';
+import { DynamicIntlProvider } from '../dynamicIntlProvider.component';
 
 // Mock fetch
 const mockFetch = jest.fn();
@@ -38,9 +38,7 @@ describe('DynamicIntlProvider', () => {
   });
 
   it('should render children with bundled translations as fallback', async () => {
-    const TestComponent = () => (
-      <FormattedMessage id="NonExistent / Key" defaultMessage="Default Test Message" />
-    );
+    const TestComponent = () => <FormattedMessage id="NonExistent / Key" defaultMessage="Default Test Message" />;
 
     const { container } = render(<TestComponent />, {
       wrapper: createWrapper(),
@@ -60,9 +58,7 @@ describe('DynamicIntlProvider', () => {
       json: () => Promise.resolve(remoteTranslations),
     });
 
-    const TestComponent = () => (
-      <FormattedMessage id="Test / Key" defaultMessage="Default Test Message" />
-    );
+    const TestComponent = () => <FormattedMessage id="Test / Key" defaultMessage="Default Test Message" />;
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -89,9 +85,7 @@ describe('DynamicIntlProvider', () => {
   });
 
   it('should support different locales', () => {
-    const TestComponent = () => (
-      <FormattedMessage id="Test / Key" defaultMessage="Hello" />
-    );
+    const TestComponent = () => <FormattedMessage id="Test / Key" defaultMessage="Hello" />;
 
     const { container } = render(<TestComponent />, {
       wrapper: createWrapper(Locale.POLISH),
@@ -102,9 +96,7 @@ describe('DynamicIntlProvider', () => {
   });
 
   it('should handle missing translations gracefully', () => {
-    const TestComponent = () => (
-      <FormattedMessage id="Unknown / Key" defaultMessage="Fallback Message" />
-    );
+    const TestComponent = () => <FormattedMessage id="Unknown / Key" defaultMessage="Fallback Message" />;
 
     const { container } = render(<TestComponent />, {
       wrapper: createWrapper(),
@@ -115,3 +107,71 @@ describe('DynamicIntlProvider', () => {
   });
 });
 
+describe('DynamicIntlProvider: localized validation fallback', () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue({ ok: false, status: 503 });
+  });
+
+  it('preserves unsaved form answers when changing language', async () => {
+    const Form = () => {
+      const [answer, setAnswer] = useState('');
+      return (
+        <>
+          <input aria-label="answer" value={answer} onChange={(event) => setAnswer(event.target.value)} />
+          <FormattedMessage id="Onboarding / Save failed" />
+        </>
+      );
+    };
+    const { rerender } = render(
+      <DynamicIntlProvider locale={Locale.ENGLISH}>
+        <Form />
+      </DynamicIntlProvider>
+    );
+    fireEvent.change(screen.getByLabelText('answer'), { target: { value: 'Unsaved company details' } });
+    rerender(
+      <DynamicIntlProvider locale={Locale.POLISH}>
+        <Form />
+      </DynamicIntlProvider>
+    );
+    expect(await screen.findByText('Nie udało się zapisać tego kroku. Spróbuj ponownie.')).toBeInTheDocument();
+    expect(screen.getByLabelText('answer')).toHaveValue('Unsaved company details');
+  });
+
+  it.each([
+    [Locale.POLISH, 'Nie udało się zapisać tego kroku. Spróbuj ponownie.'],
+    [Locale.GERMAN, 'Dieser Schritt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.'],
+    [Locale.FRENCH, 'Impossible d’enregistrer cette étape. Veuillez réessayer.'],
+    [Locale.SPANISH, 'No se pudo guardar este paso. Inténtalo de nuevo.'],
+    [Locale.CHINESE, '无法保存此步骤，请重试。'],
+    [Locale.HINDI, 'यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।'],
+    [Locale.ARABIC, 'تعذّر حفظ هذه الخطوة. يرجى المحاولة مرة أخرى.'],
+  ])('keeps warnings in %s when the API is unavailable', async (locale, expected) => {
+    render(
+      <DynamicIntlProvider locale={locale as Locale}>
+        <FormattedMessage
+          id="Onboarding / Save failed"
+          defaultMessage="Could not save this step. Please try again."
+        />
+      </DynamicIntlProvider>
+    );
+    expect(await screen.findByText(expected)).toBeInTheDocument();
+  });
+
+  it('keeps the Polish translation when the API supplies an untranslated English default', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          'Onboarding / Save failed': 'Could not save this step. Please try again.',
+        }),
+    });
+    render(
+      <DynamicIntlProvider locale={Locale.POLISH}>
+        <FormattedMessage id="Onboarding / Save failed" />
+      </DynamicIntlProvider>
+    );
+    expect(await screen.findByText('Nie udało się zapisać tego kroku. Spróbuj ponownie.')).toBeInTheDocument();
+    expect(screen.queryByText(/Could not save this step/)).not.toBeInTheDocument();
+  });
+});

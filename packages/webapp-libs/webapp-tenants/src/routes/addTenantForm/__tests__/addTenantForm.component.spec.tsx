@@ -1,21 +1,32 @@
-import { TenantUserRole } from '@sb/webapp-api-client';
-import { TenantType as TenantTypeField } from '@sb/webapp-api-client/constants';
-import { commonQueryCurrentUserQuery } from '@sb/webapp-api-client/providers';
-import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
+import { fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
-import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { companyLookupByNipQuery } from '../../../hooks/useCompanyLookup';
-import { membershipFactory, tenantFactory } from '../../../tests/factories/tenant';
-import { render } from '../../../tests/utils/rendering';
+import { render as baseRender } from '../../../tests/utils/rendering';
+import { onboardingChoicesMock } from '../../organizationOnboarding/__tests__/onboardingChoices.mock';
+import {
+  clearOrganizationOnboardingDraftMutation,
+  organizationOnboardingDraftQuery,
+  saveOrganizationOnboardingDraftMutation,
+} from '../../organizationOnboarding/organizationOnboarding.graphql';
 import { AddTenantForm } from '../addTenantForm.component';
-import { addTenantMutation } from '../addTenantForm.graphql';
+import { OnboardingStep } from '../../organizationOnboarding/onboardingSteps';
 
 jest.mock('@sb/webapp-core/services/analytics');
 
 const NIP = '9721382373';
+const render: typeof baseRender = (ui, options = {}) =>
+  baseRender(ui, {
+    ...options,
+    apolloMocks: (mocks) => [
+      ...mocks,
+      composeMockedQueryResult(organizationOnboardingDraftQuery, { data: { organizationOnboardingDraft: null } }),
+      onboardingChoicesMock,
+      ...(typeof options.apolloMocks === 'function' ? options.apolloMocks([]) : (options.apolloMocks ?? [])),
+    ],
+  });
 
 const lookupMock = (company: Record<string, string> | null) =>
   composeMockedQueryResult(companyLookupByNipQuery, {
@@ -43,18 +54,21 @@ describe('AddTenantForm: Component', () => {
   const Component = () => <AddTenantForm />;
 
   it('should display empty first step', async () => {
-    const { waitForApolloMocks } = render(<Component />);
-    await waitForApolloMocks();
+    render(<Component />);
     expect(await screen.findByPlaceholderText('Display name')).toHaveValue('');
     expect(screen.getByLabelText(/nip/i)).toHaveValue('');
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/role in the company/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
+    const progress = screen.getByRole('list', { name: 'Onboarding steps' });
+    expect(within(progress).getAllByRole('listitem')).toHaveLength(7);
+    expect(within(progress).getByText('Organization').closest('li')).toHaveAttribute('aria-current', 'step');
   });
 
   it('should preselect the only supported country and prefix the NIP with its code', async () => {
     render(<Component />);
 
-    expect(await screen.findByRole('combobox')).toHaveTextContent('Poland');
+    expect((await screen.findAllByRole('combobox'))[0]).toHaveTextContent('Poland');
     expect(screen.getByText(/currently supported: poland/i)).toBeInTheDocument();
     // The "PL" prefix sits inside the NIP input, as part of its label
     expect(screen.getByLabelText(/nip/i).closest('label')).toHaveTextContent('PL');
@@ -93,6 +107,7 @@ describe('AddTenantForm: Component', () => {
     await fillStepOne();
 
     expect(await screen.findByDisplayValue('ACME SP. Z O.O.')).toBeInTheDocument();
+    expect(screen.getByText('Company details').closest('li')).toHaveAttribute('aria-current', 'step');
     expect(screen.getByDisplayValue('123456785')).toBeInTheDocument();
     expect(screen.getByDisplayValue('UL. PRZYKŁADOWA 1, 00-001 WARSZAWA')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveTextContent('Active VAT payer');
@@ -110,6 +125,21 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/address/i)).toHaveValue('');
   });
 
+  it('should allow manual entry when the MF lookup fails', async () => {
+    const failedLookup = composeMockedQueryResult(companyLookupByNipQuery, {
+      variables: { nip: NIP, country: 'PL' },
+      errors: [{ message: 'MF unavailable' }],
+    });
+    render(<Component />, { apolloMocks: [failedLookup] });
+
+    await fillStepOne();
+
+    expect(await screen.findByText(/couldn't find this NIP/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/company name/i)).toBeEnabled();
+    expect(screen.getByLabelText(/regon/i)).toBeEnabled();
+    expect(screen.getByLabelText(/address/i)).toBeEnabled();
+  });
+
   it('should require every company field before creating the organization', async () => {
     render(<Component />, { apolloMocks: [lookupMock(null)] });
 
@@ -120,7 +150,7 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByText('REGON is required')).toBeInTheDocument();
     expect(screen.getByText('Address is required')).toBeInTheDocument();
     expect(screen.getByText('VAT status is required')).toBeInTheDocument();
-    const createButton = screen.getByRole('button', { name: /create organization/i });
+    const createButton = screen.getByRole('button', { name: /next/i });
     expect(createButton).toBeDisabled();
 
     await userEvent.type(screen.getByLabelText(/company name/i), 'JAN KOWALSKI');
@@ -164,77 +194,199 @@ describe('AddTenantForm: Component', () => {
     expect(screen.getByLabelText(/regon/i)).toHaveValue('');
   });
 
-  describe('action completes successfully', () => {
-    it('should commit mutation', async () => {
-      const user = currentUserFactory();
-      const commonQueryMock = fillCommonQueryWithUser(user);
-
-      const variables = {
-        input: {
-          name: 'new item name',
-          country: 'PL',
-          nip: NIP,
-          companyName: 'ACME SP. Z O.O.',
-          regon: '123456785',
-          address: 'UL. PRZYKŁADOWA 1, 00-001 WARSZAWA',
-          vatStatus: 'ACTIVE',
+  it('saves a draft after step two and continues to Customers without creating an organization', async () => {
+    const company = {
+      name: 'new item name',
+      country: 'PL',
+      nip: NIP,
+      companyName: 'ACME SP. Z O.O.',
+      regon: '123456785',
+      address: 'Warsaw',
+      vatStatus: 'ACTIVE',
+    };
+    const save = composeMockedQueryResult(saveOrganizationOnboardingDraftMutation, {
+      variables: { step: 1, company },
+      data: {
+        saveOrganizationOnboardingDraft: {
+          tenant: null,
+          profile: { currentStep: 2, completedAt: null },
         },
-      };
-      const data = {
-        createTenant: {
-          tenantEdge: {
-            node: {
-              id: '1',
-              name: variables.input.name,
+      },
+    });
+    const draft = {
+      companyData: company,
+      respondentRole: '',
+      customerType: '',
+      revenueModels: [],
+      costDrivers: [],
+      pricing: '',
+      mainGoal: '',
+      currentStep: 2,
+      isRequired: true,
+      completedAt: null,
+    };
+    render(<Component />, {
+      apolloMocks: [
+        lookupMock(company),
+        save,
+        {
+          ...composeMockedQueryResult(organizationOnboardingDraftQuery, {
+            data: { organizationOnboardingDraft: draft },
+          }),
+          maxUsageCount: 3,
+        },
+      ],
+    });
+    await fillStepOne();
+    await screen.findByDisplayValue(company.companyName);
+    expect(screen.queryByRole('button', { name: /create organization/i })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+    expect(save.result).toHaveBeenCalled();
+    expect(screen.queryByText('Organization added successfully!')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByLabelText(/company name/i)).toHaveValue(company.companyName);
+  });
+  it('runs all seven steps and creates the organization only on Summary confirmation', async () => {
+    const company = {
+      name: 'new item name',
+      country: 'PL',
+      nip: NIP,
+      companyName: 'ACME SP. Z O.O.',
+      regon: '123456785',
+      address: 'Warsaw',
+      vatStatus: 'ACTIVE',
+    };
+    const answers = {
+      respondentRole: 'ACCOUNTING',
+      customerType: 'B2B',
+      revenueModels: ['PROJECT'],
+      costDrivers: ['MATERIALS'],
+      pricing: 'FIXED',
+      mainGoal: 'COSTS',
+    };
+    const draft = (currentStep: number) => ({
+      companyData: company,
+      ...answers,
+      currentStep,
+      isRequired: true,
+      completedAt: null,
+    });
+    const query = (currentStep: number, maxUsageCount = 1) => ({
+      ...composeMockedQueryResult(organizationOnboardingDraftQuery, {
+        data: { organizationOnboardingDraft: draft(currentStep) },
+      }),
+      maxUsageCount,
+    });
+    const save = (step: number, variables: Record<string, unknown> = {}) =>
+      composeMockedQueryResult(saveOrganizationOnboardingDraftMutation, {
+        variables: { step, ...variables },
+        data: {
+          saveOrganizationOnboardingDraft: {
+            tenant: step === OnboardingStep.SUMMARY ? { id: 'created-tenant', name: company.name } : null,
+            profile: {
+              currentStep: Math.min(step + 1, OnboardingStep.SUMMARY),
+              completedAt: step === OnboardingStep.SUMMARY ? '2026-10-03T08:00:00Z' : null,
             },
           },
         },
-      };
-      const requestMock = composeMockedQueryResult(addTenantMutation, {
-        variables,
-        data,
       });
-
-      const currentUserRefetchData = {
-        ...user,
-        tenants: [
-          ...(user.tenants ?? []),
-          tenantFactory({
-            id: '1',
-            name: variables.input.name,
-            type: TenantTypeField.ORGANIZATION,
-            membership: membershipFactory({ role: TenantUserRole.OWNER }),
-          }),
-        ],
-      };
-      const refetchMock = composeMockedQueryResult(commonQueryCurrentUserQuery, {
-        data: currentUserRefetchData,
-      });
-
-      render(<Component />, {
-        apolloMocks: [
-          commonQueryMock,
-          lookupMock({
-            companyName: variables.input.companyName,
-            regon: variables.input.regon,
-            address: variables.input.address,
-            vatStatus: variables.input.vatStatus,
-          }),
-          requestMock,
-          refetchMock,
-        ],
-      });
-
-      await fillStepOne();
-      await screen.findByDisplayValue(variables.input.companyName);
-      await userEvent.click(screen.getByRole('button', { name: /create organization/i }));
-
-      // Wait for the toast first (proves mutation completed), then verify mocks were called
-      const toast = await screen.findByTestId('toast-1');
-      expect(toast).toHaveTextContent('Organization added successfully!');
-
-      expect(requestMock.result).toHaveBeenCalled();
-      expect(trackEvent).toHaveBeenCalledWith('tenant', 'add', '1');
+    const create = save(OnboardingStep.SUMMARY, { company, ...answers });
+    render(<Component />, {
+      apolloMocks: [
+        lookupMock(company),
+        save(1, { company }),
+        query(2, 2),
+        save(2, { respondentRole: answers.respondentRole, customerType: answers.customerType }),
+        query(3),
+        save(3, { revenueModels: answers.revenueModels }),
+        query(4),
+        save(4, { costDrivers: answers.costDrivers }),
+        query(5),
+        save(5, { pricing: answers.pricing, mainGoal: answers.mainGoal }),
+        query(OnboardingStep.SUMMARY),
+        create,
+        fillCommonQueryWithUser(),
+      ],
     });
+    await fillStepOne();
+    await screen.findByDisplayValue(company.companyName);
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('What do customers pay you for?')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('Which costs grow with your sales?')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(
+      await screen.findByRole('heading', { name: 'How do you usually set prices?', level: 2 })
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('Your business profile')).toBeInTheDocument();
+    expect(create.result).not.toHaveBeenCalled();
+    expect(screen.queryByText('Organization added successfully!')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Create organization' }));
+    expect(await screen.findByText('Organization added successfully!')).toBeInTheDocument();
+    expect(create.result).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears a saved draft and returns to a blank first step', async () => {
+    const company = {
+      name: 'new item name',
+      country: 'PL',
+      nip: NIP,
+      companyName: 'ACME SP. Z O.O.',
+      regon: '123456785',
+      address: 'Warsaw',
+      vatStatus: 'ACTIVE',
+    };
+    const savedDraft = {
+      companyData: company,
+      respondentRole: '',
+      customerType: '',
+      revenueModels: [],
+      costDrivers: [],
+      pricing: '',
+      mainGoal: '',
+      currentStep: 2,
+      isRequired: true,
+      completedAt: null,
+    };
+    const draftQuery = (maxUsageCount: number, draft: typeof savedDraft | null) => ({
+      ...composeMockedQueryResult(organizationOnboardingDraftQuery, { data: { organizationOnboardingDraft: draft } }),
+      maxUsageCount,
+    });
+
+    render(<Component />, {
+      apolloMocks: () => [
+        lookupMock(company),
+        composeMockedQueryResult(saveOrganizationOnboardingDraftMutation, {
+          variables: { step: 1, company },
+          data: {
+            saveOrganizationOnboardingDraft: { tenant: null, profile: { currentStep: 2, completedAt: null } },
+          },
+        }),
+        draftQuery(2, savedDraft),
+        composeMockedQueryResult(clearOrganizationOnboardingDraftMutation, {
+          variables: {},
+          data: { clearOrganizationOnboardingDraft: { ok: true } },
+        }),
+        draftQuery(1, null),
+      ],
+    });
+
+    await fillStepOne(company.name, NIP);
+    await screen.findByDisplayValue(company.companyName);
+    await userEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Clear draft' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Clear draft' }));
+
+    expect(await screen.findByPlaceholderText('Display name')).toHaveValue('');
+    expect(screen.getByLabelText(/nip/i)).toHaveValue('');
+    const progress = screen.getByRole('list', { name: 'Onboarding steps' });
+    expect(within(progress).getAllByRole('listitem')[0]).toHaveAttribute('aria-current', 'step');
   });
 });

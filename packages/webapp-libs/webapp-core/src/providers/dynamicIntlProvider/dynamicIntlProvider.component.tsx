@@ -1,8 +1,15 @@
-import { ReactNode, useMemo } from 'react';
-import { IntlProvider, IntlConfig } from 'react-intl';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { IntlConfig, IntlProvider } from 'react-intl';
 
-import { Locale, DEFAULT_LOCALE, translationMessages, TranslationMessages, translationsConfig } from '../../config/i18n';
-import { useRemoteTranslations, useDevTranslationOverrides } from '../../hooks/useRemoteTranslations';
+import {
+  DEFAULT_LOCALE,
+  Locale,
+  TranslationMessages,
+  loadBundledTranslationMessages,
+  translationMessages,
+  translationsConfig,
+} from '../../config/i18n';
+import { useDevTranslationOverrides, useRemoteTranslations } from '../../hooks/useRemoteTranslations';
 
 export interface DynamicIntlProviderProps {
   /**
@@ -48,12 +55,20 @@ export interface DynamicIntlProviderProps {
  * </DynamicIntlProvider>
  * ```
  */
-export const DynamicIntlProvider = ({
-  locale,
-  children,
-  onError,
-  translationsBaseUrl,
-}: DynamicIntlProviderProps) => {
+export const DynamicIntlProvider = ({ locale, children, onError, translationsBaseUrl }: DynamicIntlProviderProps) => {
+  const [bundled, setBundled] = useState<{ locale: Locale; messages: TranslationMessages } | null>(
+    locale === DEFAULT_LOCALE ? { locale, messages: translationMessages[DEFAULT_LOCALE] } : null
+  );
+  useEffect(() => {
+    let active = true;
+    loadBundledTranslationMessages(locale).then((messages) => {
+      if (active) setBundled({ locale, messages });
+    });
+    return () => {
+      active = false;
+    };
+  }, [locale]);
+
   // Fetch remote translations if enabled
   const {
     data: remoteMessages,
@@ -71,20 +86,24 @@ export const DynamicIntlProvider = ({
   const messages = useMemo((): TranslationMessages => {
     // Start with bundled translations as base
     const mergedMessages: TranslationMessages = {
-      ...(translationMessages[locale] || translationMessages[DEFAULT_LOCALE]),
+      ...(bundled?.messages ?? translationMessages[DEFAULT_LOCALE]),
     };
 
     // Apply remote translations if available and no error
-    if (translationsConfig.useRemoteTranslations && remoteMessages && !isError) {
+    if (bundled?.locale === locale && translationsConfig.useRemoteTranslations && remoteMessages && !isError) {
       Object.entries(remoteMessages).forEach(([key, value]) => {
-        if (value !== undefined) {
+        // The API returns the English default for untranslated keys. Keep the local translation instead.
+        if (
+          value &&
+          (locale === DEFAULT_LOCALE || value !== translationMessages[DEFAULT_LOCALE][key] || !mergedMessages[key])
+        ) {
           mergedMessages[key] = value;
         }
       });
     }
 
     // Apply development overrides (highest priority)
-    if (isDevMode && Object.keys(overrides).length > 0) {
+    if (bundled?.locale === locale && isDevMode && Object.keys(overrides).length > 0) {
       Object.entries(overrides).forEach(([key, value]) => {
         if (value !== undefined) {
           mergedMessages[key] = value;
@@ -93,7 +112,7 @@ export const DynamicIntlProvider = ({
     }
 
     return mergedMessages;
-  }, [locale, remoteMessages, isError, overrides, isDevMode]);
+  }, [locale, bundled, remoteMessages, isError, overrides, isDevMode]);
 
   // Default error handler - only log in development
   const handleError: IntlConfig['onError'] = useMemo(() => {
@@ -112,17 +131,14 @@ export const DynamicIntlProvider = ({
     };
   }, [onError, isDevMode]);
 
+  // Keep mounted forms and their state while loading the next language.
+  if (!bundled) return null;
+
   return (
-    <IntlProvider
-      locale={locale}
-      messages={messages}
-      defaultLocale={DEFAULT_LOCALE}
-      onError={handleError}
-    >
+    <IntlProvider locale={bundled.locale} messages={messages} defaultLocale={DEFAULT_LOCALE} onError={handleError}>
       {children}
     </IntlProvider>
   );
 };
 
 export default DynamicIntlProvider;
-

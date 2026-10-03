@@ -3,13 +3,16 @@ import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useEffect } from 'react';
 
 import { DEFAULT_COMPANY_COUNTRY } from '../../utils/companyCountries';
+import { useCompanyFormErrorMessages } from '../companyDetailsFields/companyFormErrors.hook';
 import { TenantFormFields, TenantFormProps } from './tenantForm.component';
 
 type UseTenantFormProps = Pick<TenantFormProps, 'error' | 'onSubmit' | 'initialData'>;
 
 export const useTenantForm = ({ error, onSubmit, initialData }: UseTenantFormProps) => {
+  const errorMessages = useCompanyFormErrorMessages();
   const form = useApiForm<TenantFormFields>({
     // Company fields are required: flag a field as soon as it's left empty, not only on submit
+    errorMessages,
     mode: 'onTouched',
     defaultValues: {
       name: initialData?.name ?? '',

@@ -49,6 +49,12 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 openssl rand -hex 32
 ```
 
+### Organization onboarding deployment
+
+Apply the `multitenancy` migration `0028_organization_onboarding_profile` before starting the updated backend and deploying the webapp. It creates the onboarding profile, which holds the required-flow flag, account-owned drafts, and a constraint requiring exactly one organization or draft owner. Existing organizations are not made mandatory by the default `is_required=False` value. New organizations are created atomically only after the summary is confirmed. No additional secrets are required.
+
+**Rollback:** roll back application code without reversing this migration on a live database. Reversing it removes all onboarding answers and unattached drafts, so use a tested database recovery procedure if schema rollback is necessary.
+
 **URL formatting rules:**
 
 | Variable | Format | Example |

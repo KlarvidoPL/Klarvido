@@ -99,6 +99,6 @@ describe('TenantForm: Component', () => {
     const mockError = { graphQLErrors: [new GraphQLError('Provided value is invalid')] } as any;
     render(<Component error={mockError as Error} />);
 
-    expect(await screen.findByText('Provided value is invalid')).toBeInTheDocument();
+    expect(await screen.findByText('Could not save this step. Please try again.')).toBeInTheDocument();
   });
 });

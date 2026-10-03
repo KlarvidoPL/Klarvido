@@ -1,19 +1,16 @@
-import { useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
-import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
+import { useToast } from '@sb/webapp-core/toast';
+import { Alert, AlertDescription } from '@sb/webapp-core/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
-import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { cn } from '@sb/webapp-core/lib/utils';
-import { trackEvent } from '@sb/webapp-core/services/analytics';
-import { useToast } from '@sb/webapp-core/toast/useToast';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNavigate } from 'react-router';
 
 import {
   COMPANY_DETAILS_FIELDS,
@@ -22,8 +19,9 @@ import {
   DisplayNameField,
   NipField,
 } from '../../components/companyDetailsFields';
+import { useCompanyFormErrorMessages } from '../../components/companyDetailsFields/companyFormErrors.hook';
+import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
-import { useGenerateTenantPath } from '../../hooks';
 import {
   CompanyDetails,
   getMissingCompanyFields,
@@ -32,24 +30,30 @@ import {
 } from '../../hooks/useCompanyLookup';
 import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
-import { addTenantMutation } from './addTenantForm.graphql';
-
-enum Step {
-  BASICS = 1,
-  COMPANY_DETAILS = 2,
-}
+import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
+import { OnboardingStep } from '../organizationOnboarding/onboardingSteps';
+import {
+  clearOrganizationOnboardingDraftMutation,
+  organizationOnboardingDraftQuery,
+  saveOrganizationOnboardingDraftMutation,
+} from '../organizationOnboarding/organizationOnboarding.graphql';
 
 const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
 export const AddTenantForm = () => {
-  const generateTenantPath = useGenerateTenantPath();
-  const { toast } = useToast();
+  const errorMessages = useCompanyFormErrorMessages();
   const intl = useIntl();
-  const navigate = useNavigate();
-  const { reload: reloadCommonQuery } = useCommonQuery();
+  const {
+    data: draft,
+    loading: draftLoading,
+    error: draftError,
+    refetch: refetchDraft,
+  } = useQuery(organizationOnboardingDraftQuery, { fetchPolicy: 'network-only' });
+  const [clearDraft, { loading: clearingDraft }] = useMutation(clearOrganizationOnboardingDraftMutation);
   const { lookup, loading: lookupLoading } = useCompanyLookup();
+  const { toast } = useToast();
 
-  const [step, setStep] = useState<Step>(Step.BASICS);
+  const [step, setStep] = useState<number>(OnboardingStep.ORGANIZATION);
   // null = not looked up yet; true/false = whether MF returned a company for the NIP in the form
   const [companyFound, setCompanyFound] = useState<boolean | null>(null);
   const [lookedUpNip, setLookedUpNip] = useState<string>();
@@ -58,6 +62,7 @@ export const AddTenantForm = () => {
 
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
     useApiForm<TenantFormFields>({
+      errorMessages,
       mode: 'onChange',
       defaultValues: {
         name: '',
@@ -78,9 +83,9 @@ export const AddTenantForm = () => {
   } = form;
 
   // Every company field is required: as soon as step 2 opens, flag the ones the register didn't fill (red error on
-  // each), and keep "Create organization" disabled until all of them are filled in and valid
+  // each), and keep "Next" disabled until all of them are filled in and valid
   useEffect(() => {
-    if (step === Step.COMPANY_DETAILS) {
+    if (step === OnboardingStep.COMPANY_DETAILS) {
       trigger([...COMPANY_DETAILS_FIELDS]);
     }
   }, [step, trigger]);
@@ -89,35 +94,26 @@ export const AddTenantForm = () => {
     (field, index) => !companyValues[index] || !!errors[field]
   );
 
-  const successMessage = intl.formatMessage({
-    id: 'Tenant form / AddTenant / Success message',
-    defaultMessage: 'Organization added successfully!',
-  });
+  const [commitTenantFormMutation, { loading: loadingMutation }] = useMutation(
+    saveOrganizationOnboardingDraftMutation,
+    {
+      onCompleted: async () => {
+        await refetchDraft();
+      },
+      onError: (error) => {
+        const graphQLErrors = extractGraphQLErrors(error);
+        if (!graphQLErrors) return;
+        setApolloGraphQLResponseErrors(graphQLErrors);
 
-  const [commitTenantFormMutation, { loading: loadingMutation }] = useMutation(addTenantMutation, {
-    onCompleted: (data) => {
-      const id = data?.createTenant?.tenantEdge?.node?.id;
-      reloadCommonQuery();
-
-      trackEvent('tenant', 'add', id);
-
-      toast({ description: successMessage, variant: 'success' });
-
-      navigate(generateTenantPath(RoutesConfig.home, { tenantId: id! }));
-    },
-    onError: (error) => {
-      const graphQLErrors = extractGraphQLErrors(error);
-      if (!graphQLErrors) return;
-      setApolloGraphQLResponseErrors(graphQLErrors);
-
-      // Name/NIP errors can only be fixed on the first step
-      const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
-      const fieldsWithErrors = Object.keys(validationError?.extensions ?? {});
-      if (STEP_1_FIELDS.some((field) => fieldsWithErrors.includes(field))) {
-        setStep(Step.BASICS);
-      }
-    },
-  });
+        // Name/NIP errors can only be fixed on the first step
+        const validationError = graphQLErrors.find(({ message }) => message === 'GraphQlValidationError');
+        const fieldsWithErrors = Object.keys(validationError?.extensions ?? {});
+        if (STEP_1_FIELDS.some((field) => fieldsWithErrors.includes(field))) {
+          setStep(OnboardingStep.ORGANIZATION);
+        }
+      },
+    }
+  );
 
   const handleNext = async () => {
     if (!(await trigger([...STEP_1_FIELDS]))) return;
@@ -136,13 +132,14 @@ export const AddTenantForm = () => {
       setMissingFields(company ? getMissingCompanyFields(company) : []);
       setLookedUpNip(lookupKey);
     }
-    setStep(Step.COMPANY_DETAILS);
+    setStep(OnboardingStep.COMPANY_DETAILS);
   };
 
   const onSubmit = handleSubmit((formData: TenantFormFields) => {
     commitTenantFormMutation({
       variables: {
-        input: {
+        step: 1,
+        company: {
           name: formData.name,
           country: formData.country,
           nip: normalizeTaxId(formData.nip, formData.country),
@@ -155,9 +152,46 @@ export const AddTenantForm = () => {
     });
   });
 
+  const handleClearDraft = async () => {
+    try {
+      await clearDraft();
+      await refetchDraft();
+      form.reset();
+      setStep(OnboardingStep.ORGANIZATION);
+      setCompanyFound(null);
+      setLookedUpNip(undefined);
+      setMissingFields([]);
+    } catch {
+      toast({
+        description: intl.formatMessage({
+          defaultMessage: 'Could not clear this draft. Please try again.',
+          id: 'Onboarding / Clear draft failed',
+        }),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  if (draftLoading)
+    return (
+      <PageLayout>
+        <Loader2 className="mx-auto my-8 animate-spin" />
+      </PageLayout>
+    );
+  if (draftError)
+    return (
+      <PageLayout>
+        <p className="p-8 text-destructive">
+          <FormattedMessage defaultMessage="Could not load the business profile." id="Onboarding / Load failed" />
+        </p>
+      </PageLayout>
+    );
+  if (draft?.organizationOnboardingDraft)
+    return <OrganizationOnboarding draftMode onClearDraft={handleClearDraft} clearingDraft={clearingDraft} />;
+
   return (
     <PageLayout>
-      <Card>
+      <Card className="mx-auto w-full max-w-screen-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
@@ -169,7 +203,7 @@ export const AddTenantForm = () => {
               id="Tenant form / AddTenant / Card description"
             />
           </CardDescription>
-          <StepIndicator step={step} />
+          <OnboardingProgress step={step + 1} />
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -177,7 +211,7 @@ export const AddTenantForm = () => {
               className="flex flex-col gap-4"
               noValidate
               onSubmit={(event) => {
-                if (step === Step.BASICS) {
+                if (step === OnboardingStep.ORGANIZATION) {
                   event.preventDefault();
                   handleNext();
                   return;
@@ -185,7 +219,7 @@ export const AddTenantForm = () => {
                 onSubmit(event);
               }}
             >
-              {step === Step.BASICS && (
+              {step === OnboardingStep.ORGANIZATION && (
                 <>
                   <DisplayNameField />
                   <CountryField />
@@ -193,7 +227,7 @@ export const AddTenantForm = () => {
                 </>
               )}
 
-              {step === Step.COMPANY_DETAILS && (
+              {step === OnboardingStep.COMPANY_DETAILS && (
                 <>
                   <LookupResultNote found={!!companyFound} missingFields={missingFields} />
                   <CompanyDetailsFields />
@@ -209,7 +243,7 @@ export const AddTenantForm = () => {
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
                 {/* Distinct keys: without them React reuses the same <button> across steps, so clicking Back flips
                     it to type="submit" mid-click and the browser submits the form (= Next) right back to step 2 */}
-                {step === Step.BASICS ? (
+                {step === OnboardingStep.ORGANIZATION ? (
                   <Button
                     key="next"
                     type="submit"
@@ -226,7 +260,7 @@ export const AddTenantForm = () => {
                       key="back"
                       type="button"
                       variant={ButtonVariant.SECONDARY}
-                      onClick={() => setStep(Step.BASICS)}
+                      onClick={() => setStep(OnboardingStep.ORGANIZATION)}
                       disabled={loadingMutation}
                       className="w-full sm:w-fit"
                       icon={<ArrowLeft className="h-4 w-4" />}
@@ -239,10 +273,7 @@ export const AddTenantForm = () => {
                       disabled={loadingMutation || companyDetailsIncomplete}
                       className="w-full sm:w-fit"
                     >
-                      <FormattedMessage
-                        defaultMessage="Create organization"
-                        id="Tenant form / AddTenant / Submit button"
-                      />
+                      <FormattedMessage defaultMessage="Next" id="Tenant form / AddTenant / Next button" />
                     </Button>
                   </>
                 )}
@@ -255,60 +286,37 @@ export const AddTenantForm = () => {
   );
 };
 
-const StepIndicator = ({ step }: { step: Step }) => (
-  <div className="flex items-center gap-3 pt-4 text-sm">
-    {[Step.BASICS, Step.COMPANY_DETAILS].map((current, index) => (
-      <div key={current} className="flex items-center gap-3">
-        {index > 0 && <div className="h-px w-6 bg-border sm:w-10" />}
-        <div className={cn('flex items-center gap-2', current === step ? 'text-foreground' : 'text-muted-foreground')}>
-          <span
-            className={cn(
-              'flex h-6 w-6 items-center justify-center rounded-full border text-xs font-medium',
-              current === step ? 'border-primary bg-primary text-primary-foreground' : 'border-border'
-            )}
-          >
-            {current}
-          </span>
-          {current === Step.BASICS ? (
-            <FormattedMessage defaultMessage="Organization" id="Tenant form / AddTenant / Step basics" />
-          ) : (
-            <FormattedMessage defaultMessage="Company details" id="Tenant form / AddTenant / Step company details" />
-          )}
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
 const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFields: Array<keyof CompanyDetails> }) => {
   const formatCompanyFields = useFormatCompanyFields();
 
   if (found && missingFields.length > 0) {
     return (
-      <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-        {/* One text node: FormattedMessage with rich values renders several siblings, which the flex row would split */}
-        <span>
+      <Alert
+        variant="destructive"
+        className="flex items-center gap-3 py-3 text-sm [&>svg]:static [&>svg]:shrink-0 [&>svg~*]:pl-0 [&>svg+div]:translate-y-0"
+      >
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
           <FormattedMessage
             defaultMessage="We found your company in the Ministry of Finance register, but it has no {fields} for it. Please check the details below and fill in what's missing."
             id="Tenant form / AddTenant / Lookup found partial"
-            values={{ fields: <strong>{formatCompanyFields(missingFields)}</strong> }}
+            values={{ fields: <strong key="missing-fields">{formatCompanyFields(missingFields)}</strong> }}
           />
-        </span>
-      </div>
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
     <div
       className={cn(
-        'flex items-start gap-2 rounded-md border px-3 py-2 text-sm',
-        found ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-muted/50'
+        'flex items-center gap-3 rounded-lg border px-4 py-3 text-sm',
+        found ? 'border-green-500/30 bg-green-500/5 text-green-600 dark:text-green-400' : 'border-border bg-muted/50'
       )}
     >
       {found ? (
         <>
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
           <FormattedMessage
             defaultMessage="We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
             id="Tenant form / AddTenant / Lookup found"
@@ -316,7 +324,7 @@ const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFie
         </>
       ) : (
         <>
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+          <Info className="h-4 w-4 shrink-0 text-muted-foreground" />
           <FormattedMessage
             defaultMessage="We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
             id="Tenant form / AddTenant / Lookup not found"
