@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "संगठन को हटाया नहीं जा सका।"
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "कम से कम एक भूमिका निर्दिष्ट होनी चाहिए।"
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "आप '{permissions}' अनुमति(याँ) वाली भूमिका नहीं सौंप सकते क्योंकि यह आपके पास स्वयं नहीं है। पहले किसी संगठन स्वामी या व्यवस्थापक से यह अनुमति प्राप्त करें।"
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "स्वामी भूमिका को हटाया नहीं जा सकता: संगठन में कम से कम एक स्वामी होना चाहिए।"
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "आपके पास सदस्य भूमिकाएं संपादित करने की अनुमति नहीं है।"
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "केवल संगठन स्वामी ही स्वामी भूमिका प्रदान कर सकते हैं।"
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "केवल स्वामी ही अन्य स्वामियों की भूमिकाएं बदल सकते हैं।"
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "{name} को असाइन करने के लिए भूमिकाएँ चुनें"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "सिस्टम"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "यूज़र भूमिका बदली नहीं जा सकी।"
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "यूज़र भूमिका सफलतापूर्वक अपडेट हुई!"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "सदस्य"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "आप '{permissions}' अनुमति(याँ) वाली भूमिका के साथ किसी सदस्य को आमंत्रित नहीं कर सकते क्योंकि यह आपके पास स्वयं नहीं है। पहले किसी संगठन स्वामी या व्यवस्थापक से यह अनुमति प्राप्त करें।"
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "उपयोगकर्ता को आमंत्रित करने में विफल। कृपया पुनः प्रयास करें।"
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "केवल संगठन स्वामी ही स्वामी भूमिका के साथ नए सदस्यों को आमंत्रित कर सकते हैं।"
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "यूज़र को सफलतापूर्वक आमंत्रित किया गया!"

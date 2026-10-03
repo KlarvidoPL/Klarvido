@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import { TenantInvitationForm, type TenantInvitationFormFields } from '../../../../components/tenantInvitationForm';
 import { tenantMembersListQuery } from '../../../../components/tenantMembersList/tenantMembersList.graphql';
 import { useCurrentTenant } from '../../../../providers';
+import { getPermissionDisplay } from '../../../../utils/permissionDisplay';
 import { createTenantInvitation } from './invitationForm.graphql';
 
 export const InvitationForm = () => {
@@ -26,18 +27,40 @@ export const InvitationForm = () => {
     id: 'Tenant Members / Invitation form / User cannot be invited',
     defaultMessage: 'This user cannot be a member of this organization.',
   });
+  const ownerRoleRequiresOwnerMessage = intl.formatMessage({
+    id: 'Tenant Members / Invitation form / Only owner can invite owner role',
+    defaultMessage: 'Only organization owners can invite members with the Owner role.',
+  });
 
   // Backend validation messages are plain English server text, not translated -
   // this repo's i18n system only covers frontend-owned FormattedMessage strings.
-  // Never show that raw text directly; map a known, stable error `code` to a
+  // Never show that raw text directly; map a known, stable error `code`/`message` to a
   // proper translated message instead, falling back to a generic one otherwise.
-  const errorMessageForCode = (code?: string) => {
-    switch (code) {
-      case 'user_cannot_be_invited':
-        return userCannotBeInvitedMessage;
-      default:
-        return fallbackErrorMessage;
+  const errorMessageFor = (nonFieldError?: { message?: string; code?: string }) => {
+    if (nonFieldError?.code === 'user_cannot_be_invited') {
+      return userCannotBeInvitedMessage;
     }
+    if (nonFieldError?.message === 'Only organization owners can invite members with the Owner role.') {
+      return ownerRoleRequiresOwnerMessage;
+    }
+    const permissionsMatch = nonFieldError?.message?.match(
+      /^You cannot invite a member with permissions you don't have: (.+)$/
+    );
+    if (permissionsMatch) {
+      const permissions = permissionsMatch[1]
+        .split(', ')
+        .map((code) => getPermissionDisplay(intl, code, code).name)
+        .join(', ');
+      return intl.formatMessage(
+        {
+          defaultMessage:
+            'You can’t invite a member with a role that includes the "{permissions}" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first.',
+          id: 'Tenant Members / Invitation form / Cannot invite with permissions not owned',
+        },
+        { permissions }
+      );
+    }
+    return fallbackErrorMessage;
   };
 
   const [commitTenantInvitationMutation, { error, loading: loadingMutation }] = useMutation(createTenantInvitation, {
@@ -59,7 +82,7 @@ export const InvitationForm = () => {
       const nonFieldErrors = validationError?.extensions?.['non_field_errors'] as
         | { message?: string; code?: string }[]
         | undefined;
-      toast({ description: errorMessageForCode(nonFieldErrors?.[0]?.code), variant: 'destructive' });
+      toast({ description: errorMessageFor(nonFieldErrors?.[0]), variant: 'destructive' });
     },
   });
 

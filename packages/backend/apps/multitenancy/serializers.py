@@ -279,6 +279,8 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
                     ).exists()
                 )
 
+            inviter_permissions = models.get_user_permissions_for_tenant(inviter, tenant) if inviter else set()
+
             for role_id in org_role_ids:
                 decoded_id = decode_role_id(role_id)
 
@@ -292,6 +294,17 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
                     raise serializers.ValidationError(
                         _("Only organization owners can invite members with the Owner role.")
                     )
+
+                # SECURITY: Users can only invite members with roles whose permissions they also have
+                # (owners can invite with any role) - mirrors AssignRolesToMemberMutation in schema.py.
+                if not is_inviter_owner:
+                    role_permissions = set(role.permissions.values_list("code", flat=True))
+                    missing_permissions = role_permissions - inviter_permissions
+                    if missing_permissions:
+                        permissions_list = ", ".join(list(missing_permissions)[:3])
+                        raise serializers.ValidationError(
+                            _(f"You cannot invite a member with permissions you don't have: {permissions_list}")
+                        )
 
                 decoded_role_ids.append(decoded_id)
 

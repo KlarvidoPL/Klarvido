@@ -27,7 +27,7 @@ import { useToast } from '@sb/webapp-core/toast';
 import { Check, Crown, GripHorizontal, Hourglass, RefreshCw, Settings2, Trash2, UserCheck } from 'lucide-react';
 import { trim } from 'ramda';
 import { useCallback, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { usePermissionCheck } from '../../../hooks';
 import { useCurrentTenant } from '../../../providers';
@@ -36,10 +36,68 @@ import {
   assignRolesToMemberMutation,
 } from '../../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
 import { getSystemRoleDisplay } from '../../../utils/organizationRoleDisplay';
+import { getPermissionDisplay } from '../../../utils/permissionDisplay';
 import {
   deleteTenantMembershipMutation,
   resendTenantInvitationMutation,
 } from './membershipEntry.graphql';
+
+// Translates the known raw-English error strings raised by AssignRolesToMemberMutation
+// (apps/multitenancy/schema.py) - same pattern as getRoleMutationErrorMessage in
+// tenantRoles.component.tsx, since this mutation is a plain graphene mutation whose errors
+// arrive as a flat error.message rather than extensions.non_field_errors. Unrecognized
+// messages fall back to the raw text.
+const getAssignRolesErrorMessage = (intl: IntlShape, error: Error): string => {
+  const message = error.message;
+
+  const missingPermissionsMatch = message.match(
+    /^You cannot assign roles with permissions you don't have: (.+)$/
+  );
+  if (missingPermissionsMatch) {
+    const permissions = missingPermissionsMatch[1]
+      .split(', ')
+      .map((code) => getPermissionDisplay(intl, code, code).name)
+      .join(', ');
+    return intl.formatMessage(
+      {
+        defaultMessage:
+          'You can’t assign a role that includes the "{permissions}" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first.',
+        id: 'Membership Entry / Error / Cannot assign permissions not owned',
+      },
+      { permissions }
+    );
+  }
+
+  switch (message) {
+    case "You don't have permission to edit member roles.":
+      return intl.formatMessage({
+        defaultMessage: "You don't have permission to edit member roles.",
+        id: 'Membership Entry / Error / No edit member roles permission',
+      });
+    case 'At least one role must be assigned.':
+      return intl.formatMessage({
+        defaultMessage: 'At least one role must be assigned.',
+        id: 'Membership Entry / Error / At least one role required',
+      });
+    case 'Only organization owners can assign the Owner role.':
+      return intl.formatMessage({
+        defaultMessage: 'Only organization owners can assign the Owner role.',
+        id: 'Membership Entry / Error / Only owner can assign owner role',
+      });
+    case 'Cannot remove the Owner role: there must be at least one owner in the organization.':
+      return intl.formatMessage({
+        defaultMessage: "The Owner role can’t be removed: there must be at least one owner in the organization.",
+        id: 'Membership Entry / Error / Cannot remove last owner',
+      });
+    case 'Only owners can modify the roles of other owners.':
+      return intl.formatMessage({
+        defaultMessage: 'Only owners can modify the roles of other owners.',
+        id: 'Membership Entry / Error / Only owner can modify owner roles',
+      });
+    default:
+      return message;
+  }
+};
 
 // Role color mapping
 const ROLE_COLOR_CLASSES: Record<string, string> = {
@@ -135,11 +193,6 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
     defaultMessage: 'The user roles were updated successfully!',
   });
 
-  const updateFailMessage = intl.formatMessage({
-    id: 'Membership Entry / UpdateRole / Fail message',
-    defaultMessage: 'Unable to change the user roles.',
-  });
-
   const deleteSuccessMessage = intl.formatMessage({
     id: 'Membership Entry / DeleteMembership / Success message',
     defaultMessage: 'User was removed successfully!',
@@ -166,8 +219,8 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
       setRolesDialogOpen(false);
       onAfterUpdate?.();
     },
-    onError: () => {
-      toast({ description: updateFailMessage, variant: 'destructive' });
+    onError: (error) => {
+      toast({ description: getAssignRolesErrorMessage(intl, error), variant: 'destructive' });
     },
   });
 

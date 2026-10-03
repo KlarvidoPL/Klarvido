@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "Unable to delete the organization."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "At least one role must be assigned."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "You can’t assign a role that includes the \"{permissions}\" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "The Owner role can’t be removed: there must be at least one owner in the organization."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "You don't have permission to edit member roles."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "Only organization owners can assign the Owner role."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "Only owners can modify the roles of other owners."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Select which roles to assign to {name}"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "System"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "Unable to change the user roles."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "The user roles were updated successfully!"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Members"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "You can’t invite a member with a role that includes the \"{permissions}\" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "Failed to invite user. Please try again."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "Only organization owners can invite members with the Owner role."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "User invited successfully!"

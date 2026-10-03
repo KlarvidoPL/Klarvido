@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from ..models import TenantMembership, OrganizationRole, TenantMembershipRole
+from ..models import TenantMembership, OrganizationRole, TenantMembershipRole, Permission
 from ..constants import TenantUserRole, TenantType, SystemRoleType
 from ..serializers import (
     CreateTenantInvitationSerializer,
@@ -95,6 +95,59 @@ class TestCreateTenantInvitationSerializer:
 
         assert not serializer.is_valid()
         assert 'Invitation already exists' in serializer.errors['non_field_errors'][0]
+
+    def test_cannot_invite_with_role_granting_permissions_inviter_lacks(
+        self, user, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        """
+        SECURITY: A non-owner inviter cannot invite a new member with a role that grants
+        permissions the inviter doesn't personally have - mirrors AssignRolesToMemberMutation's
+        equivalent check in schema.py, which previously had no counterpart here.
+        """
+        tenant = tenant_factory(name="Test Tenant", type=TenantType.ORGANIZATION)
+        inviter = user_factory()
+        # Legacy ADMIN role auto-assigns the system Administrator RBAC role, which does not
+        # include 'billing.manage' (owner-only permission).
+        tenant_membership_factory(user=inviter, tenant=tenant, role=TenantUserRole.ADMIN, is_accepted=True)
+
+        billing_permission, _ = Permission.objects.get_or_create(
+            code="billing.manage", defaults={"name": "Manage Billing", "category": "billing"}
+        )
+        billing_role = OrganizationRole.objects.create(tenant=tenant, name="Billing Manager")
+        billing_role.permissions.add(billing_permission)
+
+        data = {
+            "email": "new_user@example.com",
+            "organization_role_ids": [str(billing_role.id)],
+            "tenant_id": str(tenant.id),
+        }
+        serializer = CreateTenantInvitationSerializer(data=data, context={'request': Mock(tenant=tenant, user=inviter)})
+
+        assert not serializer.is_valid()
+        error_text = str(serializer.errors).lower()
+        assert "permissions you don't have" in error_text
+        assert "billing.manage" in error_text
+
+    def test_owner_can_invite_with_role_granting_any_permission(self, user, tenant_factory, tenant_membership_factory):
+        """An owner inviter is exempt from the permission-coverage check."""
+        tenant = tenant_factory(name="Test Tenant", type=TenantType.ORGANIZATION)
+        owner = user
+        tenant_membership_factory(user=owner, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
+
+        billing_permission, _ = Permission.objects.get_or_create(
+            code="billing.manage", defaults={"name": "Manage Billing", "category": "billing"}
+        )
+        billing_role = OrganizationRole.objects.create(tenant=tenant, name="Billing Manager")
+        billing_role.permissions.add(billing_permission)
+
+        data = {
+            "email": "new_user@example.com",
+            "organization_role_ids": [str(billing_role.id)],
+            "tenant_id": str(tenant.id),
+        }
+        serializer = CreateTenantInvitationSerializer(data=data, context={'request': Mock(tenant=tenant, user=owner)})
+
+        assert serializer.is_valid(), serializer.errors
 
 
 class TestResendTenantInvitationSerializer:

@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "无法删除该组织。"
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "必须至少分配一个角色。"
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "您无法分配包含“{permissions}”权限的角色，因为您自己没有该权限。请先让组织所有者或管理员将该权限授予您。"
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "无法移除所有者角色：组织中必须至少保留一位所有者。"
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "您没有编辑成员角色的权限。"
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "只有组织所有者可以授予所有者角色。"
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "只有所有者可以修改其他所有者的角色。"
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "选择要分配给{name}的角色"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "系统"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "无法更改用户角色。"
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "用户角色已成功更新！"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "成员"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "您无法邀请拥有包含“{permissions}”权限角色的成员，因为您自己没有该权限。请先让组织所有者或管理员将该权限授予您。"
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "邀请用户失败,请重试。"
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "只有组织所有者可以邀请拥有所有者角色的新成员。"
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "用户邀请已发送！"

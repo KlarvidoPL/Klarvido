@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "تعذّر حذف المؤسسة."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "يجب تعيين دور واحد على الأقل."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "لا يمكنك تعيين دور يتضمن صلاحية \"{permissions}\" لأنك لا تملكها بنفسك. اطلب من مالك المؤسسة أو المسؤول منحك إياها أولاً."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "لا يمكن إزالة دور المالك: يجب أن يبقى مالك واحد على الأقل في المؤسسة."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "ليس لديك صلاحية لتعديل أدوار الأعضاء."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "يمكن فقط لمالكي المؤسسة منح دور المالك."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "يمكن فقط للمالكين تعديل أدوار المالكين الآخرين."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "اختر الأدوار التي تريد إسنادها إلى {name}"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "النظام"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "تعذّر تغيير دور المستخدم."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "تم تحديث دور المستخدم بنجاح!"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "الأعضاء"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "لا يمكنك دعوة عضو بدور يتضمن صلاحية \"{permissions}\" لأنك لا تملكها بنفسك. اطلب من مالك المؤسسة أو المسؤول منحك إياها أولاً."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "فشلت دعوة المستخدم. يرجى المحاولة مرة أخرى."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "يمكن فقط لمالكي المؤسسة دعوة أعضاء جدد بدور المالك."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "تمت دعوة المستخدم بنجاح!"

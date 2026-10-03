@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "Die Organisation konnte nicht gelöscht werden."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "Es muss mindestens eine Rolle zugewiesen werden."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "Sie können keine Rolle zuweisen, die die Berechtigung(en) „{permissions}“ enthält, da Sie diese selbst nicht besitzen. Bitten Sie einen Organisationsinhaber oder -administrator, sie Ihnen zuerst zuzuweisen."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "Die Rolle „Inhaber“ kann nicht entfernt werden: Es muss mindestens einen Inhaber in der Organisation geben."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "Sie haben keine Berechtigung, Mitgliederrollen zu bearbeiten."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "Nur Organisationsinhaber können die Rolle „Inhaber“ vergeben."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "Nur Inhaber können die Rollen anderer Inhaber ändern."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Wähle aus, welche Rollen {name} zugewiesen werden sollen"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "System"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "Die Benutzerrolle konnte nicht geändert werden."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "Die Benutzerrolle wurde erfolgreich aktualisiert!"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Mitglieder"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "Sie können kein Mitglied mit einer Rolle einladen, die die Berechtigung(en) „{permissions}“ enthält, da Sie diese selbst nicht besitzen. Bitten Sie einen Organisationsinhaber oder -administrator, sie Ihnen zuerst zuzuweisen."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "Einladung des Nutzers fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "Nur Organisationsinhaber können neue Mitglieder mit der Rolle „Inhaber“ einladen."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "Benutzer erfolgreich eingeladen!"

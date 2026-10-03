@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "Impossible de supprimer l'organisation."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "Au moins un rôle doit être attribué."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "Vous ne pouvez pas attribuer un rôle incluant la ou les permissions « {permissions} » car vous ne les possédez pas vous-même. Demandez à un propriétaire ou administrateur de l'organisation de vous les accorder d'abord."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "Le rôle Propriétaire ne peut pas être retiré : il doit rester au moins un propriétaire dans l'organisation."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "Vous n'avez pas la permission de modifier les rôles des membres."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "Seuls les propriétaires de l'organisation peuvent attribuer le rôle Propriétaire."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "Seuls les propriétaires peuvent modifier les rôles des autres propriétaires."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Sélectionnez les rôles à attribuer à {name}"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "Système"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "Impossible de modifier le rôle de l’utilisateur."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "Le rôle de l’utilisateur a été mis à jour avec succès !"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Membres"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "Vous ne pouvez pas inviter un membre avec un rôle incluant la ou les permissions « {permissions} » car vous ne les possédez pas vous-même. Demandez à un propriétaire ou administrateur de l'organisation de vous les accorder d'abord."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "Échec de l'invitation de l'utilisateur. Veuillez réessayer."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "Seuls les propriétaires de l'organisation peuvent inviter de nouveaux membres avec le rôle Propriétaire."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "Utilisateur invité avec succès."

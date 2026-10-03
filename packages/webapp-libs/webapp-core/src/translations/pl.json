@@ -2648,6 +2648,24 @@
   "Membership Entry / DeleteTenant / Fail message": {
     "defaultMessage": "Nie udało się usunąć organizacji."
   },
+  "Membership Entry / Error / At least one role required": {
+    "defaultMessage": "Musisz przypisać co najmniej jedną rolę."
+  },
+  "Membership Entry / Error / Cannot assign permissions not owned": {
+    "defaultMessage": "Nie możesz przypisać roli obejmującej uprawnienie(a) „{permissions}”, ponieważ sam ich nie posiadasz. Poproś właściciela lub administratora organizacji, aby najpierw nadał je Tobie."
+  },
+  "Membership Entry / Error / Cannot remove last owner": {
+    "defaultMessage": "Nie można usunąć roli Właściciela: w organizacji musi pozostać co najmniej jeden właściciel."
+  },
+  "Membership Entry / Error / No edit member roles permission": {
+    "defaultMessage": "Nie masz uprawnień do edytowania ról członków."
+  },
+  "Membership Entry / Error / Only owner can assign owner role": {
+    "defaultMessage": "Tylko właściciele organizacji mogą nadawać rolę Właściciela."
+  },
+  "Membership Entry / Error / Only owner can modify owner roles": {
+    "defaultMessage": "Tylko właściciele mogą zmieniać role innych właścicieli."
+  },
   "Membership Entry / Manage Roles Description": {
     "defaultMessage": "Wybierz role do przypisania użytkownikowi {name}"
   },
@@ -2671,9 +2689,6 @@
   },
   "Membership Entry / System Badge": {
     "defaultMessage": "System"
-  },
-  "Membership Entry / UpdateRole / Fail message": {
-    "defaultMessage": "Nie można zmienić roli użytkownika."
   },
   "Membership Entry / UpdateRole / Success message": {
     "defaultMessage": "Rola użytkownika została pomyślnie zmieniona!"
@@ -4328,8 +4343,14 @@
   "Tenant Members / Header": {
     "defaultMessage": "Członkowie"
   },
+  "Tenant Members / Invitation form / Cannot invite with permissions not owned": {
+    "defaultMessage": "Nie możesz zaprosić członka z rolą obejmującą uprawnienie(a) „{permissions}”, ponieważ sam ich nie posiadasz. Poproś właściciela lub administratora organizacji, aby najpierw nadał je Tobie."
+  },
   "Tenant Members / Invitation form / Error message": {
     "defaultMessage": "Nie udało się zaprosić użytkownika. Spróbuj ponownie."
+  },
+  "Tenant Members / Invitation form / Only owner can invite owner role": {
+    "defaultMessage": "Tylko właściciele organizacji mogą zapraszać nowych członków z rolą Właściciela."
   },
   "Tenant Members / Invitation form / Success message": {
     "defaultMessage": "Użytkownik został pomyślnie zaproszony!"
