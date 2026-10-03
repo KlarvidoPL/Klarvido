@@ -1,3 +1,5 @@
+import { renderHook as renderPlainHook } from '@testing-library/react';
+
 import { renderHook } from '../../../../tests/utils/rendering';
 import { ErrorMessages } from '../../useApiForm.types';
 import { useTranslatedErrors } from '../useTranslatedErrors.hook';
@@ -20,4 +22,17 @@ describe('useTranslatedErrors: Hook', () => {
       expect(result.current.translateErrorMessage('email', { code: 'NON_EXISTING_ERROR' })).toBe('NON_EXISTING_ERROR');
     });
   });
+});
+
+it('uses the latest localized messages and a localized fallback for unknown validation codes', () => {
+  const { result, rerender } = renderPlainHook(({ messages }) => useTranslatedErrors(messages), {
+    initialProps: { messages: { nip: { duplicate_nip: 'Duplicate NIP', default: 'Check this value' } } },
+  });
+  rerender({ messages: { nip: { duplicate_nip: 'NIP już istnieje', default: 'Sprawdź tę wartość' } } });
+  expect(result.current.translateErrorMessage('nip', { code: 'duplicate_nip', message: 'English backend error' })).toBe(
+    'NIP już istnieje'
+  );
+  expect(result.current.translateErrorMessage('nip', { code: 'unknown', message: 'English backend error' })).toBe(
+    'Sprawdź tę wartość'
+  );
 });

@@ -2925,7 +2925,7 @@
     "defaultMessage": "Wstecz"
   },
   "Onboarding / Completed": {
-    "defaultMessage": "Onboarding zakończony"
+    "defaultMessage": "Onboarding ukończony"
   },
   "Onboarding / Confirm": {
     "defaultMessage": "Potwierdź profil"
@@ -3018,7 +3018,7 @@
     "defaultMessage": "Dalej"
   },
   "Onboarding / Organization save failed": {
-    "defaultMessage": "Nie udało się zapisać danych organizacji. Sprawdź pola i spróbuj ponownie."
+    "defaultMessage": "Nie udało się zaktualizować organizacji. Sprawdź pola i spróbuj ponownie."
   },
   "Onboarding / Pricing cost plus": {
     "defaultMessage": "Koszt plus marża"
@@ -4711,5 +4711,23 @@
   },
   "Onboarding / NIP check failed": {
     "defaultMessage": "Nie udało się sprawdzić NIP-u. Spróbuj ponownie."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Sprawdź tę wartość i spróbuj ponownie."
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
+  },
+  "Onboarding / KSeF token help": {
+    "defaultMessage": "Wprowadź token KSeF. Zapiszemy go bezpiecznie i nie pokażemy go w podsumowaniu."
+  },
+  "Onboarding / KSeF token input label": {
+    "defaultMessage": "Token KSeF (dokładnie 40 znaków)"
+  },
+  "Onboarding / KSeF token saved": {
+    "defaultMessage": "Token zapisany. Wprowadź nową wartość składającą się z 40 znaków, aby go zastąpić."
+  },
+  "Onboarding / Summary token saved": {
+    "defaultMessage": "Token zapisany"
   }
 }

@@ -1,6 +1,6 @@
 import { keys } from 'ramda';
 
-// Only import English as fallback - other languages are loaded on-demand from API
+// English is available immediately; other bundled locales are loaded on demand.
 import enTranslationMessages from '../translations/en.json';
 import { getViteEnv } from './env.vite';
 
@@ -67,7 +67,7 @@ export interface TranslationsConfig {
 
 /**
  * Get translations configuration from environment variables.
- * 
+ *
  * IMPORTANT: Vite statically replaces import.meta.env.* at build time.
  * We must access these values directly (not via dynamic lookup) for the
  * replacement to work correctly.
@@ -75,16 +75,13 @@ export interface TranslationsConfig {
 const getTranslationsConfig = (): TranslationsConfig => {
   // Access Vite env vars via helper (mocked in Jest tests)
   const env = getViteEnv();
-  
+
   const isDev = env.MODE === 'development' || env.DEV === true;
 
-  // Default: always use remote translations since only English is bundled
-  // Other languages are stored in the backend translations API
+  // Remote translations provide published updates; bundled locales cover missing keys and API failures.
   // Can be disabled via VITE_USE_REMOTE_TRANSLATIONS=false
   const useRemoteEnv = env.VITE_USE_REMOTE_TRANSLATIONS;
-  const useRemoteTranslations = useRemoteEnv !== undefined && useRemoteEnv !== '' 
-    ? useRemoteEnv === 'true' 
-    : true; // Always enable by default - translations are in the API
+  const useRemoteTranslations = useRemoteEnv !== undefined && useRemoteEnv !== '' ? useRemoteEnv === 'true' : true; // Always enable by default - translations are in the API
 
   // Get translations URL - if not explicitly set, derive from base API URL
   // This is important for production where frontend and backend are on different domains
@@ -139,15 +136,15 @@ export const formatTranslationMessages = (
 
 /**
  * Bundled translation messages.
- * Only English is bundled as fallback - other languages are loaded on-demand
- * from the translations API to reduce initial bundle size.
+ * English is immediately available. Other locale bundles are loaded on demand
+ * by DynamicIntlProvider and merged with published API translations.
  */
 const englishMessages = formatTranslationMessages(Locale.ENGLISH, enTranslationMessages);
 
-export const translationMessages: Partial<Record<Locale, TranslationMessages>> & Record<Locale.ENGLISH, TranslationMessages> = {
+export const translationMessages: Partial<Record<Locale, TranslationMessages>> &
+  Record<Locale.ENGLISH, TranslationMessages> = {
   [Locale.ENGLISH]: englishMessages,
-  // Other locales are loaded on-demand from API
-  // Fallback to English if not loaded yet
+  // Synchronous consumers use English until DynamicIntlProvider loads the selected locale bundle.
   [Locale.POLISH]: englishMessages,
   [Locale.GERMAN]: englishMessages,
   [Locale.FRENCH]: englishMessages,
@@ -155,4 +152,21 @@ export const translationMessages: Partial<Record<Locale, TranslationMessages>> &
   [Locale.CHINESE]: englishMessages,
   [Locale.HINDI]: englishMessages,
   [Locale.ARABIC]: englishMessages,
+};
+
+const bundledLocaleLoaders = {
+  [Locale.POLISH]: () => import('../translations/pl.json'),
+  [Locale.GERMAN]: () => import('../translations/de.json'),
+  [Locale.FRENCH]: () => import('../translations/fr.json'),
+  [Locale.SPANISH]: () => import('../translations/es.json'),
+  [Locale.CHINESE]: () => import('../translations/zh.json'),
+  [Locale.HINDI]: () => import('../translations/hi.json'),
+  [Locale.ARABIC]: () => import('../translations/ar.json'),
+};
+
+/** Keep the selected language available when the translation API is incomplete or unavailable. */
+export const loadBundledTranslationMessages = async (locale: Locale): Promise<TranslationMessages> => {
+  if (locale === Locale.ENGLISH) return englishMessages;
+  const { default: messages } = await bundledLocaleLoaders[locale]();
+  return { ...englishMessages, ...formatTranslationMessages(locale, messages) };
 };

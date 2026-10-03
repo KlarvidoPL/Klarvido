@@ -4489,5 +4489,47 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "त्वरित शुरुआत"
+  },
+  "Onboarding / Duplicate NIP": {
+    "defaultMessage": "इस NIP वाला संगठन आपके खाते में पहले से मौजूद है।"
+  },
+  "Onboarding / NIP check failed": {
+    "defaultMessage": "इस NIP की जाँच नहीं हो सकी। कृपया फिर से कोशिश करें।"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "संगठन अपडेट नहीं हो सका। फ़ील्ड जाँचें और फिर से कोशिश करें।"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "कंपनी की प्रोफ़ाइल लोड नहीं हो सकी।"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "ऑनबोर्डिंग पूरी हुई"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "यह मान जाँचें और फिर से कोशिश करें।"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "सहेजने के बाद यह मान बदला नहीं जा सकता।"
+  },
+  "Onboarding / KSeF token help": {
+    "defaultMessage": "अपना KSeF टोकन दर्ज करें। इसे सुरक्षित रूप से सहेजा जाएगा और सारांश में नहीं दिखाया जाएगा।"
+  },
+  "Onboarding / KSeF token input label": {
+    "defaultMessage": "KSeF टोकन (ठीक 40 अक्षर)"
+  },
+  "Onboarding / KSeF token saved": {
+    "defaultMessage": "टोकन सहेजा गया। इसे बदलने के लिए 40 अक्षरों का नया मान दर्ज करें।"
+  },
+  "Onboarding / Summary token saved": {
+    "defaultMessage": "टोकन सहेजा गया"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "अधिकतम दो उत्तर चुनें।"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "अधिकतम तीन उत्तर चुनें।"
   }
 }

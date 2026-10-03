@@ -4489,5 +4489,47 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "بدء سريع"
+  },
+  "Onboarding / Duplicate NIP": {
+    "defaultMessage": "توجد بالفعل مؤسسة بهذا الرقم NIP في حسابك."
+  },
+  "Onboarding / NIP check failed": {
+    "defaultMessage": "تعذّر التحقق من رقم NIP هذا. يرجى المحاولة مرة أخرى."
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "تعذّر حفظ هذه الخطوة. يرجى المحاولة مرة أخرى."
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "تعذّر تحديث المؤسسة. تحقق من الحقول وحاول مرة أخرى."
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "تعذّر تحميل ملف الشركة."
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "اكتمل الإعداد"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "تحقق من هذه القيمة وحاول مرة أخرى."
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "لا يمكن تغيير هذه القيمة بعد حفظها."
+  },
+  "Onboarding / KSeF token help": {
+    "defaultMessage": "أدخل رمز KSeF الخاص بك. سيتم تخزينه بأمان ولن يظهر في الملخص."
+  },
+  "Onboarding / KSeF token input label": {
+    "defaultMessage": "رمز KSeF (40 حرفًا بالضبط)"
+  },
+  "Onboarding / KSeF token saved": {
+    "defaultMessage": "تم حفظ الرمز. أدخل قيمة جديدة من 40 حرفًا لاستبداله."
+  },
+  "Onboarding / Summary token saved": {
+    "defaultMessage": "تم حفظ الرمز"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "اختر إجابتين كحد أقصى."
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "اختر ثلاث إجابات كحد أقصى."
   }
 }

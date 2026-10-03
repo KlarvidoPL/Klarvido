@@ -100,7 +100,7 @@ class TenantSerializer(serializers.ModelSerializer):
             organizations = organizations.exclude(pk=self.instance.pk)
         if organizations.exists():
             raise serializers.ValidationError(
-                {"nip": _("An organization with this NIP already exists in your account.")}
+                {"nip": _("An organization with this NIP already exists in your account.")}, code="duplicate_nip"
             )
 
     @transaction.atomic

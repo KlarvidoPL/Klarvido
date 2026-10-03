@@ -17,6 +17,7 @@ import {
   DisplayNameField,
   NipField,
 } from '../../components/companyDetailsFields';
+import { useCompanyFormErrorMessages } from '../../components/companyDetailsFields/companyFormErrors.hook';
 import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import {
@@ -42,6 +43,7 @@ enum Step {
 const STEP_1_FIELDS = ['name', 'country', 'nip'] as const;
 
 export const AddTenantForm = () => {
+  const errorMessages = useCompanyFormErrorMessages();
   const intl = useIntl();
   const {
     data: draft,
@@ -63,6 +65,7 @@ export const AddTenantForm = () => {
 
   const { form, handleSubmit, setApolloGraphQLResponseErrors, hasGenericErrorOnly, genericError } =
     useApiForm<TenantFormFields>({
+      errorMessages,
       mode: 'onChange',
       defaultValues: {
         name: '',

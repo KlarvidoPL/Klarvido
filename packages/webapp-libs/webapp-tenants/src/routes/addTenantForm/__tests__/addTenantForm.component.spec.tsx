@@ -347,10 +347,12 @@ describe('AddTenantForm: Component', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Which costs grow with your sales?')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(await screen.findByText('How do you make key decisions?')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'How do you usually set prices?', level: 2 })
+    ).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText(/demo token/i), token);
+    await userEvent.type(screen.getByLabelText(/ksef token/i), token);
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Your business profile')).toBeInTheDocument();
     expect(create.result).not.toHaveBeenCalled();

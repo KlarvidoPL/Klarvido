@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Locale, DEFAULT_LOCALE, translationMessages, TranslationMessages, translationsConfig } from '../../config/i18n';
 import { getViteEnv } from '../../config/env.vite';
+import {
+  DEFAULT_LOCALE,
+  Locale,
+  TranslationMessages,
+  translationMessages,
+  translationsConfig,
+} from '../../config/i18n';
 
 /**
  * Check if running in development mode.
@@ -113,6 +119,7 @@ export function useRemoteTranslations(
   const [data, setData] = useState<TranslationMessages | undefined>(
     translationMessages[locale] || translationMessages[DEFAULT_LOCALE]
   );
+  const [dataLocale, setDataLocale] = useState(locale);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -121,6 +128,7 @@ export function useRemoteTranslations(
   const fetchData = useCallback(async () => {
     if (!enabled) {
       setData(translationMessages[locale] || translationMessages[DEFAULT_LOCALE]);
+      setDataLocale(locale);
       setIsError(false);
       setError(null);
       return;
@@ -132,6 +140,7 @@ export function useRemoteTranslations(
     try {
       const translations = await fetchTranslations(locale, translationsBaseUrl);
       setData(translations);
+      setDataLocale(locale);
       setIsError(false);
       setError(null);
     } catch (err) {
@@ -139,6 +148,7 @@ export function useRemoteTranslations(
       setError(err instanceof Error ? err : new Error('Failed to fetch translations'));
       // Keep using bundled translations as fallback
       setData(translationMessages[locale] || translationMessages[DEFAULT_LOCALE]);
+      setDataLocale(locale);
     } finally {
       setIsLoading(false);
       setIsFetching(false);
@@ -162,7 +172,7 @@ export function useRemoteTranslations(
   }, [enabled, enablePolling, pollingInterval, fetchData]);
 
   return {
-    data,
+    data: dataLocale === locale ? data : undefined,
     isLoading,
     isError,
     isFetching,
@@ -238,4 +248,3 @@ export function useDevTranslationOverrides(locale: Locale) {
     isDevMode,
   };
 }
-

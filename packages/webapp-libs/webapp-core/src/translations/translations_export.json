@@ -1629,7 +1629,13 @@
       "Onboarding / Organization save failed": "Could not update the organization. Please check the fields and try again.",
       "Onboarding / Summary role": "Your role",
       "Onboarding / Duplicate NIP": "An organization with this NIP already exists in your account.",
-      "Onboarding / NIP check failed": "Could not verify this NIP. Please try again."
+      "Onboarding / NIP check failed": "Could not verify this NIP. Please try again.",
+      "Tenant form / Invalid value": "Check this value and try again.",
+      "Tenant form / Immutable value": "This value can't be changed once saved.",
+      "Onboarding / KSeF token help": "Enter your KSeF token. It will be stored securely and will not appear in the summary.",
+      "Onboarding / KSeF token input label": "KSeF token (exactly 40 characters)",
+      "Onboarding / KSeF token saved": "Token saved. Enter a new 40-character value to replace it.",
+      "Onboarding / Summary token saved": "Token saved"
     },
     "pl": {
       "AI Assistant / Accessing data": "Łączenie ze źródłami danych",
@@ -3130,7 +3136,7 @@
       "Welcome Modal / tip 2": "Przejrzyj pulpit, aby odkryć wszystkie funkcje",
       "Welcome Modal / tips title": "Szybki start",
       "Onboarding / Back": "Wstecz",
-      "Onboarding / Completed": "Onboarding zakończony",
+      "Onboarding / Completed": "Onboarding ukończony",
       "Onboarding / Confirm": "Potwierdź profil",
       "Onboarding / Cost employees": "Czas pracowników",
       "Onboarding / Cost marketing": "Marketing / prowizje",
@@ -3202,7 +3208,13 @@
       "Onboarding / Organization save failed": "Nie udało się zaktualizować organizacji. Sprawdź pola i spróbuj ponownie.",
       "Onboarding / Summary role": "Twoja rola",
       "Onboarding / Duplicate NIP": "Organizacja z tym NIP-em już istnieje na Twoim koncie.",
-      "Onboarding / NIP check failed": "Nie udało się sprawdzić NIP-u. Spróbuj ponownie."
+      "Onboarding / NIP check failed": "Nie udało się sprawdzić NIP-u. Spróbuj ponownie.",
+      "Tenant form / Invalid value": "Sprawdź tę wartość i spróbuj ponownie.",
+      "Tenant form / Immutable value": "Tej wartości nie można zmienić po zapisaniu.",
+      "Onboarding / KSeF token help": "Wprowadź token KSeF. Zapiszemy go bezpiecznie i nie pokażemy go w podsumowaniu.",
+      "Onboarding / KSeF token input label": "Token KSeF (dokładnie 40 znaków)",
+      "Onboarding / KSeF token saved": "Token zapisany. Wprowadź nową wartość składającą się z 40 znaków, aby go zastąpić.",
+      "Onboarding / Summary token saved": "Token zapisany"
     },
     "de": {
       "AI Assistant / Accessing data": "Zugriff auf Datenquellen",
@@ -4701,7 +4713,21 @@
       "Welcome Modal / subheading": "Dein Konto wurde erfolgreich erstellt. Legen wir los!",
       "Welcome Modal / tip 1": "Vervollständigen Sie Ihr Profil für ein personalisiertes Erlebnis",
       "Welcome Modal / tip 2": "Entdecken Sie das Dashboard, um alle Funktionen kennenzulernen",
-      "Welcome Modal / tips title": "Schnellstart"
+      "Welcome Modal / tips title": "Schnellstart",
+      "Onboarding / Duplicate NIP": "Eine Organisation mit dieser NIP existiert bereits in Ihrem Konto.",
+      "Onboarding / NIP check failed": "Diese NIP konnte nicht überprüft werden. Bitte versuchen Sie es erneut.",
+      "Onboarding / Save failed": "Dieser Schritt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "Onboarding / Organization save failed": "Die Organisation konnte nicht aktualisiert werden. Bitte überprüfen Sie die Felder und versuchen Sie es erneut.",
+      "Onboarding / Load failed": "Das Unternehmensprofil konnte nicht geladen werden.",
+      "Onboarding / Completed": "Onboarding abgeschlossen",
+      "Tenant form / Invalid value": "Überprüfen Sie diesen Wert und versuchen Sie es erneut.",
+      "Tenant form / Immutable value": "Dieser Wert kann nach dem Speichern nicht geändert werden.",
+      "Onboarding / KSeF token help": "Geben Sie Ihr KSeF-Token ein. Es wird sicher gespeichert und nicht in der Zusammenfassung angezeigt.",
+      "Onboarding / KSeF token input label": "KSeF-Token (genau 40 Zeichen)",
+      "Onboarding / KSeF token saved": "Token gespeichert. Geben Sie einen neuen Wert mit 40 Zeichen ein, um es zu ersetzen.",
+      "Onboarding / Summary token saved": "Token gespeichert",
+      "Onboarding / Revenue hint": "Wählen Sie bis zu zwei Antworten.",
+      "Onboarding / Costs hint": "Wählen Sie bis zu drei Antworten."
     },
     "es": {
       "AI Assistant / Accessing data": "Accediendo a las fuentes de datos",
@@ -6200,7 +6226,21 @@
       "Welcome Modal / subheading": "Tu cuenta se ha creado correctamente. ¡Empecemos!",
       "Welcome Modal / tip 1": "Completa tu perfil para disfrutar de una experiencia personalizada",
       "Welcome Modal / tip 2": "Explora el panel para descubrir todas las funciones",
-      "Welcome Modal / tips title": "Inicio rápido"
+      "Welcome Modal / tips title": "Inicio rápido",
+      "Onboarding / Duplicate NIP": "Ya existe una organización con este NIP en tu cuenta.",
+      "Onboarding / NIP check failed": "No se pudo verificar este NIP. Inténtalo de nuevo.",
+      "Onboarding / Save failed": "No se pudo guardar este paso. Inténtalo de nuevo.",
+      "Onboarding / Organization save failed": "No se pudo actualizar la organización. Revisa los campos e inténtalo de nuevo.",
+      "Onboarding / Load failed": "No se pudo cargar el perfil de la empresa.",
+      "Onboarding / Completed": "Onboarding completado",
+      "Tenant form / Invalid value": "Revisa este valor e inténtalo de nuevo.",
+      "Tenant form / Immutable value": "Este valor no se puede cambiar una vez guardado.",
+      "Onboarding / KSeF token help": "Introduce tu token KSeF. Se guardará de forma segura y no aparecerá en el resumen.",
+      "Onboarding / KSeF token input label": "Token KSeF (exactamente 40 caracteres)",
+      "Onboarding / KSeF token saved": "Token guardado. Introduce un nuevo valor de 40 caracteres para reemplazarlo.",
+      "Onboarding / Summary token saved": "Token guardado",
+      "Onboarding / Revenue hint": "Elige hasta dos respuestas.",
+      "Onboarding / Costs hint": "Elige hasta tres respuestas."
     },
     "zh": {
       "AI Assistant / Accessing data": "正在访问数据源",
@@ -7699,7 +7739,21 @@
       "Welcome Modal / subheading": "你的账号已创建成功。让我们开始吧！",
       "Welcome Modal / tip 1": "完善个人资料，获得更个性化的体验",
       "Welcome Modal / tip 2": "浏览仪表盘，探索全部功能",
-      "Welcome Modal / tips title": "快速开始"
+      "Welcome Modal / tips title": "快速开始",
+      "Onboarding / Duplicate NIP": "你的账户中已存在使用此 NIP 的组织。",
+      "Onboarding / NIP check failed": "无法验证此 NIP，请重试。",
+      "Onboarding / Save failed": "无法保存此步骤，请重试。",
+      "Onboarding / Organization save failed": "无法更新组织，请检查字段后重试。",
+      "Onboarding / Load failed": "无法加载公司资料。",
+      "Onboarding / Completed": "引导流程已完成",
+      "Tenant form / Invalid value": "请检查此值后重试。",
+      "Tenant form / Immutable value": "此值保存后无法更改。",
+      "Onboarding / KSeF token help": "请输入你的 KSeF 令牌。令牌将安全存储，不会显示在摘要中。",
+      "Onboarding / KSeF token input label": "KSeF 令牌（必须为 40 个字符）",
+      "Onboarding / KSeF token saved": "令牌已保存。输入新的 40 字符值以替换令牌。",
+      "Onboarding / Summary token saved": "令牌已保存",
+      "Onboarding / Revenue hint": "最多选择两个答案。",
+      "Onboarding / Costs hint": "最多选择三个答案。"
     },
     "hi": {
       "AI Assistant / Accessing data": "डेटा स्रोतों तक पहुंच हो रही है",
@@ -9198,7 +9252,21 @@
       "Welcome Modal / subheading": "आपका अकाउंट सफलतापूर्वक बना दिया गया है। चलिए शुरू करते हैं!",
       "Welcome Modal / tip 1": "व्यक्तिगत अनुभव के लिए अपना प्रोफ़ाइल पूरा करें",
       "Welcome Modal / tip 2": "सभी फ़ीचर्स जानने के लिए डैशबोर्ड एक्सप्लोर करें",
-      "Welcome Modal / tips title": "त्वरित शुरुआत"
+      "Welcome Modal / tips title": "त्वरित शुरुआत",
+      "Onboarding / Duplicate NIP": "इस NIP वाला संगठन आपके खाते में पहले से मौजूद है।",
+      "Onboarding / NIP check failed": "इस NIP की जाँच नहीं हो सकी। कृपया फिर से कोशिश करें।",
+      "Onboarding / Save failed": "यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।",
+      "Onboarding / Organization save failed": "संगठन अपडेट नहीं हो सका। फ़ील्ड जाँचें और फिर से कोशिश करें।",
+      "Onboarding / Load failed": "कंपनी की प्रोफ़ाइल लोड नहीं हो सकी।",
+      "Onboarding / Completed": "ऑनबोर्डिंग पूरी हुई",
+      "Tenant form / Invalid value": "यह मान जाँचें और फिर से कोशिश करें।",
+      "Tenant form / Immutable value": "सहेजने के बाद यह मान बदला नहीं जा सकता।",
+      "Onboarding / KSeF token help": "अपना KSeF टोकन दर्ज करें। इसे सुरक्षित रूप से सहेजा जाएगा और सारांश में नहीं दिखाया जाएगा।",
+      "Onboarding / KSeF token input label": "KSeF टोकन (ठीक 40 अक्षर)",
+      "Onboarding / KSeF token saved": "टोकन सहेजा गया। इसे बदलने के लिए 40 अक्षरों का नया मान दर्ज करें।",
+      "Onboarding / Summary token saved": "टोकन सहेजा गया",
+      "Onboarding / Revenue hint": "अधिकतम दो उत्तर चुनें।",
+      "Onboarding / Costs hint": "अधिकतम तीन उत्तर चुनें।"
     },
     "ar": {
       "AI Assistant / Accessing data": "جارٍ الوصول إلى مصادر البيانات",
@@ -10697,7 +10765,21 @@
       "Welcome Modal / subheading": "تم إنشاء حسابك بنجاح. لنبدأ الآن!",
       "Welcome Modal / tip 1": "أكمل ملفك الشخصي لتحصل على تجربة مخصصة",
       "Welcome Modal / tip 2": "استكشف لوحة التحكم لاكتشاف جميع الميزات",
-      "Welcome Modal / tips title": "بدء سريع"
+      "Welcome Modal / tips title": "بدء سريع",
+      "Onboarding / Duplicate NIP": "توجد بالفعل مؤسسة بهذا الرقم NIP في حسابك.",
+      "Onboarding / NIP check failed": "تعذّر التحقق من رقم NIP هذا. يرجى المحاولة مرة أخرى.",
+      "Onboarding / Save failed": "تعذّر حفظ هذه الخطوة. يرجى المحاولة مرة أخرى.",
+      "Onboarding / Organization save failed": "تعذّر تحديث المؤسسة. تحقق من الحقول وحاول مرة أخرى.",
+      "Onboarding / Load failed": "تعذّر تحميل ملف الشركة.",
+      "Onboarding / Completed": "اكتمل الإعداد",
+      "Tenant form / Invalid value": "تحقق من هذه القيمة وحاول مرة أخرى.",
+      "Tenant form / Immutable value": "لا يمكن تغيير هذه القيمة بعد حفظها.",
+      "Onboarding / KSeF token help": "أدخل رمز KSeF الخاص بك. سيتم تخزينه بأمان ولن يظهر في الملخص.",
+      "Onboarding / KSeF token input label": "رمز KSeF (40 حرفًا بالضبط)",
+      "Onboarding / KSeF token saved": "تم حفظ الرمز. أدخل قيمة جديدة من 40 حرفًا لاستبداله.",
+      "Onboarding / Summary token saved": "تم حفظ الرمز",
+      "Onboarding / Revenue hint": "اختر إجابتين كحد أقصى.",
+      "Onboarding / Costs hint": "اختر ثلاث إجابات كحد أقصى."
     },
     "fr": {
       "AI Assistant / Accessing data": "Accès aux sources de données",
@@ -12196,7 +12278,21 @@
       "Welcome Modal / subheading": "Votre compte a été créé avec succès. Commençons !",
       "Welcome Modal / tip 1": "Complétez votre profil pour une expérience personnalisée",
       "Welcome Modal / tip 2": "Explorez le tableau de bord pour découvrir toutes les fonctionnalités",
-      "Welcome Modal / tips title": "Démarrage rapide"
+      "Welcome Modal / tips title": "Démarrage rapide",
+      "Onboarding / Duplicate NIP": "Une organisation avec ce NIP existe déjà dans votre compte.",
+      "Onboarding / NIP check failed": "Impossible de vérifier ce NIP. Veuillez réessayer.",
+      "Onboarding / Save failed": "Impossible d’enregistrer cette étape. Veuillez réessayer.",
+      "Onboarding / Organization save failed": "Impossible de mettre à jour l’organisation. Vérifiez les champs et réessayez.",
+      "Onboarding / Load failed": "Impossible de charger le profil de l’entreprise.",
+      "Onboarding / Completed": "Onboarding terminé",
+      "Tenant form / Invalid value": "Vérifiez cette valeur et réessayez.",
+      "Tenant form / Immutable value": "Cette valeur ne peut plus être modifiée après son enregistrement.",
+      "Onboarding / KSeF token help": "Saisissez votre jeton KSeF. Il sera stocké de manière sécurisée et ne figurera pas dans le récapitulatif.",
+      "Onboarding / KSeF token input label": "Jeton KSeF (exactement 40 caractères)",
+      "Onboarding / KSeF token saved": "Jeton enregistré. Saisissez une nouvelle valeur de 40 caractères pour le remplacer.",
+      "Onboarding / Summary token saved": "Jeton enregistré",
+      "Onboarding / Revenue hint": "Choisissez jusqu’à deux réponses.",
+      "Onboarding / Costs hint": "Choisissez jusqu’à trois réponses."
     }
   }
 }

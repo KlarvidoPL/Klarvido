@@ -4489,5 +4489,47 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Inicio rápido"
+  },
+  "Onboarding / Duplicate NIP": {
+    "defaultMessage": "Ya existe una organización con este NIP en tu cuenta."
+  },
+  "Onboarding / NIP check failed": {
+    "defaultMessage": "No se pudo verificar este NIP. Inténtalo de nuevo."
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "No se pudo guardar este paso. Inténtalo de nuevo."
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "No se pudo actualizar la organización. Revisa los campos e inténtalo de nuevo."
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "No se pudo cargar el perfil de la empresa."
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "Onboarding completado"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Revisa este valor e inténtalo de nuevo."
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Este valor no se puede cambiar una vez guardado."
+  },
+  "Onboarding / KSeF token help": {
+    "defaultMessage": "Introduce tu token KSeF. Se guardará de forma segura y no aparecerá en el resumen."
+  },
+  "Onboarding / KSeF token input label": {
+    "defaultMessage": "Token KSeF (exactamente 40 caracteres)"
+  },
+  "Onboarding / KSeF token saved": {
+    "defaultMessage": "Token guardado. Introduce un nuevo valor de 40 caracteres para reemplazarlo."
+  },
+  "Onboarding / Summary token saved": {
+    "defaultMessage": "Token guardado"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "Elige hasta dos respuestas."
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "Elige hasta tres respuestas."
   }
 }

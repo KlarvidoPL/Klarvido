@@ -103,9 +103,9 @@ describe('OrganizationOnboarding', () => {
     expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
     const next = screen.getByRole('button', { name: /next/i });
     expect(next).toBeDisabled();
-    await userEvent.type(screen.getByLabelText(/demo token/i), token.slice(0, 39));
+    await userEvent.type(screen.getByLabelText(/ksef token/i), token.slice(0, 39));
     expect(next).toBeDisabled();
-    await userEvent.type(screen.getByLabelText(/demo token/i), token.slice(39));
+    await userEvent.type(screen.getByLabelText(/ksef token/i), token.slice(39));
     expect(next).toBeEnabled();
     await userEvent.click(next);
     expect(await screen.findByText('Your business profile')).toBeInTheDocument();
@@ -250,10 +250,12 @@ describe('OrganizationOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Which costs grow with your sales?')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(await screen.findByText('How do you make key decisions?')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'How do you usually set prices?', level: 2 })
+    ).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByRole('heading', { name: 'KSeF' })).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText(/demo token/i), token);
+    await userEvent.type(screen.getByLabelText(/ksef token/i), token);
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('Your business profile')).toBeInTheDocument();
     expect(screen.getByText('Owner / management')).toBeInTheDocument();

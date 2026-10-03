@@ -4711,5 +4711,23 @@
   },
   "Onboarding / NIP check failed": {
     "defaultMessage": "Could not verify this NIP. Please try again."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Check this value and try again."
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "This value can't be changed once saved."
+  },
+  "Onboarding / KSeF token help": {
+    "defaultMessage": "Enter your KSeF token. It will be stored securely and will not appear in the summary."
+  },
+  "Onboarding / KSeF token input label": {
+    "defaultMessage": "KSeF token (exactly 40 characters)"
+  },
+  "Onboarding / KSeF token saved": {
+    "defaultMessage": "Token saved. Enter a new 40-character value to replace it."
+  },
+  "Onboarding / Summary token saved": {
+    "defaultMessage": "Token saved"
   }
 }

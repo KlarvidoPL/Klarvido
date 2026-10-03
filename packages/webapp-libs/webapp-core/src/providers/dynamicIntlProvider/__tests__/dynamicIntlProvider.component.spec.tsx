@@ -1,11 +1,11 @@
-import { renderHook, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, screen } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Locale } from '../../../config/i18n';
-import { DynamicIntlProvider } from '../dynamicIntlProvider.component';
 import { render } from '../../../tests/utils/rendering';
+import { DynamicIntlProvider } from '../dynamicIntlProvider.component';
 
 // Mock fetch
 const mockFetch = jest.fn();
@@ -38,9 +38,7 @@ describe('DynamicIntlProvider', () => {
   });
 
   it('should render children with bundled translations as fallback', async () => {
-    const TestComponent = () => (
-      <FormattedMessage id="NonExistent / Key" defaultMessage="Default Test Message" />
-    );
+    const TestComponent = () => <FormattedMessage id="NonExistent / Key" defaultMessage="Default Test Message" />;
 
     const { container } = render(<TestComponent />, {
       wrapper: createWrapper(),
@@ -60,9 +58,7 @@ describe('DynamicIntlProvider', () => {
       json: () => Promise.resolve(remoteTranslations),
     });
 
-    const TestComponent = () => (
-      <FormattedMessage id="Test / Key" defaultMessage="Default Test Message" />
-    );
+    const TestComponent = () => <FormattedMessage id="Test / Key" defaultMessage="Default Test Message" />;
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -89,9 +85,7 @@ describe('DynamicIntlProvider', () => {
   });
 
   it('should support different locales', () => {
-    const TestComponent = () => (
-      <FormattedMessage id="Test / Key" defaultMessage="Hello" />
-    );
+    const TestComponent = () => <FormattedMessage id="Test / Key" defaultMessage="Hello" />;
 
     const { container } = render(<TestComponent />, {
       wrapper: createWrapper(Locale.POLISH),
@@ -102,9 +96,7 @@ describe('DynamicIntlProvider', () => {
   });
 
   it('should handle missing translations gracefully', () => {
-    const TestComponent = () => (
-      <FormattedMessage id="Unknown / Key" defaultMessage="Fallback Message" />
-    );
+    const TestComponent = () => <FormattedMessage id="Unknown / Key" defaultMessage="Fallback Message" />;
 
     const { container } = render(<TestComponent />, {
       wrapper: createWrapper(),
@@ -115,3 +107,49 @@ describe('DynamicIntlProvider', () => {
   });
 });
 
+describe('DynamicIntlProvider: localized validation fallback', () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue({ ok: false, status: 503 });
+  });
+
+  it.each([
+    [Locale.POLISH, 'Organizacja z tym NIP-em już istnieje na Twoim koncie.'],
+    [Locale.GERMAN, 'Eine Organisation mit dieser NIP existiert bereits in Ihrem Konto.'],
+    [Locale.FRENCH, 'Une organisation avec ce NIP existe déjà dans votre compte.'],
+    [Locale.SPANISH, 'Ya existe una organización con este NIP en tu cuenta.'],
+    [Locale.CHINESE, '你的账户中已存在使用此 NIP 的组织。'],
+    [Locale.HINDI, 'इस NIP वाला संगठन आपके खाते में पहले से मौजूद है।'],
+    [Locale.ARABIC, 'توجد بالفعل مؤسسة بهذا الرقم NIP في حسابك.'],
+  ])('keeps warnings in %s when the API is unavailable', async (locale, expected) => {
+    render(
+      <DynamicIntlProvider locale={locale as Locale}>
+        <FormattedMessage
+          id="Onboarding / Duplicate NIP"
+          defaultMessage="An organization with this NIP already exists in your account."
+        />
+      </DynamicIntlProvider>
+    );
+    expect(await screen.findByText(expected)).toBeInTheDocument();
+  });
+
+  it('keeps the Polish translation when the API supplies an untranslated English default', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          'Onboarding / Duplicate NIP': 'An organization with this NIP already exists in your account.',
+          'Onboarding / Save failed': 'Could not save this step. Please try again.',
+        }),
+    });
+    render(
+      <DynamicIntlProvider locale={Locale.POLISH}>
+        <FormattedMessage id="Onboarding / Duplicate NIP" />
+        <FormattedMessage id="Onboarding / Save failed" />
+      </DynamicIntlProvider>
+    );
+    expect(await screen.findByText(/Organizacja z tym NIP-em już istnieje na Twoim koncie/)).toBeInTheDocument();
+    expect(await screen.findByText(/Nie udało się zapisać tego kroku/)).toBeInTheDocument();
+    expect(screen.queryByText(/An organization with this NIP/)).not.toBeInTheDocument();
+  });
+});

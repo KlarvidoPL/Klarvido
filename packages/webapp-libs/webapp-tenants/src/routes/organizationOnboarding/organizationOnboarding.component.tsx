@@ -22,6 +22,7 @@ import {
   DisplayNameField,
   NipField,
 } from '../../components/companyDetailsFields';
+import { useCompanyFormErrorMessages } from '../../components/companyDetailsFields/companyFormErrors.hook';
 import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
 import { useGenerateTenantPath } from '../../hooks';
@@ -138,6 +139,7 @@ const ChoiceGroup = ({
 };
 
 export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: boolean }) => {
+  const errorMessages = useCompanyFormErrorMessages();
   const { data: currentTenant } = useCurrentTenant();
   const draftQuery = useQuery(organizationOnboardingDraftQuery, { skip: !draftMode, fetchPolicy: 'network-only' });
   const tenant = draftMode ? draftQuery.data?.organizationOnboardingDraft?.companyData : currentTenant;
@@ -170,6 +172,7 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
     hasGenericErrorOnly: hasTenantError,
     genericError: tenantError,
   } = useApiForm<TenantFormFields>({
+    errorMessages,
     mode: 'onChange',
     defaultValues: {
       name: tenant?.name ?? '',
@@ -690,21 +693,13 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
               )}
               {step === 5 && (
                 <>
-                  <div>
-                    <h2 className="text-xl font-semibold">
-                      <FormattedMessage
-                        defaultMessage="How do you make key decisions?"
-                        id="Onboarding / Pricing title"
-                      />
-                    </h2>
-                  </div>
                   <div className="space-y-3">
-                    <h3 className="font-medium">
+                    <h2 className="text-xl font-semibold">
                       <FormattedMessage
                         defaultMessage="How do you usually set prices?"
                         id="Onboarding / Pricing question"
                       />
-                    </h3>
+                    </h2>
                     <ChoiceGroup
                       options={pricingOptions}
                       selected={[answers.pricing]}
@@ -712,12 +707,12 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                     />
                   </div>
                   <div className="space-y-3">
-                    <h3 className="font-medium">
+                    <h2 className="text-xl font-semibold">
                       <FormattedMessage
                         defaultMessage="What do you most want to keep under control?"
                         id="Onboarding / Goal question"
                       />
-                    </h3>
+                    </h2>
                     <ChoiceGroup
                       options={goalOptions}
                       selected={[answers.mainGoal]}
@@ -734,20 +729,20 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                     </h2>
                     <p className="text-sm text-muted-foreground">
                       <FormattedMessage
-                        defaultMessage="This is a demonstration only. No connection to KSeF or invoice synchronization will occur."
-                        id="Onboarding / KSeF disclaimer"
+                        defaultMessage="Enter your KSeF token. It will be stored securely and will not appear in the summary."
+                        id="Onboarding / KSeF token help"
                       />
                     </p>
                   </div>
                   <div className="max-w-lg space-y-2">
-                    <label htmlFor="ksef-demo-token" className="text-sm font-medium">
+                    <label htmlFor="ksef-token" className="text-sm font-medium">
                       <FormattedMessage
-                        defaultMessage="Demo token (exactly 40 characters)"
-                        id="Onboarding / KSeF token label"
+                        defaultMessage="KSeF token (exactly 40 characters)"
+                        id="Onboarding / KSeF token input label"
                       />
                     </label>
                     <input
-                      id="ksef-demo-token"
+                      id="ksef-token"
                       type="password"
                       autoComplete="off"
                       value={answers.ksefToken}
@@ -758,8 +753,8 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                     {answers.ksefDemoConnected && (
                       <p className="text-sm text-emerald-700">
                         <FormattedMessage
-                          defaultMessage="Demo token saved. Enter a new 40-character value to replace it."
-                          id="Onboarding / KSeF saved"
+                          defaultMessage="Token saved. Enter a new 40-character value to replace it."
+                          id="Onboarding / KSeF token saved"
                         />
                       </p>
                     )}
@@ -843,8 +838,8 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
                         'KSeF',
                         answers.ksefDemoConnected
                           ? intl.formatMessage({
-                              defaultMessage: 'Demo token saved',
-                              id: 'Onboarding / Summary KSeF saved',
+                              defaultMessage: 'Token saved',
+                              id: 'Onboarding / Summary token saved',
                             })
                           : intl.formatMessage({ defaultMessage: 'Not set', id: 'Onboarding / Summary not set' }),
                         6,
