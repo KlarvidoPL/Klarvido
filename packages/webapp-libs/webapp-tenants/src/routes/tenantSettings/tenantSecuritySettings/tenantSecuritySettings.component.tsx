@@ -1,17 +1,27 @@
 import { usePermissionCheck } from '../../../hooks';
-import { SSOConnectionCard, DirectorySyncCard, PasskeysCard, AuditLogCard } from './components';
+import { useCurrentTenant } from '../../../providers';
+import { AuditLogCard, DirectorySyncCard, KsefTokenCard, PasskeysCard, SSOConnectionCard } from './components';
 
 export const TenantSecuritySettings = () => {
+  const { data: currentTenant } = useCurrentTenant();
+  const { hasPermission: canViewKsef } = usePermissionCheck('security.ksef.view');
+  const { hasPermission: canManageKsef } = usePermissionCheck('security.ksef.manage');
   // Permission checks
+  const { hasPermission: canViewSecurity } = usePermissionCheck('security.view');
   const { hasPermission: canManageSSO } = usePermissionCheck('security.sso.manage');
   const { hasPermission: canManagePasskeys } = usePermissionCheck('security.passkeys.manage');
   const { hasPermission: canViewLogs } = usePermissionCheck('security.logs.view');
 
   return (
     <div className="space-y-6">
-      <SSOConnectionCard canManageSSO={canManageSSO} />
-      <DirectorySyncCard canManageSSO={canManageSSO} />
-      <PasskeysCard canManagePasskeys={canManagePasskeys} />
+      {currentTenant?.country === 'PL' && canViewKsef && <KsefTokenCard canManageKsef={canManageKsef} />}
+      {canViewSecurity && (
+        <>
+          <SSOConnectionCard canManageSSO={canManageSSO} />
+          <DirectorySyncCard canManageSSO={canManageSSO} />
+          <PasskeysCard canManagePasskeys={canManagePasskeys} />
+        </>
+      )}
       {canViewLogs && <AuditLogCard />}
     </div>
   );

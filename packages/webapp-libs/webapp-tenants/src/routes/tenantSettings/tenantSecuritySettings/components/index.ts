@@ -6,3 +6,4 @@ export { PasskeysCard } from './passkeysCard';
 export { DirectorySyncCard } from './directorySyncCard';
 export { AuditLogCard } from './auditLogCard';
 
+export { KsefTokenCard } from './ksefTokenCard';

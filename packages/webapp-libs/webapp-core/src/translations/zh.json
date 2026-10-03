@@ -2588,6 +2588,153 @@
   "Home / t&c link": {
     "defaultMessage": "条款和条件"
   },
+  "KSeF / Cancel button": {
+    "defaultMessage": "取消"
+  },
+  "KSeF / Card description": {
+    "defaultMessage": "KSeF 令牌允许 Klarvido 从 KSeF 读取贵公司的发票。"
+  },
+  "KSeF / Card title": {
+    "defaultMessage": "KSeF 连接"
+  },
+  "KSeF / Connect token button": {
+    "defaultMessage": "连接 KSeF 令牌"
+  },
+  "KSeF / Empty state": {
+    "defaultMessage": "连接令牌后，即可开始从 KSeF 读取贵公司的发票。"
+  },
+  "KSeF / Empty title": {
+    "defaultMessage": "尚未连接 KSeF 令牌"
+  },
+  "KSeF / Error NIP missing": {
+    "defaultMessage": "连接 KSeF 之前，请先添加组织的税号（NIP）。"
+  },
+  "KSeF / Error country not supported": {
+    "defaultMessage": "KSeF 仅适用于波兰组织。"
+  },
+  "KSeF / Error decryption failed": {
+    "defaultMessage": "无法读取已保存的令牌。请替换为新的令牌。"
+  },
+  "KSeF / Error encryption not configured": {
+    "defaultMessage": "此服务器暂不支持 KSeF 连接。请联系支持人员。"
+  },
+  "KSeF / Error generic": {
+    "defaultMessage": "连接 KSeF 时出错。请重试。"
+  },
+  "KSeF / Error invalid token": {
+    "defaultMessage": "KSeF 未接受此令牌。请检查令牌是否复制正确，以及是否已被撤销。"
+  },
+  "KSeF / Error no permissions": {
+    "defaultMessage": "此令牌没有该公司的权限。请生成具有发票读取权限的新令牌。"
+  },
+  "KSeF / Error service unavailable": {
+    "defaultMessage": "目前无法连接 KSeF。请稍后再试。"
+  },
+  "KSeF / Error token empty": {
+    "defaultMessage": "保存前请粘贴 KSeF 令牌。"
+  },
+  "KSeF / Invalid hint": {
+    "defaultMessage": "KSeF 不再接受此令牌。请替换为新的令牌。"
+  },
+  "KSeF / Last verified label": {
+    "defaultMessage": "最近验证"
+  },
+  "KSeF / Loading": {
+    "defaultMessage": "正在加载 KSeF 连接..."
+  },
+  "KSeF / Modal description sr": {
+    "defaultMessage": "生成并粘贴 KSeF 令牌的说明"
+  },
+  "KSeF / Modal subtitle": {
+    "defaultMessage": "连接 KSeF 令牌，以便从 KSeF 读取发票"
+  },
+  "KSeF / Modal title": {
+    "defaultMessage": "连接 KSeF"
+  },
+  "KSeF / Modal title sr": {
+    "defaultMessage": "连接 KSeF"
+  },
+  "KSeF / Never verified": {
+    "defaultMessage": "从未"
+  },
+  "KSeF / Remove dialog description": {
+    "defaultMessage": "在连接新令牌之前，Klarvido 将停止从 KSeF 读取发票。"
+  },
+  "KSeF / Remove dialog title": {
+    "defaultMessage": "移除 KSeF 令牌"
+  },
+  "KSeF / Remove token button": {
+    "defaultMessage": "移除"
+  },
+  "KSeF / Removed toast": {
+    "defaultMessage": "KSeF 令牌已移除。"
+  },
+  "KSeF / Replace token button": {
+    "defaultMessage": "替换令牌"
+  },
+  "KSeF / Saved toast": {
+    "defaultMessage": "KSeF 令牌已验证并保存。"
+  },
+  "KSeF / Saved unverified toast": {
+    "defaultMessage": "令牌已保存。无法连接 KSeF，因此尚未验证。请稍后测试连接。"
+  },
+  "KSeF / Status invalid": {
+    "defaultMessage": "令牌被拒绝"
+  },
+  "KSeF / Status unverified": {
+    "defaultMessage": "未验证"
+  },
+  "KSeF / Status valid": {
+    "defaultMessage": "已连接"
+  },
+  "KSeF / Step 1 description": {
+    "defaultMessage": "请使用对贵公司有授权的账户登录 KSeF。"
+  },
+  "KSeF / Step 1 title": {
+    "defaultMessage": "打开 KSeF 网页应用"
+  },
+  "KSeF / Step 2 description": {
+    "defaultMessage": "打开“令牌”部分并生成新令牌。仅授予发票读取权限（InvoiceRead）。不要授予写入权限。"
+  },
+  "KSeF / Step 2 title": {
+    "defaultMessage": "生成新令牌"
+  },
+  "KSeF / Step 3 description": {
+    "defaultMessage": "KSeF 仅显示一次令牌。请在关闭窗口前立即复制。"
+  },
+  "KSeF / Step 3 title": {
+    "defaultMessage": "复制令牌"
+  },
+  "KSeF / Step 4 description": {
+    "defaultMessage": "保存前，我们会向 KSeF 验证令牌。已保存的令牌会加密存储，且不会再次显示。"
+  },
+  "KSeF / Step 4 title": {
+    "defaultMessage": "粘贴到下方"
+  },
+  "KSeF / Test connection button": {
+    "defaultMessage": "测试连接"
+  },
+  "KSeF / Test passed toast": {
+    "defaultMessage": "KSeF 令牌有效。"
+  },
+  "KSeF / Token input label": {
+    "defaultMessage": "KSeF 令牌"
+  },
+  "KSeF / Token name label": {
+    "defaultMessage": "KSeF 中的令牌名称"
+  },
+  "KSeF / Token required": {
+    "defaultMessage": "粘贴 KSeF 令牌"
+  },
+  "KSeF / Token security note": {
+    "defaultMessage": "令牌在保存前会被加密，保存后无法再次查看。"
+  },
+  "KSeF / Unverified hint": {
+    "defaultMessage": "保存令牌时无法连接 KSeF。请测试连接以进行验证。"
+  },
+  "KSeF / Verify and save button": {
+    "defaultMessage": "验证并保存"
+  },
   "Login form / error / authentication failed": {
     "defaultMessage": "身份验证凭据不正确。"
   },
@@ -3478,6 +3625,18 @@
   },
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "查看组织设置"
+  },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "添加、测试、替换或移除 KSeF 令牌"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "管理 KSeF 连接"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "查看是否已连接 KSeF 令牌以及上次验证时间"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "查看 KSeF 连接"
   },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "将活动日志导出为 CSV 或其他格式"

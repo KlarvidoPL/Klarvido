@@ -2588,6 +2588,153 @@
   "Home / t&c link": {
     "defaultMessage": "टर्म्स और कंडीशंस"
   },
+  "KSeF / Cancel button": {
+    "defaultMessage": "रद्द करें"
+  },
+  "KSeF / Card description": {
+    "defaultMessage": "KSeF टोकन से Klarvido आपकी कंपनी के चालान KSeF से पढ़ सकता है।"
+  },
+  "KSeF / Card title": {
+    "defaultMessage": "KSeF कनेक्शन"
+  },
+  "KSeF / Connect token button": {
+    "defaultMessage": "KSeF टोकन कनेक्ट करें"
+  },
+  "KSeF / Empty state": {
+    "defaultMessage": "कंपनी के चालान KSeF से पढ़ना शुरू करने के लिए एक टोकन कनेक्ट करें।"
+  },
+  "KSeF / Empty title": {
+    "defaultMessage": "कोई KSeF टोकन कनेक्ट नहीं है"
+  },
+  "KSeF / Error NIP missing": {
+    "defaultMessage": "KSeF कनेक्ट करने से पहले संगठन का NIP जोड़ें।"
+  },
+  "KSeF / Error country not supported": {
+    "defaultMessage": "KSeF केवल पोलिश संगठनों के लिए उपलब्ध है।"
+  },
+  "KSeF / Error decryption failed": {
+    "defaultMessage": "सहेजा गया टोकन पढ़ा नहीं जा सकता। इसे नए टोकन से बदलें।"
+  },
+  "KSeF / Error encryption not configured": {
+    "defaultMessage": "इस सर्वर पर KSeF कनेक्शन उपलब्ध नहीं है। सहायता से संपर्क करें।"
+  },
+  "KSeF / Error generic": {
+    "defaultMessage": "KSeF से कनेक्ट करते समय त्रुटि हुई। फिर से प्रयास करें।"
+  },
+  "KSeF / Error invalid token": {
+    "defaultMessage": "KSeF ने यह टोकन स्वीकार नहीं किया। जाँचें कि यह सही तरह से कॉपी हुआ है और रद्द नहीं किया गया है।"
+  },
+  "KSeF / Error no permissions": {
+    "defaultMessage": "इस टोकन के पास कंपनी के लिए अनुमतियाँ नहीं हैं। चालान पढ़ने की पहुँच वाला नया टोकन बनाएँ।"
+  },
+  "KSeF / Error service unavailable": {
+    "defaultMessage": "अभी KSeF तक पहुँच नहीं हो पा रही है। बाद में फिर से प्रयास करें।"
+  },
+  "KSeF / Error token empty": {
+    "defaultMessage": "सहेजने से पहले KSeF टोकन पेस्ट करें।"
+  },
+  "KSeF / Invalid hint": {
+    "defaultMessage": "KSeF अब इस टोकन को स्वीकार नहीं करता। इसे नए टोकन से बदलें।"
+  },
+  "KSeF / Last verified label": {
+    "defaultMessage": "अंतिम सत्यापन"
+  },
+  "KSeF / Loading": {
+    "defaultMessage": "KSeF कनेक्शन लोड हो रहा है..."
+  },
+  "KSeF / Modal description sr": {
+    "defaultMessage": "KSeF टोकन बनाने और पेस्ट करने के निर्देश"
+  },
+  "KSeF / Modal subtitle": {
+    "defaultMessage": "KSeF से चालान पढ़ने के लिए KSeF टोकन कनेक्ट करें"
+  },
+  "KSeF / Modal title": {
+    "defaultMessage": "KSeF कनेक्ट करें"
+  },
+  "KSeF / Modal title sr": {
+    "defaultMessage": "KSeF कनेक्ट करें"
+  },
+  "KSeF / Never verified": {
+    "defaultMessage": "कभी नहीं"
+  },
+  "KSeF / Remove dialog description": {
+    "defaultMessage": "नया टोकन कनेक्ट होने तक Klarvido KSeF से चालान पढ़ना बंद कर देगा।"
+  },
+  "KSeF / Remove dialog title": {
+    "defaultMessage": "KSeF टोकन हटाएँ"
+  },
+  "KSeF / Remove token button": {
+    "defaultMessage": "हटाएँ"
+  },
+  "KSeF / Removed toast": {
+    "defaultMessage": "KSeF टोकन हटा दिया गया।"
+  },
+  "KSeF / Replace token button": {
+    "defaultMessage": "टोकन बदलें"
+  },
+  "KSeF / Saved toast": {
+    "defaultMessage": "KSeF टोकन सत्यापित और सहेजा गया।"
+  },
+  "KSeF / Saved unverified toast": {
+    "defaultMessage": "टोकन सहेजा गया। KSeF उपलब्ध नहीं था, इसलिए यह अभी सत्यापित नहीं है। बाद में कनेक्शन जाँचें।"
+  },
+  "KSeF / Status invalid": {
+    "defaultMessage": "टोकन अस्वीकृत"
+  },
+  "KSeF / Status unverified": {
+    "defaultMessage": "सत्यापित नहीं"
+  },
+  "KSeF / Status valid": {
+    "defaultMessage": "कनेक्टेड"
+  },
+  "KSeF / Step 1 description": {
+    "defaultMessage": "अपनी कंपनी के लिए अधिकृत खाते से KSeF में लॉग इन करें।"
+  },
+  "KSeF / Step 1 title": {
+    "defaultMessage": "KSeF वेब एप्लिकेशन खोलें"
+  },
+  "KSeF / Step 2 description": {
+    "defaultMessage": "Tokens अनुभाग खोलें और नया टोकन बनाएँ। केवल चालान पढ़ने की अनुमति (InvoiceRead) दें। लिखने की अनुमति न दें।"
+  },
+  "KSeF / Step 2 title": {
+    "defaultMessage": "नया टोकन बनाएँ"
+  },
+  "KSeF / Step 3 description": {
+    "defaultMessage": "KSeF टोकन केवल एक बार दिखाता है। विंडो बंद करने से पहले इसे तुरंत कॉपी करें।"
+  },
+  "KSeF / Step 3 title": {
+    "defaultMessage": "टोकन कॉपी करें"
+  },
+  "KSeF / Step 4 description": {
+    "defaultMessage": "सहेजने से पहले हम KSeF के साथ टोकन की जाँच करते हैं। सहेजे गए टोकन एन्क्रिप्ट होते हैं और फिर कभी नहीं दिखाए जाते।"
+  },
+  "KSeF / Step 4 title": {
+    "defaultMessage": "नीचे पेस्ट करें"
+  },
+  "KSeF / Test connection button": {
+    "defaultMessage": "कनेक्शन जाँचें"
+  },
+  "KSeF / Test passed toast": {
+    "defaultMessage": "KSeF टोकन मान्य है।"
+  },
+  "KSeF / Token input label": {
+    "defaultMessage": "KSeF टोकन"
+  },
+  "KSeF / Token name label": {
+    "defaultMessage": "KSeF में टोकन का नाम"
+  },
+  "KSeF / Token required": {
+    "defaultMessage": "KSeF टोकन पेस्ट करें"
+  },
+  "KSeF / Token security note": {
+    "defaultMessage": "सहेजने से पहले टोकन एन्क्रिप्ट किया जाता है और सहेजने के बाद इसे फिर से नहीं देखा जा सकता।"
+  },
+  "KSeF / Unverified hint": {
+    "defaultMessage": "टोकन सहेजते समय KSeF उपलब्ध नहीं था। सत्यापित करने के लिए कनेक्शन जाँचें।"
+  },
+  "KSeF / Verify and save button": {
+    "defaultMessage": "सत्यापित करें और सहेजें"
+  },
   "Login form / error / authentication failed": {
     "defaultMessage": "गलत प्रमाणीकरण जानकारी।"
   },
@@ -3478,6 +3625,18 @@
   },
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "संगठन सेटिंग्स देखें"
+  },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "KSeF टोकन जोड़ें, जाँचें, बदलें या हटाएँ"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "KSeF कनेक्शन प्रबंधित करें"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "देखें कि KSeF टोकन कनेक्ट है या नहीं और उसका अंतिम सत्यापन कब हुआ"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "KSeF कनेक्शन देखें"
   },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "गतिविधि लॉग को CSV या अन्य प्रारूपों में निर्यात करें"

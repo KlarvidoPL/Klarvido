@@ -16,7 +16,7 @@ is needed when adding a new app.
 import importlib
 from dataclasses import dataclass
 from itertools import chain
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Set, Tuple, Union
 
 from .constants import PermissionCategory, SystemRoleType
 
@@ -102,6 +102,8 @@ class PermissionDefinition:
     description: str
     category: Union[PermissionCategory, str]  # str for app-defined categories
     sort_order: int = 0
+    # Country codes (CompanyCountry values) whose organizations may use this permission. None means every country.
+    countries: Optional[Tuple[str, ...]] = None
 
 
 # ============ Permission Registry ============
@@ -379,6 +381,11 @@ def get_all_permission_codes() -> list:
     return [p.code for p in get_all_permissions()]
 
 
+def get_permission_codes_unavailable_for_country(country: str) -> Set[str]:
+    """Codes of permissions that organizations in `country` cannot use (see PermissionDefinition.countries)."""
+    return {p.code for p in get_all_permissions() if p.countries is not None and country not in p.countries}
+
+
 def create_system_roles_for_tenant(tenant, apps=None):
     """
     Create system template roles (OWNER, ADMIN, MEMBER) for a tenant.
@@ -427,13 +434,15 @@ def create_system_roles_for_tenant(tenant, apps=None):
         )
         created_roles.append(role)
 
-        # Assign permissions based on template (base + app-registered extras)
+        # Assign permissions based on template (base + app-registered extras), skipping permissions this
+        # organization's country cannot use
+        unavailable = get_permission_codes_unavailable_for_country(tenant.country)
         permission_codes = get_effective_role_template_permissions(config['system_role_type'])
         if permission_codes is None:
             # OWNER gets all permissions
-            permissions = Permission.objects.all()
+            permissions = Permission.objects.exclude(code__in=unavailable)
         else:
-            permissions = Permission.objects.filter(code__in=permission_codes)
+            permissions = Permission.objects.filter(code__in=permission_codes).exclude(code__in=unavailable)
 
         for permission in permissions:
             OrganizationRolePermission.objects.get_or_create(

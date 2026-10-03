@@ -27,6 +27,7 @@ const TENANT_ID = 'tenant-roles-1';
 
 const createPermissionsMock = (permissions: string[] = []) =>
   composeMockedQueryResult(allPermissionsQuery, {
+    variables: { tenantId: TENANT_ID },
     data: {
       allPermissions: {
         edges: [

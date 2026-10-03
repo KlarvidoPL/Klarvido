@@ -90,6 +90,7 @@ LOCAL_APPS = [
     "apps.sso",
     "apps.translations",
     "apps.backup",
+    "apps.ksef",
 ]
 
 INSTALLED_APPS = (
@@ -554,6 +555,13 @@ AWS_REGION = env("AWS_REGION", default=None)
 # Set to a Fernet key (44-char urlsafe base64). Generate with:
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 BACKUP_MASTER_KEY = env("BACKUP_MASTER_KEY", default=None)
+
+# KSeF (Krajowy System e-Faktur) integration. KSEF_ENVIRONMENT is per deployment: test | demo | prod.
+# KSEF_ENCRYPTION_KEYS: comma-separated base64 32-byte AES keys, newest first. Stored KSeF tokens are encrypted with the
+# first key; keys are never stored in the database. Generate one with:
+#   python -c "import base64,os; print(base64.b64encode(os.urandom(32)).decode())"
+KSEF_ENVIRONMENT = env("KSEF_ENVIRONMENT", default="test")
+KSEF_ENCRYPTION_KEYS = env("KSEF_ENCRYPTION_KEYS", default="")
 
 LAMBDA_TASKS_BASE_HANDLER = env("LAMBDA_TASKS_BASE_HANDLER", default="common.tasks.LambdaTask")
 LAMBDA_TASKS_LOCAL_URL = env("LAMBDA_TASKS_LOCAL_URL", default=None)

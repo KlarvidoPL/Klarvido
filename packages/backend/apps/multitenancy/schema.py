@@ -28,6 +28,7 @@ from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
 from .services.onboarding import CHOICES, clear_draft, save_draft_step, save_onboarding_step
 from .validators import validate_tax_id
+from .permissions import get_permission_codes_unavailable_for_country
 from .constants import (
     CompanyCountry as ConstantsCompanyCountry,
     TenantUserRole,
@@ -952,6 +953,15 @@ class CreateOrganizationRoleMutation(graphene.Mutation):
         if models.OrganizationRole.objects.filter(tenant=tenant, name=name).exists():
             raise exceptions.GraphQlValidationError(f"A role with the name '{name}' already exists.")
 
+        unavailable = get_permission_codes_unavailable_for_country(tenant.country)
+        for perm_id in permission_ids:
+            _, perm_pk = from_global_id(perm_id)
+            permission = get_object_or_404(models.Permission, pk=perm_pk)
+            if permission.code in unavailable:
+                raise exceptions.GraphQlValidationError(
+                    f"Permission '{permission.code}' is not available for this organization."
+                )
+
         # SECURITY CHECK 2: Users can only create roles with permissions they have (except owners)
         user_permissions = models.get_user_permissions_for_tenant(user, tenant)
         is_owner = models.user_has_permission(user, tenant, "org.*")  # Owners have org.*
@@ -1035,6 +1045,15 @@ class UpdateOrganizationRoleMutation(graphene.Mutation):
 
         # SECURITY CHECK 2: If adding permissions, verify user has those permissions
         if permission_ids is not None:
+            unavailable = get_permission_codes_unavailable_for_country(tenant.country)
+            for perm_id in permission_ids:
+                _, perm_pk = from_global_id(perm_id)
+                permission = get_object_or_404(models.Permission, pk=perm_pk)
+                if permission.code in unavailable:
+                    raise exceptions.GraphQlValidationError(
+                        f"Permission '{permission.code}' is not available for this organization."
+                    )
+
             user_permissions = models.get_user_permissions_for_tenant(user, tenant)
             is_owner = models.user_has_permission(user, tenant, "org.*")
 
@@ -1519,6 +1538,7 @@ class Query(graphene.ObjectType):
     all_permissions = graphene.relay.ConnectionField(
         PermissionConnection,
         category=PermissionCategoryType(description="Filter by category"),
+        tenant_id=graphene.ID(description="Only permissions the organization's country can use"),
     )
     all_organization_roles = graphene.relay.ConnectionField(
         OrganizationRoleConnection,
@@ -1613,14 +1633,18 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     @permission_classes(policies.IsAuthenticatedFullAccess)
-    def resolve_all_permissions(root, info, category=None, **kwargs):
-        """Get all available permissions, optionally filtered by category.
+    def resolve_all_permissions(root, info, category=None, tenant_id=None, **kwargs):
+        """Get all available permissions, optionally filtered by category and by an organization's country.
 
         Permissions are global data, so only authentication is required.
         """
         qs = models.Permission.objects.all()
         if category:
             qs = qs.filter(category=category)
+        if tenant_id:
+            _, pk = from_global_id(tenant_id)
+            tenant = get_object_or_404(models.Tenant, pk=pk)
+            qs = qs.exclude(code__in=get_permission_codes_unavailable_for_country(tenant.country))
         return qs.order_by("category", "sort_order", "name")
 
     @staticmethod

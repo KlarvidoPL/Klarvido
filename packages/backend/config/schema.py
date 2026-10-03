@@ -13,6 +13,7 @@ from apps.multitenancy import schema as multitenancy_schema
 from apps.sso import schema as sso_schema
 from apps.translations import schema as translations_schema
 from apps.backup import schema as backup_schema
+from apps.ksef import schema as ksef_schema
 from common.graphql.utils import graphql_query, graphql_mutation, graphql_subscription
 
 schema = graphene.Schema(
@@ -27,6 +28,7 @@ schema = graphene.Schema(
             sso_schema.TenantSSOQuery,
             translations_schema.TranslationsQuery,
             backup_schema.BackupQuery,
+            ksef_schema.KsefQuery,
         ]
     ),
     mutation=graphql_mutation(
@@ -46,6 +48,7 @@ schema = graphene.Schema(
             sso_schema.TenantOwnerMutation,
             translations_schema.TranslationsMutation,
             backup_schema.BackupMutation,
+            ksef_schema.KsefMutation,
         ]
     ),
     subscription=graphql_subscription(
