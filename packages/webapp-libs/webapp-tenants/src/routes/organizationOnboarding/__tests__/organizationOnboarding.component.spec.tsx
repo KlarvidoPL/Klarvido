@@ -48,8 +48,6 @@ const profileMock = (currentStep = 6, isRequired = false) =>
   });
 
 describe('OrganizationOnboarding', () => {
-  afterEach(() => sessionStorage.clear());
-
   it('goes back from Customers to company details and restores an unfinished answer', async () => {
     render(
       <>

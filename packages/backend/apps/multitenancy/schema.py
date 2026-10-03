@@ -504,6 +504,19 @@ class SaveOrganizationOnboardingDraftMutation(graphene.Mutation):
         return cls(profile=profile, tenant=tenant)
 
 
+class ClearOrganizationOnboardingDraftMutation(graphene.Mutation):
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        # Only the caller's own draft: organization profiles are never touched here.
+        models.OrganizationOnboardingProfile.objects.filter(draft_owner=user).delete()
+        return cls(ok=True)
+
+
 @action_logged(entity_type="tenant", action_type=ActionType.UPDATE)
 class UpdateTenantMutation(mutations.UpdateModelMutation):
     class Meta:
@@ -1678,6 +1691,7 @@ class Mutation(graphene.ObjectType):
     """
 
     save_organization_onboarding_draft = SaveOrganizationOnboardingDraftMutation.Field()
+    clear_organization_onboarding_draft = ClearOrganizationOnboardingDraftMutation.Field()
     create_tenant = CreateTenantMutation.Field()
     accept_tenant_invitation = AcceptTenantInvitationMutation.Field()
     decline_tenant_invitation = DeclineTenantInvitationMutation.Field()

@@ -128,3 +128,11 @@ export const saveOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
     }
   }
 `);
+
+export const clearOrganizationOnboardingDraftMutation = gql(/* GraphQL */ `
+  mutation clearOrganizationOnboardingDraftOperation {
+    clearOrganizationOnboardingDraft {
+      ok
+    }
+  }
+`);

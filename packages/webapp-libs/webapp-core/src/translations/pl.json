@@ -4738,5 +4738,20 @@
   },
   "Tenant form / Immutable value": {
     "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Wyczyścić ten szkic?"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Wszystkie odpowiedzi dla tej nowej organizacji zostaną usunięte. Tej operacji nie można cofnąć."
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
   }
 }

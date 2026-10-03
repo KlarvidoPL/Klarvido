@@ -4,6 +4,7 @@ import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
+import { useToast } from '@sb/webapp-core/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
@@ -30,6 +31,7 @@ import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCoun
 import { normalizeDigits } from '../../utils/nip';
 import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
 import {
+  clearOrganizationOnboardingDraftMutation,
   organizationOnboardingDraftQuery,
   saveOrganizationOnboardingDraftMutation,
 } from '../organizationOnboarding/organizationOnboarding.graphql';
@@ -50,7 +52,9 @@ export const AddTenantForm = () => {
     error: draftError,
     refetch: refetchDraft,
   } = useQuery(organizationOnboardingDraftQuery, { fetchPolicy: 'network-only' });
+  const [clearDraft, { loading: clearingDraft }] = useMutation(clearOrganizationOnboardingDraftMutation);
   const { lookup, loading: lookupLoading } = useCompanyLookup();
+  const { toast } = useToast();
 
   const [step, setStep] = useState<Step>(Step.BASICS);
   // null = not looked up yet; true/false = whether MF returned a company for the NIP in the form
@@ -151,6 +155,26 @@ export const AddTenantForm = () => {
     });
   });
 
+  const handleClearDraft = async () => {
+    try {
+      await clearDraft();
+      await refetchDraft();
+      form.reset();
+      setStep(Step.BASICS);
+      setCompanyFound(null);
+      setLookedUpNip(undefined);
+      setMissingFields([]);
+    } catch {
+      toast({
+        description: intl.formatMessage({
+          defaultMessage: 'Could not clear this draft. Please try again.',
+          id: 'Onboarding / Clear draft failed',
+        }),
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (draftLoading)
     return (
       <PageLayout>
@@ -165,7 +189,8 @@ export const AddTenantForm = () => {
         </p>
       </PageLayout>
     );
-  if (draft?.organizationOnboardingDraft) return <OrganizationOnboarding draftMode />;
+  if (draft?.organizationOnboardingDraft)
+    return <OrganizationOnboarding draftMode onClearDraft={handleClearDraft} clearingDraft={clearingDraft} />;
 
   return (
     <PageLayout>

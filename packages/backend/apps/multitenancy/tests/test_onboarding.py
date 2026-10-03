@@ -189,3 +189,24 @@ def test_draft_is_account_scoped_and_cannot_skip(graphene_client, user, user_fac
     assert graphene_client.query(DRAFT_MUTATION, variable_values={'step': 3, 'revenueModels': ['PROJECT']}).get('errors')
     graphene_client.force_authenticate(user_factory())
     assert graphene_client.query(DRAFT_QUERY)['data']['organizationOnboardingDraft'] is None
+
+
+CLEAR_MUTATION = """
+mutation {
+  clearOrganizationOnboardingDraft { ok }
+}
+"""
+
+
+def test_clear_draft_removes_only_the_callers_draft(graphene_client, user, user_factory):
+    graphene_client.force_authenticate(user)
+    started = graphene_client.query(DRAFT_MUTATION, variable_values={'step': 1, 'company': DRAFT_COMPANY})
+    assert 'errors' not in started, started
+    other = user_factory()
+    OrganizationOnboardingProfile.objects.create(draft_owner=other)
+
+    result = graphene_client.query(CLEAR_MUTATION)
+    assert 'errors' not in result, result
+    assert result['data']['clearOrganizationOnboardingDraft']['ok'] is True
+    assert graphene_client.query(DRAFT_QUERY)['data']['organizationOnboardingDraft'] is None
+    assert OrganizationOnboardingProfile.objects.filter(draft_owner=other).exists()

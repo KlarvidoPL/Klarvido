@@ -1479,6 +1479,7 @@ type ApiMutation {
   """
   removeRoleFromMember(membershipId: ID!, roleId: ID!, tenantId: ID!): RemoveRoleFromMemberMutation
   saveOrganizationOnboardingDraft(company: OnboardingCompanyInput, costDrivers: [String], customerType: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!): SaveOrganizationOnboardingDraftMutation
+  clearOrganizationOnboardingDraft: ClearOrganizationOnboardingDraftMutation
   createTenant(input: CreateTenantMutationInput!): CreateTenantMutationPayload
   acceptTenantInvitation(input: AcceptTenantInvitationMutationInput!): AcceptTenantInvitationMutationPayload
   declineTenantInvitation(input: DeclineTenantInvitationMutationInput!): DeclineTenantInvitationMutationPayload
@@ -1881,6 +1882,9 @@ type RemoveRoleFromMemberMutation {
 type SaveOrganizationOnboardingDraftMutation {
   profile: OrganizationOnboardingProfileType
   tenant: TenantType
+}
+type ClearOrganizationOnboardingDraftMutation {
+  ok: Boolean
 }
 type CreateTenantMutationPayload {
   tenant: TenantType

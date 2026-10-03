@@ -3,6 +3,7 @@ import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
+import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
@@ -10,7 +11,7 @@ import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast';
-import { ArrowLeft, ArrowRight, Building2, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Loader2, Trash2 } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
@@ -136,7 +137,15 @@ const ChoiceGroup = ({
   );
 };
 
-export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: boolean }) => {
+export const OrganizationOnboarding = ({
+  draftMode = false,
+  onClearDraft,
+  clearingDraft = false,
+}: {
+  draftMode?: boolean;
+  onClearDraft?: () => Promise<void>;
+  clearingDraft?: boolean;
+}) => {
   const errorMessages = useCompanyFormErrorMessages();
   const { data: currentTenant } = useCurrentTenant();
   const draftQuery = useQuery(organizationOnboardingDraftQuery, { skip: !draftMode, fetchPolicy: 'network-only' });
@@ -523,14 +532,40 @@ export const OrganizationOnboarding = ({ draftMode = false }: { draftMode?: bool
     <PageLayout>
       <Card className="mx-auto w-full max-w-screen-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            {draftMode ? (
-              <FormattedMessage defaultMessage="Add Organization" id="Tenant form / AddTenant / Card title" />
-            ) : (
-              <FormattedMessage defaultMessage="Set up your organization" id="Onboarding / Title" />
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              {draftMode ? (
+                <FormattedMessage defaultMessage="Add Organization" id="Tenant form / AddTenant / Card title" />
+              ) : (
+                <FormattedMessage defaultMessage="Set up your organization" id="Onboarding / Title" />
+              )}
+            </CardTitle>
+            {draftMode && onClearDraft && (
+              <ConfirmDialog
+                title={<FormattedMessage defaultMessage="Clear this draft?" id="Onboarding / Clear draft title" />}
+                description={
+                  <FormattedMessage
+                    defaultMessage="All answers for this new organization will be deleted. This cannot be undone."
+                    id="Onboarding / Clear draft description"
+                  />
+                }
+                continueLabel={<FormattedMessage defaultMessage="Clear draft" id="Onboarding / Clear draft confirm" />}
+                variant="destructive"
+                onContinue={() => void onClearDraft()}
+              >
+                <button
+                  type="button"
+                  disabled={clearingDraft}
+                  aria-label={intl.formatMessage({ defaultMessage: 'Clear draft', id: 'Onboarding / Clear draft' })}
+                  title={intl.formatMessage({ defaultMessage: 'Clear draft', id: 'Onboarding / Clear draft' })}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </ConfirmDialog>
             )}
-          </CardTitle>
+          </div>
           <CardDescription>
             {draftMode ? (
               <FormattedMessage
