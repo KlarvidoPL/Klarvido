@@ -3089,6 +3089,9 @@
   "Passkeys Card / Add Another Button": {
     "defaultMessage": "Dodaj kolejną passkey"
   },
+  "Passkeys Card / Add My Passkey Button": {
+    "defaultMessage": "Dodaj mój passkey"
+  },
   "Passkeys Card / Added Date": {
     "defaultMessage": "Dodano {date}"
   },

@@ -3089,6 +3089,9 @@
   "Passkeys Card / Add Another Button": {
     "defaultMessage": "إضافة Passkey أخرى"
   },
+  "Passkeys Card / Add My Passkey Button": {
+    "defaultMessage": "إضافة مفتاح المرور الخاص بي"
+  },
   "Passkeys Card / Added Date": {
     "defaultMessage": "أضيفت في {date}"
   },

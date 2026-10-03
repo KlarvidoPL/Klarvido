@@ -3089,6 +3089,9 @@
   "Passkeys Card / Add Another Button": {
     "defaultMessage": "添加另一个 Passkey"
   },
+  "Passkeys Card / Add My Passkey Button": {
+    "defaultMessage": "添加我的通行密钥"
+  },
   "Passkeys Card / Added Date": {
     "defaultMessage": "添加于 {date}"
   },

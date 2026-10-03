@@ -3089,6 +3089,9 @@
   "Passkeys Card / Add Another Button": {
     "defaultMessage": "एक और passkey जोड़ें"
   },
+  "Passkeys Card / Add My Passkey Button": {
+    "defaultMessage": "मेरा पासकी जोड़ें"
+  },
   "Passkeys Card / Added Date": {
     "defaultMessage": "{date} को जोड़ा गया"
   },

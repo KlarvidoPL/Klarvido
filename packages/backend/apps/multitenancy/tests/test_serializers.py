@@ -149,6 +149,31 @@ class TestCreateTenantInvitationSerializer:
 
         assert serializer.is_valid(), serializer.errors
 
+    def test_superuser_without_membership_can_invite_with_owner_role(self, user_factory, tenant_factory):
+        """
+        SECURITY: The superuser cross-tenant bypass grants owner-equivalent access without
+        a real membership row - a superuser with no real membership in the tenant must still
+        be able to invite a new member with the Owner role, same as a real owner.
+        """
+        from ..permissions import create_system_roles_for_tenant
+
+        tenant = tenant_factory(name="Test Tenant", type=TenantType.ORGANIZATION)
+        create_system_roles_for_tenant(tenant)
+        owner_role = OrganizationRole.objects.get(tenant=tenant, system_role_type=SystemRoleType.OWNER)
+
+        superuser = user_factory(is_superuser=True)
+
+        data = {
+            "email": "new_user@example.com",
+            "organization_role_ids": [str(owner_role.id)],
+            "tenant_id": str(tenant.id),
+        }
+        serializer = CreateTenantInvitationSerializer(
+            data=data, context={'request': Mock(tenant=tenant, user=superuser)}
+        )
+
+        assert serializer.is_valid(), serializer.errors
+
 
 class TestResendTenantInvitationSerializer:
     def test_resend_invitation_for_existing_user(self, mocker, user, user_factory, tenant_factory):

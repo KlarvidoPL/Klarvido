@@ -1986,3 +1986,49 @@ class TestAllOrganizationRolesQuery:
         assert roles_by_name["Owner"]["systemRoleType"] == "OWNER"
         assert roles_by_name["Administrator"]["systemRoleType"] == "ADMIN"
         assert roles_by_name["Member"]["systemRoleType"] == "MEMBER"
+
+
+class TestAssignRolesToMemberMutationSuperuserBypass:
+    """Regression coverage: the superuser cross-tenant bypass grants owner-equivalent
+    access without a real TenantMembership row, but the Owner-role-assignment special
+    case previously checked only for a real OWNER membership row, blocking a bypassed
+    superuser from assigning the Owner role - even though the general permission check
+    (get_user_permissions_for_tenant) already correctly treats them as having every
+    permission."""
+
+    MUTATION = '''
+        mutation AssignRolesToMember($membershipId: ID!, $tenantId: ID!, $roleIds: [ID]!) {
+          assignRolesToMember(membershipId: $membershipId, tenantId: $tenantId, roleIds: $roleIds) {
+            ok
+          }
+        }
+    '''
+
+    def test_superuser_without_membership_can_assign_owner_role(
+        self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        target_user = user_factory()
+        target_membership = tenant_membership_factory(
+            user=target_user, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True
+        )
+        owner_role = OrganizationRole.objects.get(tenant=tenant, system_role_type=SystemRoleType.OWNER)
+
+        superuser = user_factory(is_superuser=True)
+        graphene_client.force_authenticate(superuser)
+        graphene_client.set_tenant_dependent_context(tenant, None)
+
+        executed = graphene_client.mutate(
+            self.MUTATION,
+            variable_values={
+                "membershipId": to_global_id("TenantMembershipType", target_membership.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "roleIds": [to_global_id("OrganizationRoleType", owner_role.id)],
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        assert executed["data"]["assignRolesToMember"]["ok"] is True
+        assert TenantMembershipRole.objects.filter(
+            membership=target_membership, role__system_role_type=SystemRoleType.OWNER
+        ).exists()

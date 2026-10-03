@@ -265,18 +265,24 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
             valid_roles = {str(r.id): r for r in models.OrganizationRole.objects.filter(tenant=tenant)}
             decoded_role_ids = []
 
-            # Check if inviter is an owner (needed for owner role assignment validation)
+            # Check if inviter is an owner (needed for owner role assignment validation).
+            # The superuser cross-tenant bypass grants owner-equivalent access without a
+            # real membership row - OR it in the same way get_user_permissions_for_tenant
+            # already does for the general permission set below.
             inviter = request.user if request else None
             is_inviter_owner = False
             if inviter:
                 inviter_membership = models.TenantMembership.objects.filter(
                     user=inviter, tenant=tenant, is_accepted=True
                 ).first()
-                is_inviter_owner = inviter_membership and (
-                    inviter_membership.role == TenantUserRole.OWNER
-                    or models.TenantMembershipRole.objects.filter(
-                        membership=inviter_membership, role__system_role_type=SystemRoleType.OWNER
-                    ).exists()
+                is_inviter_owner = models.is_superuser_bypass_eligible(inviter) or bool(
+                    inviter_membership
+                    and (
+                        inviter_membership.role == TenantUserRole.OWNER
+                        or models.TenantMembershipRole.objects.filter(
+                            membership=inviter_membership, role__system_role_type=SystemRoleType.OWNER
+                        ).exists()
+                    )
                 )
 
             inviter_permissions = models.get_user_permissions_for_tenant(inviter, tenant) if inviter else set()

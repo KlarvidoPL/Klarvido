@@ -49,8 +49,6 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
     canManagePasskeys ? searchQuery : undefined
   );
 
-  const filteredPasskeys = canManagePasskeys ? passkeys : passkeys;
-
   const handleDelete = async (passkeyId: string) => {
     setDeletingId(passkeyId);
     try {
@@ -156,7 +154,7 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
             <div className="flex items-center justify-center p-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : filteredPasskeys.length === 0 ? (
+          ) : passkeys.length === 0 ? (
             <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
               <div className="flex items-center gap-3">
                 <div className="rounded-full bg-muted p-2">
@@ -196,19 +194,21 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
                   </p>
                 </div>
               </div>
-              {!canManagePasskeys && (
-                <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                {canManagePasskeys ? (
+                  <FormattedMessage defaultMessage="Add my passkey" id="Passkeys Card / Add My Passkey Button" />
+                ) : (
                   <FormattedMessage
                     defaultMessage="Add Passkey"
                     id="Tenant Security Settings / Add Passkey Button"
                   />
-                </Button>
-              )}
+                )}
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredPasskeys.map((passkey) => (
+              {passkeys.map((passkey) => (
                 <div
                   key={passkey.id}
                   className="flex items-center justify-between rounded-lg border p-4"
@@ -277,20 +277,17 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
                 </div>
               ))}
 
-              {!canManagePasskeys && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" className="w-full" onClick={() => setIsModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                {canManagePasskeys ? (
+                  <FormattedMessage defaultMessage="Add my passkey" id="Passkeys Card / Add My Passkey Button" />
+                ) : (
                   <FormattedMessage
                     defaultMessage="Add another passkey"
                     id="Passkeys Card / Add Another Button"
                   />
-                </Button>
-              )}
+                )}
+              </Button>
             </div>
           )}
         </CardContent>
