@@ -67,8 +67,11 @@ type Query {
   mySessions(before: String, after: String, first: Int, last: Int): SSOSessionConnection
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
   ssoDiscover(email: String!): SSODiscoveryResultType
+  organizationOnboardingDraft: OrganizationOnboardingProfileType
+  organizationOnboardingChoices: OrganizationOnboardingChoicesType
   allTenants(before: String, after: String, first: Int, last: Int): TenantConnection
   tenant(id: ID): TenantType
+  organizationOnboardingProfile(tenantId: ID!): OrganizationOnboardingProfileType
   allActionLogs(tenantId: ID!, 
     "Filter by entity type"
     entityType: String,
@@ -209,6 +212,8 @@ type TenantType implements Node {
   address: String
   vatStatus: String
   userMemberships: [TenantMembershipType]
+  onboardingRequired: Boolean!
+  onboardingCompleted: Boolean!
   membership: TenantMembershipType
 }
 type TenantMembershipType implements Node {
@@ -596,6 +601,35 @@ type SSODiscoveryConnectionType {
   tenantId: String
   tenantName: String
   loginUrl: String
+}
+type OrganizationOnboardingProfileType {
+  companyData: OnboardingCompanyType
+  respondentRole: String
+  customerType: String
+  revenueModels: [String]
+  costDrivers: [String]
+  pricing: String
+  mainGoal: String
+  currentStep: Int
+  isRequired: Boolean
+  completedAt: DateTime
+}
+type OnboardingCompanyType {
+  name: String
+  country: String
+  nip: String
+  companyName: String
+  regon: String
+  address: String
+  vatStatus: String
+}
+type OrganizationOnboardingChoicesType {
+  respondentRoles: [String]
+  customerTypes: [String]
+  revenueModels: [String]
+  costDrivers: [String]
+  pricingModels: [String]
+  mainGoals: [String]
 }
 type TenantConnection {
   "Pagination data for this connection."
@@ -1407,6 +1441,7 @@ type ApiMutation {
   "Delete a passkey."
   deletePasskey(input: DeletePasskeyMutationInput!): DeletePasskeyMutationPayload
   updateTenant(input: UpdateTenantMutationInput!): UpdateTenantMutationPayload
+  saveOrganizationOnboardingStep(costDrivers: [String], customerType: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!, tenantId: ID!): SaveOrganizationOnboardingStepMutation
   "Mutation to delete a tenant from the system."
   deleteTenant(input: DeleteTenantMutationInput!): DeleteTenantMutationPayload
   createTenantInvitation(input: CreateTenantInvitationMutationInput!): CreateTenantInvitationMutationPayload
@@ -1470,6 +1505,8 @@ type ApiMutation {
   - Non-owners cannot modify owner memberships
   """
   removeRoleFromMember(membershipId: ID!, roleId: ID!, tenantId: ID!): RemoveRoleFromMemberMutation
+  saveOrganizationOnboardingDraft(company: OnboardingCompanyInput, costDrivers: [String], customerType: String, mainGoal: String, pricing: String, respondentRole: String, revenueModels: [String], step: Int!): SaveOrganizationOnboardingDraftMutation
+  clearOrganizationOnboardingDraft: ClearOrganizationOnboardingDraftMutation
   createTenant(input: CreateTenantMutationInput!): CreateTenantMutationPayload
   acceptTenantInvitation(input: AcceptTenantInvitationMutationInput!): AcceptTenantInvitationMutationPayload
   declineTenantInvitation(input: DeclineTenantInvitationMutationInput!): DeclineTenantInvitationMutationPayload
@@ -1758,6 +1795,9 @@ type UpdateTenantMutationPayload {
   tenantEdge: TenantEdge
   clientMutationId: String
 }
+type SaveOrganizationOnboardingStepMutation {
+  profile: OrganizationOnboardingProfileType
+}
 "Mutation to delete a tenant from the system."
 type DeleteTenantMutationPayload {
   deletedIds: [ID]
@@ -1873,6 +1913,13 @@ SECURITY:
 """
 type RemoveRoleFromMemberMutation {
   membership: TenantMembershipType
+  ok: Boolean
+}
+type SaveOrganizationOnboardingDraftMutation {
+  profile: OrganizationOnboardingProfileType
+  tenant: TenantType
+}
+type ClearOrganizationOnboardingDraftMutation {
   ok: Boolean
 }
 type CreateTenantMutationPayload {
@@ -3019,6 +3066,15 @@ input UpdateTenantMembershipMutationInput {
   tenantId: String!
   role: TenantUserRole!
   clientMutationId: String
+}
+input OnboardingCompanyInput {
+  name: String!
+  country: String!
+  nip: String!
+  companyName: String!
+  regon: String!
+  address: String!
+  vatStatus: String!
 }
 input CreateTenantMutationInput {
   name: String!

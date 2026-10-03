@@ -3122,6 +3122,204 @@
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "np. Google Workspace"
   },
+  "Onboarding / Back": {
+    "defaultMessage": "Wstecz"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "Onboarding ukończony"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "Potwierdź profil"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "Czas pracowników"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "Marketing / prowizje"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "Materiały / towary"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "Podwykonawcy"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "Technologia / infrastruktura"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "Transport / logistyka"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "Wybierz maksymalnie trzy odpowiedzi."
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "Które koszty rosną wraz ze sprzedażą?"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "Głównie firmy (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "Głównie konsumenci (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "Firmy i konsumenci"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "Instytucje publiczne"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "To pomoże ocenić, jaką część sprzedaży obejmą przyszłe integracje."
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "Kto najczęściej Ci płaci?"
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Edytuj"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "Opowiedz nam, jak działa Twoja firma. Możesz wracać do wcześniejszych kroków."
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "Dużo pracuję, ale nie widać tego na koncie"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "Boję się utraty dużego klienta"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "Koszty ciągle rosną"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "Chcę wcześniej dostrzegać problemy"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "Czy stać mnie na powiększenie zespołu?"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "Nie wiem, czy dobrze wyceniam"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "Co najbardziej chcesz mieć pod kontrolą?"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "Nie udało się wczytać profilu firmy."
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "Dalej"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "Nie udało się zaktualizować organizacji. Sprawdź pola i spróbuj ponownie."
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "Koszt plus marża"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "Stały cennik / wycena"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "Cena indywidualna dla klienta"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "Jak najczęściej ustalasz ceny?"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "Abonament / pakiet"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "Czas / jednostka"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "Jak podejmujesz najważniejsze decyzje?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "Twoja rola w firmie"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "Ta odpowiedź ma charakter informacyjny i nie zmienia Twoich uprawnień w organizacji."
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "Prowizja / wynik"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "Wybierz maksymalnie dwie odpowiedzi."
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "Produkt / zamówienie"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "Projekt / zlecenie"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "Liczba wykonanych usług"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "Stała obsługa / abonament"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "Czas pracy"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "Za co klienci Ci płacą?"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "Księgowość"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "Doradca"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "Pracownik"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "Właściciel / zarząd"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "Nie udało się zapisać tego kroku. Spróbuj ponownie."
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Otwórz profil firmy"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Uzupełnij lub zmień odpowiedzi dotyczące Twojej organizacji."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Profil firmy"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "Koszty"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "Klienci"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "Ceny i cel"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "Przychody"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "Podsumowanie"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "Kroki onboardingu"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "Najważniejszy cel"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "To punkt wyjścia do przyszłych analiz."
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "Ceny"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "Twoja rola"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "Profil Twojej firmy"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "Skonfiguruj organizację"
+  },
   "Passkeys / Add another": {
     "defaultMessage": "Dodaj kolejny klucz dostępu"
   },
@@ -4990,5 +5188,26 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Szybki start"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Sprawdź tę wartość i spróbuj ponownie."
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Wyczyścić ten szkic?"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Wszystkie odpowiedzi dla tej nowej organizacji zostaną usunięte. Tej operacji nie można cofnąć."
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
   }
 }

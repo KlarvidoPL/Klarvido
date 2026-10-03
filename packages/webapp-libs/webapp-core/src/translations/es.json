@@ -4990,5 +4990,212 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Inicio rápido"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "No se pudo guardar este paso. Inténtalo de nuevo."
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "No se pudo actualizar la organización. Revisa los campos e inténtalo de nuevo."
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "No se pudo cargar el perfil de la empresa."
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "Onboarding completado"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Revisa este valor e inténtalo de nuevo."
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Este valor no se puede cambiar una vez guardado."
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "Elige hasta dos respuestas."
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "Elige hasta tres respuestas."
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "Atrás"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Borrar borrador"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Borrar borrador"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Se eliminarán todas las respuestas de esta nueva organización. Esta acción no se puede deshacer."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "No se pudo borrar el borrador. Inténtelo de nuevo."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "¿Borrar este borrador?"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "Confirmar perfil"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "Tiempo de empleados"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "Marketing / comisiones"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "Materiales / mercancías"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "Subcontratistas"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "Tecnología / infraestructura"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "Transporte / logística"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "¿Qué costes aumentan con sus ventas?"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "Principalmente empresas (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "Principalmente consumidores (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "Empresas y consumidores"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "Instituciones públicas"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "Esto ayuda a estimar cuántos datos de ventas podrán cubrir las futuras integraciones."
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "¿Quién le paga normalmente?"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "Cuéntenos cómo funciona su negocio. Puede volver a los pasos anteriores."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Editar"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "Trabajo mucho, pero no hay dinero"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "Me preocupa perder a un cliente importante"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "Los costes siguen subiendo"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "Quiero detectar los problemas a tiempo"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "¿Puedo permitirme ampliar el equipo?"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "No estoy seguro de mis precios"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "¿Qué es lo que más quiere mantener bajo control?"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "Siguiente"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "Coste más margen"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "Precio fijo / presupuesto"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "Precio individual por cliente"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "¿Cómo fija sus precios normalmente?"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "Suscripción / paquete"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "Tiempo / unidad"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "Su función en la empresa"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "Esta respuesta es descriptiva y no cambia sus permisos en la organización."
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "Comisión / resultado"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "Producto / pedido"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "Proyecto / encargo"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "Número de servicios"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "Suscripción / servicio recurrente"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "Tiempo trabajado"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "¿Por qué pagan sus clientes?"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "Contabilidad"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "Asesor"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "Empleado"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "Propietario / dirección"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "Costes"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "Clientes"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "Precios y objetivo"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "Ingresos"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "Resumen"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "Pasos de incorporación"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "Objetivo principal"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "Este es un punto de partida para análisis futuros."
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "Precios"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "Su función"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "Perfil de su empresa"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "Configure su organización"
   }
 }

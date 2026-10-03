@@ -26,6 +26,7 @@ from . import serializers
 from . import tasks
 from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
+from .services.onboarding import CHOICES, clear_draft, save_draft_step, save_onboarding_step
 from .validators import validate_tax_id
 from .permissions import get_permission_codes_unavailable_for_country
 from .constants import (
@@ -266,6 +267,8 @@ class TenantType(DjangoObjectType):
     address = graphene.String()
     # Plain String (not the auto-generated choices enum): legacy rows store "" which isn't a VatStatus member
     vat_status = graphene.String()
+    onboarding_required = graphene.Boolean(required=True)
+    onboarding_completed = graphene.Boolean(required=True)
     membership = graphene.Field(TenantMembershipType)
     user_memberships = graphene.List(of_type=TenantMembershipType)
 
@@ -299,6 +302,20 @@ class TenantType(DjangoObjectType):
 
     def resolve_id(self, info):
         return to_global_id("TenantType", self.id)
+
+    @staticmethod
+    def resolve_onboarding_required(parent, info):
+        try:
+            return parent.onboarding_profile.is_required
+        except models.OrganizationOnboardingProfile.DoesNotExist:
+            return False
+
+    @staticmethod
+    def resolve_onboarding_completed(parent, info):
+        try:
+            return parent.onboarding_profile.completed_at is not None
+        except models.OrganizationOnboardingProfile.DoesNotExist:
+            return False
 
     @staticmethod
     def resolve_user_memberships(parent, info):
@@ -372,6 +389,114 @@ class CreateTenantMutation(mutations.CreateModelMutation):
     class Meta:
         serializer_class = serializers.TenantSerializer
         edge_class = TenantConnection.Edge
+
+
+class OnboardingCompanyInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
+    country = graphene.String(required=True)
+    nip = graphene.String(required=True)
+    company_name = graphene.String(required=True)
+    regon = graphene.String(required=True)
+    address = graphene.String(required=True)
+    vat_status = graphene.String(required=True)
+
+
+class OnboardingCompanyType(graphene.ObjectType):
+    name = graphene.String()
+    country = graphene.String()
+    nip = graphene.String()
+    company_name = graphene.String()
+    regon = graphene.String()
+    address = graphene.String()
+    vat_status = graphene.String()
+
+
+class OrganizationOnboardingProfileType(graphene.ObjectType):
+    company_data = graphene.Field(OnboardingCompanyType)
+    respondent_role = graphene.String()
+    customer_type = graphene.String()
+    revenue_models = graphene.List(graphene.String)
+    cost_drivers = graphene.List(graphene.String)
+    pricing = graphene.String()
+    main_goal = graphene.String()
+    current_step = graphene.Int()
+    is_required = graphene.Boolean()
+    completed_at = graphene.DateTime()
+
+
+class OrganizationOnboardingChoicesType(graphene.ObjectType):
+    respondent_roles = graphene.List(graphene.String)
+    customer_types = graphene.List(graphene.String)
+    revenue_models = graphene.List(graphene.String)
+    cost_drivers = graphene.List(graphene.String)
+    pricing_models = graphene.List(graphene.String)
+    main_goals = graphene.List(graphene.String)
+
+
+class SaveOrganizationOnboardingStepMutation(graphene.Mutation):
+    class Arguments:
+        tenant_id = graphene.ID(required=True)
+        step = graphene.Int(required=True)
+        respondent_role = graphene.String()
+        customer_type = graphene.String()
+        revenue_models = graphene.List(graphene.String)
+        cost_drivers = graphene.List(graphene.String)
+        pricing = graphene.String()
+        main_goal = graphene.String()
+
+    profile = graphene.Field(OrganizationOnboardingProfileType)
+
+    @classmethod
+    def mutate(cls, root, info, tenant_id, step, **answers):
+        _, pk = from_global_id(tenant_id)
+        tenant = get_object_or_404(models.Tenant, pk=pk)
+        if not models.has_tenant_access(info.context.user, tenant) or not models.user_has_permission(
+            info.context.user, tenant, "org.settings.edit"
+        ):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            profile = save_onboarding_step(tenant, step, **answers)
+        except DRFValidationError as error:
+            raise exceptions.GraphQlValidationError(error.detail)
+        return cls(profile=profile)
+
+
+class SaveOrganizationOnboardingDraftMutation(graphene.Mutation):
+    class Arguments:
+        step = graphene.Int(required=True)
+        company = OnboardingCompanyInput()
+        respondent_role = graphene.String()
+        customer_type = graphene.String()
+        revenue_models = graphene.List(graphene.String)
+        cost_drivers = graphene.List(graphene.String)
+        pricing = graphene.String()
+        main_goal = graphene.String()
+
+    profile = graphene.Field(OrganizationOnboardingProfileType)
+    tenant = graphene.Field(TenantType)
+
+    @classmethod
+    def mutate(cls, root, info, step, company=None, **answers):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        try:
+            profile, tenant = save_draft_step(user, step, company=company, context={"request": info.context}, **answers)
+        except DRFValidationError as error:
+            raise exceptions.GraphQlValidationError(error.detail)
+        return cls(profile=profile, tenant=tenant)
+
+
+class ClearOrganizationOnboardingDraftMutation(graphene.Mutation):
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        clear_draft(user)
+        return cls(ok=True)
 
 
 @action_logged(entity_type="tenant", action_type=ActionType.UPDATE)
@@ -1364,8 +1489,38 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
 
 
 class Query(graphene.ObjectType):
+    organization_onboarding_draft = graphene.Field(OrganizationOnboardingProfileType)
+    organization_onboarding_choices = graphene.Field(OrganizationOnboardingChoicesType)
+
+    @staticmethod
+    def resolve_organization_onboarding_choices(root, info):
+        if not info.context.user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return OrganizationOnboardingChoicesType(**CHOICES)
+
+    @staticmethod
+    def resolve_organization_onboarding_draft(root, info):
+        if not info.context.user.is_authenticated:
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        return models.OrganizationOnboardingProfile.objects.filter(draft_owner=info.context.user).first()
+
     all_tenants = graphene.relay.ConnectionField(TenantConnection)
     tenant = graphene.Field(TenantType, id=graphene.ID())
+    organization_onboarding_profile = graphene.Field(
+        OrganizationOnboardingProfileType, tenant_id=graphene.ID(required=True)
+    )
+
+    @staticmethod
+    def resolve_organization_onboarding_profile(root, info, tenant_id):
+        _, pk = from_global_id(tenant_id)
+        tenant = get_object_or_404(models.Tenant, pk=pk)
+        if not models.has_tenant_access(info.context.user, tenant) or not models.user_has_permission(
+            info.context.user, tenant, "org.settings.view"
+        ):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        if tenant.type != ConstantsTenantType.ORGANIZATION:
+            raise DRFValidationError({'tenant': 'Onboarding is available only for organizations.'})
+        return models.OrganizationOnboardingProfile.objects.filter(tenant_id=pk).first()
 
     # Action Logs
     all_action_logs = graphene.relay.ConnectionField(
@@ -1548,6 +1703,9 @@ class TenantOwnerMutation(graphene.ObjectType):
 
     # Organization settings - org.settings.edit
     update_tenant = permission_classes(requires("org.settings.edit"))(UpdateTenantMutation.Field())
+    save_organization_onboarding_step = permission_classes(requires("org.settings.edit"))(
+        SaveOrganizationOnboardingStepMutation.Field()
+    )
 
     # Delete organization - org.delete (owner-only)
     delete_tenant = permission_classes(
@@ -1590,6 +1748,8 @@ class Mutation(graphene.ObjectType):
     - delete_tenant_membership: Requires members.remove permission
     """
 
+    save_organization_onboarding_draft = SaveOrganizationOnboardingDraftMutation.Field()
+    clear_organization_onboarding_draft = ClearOrganizationOnboardingDraftMutation.Field()
     create_tenant = CreateTenantMutation.Field()
     accept_tenant_invitation = AcceptTenantInvitationMutation.Field()
     decline_tenant_invitation = DeclineTenantInvitationMutation.Field()

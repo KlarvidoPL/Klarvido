@@ -4,13 +4,15 @@ import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast';
-import { Settings } from 'lucide-react';
+import { Building2, Settings } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { Link } from 'react-router-dom';
 
 import { TenantDangerZone } from '../../../components/tenantDangerZone';
 import { TenantForm } from '../../../components/tenantForm';
 import { TenantFormFields } from '../../../components/tenantForm/tenantForm.component';
-import { usePermissionCheck } from '../../../hooks';
+import { RoutesConfig } from '../../../config/routes';
+import { useGenerateTenantPath, usePermissionCheck } from '../../../hooks';
 import { useCurrentTenant } from '../../../providers';
 import { updateTenantMutation } from './tenantGeneralSettings.graphql';
 
@@ -19,6 +21,7 @@ export const TenantGeneralSettings = () => {
   const { reload: reloadCommonQuery } = useCommonQuery();
   const { toast } = useToast();
   const intl = useIntl();
+  const generateTenantPath = useGenerateTenantPath();
 
   // Permission checks
   const { hasPermission: canEditSettings } = usePermissionCheck('org.settings.edit');
@@ -67,6 +70,36 @@ export const TenantGeneralSettings = () => {
 
   return (
     <div className="space-y-6">
+      {isOrganizationType && canEditSettings && (
+        <Card>
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">
+                  <FormattedMessage defaultMessage="Business profile" id="Onboarding / Settings title" />
+                </CardTitle>
+                <CardDescription className="mt-0.5">
+                  <FormattedMessage
+                    defaultMessage="Complete or update your organization onboarding answers."
+                    id="Onboarding / Settings description"
+                  />
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Link
+              to={generateTenantPath(RoutesConfig.tenant.onboarding)}
+              className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              <FormattedMessage defaultMessage="Open business profile" id="Onboarding / Settings action" />
+            </Link>
+          </CardContent>
+        </Card>
+      )}
       {/* General Settings Card */}
       <Card>
         <CardHeader className="pb-4">

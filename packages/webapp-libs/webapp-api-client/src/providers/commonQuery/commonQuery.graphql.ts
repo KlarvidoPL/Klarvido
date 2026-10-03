@@ -36,6 +36,8 @@ export const commonQueryTenantItemFragment = gql(/* GraphQL */ `
     regon
     address
     vatStatus
+    onboardingRequired
+    onboardingCompleted
     membership {
       ...commonQueryMembershipFragment
     }

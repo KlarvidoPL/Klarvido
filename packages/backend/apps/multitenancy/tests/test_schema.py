@@ -15,7 +15,15 @@ from ..constants import (
     SystemRoleType,
     VatStatus,
 )
-from ..models import ActionLog, Tenant, TenantMembership, TenantMembershipRole, OrganizationRole, Permission
+from ..models import (
+    ActionLog,
+    Tenant,
+    TenantMembership,
+    TenantMembershipRole,
+    OrganizationRole,
+    OrganizationOnboardingProfile,
+    Permission,
+)
 from ..permissions import create_system_roles_for_tenant
 from ..services.mf_whitelist import CompanyDetails
 
@@ -156,6 +164,9 @@ class TestCreateTenantMutation:
         assert response_data["billingEmail"] == "test@example.com"
         assert response_data["nip"] == VALID_NIP
         assert response_data["membership"]["role"] == TenantUserRole.OWNER
+        profile = OrganizationOnboardingProfile.objects.get(tenant__name="Test")
+        assert profile.is_required is True
+        assert profile.respondent_role == ""
 
     def test_create_new_tenant_with_company_details(self, graphene_client, user):
         graphene_client.force_authenticate(user)
