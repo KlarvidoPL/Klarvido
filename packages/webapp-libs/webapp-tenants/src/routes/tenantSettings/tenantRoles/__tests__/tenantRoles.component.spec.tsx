@@ -85,6 +85,13 @@ const createRolesMock = (
     },
   });
 
+const createRolesErrorMock = () =>
+  composeMockedQueryResult(allOrganizationRolesQuery, {
+    variables: { tenantId: TENANT_ID },
+    data: null as any,
+    errors: [{ message: "Enum 'SystemRoleType' cannot represent value: ''" } as any],
+  });
+
 const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.roles, { tenantId: TENANT_ID });
 const rolesPath = (routerProps.initialEntries as string[])?.[0] ?? '';
 
@@ -169,6 +176,16 @@ describe('TenantRoles: Component', () => {
 
     expect(await screen.findByText(/no custom roles yet/i)).toBeInTheDocument();
     expect(await screen.findByText(/create custom roles to fine-tune member access/i)).toBeInTheDocument();
+  });
+
+  it('should show an error state instead of an empty list when the roles query fails', async () => {
+    const permissionsMock = createPermissionsMock();
+    const rolesErrorMock = createRolesErrorMock();
+
+    renderComponent([permissionsMock, rolesErrorMock]);
+
+    expect(await screen.findByText(/failed to load roles/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no custom roles yet/i)).not.toBeInTheDocument();
   });
 
 });

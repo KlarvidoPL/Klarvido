@@ -2660,6 +2660,9 @@
   "Membership Entry / ResendInvitation / Success message": {
     "defaultMessage": "निमंत्रण सफलतापूर्वक दोबारा भेजा गया!"
   },
+  "Membership Entry / Roles load error": {
+    "defaultMessage": "भूमिकाएं लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।"
+  },
   "Membership Entry / Save Roles": {
     "defaultMessage": "भूमिकाएँ सहेजें"
   },
@@ -3167,6 +3170,81 @@
   "Roles / Cancel Button": {
     "defaultMessage": "रद्द करें"
   },
+  "Roles / Category / Backup / Description": {
+    "defaultMessage": "संगठन का बैकअप और पुनर्स्थापना"
+  },
+  "Roles / Category / Backup / Label": {
+    "defaultMessage": "बैकअप"
+  },
+  "Roles / Category / Billing / Description": {
+    "defaultMessage": "सदस्यता और भुगतान प्रबंधन"
+  },
+  "Roles / Category / Billing / Label": {
+    "defaultMessage": "बिलिंग"
+  },
+  "Roles / Category / Dashboard / Description": {
+    "defaultMessage": "मुख्य एप्लिकेशन डैशबोर्ड"
+  },
+  "Roles / Category / Dashboard / Label": {
+    "defaultMessage": "डैशबोर्ड"
+  },
+  "Roles / Category / Features / Description": {
+    "defaultMessage": "AI, दस्तावेज़ और अन्य सुविधाएं"
+  },
+  "Roles / Category / Features / Label": {
+    "defaultMessage": "सुविधाएं"
+  },
+  "Roles / Category / Management / Description": {
+    "defaultMessage": "वित्त और प्रबंधन उपकरण"
+  },
+  "Roles / Category / Management / Label": {
+    "defaultMessage": "प्रबंधन डैशबोर्ड"
+  },
+  "Roles / Category / Members / Description": {
+    "defaultMessage": "टीम सदस्य प्रबंधन"
+  },
+  "Roles / Category / Members / Label": {
+    "defaultMessage": "सदस्य"
+  },
+  "Roles / Category / Organization / Description": {
+    "defaultMessage": "संगठन सेटिंग्स और कॉन्फ़िगरेशन"
+  },
+  "Roles / Category / Organization / Label": {
+    "defaultMessage": "संगठन"
+  },
+  "Roles / Category / Security / Description": {
+    "defaultMessage": "सुरक्षा और प्रमाणीकरण सेटिंग्स"
+  },
+  "Roles / Category / Security / Label": {
+    "defaultMessage": "सुरक्षा"
+  },
+  "Roles / Color / Blue": {
+    "defaultMessage": "नीला"
+  },
+  "Roles / Color / Gray": {
+    "defaultMessage": "धूसर"
+  },
+  "Roles / Color / Green": {
+    "defaultMessage": "हरा"
+  },
+  "Roles / Color / Orange": {
+    "defaultMessage": "नारंगी"
+  },
+  "Roles / Color / Pink": {
+    "defaultMessage": "गुलाबी"
+  },
+  "Roles / Color / Purple": {
+    "defaultMessage": "बैंगनी"
+  },
+  "Roles / Color / Red": {
+    "defaultMessage": "लाल"
+  },
+  "Roles / Color / Teal": {
+    "defaultMessage": "फ़िरोज़ी"
+  },
+  "Roles / Color / Yellow": {
+    "defaultMessage": "पीला"
+  },
   "Roles / Color Label": {
     "defaultMessage": "रंग"
   },
@@ -3212,6 +3290,9 @@
   "Roles / Description Label": {
     "defaultMessage": "विवरण"
   },
+  "Roles / Description Optional Suffix": {
+    "defaultMessage": "(वैकल्पिक)"
+  },
   "Roles / Description Placeholder": {
     "defaultMessage": "बताएँ कि यह भूमिका किस लिए है..."
   },
@@ -3223,6 +3304,12 @@
   },
   "Roles / Edit Title": {
     "defaultMessage": "Role संपादित करें"
+  },
+  "Roles / Load Error": {
+    "defaultMessage": "भूमिकाएं लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।"
+  },
+  "Roles / Load Error Retry": {
+    "defaultMessage": "पुनः प्रयास करें"
   },
   "Roles / Member singular": {
     "defaultMessage": "सदस्य"
@@ -3244,6 +3331,156 @@
   },
   "Roles / No Custom Roles Description": {
     "defaultMessage": "सदस्यों की पहुँच और अनुमतियों को बेहतर नियंत्रित करने के लिए कस्टम भूमिकाएँ बनाएँ"
+  },
+  "Roles / Permission / backup.manage / Description": {
+    "defaultMessage": "बैकअप कॉन्फ़िगर करें, मैन्युअल बैकअप शुरू करें और बैकअप सेटिंग्स प्रबंधित करें"
+  },
+  "Roles / Permission / backup.manage / Name": {
+    "defaultMessage": "बैकअप प्रबंधित करें"
+  },
+  "Roles / Permission / backup.view / Description": {
+    "defaultMessage": "बैकअप कॉन्फ़िगरेशन और इतिहास देखें"
+  },
+  "Roles / Permission / backup.view / Name": {
+    "defaultMessage": "बैकअप सेटिंग्स देखें"
+  },
+  "Roles / Permission / billing.manage / Description": {
+    "defaultMessage": "सदस्यता योजना बदलें, भुगतान विधियां अपडेट करें और बिलिंग प्रबंधित करें"
+  },
+  "Roles / Permission / billing.manage / Name": {
+    "defaultMessage": "बिलिंग प्रबंधित करें"
+  },
+  "Roles / Permission / billing.view / Description": {
+    "defaultMessage": "सदस्यता स्थिति, चालान और भुगतान विधियां देखें"
+  },
+  "Roles / Permission / billing.view / Name": {
+    "defaultMessage": "बिलिंग देखें"
+  },
+  "Roles / Permission / dashboard.view / Description": {
+    "defaultMessage": "मुख्य ऐप डैशबोर्ड/होम पेज तक पहुंचें"
+  },
+  "Roles / Permission / dashboard.view / Name": {
+    "defaultMessage": "डैशबोर्ड देखें"
+  },
+  "Roles / Permission / features.ai.use / Description": {
+    "defaultMessage": "OpenAI एकीकरण और AI-संचालित सुविधाओं तक पहुंच प्राप्त करें और उपयोग करें"
+  },
+  "Roles / Permission / features.ai.use / Name": {
+    "defaultMessage": "AI सुविधाओं का उपयोग करें"
+  },
+  "Roles / Permission / features.content.view / Description": {
+    "defaultMessage": "CMS से सामग्री आइटम देखें"
+  },
+  "Roles / Permission / features.content.view / Name": {
+    "defaultMessage": "सामग्री आइटम देखें"
+  },
+  "Roles / Permission / features.crud.manage / Description": {
+    "defaultMessage": "CRUD डेमो आइटम बनाएं, संपादित करें और हटाएं"
+  },
+  "Roles / Permission / features.crud.manage / Name": {
+    "defaultMessage": "CRUD डेमो आइटम प्रबंधित करें"
+  },
+  "Roles / Permission / features.crud.view / Description": {
+    "defaultMessage": "CRUD डेमो आइटम देखें"
+  },
+  "Roles / Permission / features.crud.view / Name": {
+    "defaultMessage": "CRUD डेमो आइटम देखें"
+  },
+  "Roles / Permission / features.documents.manage / Description": {
+    "defaultMessage": "दस्तावेज़ अपलोड करें, संपादित करें और हटाएं"
+  },
+  "Roles / Permission / features.documents.manage / Name": {
+    "defaultMessage": "दस्तावेज़ प्रबंधित करें"
+  },
+  "Roles / Permission / features.documents.view / Description": {
+    "defaultMessage": "अपलोड किए गए दस्तावेज़ देखें"
+  },
+  "Roles / Permission / features.documents.view / Name": {
+    "defaultMessage": "दस्तावेज़ देखें"
+  },
+  "Roles / Permission / members.invite / Description": {
+    "defaultMessage": "नए सदस्यों को आमंत्रण भेजें"
+  },
+  "Roles / Permission / members.invite / Name": {
+    "defaultMessage": "सदस्यों को आमंत्रित करें"
+  },
+  "Roles / Permission / members.remove / Description": {
+    "defaultMessage": "संगठन से सदस्यों को हटाएं"
+  },
+  "Roles / Permission / members.remove / Name": {
+    "defaultMessage": "सदस्यों को हटाएं"
+  },
+  "Roles / Permission / members.roles.edit / Description": {
+    "defaultMessage": "मौजूदा सदस्यों को सौंपी गई भूमिकाएं बदलें"
+  },
+  "Roles / Permission / members.roles.edit / Name": {
+    "defaultMessage": "सदस्य भूमिकाएं संपादित करें"
+  },
+  "Roles / Permission / members.view / Description": {
+    "defaultMessage": "संगठन के सदस्यों और उनकी भूमिकाओं की सूची देखें"
+  },
+  "Roles / Permission / members.view / Name": {
+    "defaultMessage": "सदस्य देखें"
+  },
+  "Roles / Permission / org.delete / Description": {
+    "defaultMessage": "संगठन और उसके सभी डेटा को स्थायी रूप से हटाएं"
+  },
+  "Roles / Permission / org.delete / Name": {
+    "defaultMessage": "संगठन हटाएं"
+  },
+  "Roles / Permission / org.roles.manage / Description": {
+    "defaultMessage": "कस्टम भूमिकाएं बनाएं, संपादित करें और हटाएं"
+  },
+  "Roles / Permission / org.roles.manage / Name": {
+    "defaultMessage": "संगठन भूमिकाएं प्रबंधित करें"
+  },
+  "Roles / Permission / org.roles.view / Description": {
+    "defaultMessage": "परिभाषित भूमिकाएं और उनकी अनुमतियां देखें"
+  },
+  "Roles / Permission / org.roles.view / Name": {
+    "defaultMessage": "संगठन भूमिकाएं देखें"
+  },
+  "Roles / Permission / org.settings.edit / Description": {
+    "defaultMessage": "संगठन का नाम, बिलिंग ईमेल और सामान्य सेटिंग्स संशोधित करें"
+  },
+  "Roles / Permission / org.settings.edit / Name": {
+    "defaultMessage": "संगठन सेटिंग्स संपादित करें"
+  },
+  "Roles / Permission / org.settings.view / Description": {
+    "defaultMessage": "संगठन का नाम, बिलिंग ईमेल और सामान्य सेटिंग्स देखें"
+  },
+  "Roles / Permission / org.settings.view / Name": {
+    "defaultMessage": "संगठन सेटिंग्स देखें"
+  },
+  "Roles / Permission / security.logs.export / Description": {
+    "defaultMessage": "गतिविधि लॉग को CSV या अन्य प्रारूपों में निर्यात करें"
+  },
+  "Roles / Permission / security.logs.export / Name": {
+    "defaultMessage": "गतिविधि लॉग निर्यात करें"
+  },
+  "Roles / Permission / security.logs.view / Description": {
+    "defaultMessage": "संगठन में की गई कार्रवाइयों के ऑडिट लॉग देखें"
+  },
+  "Roles / Permission / security.logs.view / Name": {
+    "defaultMessage": "गतिविधि लॉग देखें"
+  },
+  "Roles / Permission / security.passkeys.manage / Description": {
+    "defaultMessage": "संगठन की पासकी नीतियां देखें और प्रबंधित करें"
+  },
+  "Roles / Permission / security.passkeys.manage / Name": {
+    "defaultMessage": "पासकी प्रबंधित करें"
+  },
+  "Roles / Permission / security.sso.manage / Description": {
+    "defaultMessage": "सिंगल साइन-ऑन (SSO) कनेक्शन और SCIM प्रोविज़निंग कॉन्फ़िगर करें"
+  },
+  "Roles / Permission / security.sso.manage / Name": {
+    "defaultMessage": "SSO प्रबंधित करें"
+  },
+  "Roles / Permission / security.view / Description": {
+    "defaultMessage": "SSO कनेक्शन, पासकी और सुरक्षा कॉन्फ़िगरेशन देखें"
+  },
+  "Roles / Permission / security.view / Name": {
+    "defaultMessage": "सुरक्षा सेटिंग्स देखें"
   },
   "Roles / Permission Required": {
     "defaultMessage": "कम से कम एक अनुमति आवश्यक है"
@@ -3277,6 +3514,24 @@
   },
   "Roles / System Badge": {
     "defaultMessage": "सिस्टम"
+  },
+  "Roles / System Role / Administrator / Description": {
+    "defaultMessage": "संगठन सेटिंग्स और सदस्यों को प्रबंधित करें"
+  },
+  "Roles / System Role / Administrator / Name": {
+    "defaultMessage": "व्यवस्थापक"
+  },
+  "Roles / System Role / Member / Description": {
+    "defaultMessage": "संगठन डेटा तक देखने की पहुंच"
+  },
+  "Roles / System Role / Member / Name": {
+    "defaultMessage": "सदस्य"
+  },
+  "Roles / System Role / Owner / Description": {
+    "defaultMessage": "संगठन की सभी सुविधाओं तक पूर्ण पहुंच"
+  },
+  "Roles / System Role / Owner / Name": {
+    "defaultMessage": "स्वामी"
   },
   "Roles / System Roles Header": {
     "defaultMessage": "सिस्टम भूमिकाएँ"
@@ -4379,11 +4634,20 @@
   "Tenant invitation form / Roles label": {
     "defaultMessage": "रोल:"
   },
+  "Tenant invitation form / Roles load error": {
+    "defaultMessage": "भूमिकाएं लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।"
+  },
+  "Tenant invitation form / Roles loading": {
+    "defaultMessage": "लोड हो रहा है..."
+  },
   "Tenant invitation form / Roles placeholder": {
     "defaultMessage": "रोल चुनें"
   },
   "Tenant invitation form / Submit button": {
     "defaultMessage": "आमंत्रित करें"
+  },
+  "Tenant invitation form / System role suffix": {
+    "defaultMessage": "(सिस्टम)"
   },
   "Tenant members list / Actions": {
     "defaultMessage": "क्रियाएँ"

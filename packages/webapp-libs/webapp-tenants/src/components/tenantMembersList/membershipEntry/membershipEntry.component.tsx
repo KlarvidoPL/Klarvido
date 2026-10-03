@@ -102,7 +102,7 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
   const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(new Set());
 
   // Fetch all organization roles for role assignment
-  const { data: rolesData } = useQuery(allOrganizationRolesQuery, {
+  const { data: rolesData, error: rolesError } = useQuery(allOrganizationRolesQuery, {
     variables: { tenantId },
     skip: !tenantId,
   });
@@ -387,6 +387,14 @@ export const MembershipEntry = ({ membership, className, onAfterUpdate }: Member
           </DialogHeader>
 
           <div className="space-y-2 max-h-64 overflow-y-auto py-4">
+            {rolesError && (
+              <p className="text-sm text-destructive dark:text-red-400">
+                <FormattedMessage
+                  defaultMessage="Failed to load roles. Please try again."
+                  id="Membership Entry / Roles load error"
+                />
+              </p>
+            )}
             {availableRoles.map((role) => {
               const isSelected = selectedRoleIds.has(role.id);
 

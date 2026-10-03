@@ -2660,6 +2660,9 @@
   "Membership Entry / ResendInvitation / Success message": {
     "defaultMessage": "邀请已成功重新发送！"
   },
+  "Membership Entry / Roles load error": {
+    "defaultMessage": "角色加载失败，请重试。"
+  },
   "Membership Entry / Save Roles": {
     "defaultMessage": "保存角色"
   },
@@ -3167,6 +3170,81 @@
   "Roles / Cancel Button": {
     "defaultMessage": "取消"
   },
+  "Roles / Category / Backup / Description": {
+    "defaultMessage": "组织备份与恢复"
+  },
+  "Roles / Category / Backup / Label": {
+    "defaultMessage": "备份"
+  },
+  "Roles / Category / Billing / Description": {
+    "defaultMessage": "订阅与付款管理"
+  },
+  "Roles / Category / Billing / Label": {
+    "defaultMessage": "账单"
+  },
+  "Roles / Category / Dashboard / Description": {
+    "defaultMessage": "应用程序主仪表盘"
+  },
+  "Roles / Category / Dashboard / Label": {
+    "defaultMessage": "仪表盘"
+  },
+  "Roles / Category / Features / Description": {
+    "defaultMessage": "AI、文档及其他功能"
+  },
+  "Roles / Category / Features / Label": {
+    "defaultMessage": "功能"
+  },
+  "Roles / Category / Management / Description": {
+    "defaultMessage": "财务与管理工具"
+  },
+  "Roles / Category / Management / Label": {
+    "defaultMessage": "管理仪表盘"
+  },
+  "Roles / Category / Members / Description": {
+    "defaultMessage": "团队成员管理"
+  },
+  "Roles / Category / Members / Label": {
+    "defaultMessage": "成员"
+  },
+  "Roles / Category / Organization / Description": {
+    "defaultMessage": "组织设置与配置"
+  },
+  "Roles / Category / Organization / Label": {
+    "defaultMessage": "组织"
+  },
+  "Roles / Category / Security / Description": {
+    "defaultMessage": "安全与身份验证设置"
+  },
+  "Roles / Category / Security / Label": {
+    "defaultMessage": "安全"
+  },
+  "Roles / Color / Blue": {
+    "defaultMessage": "蓝色"
+  },
+  "Roles / Color / Gray": {
+    "defaultMessage": "灰色"
+  },
+  "Roles / Color / Green": {
+    "defaultMessage": "绿色"
+  },
+  "Roles / Color / Orange": {
+    "defaultMessage": "橙色"
+  },
+  "Roles / Color / Pink": {
+    "defaultMessage": "粉色"
+  },
+  "Roles / Color / Purple": {
+    "defaultMessage": "紫色"
+  },
+  "Roles / Color / Red": {
+    "defaultMessage": "红色"
+  },
+  "Roles / Color / Teal": {
+    "defaultMessage": "青色"
+  },
+  "Roles / Color / Yellow": {
+    "defaultMessage": "黄色"
+  },
   "Roles / Color Label": {
     "defaultMessage": "颜色"
   },
@@ -3212,6 +3290,9 @@
   "Roles / Description Label": {
     "defaultMessage": "描述"
   },
+  "Roles / Description Optional Suffix": {
+    "defaultMessage": "（可选）"
+  },
   "Roles / Description Placeholder": {
     "defaultMessage": "描述此角色的用途…"
   },
@@ -3223,6 +3304,12 @@
   },
   "Roles / Edit Title": {
     "defaultMessage": "编辑角色"
+  },
+  "Roles / Load Error": {
+    "defaultMessage": "角色加载失败，请重试。"
+  },
+  "Roles / Load Error Retry": {
+    "defaultMessage": "重试"
   },
   "Roles / Member singular": {
     "defaultMessage": "成员"
@@ -3244,6 +3331,156 @@
   },
   "Roles / No Custom Roles Description": {
     "defaultMessage": "创建自定义角色以精细控制成员访问和权限"
+  },
+  "Roles / Permission / backup.manage / Description": {
+    "defaultMessage": "配置备份、手动触发备份并管理备份设置"
+  },
+  "Roles / Permission / backup.manage / Name": {
+    "defaultMessage": "管理备份"
+  },
+  "Roles / Permission / backup.view / Description": {
+    "defaultMessage": "查看备份配置和历史记录"
+  },
+  "Roles / Permission / backup.view / Name": {
+    "defaultMessage": "查看备份设置"
+  },
+  "Roles / Permission / billing.manage / Description": {
+    "defaultMessage": "更改订阅计划、更新付款方式并管理账单"
+  },
+  "Roles / Permission / billing.manage / Name": {
+    "defaultMessage": "管理账单"
+  },
+  "Roles / Permission / billing.view / Description": {
+    "defaultMessage": "查看订阅状态、发票和付款方式"
+  },
+  "Roles / Permission / billing.view / Name": {
+    "defaultMessage": "查看账单"
+  },
+  "Roles / Permission / dashboard.view / Description": {
+    "defaultMessage": "访问应用程序的主仪表盘/主页"
+  },
+  "Roles / Permission / dashboard.view / Name": {
+    "defaultMessage": "查看仪表盘"
+  },
+  "Roles / Permission / features.ai.use / Description": {
+    "defaultMessage": "访问并使用 OpenAI 集成及 AI 驱动的功能"
+  },
+  "Roles / Permission / features.ai.use / Name": {
+    "defaultMessage": "使用 AI 功能"
+  },
+  "Roles / Permission / features.content.view / Description": {
+    "defaultMessage": "查看来自 CMS 的内容项"
+  },
+  "Roles / Permission / features.content.view / Name": {
+    "defaultMessage": "查看内容项"
+  },
+  "Roles / Permission / features.crud.manage / Description": {
+    "defaultMessage": "创建、编辑和删除 CRUD 演示项"
+  },
+  "Roles / Permission / features.crud.manage / Name": {
+    "defaultMessage": "管理 CRUD 演示项"
+  },
+  "Roles / Permission / features.crud.view / Description": {
+    "defaultMessage": "查看 CRUD 演示项"
+  },
+  "Roles / Permission / features.crud.view / Name": {
+    "defaultMessage": "查看 CRUD 演示项"
+  },
+  "Roles / Permission / features.documents.manage / Description": {
+    "defaultMessage": "上传、编辑和删除文档"
+  },
+  "Roles / Permission / features.documents.manage / Name": {
+    "defaultMessage": "管理文档"
+  },
+  "Roles / Permission / features.documents.view / Description": {
+    "defaultMessage": "查看已上传的文档"
+  },
+  "Roles / Permission / features.documents.view / Name": {
+    "defaultMessage": "查看文档"
+  },
+  "Roles / Permission / members.invite / Description": {
+    "defaultMessage": "向新成员发送邀请"
+  },
+  "Roles / Permission / members.invite / Name": {
+    "defaultMessage": "邀请成员"
+  },
+  "Roles / Permission / members.remove / Description": {
+    "defaultMessage": "将成员从组织中移除"
+  },
+  "Roles / Permission / members.remove / Name": {
+    "defaultMessage": "移除成员"
+  },
+  "Roles / Permission / members.roles.edit / Description": {
+    "defaultMessage": "更改现有成员分配的角色"
+  },
+  "Roles / Permission / members.roles.edit / Name": {
+    "defaultMessage": "编辑成员角色"
+  },
+  "Roles / Permission / members.view / Description": {
+    "defaultMessage": "查看组织成员列表及其角色"
+  },
+  "Roles / Permission / members.view / Name": {
+    "defaultMessage": "查看成员"
+  },
+  "Roles / Permission / org.delete / Description": {
+    "defaultMessage": "永久删除组织及其所有数据"
+  },
+  "Roles / Permission / org.delete / Name": {
+    "defaultMessage": "删除组织"
+  },
+  "Roles / Permission / org.roles.manage / Description": {
+    "defaultMessage": "创建、编辑和删除自定义角色"
+  },
+  "Roles / Permission / org.roles.manage / Name": {
+    "defaultMessage": "管理组织角色"
+  },
+  "Roles / Permission / org.roles.view / Description": {
+    "defaultMessage": "查看已定义的角色及其权限"
+  },
+  "Roles / Permission / org.roles.view / Name": {
+    "defaultMessage": "查看组织角色"
+  },
+  "Roles / Permission / org.settings.edit / Description": {
+    "defaultMessage": "修改组织名称、账单邮箱和常规设置"
+  },
+  "Roles / Permission / org.settings.edit / Name": {
+    "defaultMessage": "编辑组织设置"
+  },
+  "Roles / Permission / org.settings.view / Description": {
+    "defaultMessage": "查看组织名称、账单邮箱和常规设置"
+  },
+  "Roles / Permission / org.settings.view / Name": {
+    "defaultMessage": "查看组织设置"
+  },
+  "Roles / Permission / security.logs.export / Description": {
+    "defaultMessage": "将活动日志导出为 CSV 或其他格式"
+  },
+  "Roles / Permission / security.logs.export / Name": {
+    "defaultMessage": "导出活动日志"
+  },
+  "Roles / Permission / security.logs.view / Description": {
+    "defaultMessage": "查看组织中所执行操作的审计日志"
+  },
+  "Roles / Permission / security.logs.view / Name": {
+    "defaultMessage": "查看活动日志"
+  },
+  "Roles / Permission / security.passkeys.manage / Description": {
+    "defaultMessage": "查看和管理组织的通行密钥（Passkey）策略"
+  },
+  "Roles / Permission / security.passkeys.manage / Name": {
+    "defaultMessage": "管理通行密钥"
+  },
+  "Roles / Permission / security.sso.manage / Description": {
+    "defaultMessage": "配置单点登录（SSO）连接和 SCIM 预配置"
+  },
+  "Roles / Permission / security.sso.manage / Name": {
+    "defaultMessage": "管理单点登录"
+  },
+  "Roles / Permission / security.view / Description": {
+    "defaultMessage": "查看 SSO 连接、通行密钥和安全配置"
+  },
+  "Roles / Permission / security.view / Name": {
+    "defaultMessage": "查看安全设置"
   },
   "Roles / Permission Required": {
     "defaultMessage": "至少需要选择一项权限"
@@ -3277,6 +3514,24 @@
   },
   "Roles / System Badge": {
     "defaultMessage": "系统"
+  },
+  "Roles / System Role / Administrator / Description": {
+    "defaultMessage": "管理组织设置和成员"
+  },
+  "Roles / System Role / Administrator / Name": {
+    "defaultMessage": "管理员"
+  },
+  "Roles / System Role / Member / Description": {
+    "defaultMessage": "可查看组织数据"
+  },
+  "Roles / System Role / Member / Name": {
+    "defaultMessage": "成员"
+  },
+  "Roles / System Role / Owner / Description": {
+    "defaultMessage": "拥有组织所有功能的完全访问权限"
+  },
+  "Roles / System Role / Owner / Name": {
+    "defaultMessage": "所有者"
   },
   "Roles / System Roles Header": {
     "defaultMessage": "系统角色"
@@ -4379,11 +4634,20 @@
   "Tenant invitation form / Roles label": {
     "defaultMessage": "角色："
   },
+  "Tenant invitation form / Roles load error": {
+    "defaultMessage": "角色加载失败，请重试。"
+  },
+  "Tenant invitation form / Roles loading": {
+    "defaultMessage": "加载中..."
+  },
   "Tenant invitation form / Roles placeholder": {
     "defaultMessage": "选择角色"
   },
   "Tenant invitation form / Submit button": {
     "defaultMessage": "邀请"
+  },
+  "Tenant invitation form / System role suffix": {
+    "defaultMessage": "（系统）"
   },
   "Tenant members list / Actions": {
     "defaultMessage": "操作"

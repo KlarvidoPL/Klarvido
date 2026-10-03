@@ -36,6 +36,7 @@ import { TabsContent } from '@sb/webapp-core/components/ui/tabs';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { cn } from '@sb/webapp-core/lib/utils';
 import {
+  AlertTriangle,
   BarChart3,
   Check,
   ChevronDown,
@@ -95,7 +96,7 @@ const SimpleCheckbox = ({
   </CheckboxPrimitive.Root>
 );
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { RoutesConfig } from '../../../config/routes';
 import { useGenerateTenantPath, usePermissionCheck } from '../../../hooks';
@@ -110,55 +111,373 @@ import {
 
 // Role color options with better visual design
 const ROLE_COLORS = [
-  { value: 'BLUE', label: 'Blue', className: 'bg-blue-500', ring: 'ring-blue-500/30' },
-  { value: 'GREEN', label: 'Green', className: 'bg-emerald-500', ring: 'ring-emerald-500/30' },
-  { value: 'RED', label: 'Red', className: 'bg-rose-500', ring: 'ring-rose-500/30' },
-  { value: 'YELLOW', label: 'Yellow', className: 'bg-amber-500', ring: 'ring-amber-500/30' },
-  { value: 'PURPLE', label: 'Purple', className: 'bg-violet-500', ring: 'ring-violet-500/30' },
-  { value: 'ORANGE', label: 'Orange', className: 'bg-orange-500', ring: 'ring-orange-500/30' },
-  { value: 'PINK', label: 'Pink', className: 'bg-pink-500', ring: 'ring-pink-500/30' },
-  { value: 'TEAL', label: 'Teal', className: 'bg-teal-500', ring: 'ring-teal-500/30' },
-  { value: 'GRAY', label: 'Gray', className: 'bg-slate-500', ring: 'ring-slate-500/30' },
+  { value: 'BLUE', className: 'bg-blue-500', ring: 'ring-blue-500/30' },
+  { value: 'GREEN', className: 'bg-emerald-500', ring: 'ring-emerald-500/30' },
+  { value: 'RED', className: 'bg-rose-500', ring: 'ring-rose-500/30' },
+  { value: 'YELLOW', className: 'bg-amber-500', ring: 'ring-amber-500/30' },
+  { value: 'PURPLE', className: 'bg-violet-500', ring: 'ring-violet-500/30' },
+  { value: 'ORANGE', className: 'bg-orange-500', ring: 'ring-orange-500/30' },
+  { value: 'PINK', className: 'bg-pink-500', ring: 'ring-pink-500/30' },
+  { value: 'TEAL', className: 'bg-teal-500', ring: 'ring-teal-500/30' },
+  { value: 'GRAY', className: 'bg-slate-500', ring: 'ring-slate-500/30' },
 ] as const;
 
-// Permission category configuration (UPPERCASE keys; API returns lowercase, normalized via toCategoryKey)
-const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ReactNode; description: string }> = {
+// Translated display name for a role color value (ROLE_COLORS above only carries styling)
+const getRoleColorLabel = (intl: IntlShape, value: string): string => {
+  switch (value) {
+    case 'BLUE':
+      return intl.formatMessage({ defaultMessage: 'Blue', id: 'Roles / Color / Blue' });
+    case 'GREEN':
+      return intl.formatMessage({ defaultMessage: 'Green', id: 'Roles / Color / Green' });
+    case 'RED':
+      return intl.formatMessage({ defaultMessage: 'Red', id: 'Roles / Color / Red' });
+    case 'YELLOW':
+      return intl.formatMessage({ defaultMessage: 'Yellow', id: 'Roles / Color / Yellow' });
+    case 'PURPLE':
+      return intl.formatMessage({ defaultMessage: 'Purple', id: 'Roles / Color / Purple' });
+    case 'ORANGE':
+      return intl.formatMessage({ defaultMessage: 'Orange', id: 'Roles / Color / Orange' });
+    case 'PINK':
+      return intl.formatMessage({ defaultMessage: 'Pink', id: 'Roles / Color / Pink' });
+    case 'TEAL':
+      return intl.formatMessage({ defaultMessage: 'Teal', id: 'Roles / Color / Teal' });
+    case 'GRAY':
+      return intl.formatMessage({ defaultMessage: 'Gray', id: 'Roles / Color / Gray' });
+    default:
+      return value;
+  }
+};
+
+// Permission category configuration (UPPERCASE keys; API returns lowercase, normalized via toCategoryKey).
+// Built from `intl` rather than a static object so labels/descriptions are translated; categories not
+// covered here (a future app-registered category) fall back to the untranslated API text - same as before.
+const getCategoryConfig = (
+  intl: IntlShape
+): Record<string, { label: string; icon: React.ReactNode; description: string }> => ({
   ORGANIZATION: {
-    label: 'Organization',
+    label: intl.formatMessage({ defaultMessage: 'Organization', id: 'Roles / Category / Organization / Label' }),
     icon: <Settings className="h-4 w-4" />,
-    description: 'Organization settings and configuration',
+    description: intl.formatMessage({
+      defaultMessage: 'Organization settings and configuration',
+      id: 'Roles / Category / Organization / Description',
+    }),
   },
   MEMBERS: {
-    label: 'Members',
+    label: intl.formatMessage({ defaultMessage: 'Members', id: 'Roles / Category / Members / Label' }),
     icon: <Users className="h-4 w-4" />,
-    description: 'Team member management',
+    description: intl.formatMessage({
+      defaultMessage: 'Team member management',
+      id: 'Roles / Category / Members / Description',
+    }),
   },
   SECURITY: {
-    label: 'Security',
+    label: intl.formatMessage({ defaultMessage: 'Security', id: 'Roles / Category / Security / Label' }),
     icon: <Lock className="h-4 w-4" />,
-    description: 'Security and authentication settings',
+    description: intl.formatMessage({
+      defaultMessage: 'Security and authentication settings',
+      id: 'Roles / Category / Security / Description',
+    }),
   },
   BILLING: {
-    label: 'Billing',
+    label: intl.formatMessage({ defaultMessage: 'Billing', id: 'Roles / Category / Billing / Label' }),
     icon: <CreditCard className="h-4 w-4" />,
-    description: 'Subscription and payment management',
+    description: intl.formatMessage({
+      defaultMessage: 'Subscription and payment management',
+      id: 'Roles / Category / Billing / Description',
+    }),
   },
   FEATURES: {
-    label: 'Features',
+    label: intl.formatMessage({ defaultMessage: 'Features', id: 'Roles / Category / Features / Label' }),
     icon: <Sparkles className="h-4 w-4" />,
-    description: 'AI, Documents, and other features',
+    description: intl.formatMessage({
+      defaultMessage: 'AI, Documents, and other features',
+      id: 'Roles / Category / Features / Description',
+    }),
   },
   DASHBOARD: {
-    label: 'Dashboard',
+    label: intl.formatMessage({ defaultMessage: 'Dashboard', id: 'Roles / Category / Dashboard / Label' }),
     icon: <Layers className="h-4 w-4" />,
-    description: 'Main application dashboard',
+    description: intl.formatMessage({
+      defaultMessage: 'Main application dashboard',
+      id: 'Roles / Category / Dashboard / Description',
+    }),
+  },
+  BACKUP: {
+    label: intl.formatMessage({ defaultMessage: 'Backup', id: 'Roles / Category / Backup / Label' }),
+    icon: <Shield className="h-4 w-4" />,
+    description: intl.formatMessage({
+      defaultMessage: 'Tenant backup and restore',
+      id: 'Roles / Category / Backup / Description',
+    }),
   },
   MANAGEMENT: {
-    label: 'Management Dashboard',
+    label: intl.formatMessage({
+      defaultMessage: 'Management Dashboard',
+      id: 'Roles / Category / Management / Label',
+    }),
     icon: <BarChart3 className="h-4 w-4" />,
-    description: 'Finance and management tools',
+    description: intl.formatMessage({
+      defaultMessage: 'Finance and management tools',
+      id: 'Roles / Category / Management / Description',
+    }),
   },
-  // App-defined categories (e.g. BACKUP from backup/permissions.py) use the fallback below: label from key, Shield icon
+});
+
+// Translated permission name/description, keyed by the stable permission code from
+// apps/multitenancy/permissions.py + apps/backup/permissions.py. Any permission code not
+// listed here (e.g. a future app-registered one) falls back to the raw API text, same
+// fallback already used for unlisted categories above.
+const getPermissionDisplay = (
+  intl: IntlShape,
+  code: string,
+  fallbackName: string,
+  fallbackDescription?: string
+): { name: string; description?: string } => {
+  // Each case uses literal id/defaultMessage (not a template string) so `extract-intl:master`
+  // can statically pick it up - a dynamically-built id would be invisible to that extractor.
+  switch (code) {
+    case 'org.settings.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Organization Settings', id: 'Roles / Permission / org.settings.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View organization name, billing email, and general settings',
+          id: 'Roles / Permission / org.settings.view / Description',
+        }),
+      };
+    case 'org.settings.edit':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Edit Organization Settings', id: 'Roles / Permission / org.settings.edit / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Modify organization name, billing email, and general settings',
+          id: 'Roles / Permission / org.settings.edit / Description',
+        }),
+      };
+    case 'org.delete':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Delete Organization', id: 'Roles / Permission / org.delete / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Permanently delete the organization and all its data',
+          id: 'Roles / Permission / org.delete / Description',
+        }),
+      };
+    case 'org.roles.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Organization Roles', id: 'Roles / Permission / org.roles.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View defined roles and their permissions',
+          id: 'Roles / Permission / org.roles.view / Description',
+        }),
+      };
+    case 'org.roles.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage Organization Roles', id: 'Roles / Permission / org.roles.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Create, edit, and delete custom roles',
+          id: 'Roles / Permission / org.roles.manage / Description',
+        }),
+      };
+    case 'members.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Members', id: 'Roles / Permission / members.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View the list of organization members and their roles',
+          id: 'Roles / Permission / members.view / Description',
+        }),
+      };
+    case 'members.invite':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Invite Members', id: 'Roles / Permission / members.invite / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Send invitations to new members',
+          id: 'Roles / Permission / members.invite / Description',
+        }),
+      };
+    case 'members.roles.edit':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Edit Member Roles', id: 'Roles / Permission / members.roles.edit / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Change roles assigned to existing members',
+          id: 'Roles / Permission / members.roles.edit / Description',
+        }),
+      };
+    case 'members.remove':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Remove Members', id: 'Roles / Permission / members.remove / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Remove members from the organization',
+          id: 'Roles / Permission / members.remove / Description',
+        }),
+      };
+    case 'security.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Security Settings', id: 'Roles / Permission / security.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View SSO connections, passkeys, and security configurations',
+          id: 'Roles / Permission / security.view / Description',
+        }),
+      };
+    case 'security.sso.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage SSO', id: 'Roles / Permission / security.sso.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Configure Single Sign-On connections and SCIM provisioning',
+          id: 'Roles / Permission / security.sso.manage / Description',
+        }),
+      };
+    case 'security.passkeys.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage Passkeys', id: 'Roles / Permission / security.passkeys.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View and manage organization passkey policies',
+          id: 'Roles / Permission / security.passkeys.manage / Description',
+        }),
+      };
+    case 'security.logs.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Activity Logs', id: 'Roles / Permission / security.logs.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View audit logs of actions performed in the organization',
+          id: 'Roles / Permission / security.logs.view / Description',
+        }),
+      };
+    case 'security.logs.export':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Export Activity Logs', id: 'Roles / Permission / security.logs.export / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Export activity logs to CSV or other formats',
+          id: 'Roles / Permission / security.logs.export / Description',
+        }),
+      };
+    case 'billing.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Billing', id: 'Roles / Permission / billing.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View subscription status, invoices, and payment methods',
+          id: 'Roles / Permission / billing.view / Description',
+        }),
+      };
+    case 'billing.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage Billing', id: 'Roles / Permission / billing.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Change subscription plan, update payment methods, and manage billing',
+          id: 'Roles / Permission / billing.manage / Description',
+        }),
+      };
+    case 'features.ai.use':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Use AI Features', id: 'Roles / Permission / features.ai.use / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Access and use OpenAI integration and AI-powered features',
+          id: 'Roles / Permission / features.ai.use / Description',
+        }),
+      };
+    case 'features.documents.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Documents', id: 'Roles / Permission / features.documents.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View uploaded documents',
+          id: 'Roles / Permission / features.documents.view / Description',
+        }),
+      };
+    case 'features.documents.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage Documents', id: 'Roles / Permission / features.documents.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Upload, edit, and delete documents',
+          id: 'Roles / Permission / features.documents.manage / Description',
+        }),
+      };
+    case 'features.content.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Content Items', id: 'Roles / Permission / features.content.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View content items from CMS',
+          id: 'Roles / Permission / features.content.view / Description',
+        }),
+      };
+    case 'features.crud.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View CRUD Demo Items', id: 'Roles / Permission / features.crud.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View CRUD demo items',
+          id: 'Roles / Permission / features.crud.view / Description',
+        }),
+      };
+    case 'features.crud.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage CRUD Demo Items', id: 'Roles / Permission / features.crud.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Create, edit, and delete CRUD demo items',
+          id: 'Roles / Permission / features.crud.manage / Description',
+        }),
+      };
+    case 'dashboard.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Dashboard', id: 'Roles / Permission / dashboard.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Access the main app dashboard/home page',
+          id: 'Roles / Permission / dashboard.view / Description',
+        }),
+      };
+    case 'backup.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View Backup Settings', id: 'Roles / Permission / backup.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View backup configuration and history',
+          id: 'Roles / Permission / backup.view / Description',
+        }),
+      };
+    case 'backup.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage Backups', id: 'Roles / Permission / backup.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Configure backups, trigger manual backups, and manage backup settings',
+          id: 'Roles / Permission / backup.manage / Description',
+        }),
+      };
+    default:
+      return { name: fallbackName, description: fallbackDescription };
+  }
+};
+
+// Translated name/description for a system role, keyed by systemRoleType. Custom (non-system)
+// roles always keep their raw freeform name/description - those are user-entered text and must
+// never be auto-translated.
+const getSystemRoleDisplay = (
+  intl: IntlShape,
+  systemRoleType: string | null | undefined,
+  fallbackName: string,
+  fallbackDescription?: string
+): { name: string; description?: string } => {
+  switch (systemRoleType) {
+    case 'OWNER':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Owner', id: 'Roles / System Role / Owner / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Full access to all organization features',
+          id: 'Roles / System Role / Owner / Description',
+        }),
+      };
+    case 'ADMIN':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Administrator', id: 'Roles / System Role / Administrator / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Manage organization settings and members',
+          id: 'Roles / System Role / Administrator / Description',
+        }),
+      };
+    case 'MEMBER':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Member', id: 'Roles / System Role / Member / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View access to organization data',
+          id: 'Roles / System Role / Member / Description',
+        }),
+      };
+    default:
+      return { name: fallbackName, description: fallbackDescription };
+  }
 };
 
 interface Permission {
@@ -176,7 +495,7 @@ interface OrganizationRole {
   name: string;
   description?: string;
   color: string;
-  systemRoleType?: string;
+  systemRoleType?: string | null;
   isSystemRole: boolean;
   isOwnerRole: boolean;
   memberCount: number;
@@ -205,6 +524,9 @@ const RoleCard = ({
   canManage?: boolean;
 }) => {
   const intl = useIntl();
+  const display = role.isSystemRole
+    ? getSystemRoleDisplay(intl, role.systemRoleType, role.name, role.description)
+    : { name: role.name, description: role.description };
 
   return (
     <Card className={cn(
@@ -217,15 +539,15 @@ const RoleCard = ({
         'absolute top-0 left-0 right-0 h-1',
         ROLE_COLORS.find((c) => c.value.toUpperCase() === role.color?.toUpperCase())?.className || 'bg-blue-500'
       )} />
-      
+
       <CardHeader className="pt-5 pb-3 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0 flex-1">
             <div className={cn(
               'flex items-center justify-center rounded-lg p-2.5 shrink-0',
               'bg-gradient-to-br',
-              role.isOwnerRole 
-                ? 'from-violet-100 to-violet-50 dark:from-violet-900/30 dark:to-violet-950/30' 
+              role.isOwnerRole
+                ? 'from-violet-100 to-violet-50 dark:from-violet-900/30 dark:to-violet-950/30'
                 : 'from-muted to-muted/50'
             )}>
               {role.isOwnerRole ? (
@@ -237,7 +559,7 @@ const RoleCard = ({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <CardTitle className="text-base font-semibold truncate">
-                  {role.name}
+                  {display.name}
                 </CardTitle>
                 {role.isSystemRole && !role.isOwnerRole && (
                   <Badge variant="secondary" className="text-[10px] font-medium px-1.5 py-0 h-5">
@@ -245,14 +567,14 @@ const RoleCard = ({
                   </Badge>
                 )}
               </div>
-              {role.description && (
+              {display.description && (
                 <CardDescription className="mt-1 text-xs line-clamp-2">
-                  {role.description}
+                  {display.description}
                 </CardDescription>
               )}
             </div>
           </div>
-          
+
           {/* Actions - visible on hover on desktop, always visible on mobile */}
           {canManage && (
             <div className={cn(
@@ -323,6 +645,8 @@ const PermissionPicker = ({
   onSelectionChange: (ids: Set<string>) => void;
   disabled?: boolean;
 }) => {
+  const intl = useIntl();
+  const categoryConfig = useMemo(() => getCategoryConfig(intl), [intl]);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['ORGANIZATION', 'MEMBERS', 'FEATURES'])
   );
@@ -349,6 +673,7 @@ const PermissionPicker = ({
       'BILLING',
       'FEATURES',
       'DASHBOARD',
+      'BACKUP',
       'MANAGEMENT',
     ];
     const knownFirst = order.filter((cat) => permissionsByCategory[cat]);
@@ -396,7 +721,7 @@ const PermissionPicker = ({
           {orderedCategories.map((category, index) => {
             const permissions = permissionsByCategory[category];
             const firstPerm = permissions?.[0];
-            const config = CATEGORY_CONFIG[category] || {
+            const config = categoryConfig[category] || {
               label: firstPerm?.categoryLabel ?? category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()),
               icon: <Shield className="h-4 w-4" />,
               description: firstPerm?.categoryDescription ?? '',
@@ -465,32 +790,35 @@ const PermissionPicker = ({
                 
                 {isExpanded && (
                   <div className="ml-3 pl-3 border-l-2 border-border/50 space-y-0.5 py-1">
-                    {permissions.map((perm) => (
-                      <label
-                        key={perm.id}
-                        className={cn(
-                          'flex items-start gap-3 px-3 py-2 rounded-md cursor-pointer',
-                          'transition-colors hover:bg-accent/50',
-                          selectedPermissionIds.has(perm.id) && 'bg-accent/30',
-                          disabled && 'opacity-50 cursor-not-allowed'
-                        )}
-                      >
-                        <SimpleCheckbox
-                          checked={selectedPermissionIds.has(perm.id)}
-                          onCheckedChange={() => !disabled && togglePermission(perm.id)}
-                          disabled={disabled}
-                          className="mt-0.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className="font-medium text-sm">{perm.name}</span>
-                          {perm.description && (
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                              {perm.description}
-                            </p>
+                    {permissions.map((perm) => {
+                      const permDisplay = getPermissionDisplay(intl, perm.code, perm.name, perm.description);
+                      return (
+                        <label
+                          key={perm.id}
+                          className={cn(
+                            'flex items-start gap-3 px-3 py-2 rounded-md cursor-pointer',
+                            'transition-colors hover:bg-accent/50',
+                            selectedPermissionIds.has(perm.id) && 'bg-accent/30',
+                            disabled && 'opacity-50 cursor-not-allowed'
                           )}
-                        </div>
-                      </label>
-                    ))}
+                        >
+                          <SimpleCheckbox
+                            checked={selectedPermissionIds.has(perm.id)}
+                            onCheckedChange={() => !disabled && togglePermission(perm.id)}
+                            disabled={disabled}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium text-sm">{permDisplay.name}</span>
+                            {permDisplay.description && (
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                {permDisplay.description}
+                              </p>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -700,7 +1028,7 @@ const RoleEditorDialog = ({
                       <SelectValue>
                         <div className="flex items-center gap-2">
                           <RoleColorBadge color={color} size="sm" />
-                          <span className="text-sm">{ROLE_COLORS.find((c) => c.value === color)?.label}</span>
+                          <span className="text-sm">{getRoleColorLabel(intl, color)}</span>
                         </div>
                       </SelectValue>
                     </SelectTrigger>
@@ -709,7 +1037,7 @@ const RoleEditorDialog = ({
                         <SelectItem key={c.value} value={c.value}>
                           <div className="flex items-center gap-2">
                             <RoleColorBadge color={c.value} size="sm" />
-                            <span>{c.label}</span>
+                            <span>{getRoleColorLabel(intl, c.value)}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -721,7 +1049,9 @@ const RoleEditorDialog = ({
               <div className="space-y-2">
                 <Label htmlFor="role-description" className="text-sm font-medium">
                   <FormattedMessage defaultMessage="Description" id="Roles / Description Label" />
-                  <span className="text-muted-foreground font-normal ml-1">(optional)</span>
+                  <span className="text-muted-foreground font-normal ml-1">
+                    <FormattedMessage defaultMessage="(optional)" id="Roles / Description Optional Suffix" />
+                  </span>
                 </Label>
                 <textarea
                   id="role-description"
@@ -971,6 +1301,7 @@ export const TenantRoles = () => {
   const {
     data: rolesData,
     loading: rolesLoading,
+    error: rolesError,
     refetch: refetchRoles,
   } = useQuery(allOrganizationRolesQuery, {
     variables: { tenantId },
@@ -1006,7 +1337,9 @@ export const TenantRoles = () => {
   }, []);
 
   const handleSuccess = useCallback(() => {
-    refetchRoles();
+    // Errors land in `rolesError` via the hook's own state; swallow here to avoid an
+    // unhandled rejection since refetch() rejects on GraphQL errors.
+    refetchRoles().catch(() => undefined);
   }, [refetchRoles]);
 
   const isLoading = permissionsLoading || rolesLoading;
@@ -1067,6 +1400,21 @@ export const TenantRoles = () => {
               </div>
             </div>
           </div>
+        ) : rolesError ? (
+          <Card className="border-destructive/50">
+            <CardContent className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+              <AlertTriangle className="h-8 w-8 text-destructive dark:text-red-400" />
+              <p className="text-sm text-muted-foreground max-w-[300px]">
+                <FormattedMessage
+                  defaultMessage="Failed to load roles. Please try again."
+                  id="Roles / Load Error"
+                />
+              </p>
+              <Button variant="outline" onClick={() => refetchRoles()}>
+                <FormattedMessage defaultMessage="Retry" id="Roles / Load Error Retry" />
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-8">
             {/* System Roles */}

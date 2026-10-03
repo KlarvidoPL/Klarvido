@@ -2660,6 +2660,9 @@
   "Membership Entry / ResendInvitation / Success message": {
     "defaultMessage": "تمت إعادة إرسال الدعوة بنجاح!"
   },
+  "Membership Entry / Roles load error": {
+    "defaultMessage": "تعذّر تحميل الأدوار. يرجى المحاولة مرة أخرى."
+  },
   "Membership Entry / Save Roles": {
     "defaultMessage": "حفظ الأدوار"
   },
@@ -3167,6 +3170,81 @@
   "Roles / Cancel Button": {
     "defaultMessage": "إلغاء"
   },
+  "Roles / Category / Backup / Description": {
+    "defaultMessage": "نسخ احتياطي للمؤسسة واستعادتها"
+  },
+  "Roles / Category / Backup / Label": {
+    "defaultMessage": "النسخ الاحتياطي"
+  },
+  "Roles / Category / Billing / Description": {
+    "defaultMessage": "إدارة الاشتراك والمدفوعات"
+  },
+  "Roles / Category / Billing / Label": {
+    "defaultMessage": "الفوترة"
+  },
+  "Roles / Category / Dashboard / Description": {
+    "defaultMessage": "لوحة التحكم الرئيسية للتطبيق"
+  },
+  "Roles / Category / Dashboard / Label": {
+    "defaultMessage": "لوحة التحكم"
+  },
+  "Roles / Category / Features / Description": {
+    "defaultMessage": "الذكاء الاصطناعي والمستندات وميزات أخرى"
+  },
+  "Roles / Category / Features / Label": {
+    "defaultMessage": "الميزات"
+  },
+  "Roles / Category / Management / Description": {
+    "defaultMessage": "أدوات مالية وإدارية"
+  },
+  "Roles / Category / Management / Label": {
+    "defaultMessage": "لوحة التحكم الإدارية"
+  },
+  "Roles / Category / Members / Description": {
+    "defaultMessage": "إدارة أعضاء الفريق"
+  },
+  "Roles / Category / Members / Label": {
+    "defaultMessage": "الأعضاء"
+  },
+  "Roles / Category / Organization / Description": {
+    "defaultMessage": "إعدادات المؤسسة وتكوينها"
+  },
+  "Roles / Category / Organization / Label": {
+    "defaultMessage": "المؤسسة"
+  },
+  "Roles / Category / Security / Description": {
+    "defaultMessage": "إعدادات الأمان والمصادقة"
+  },
+  "Roles / Category / Security / Label": {
+    "defaultMessage": "الأمان"
+  },
+  "Roles / Color / Blue": {
+    "defaultMessage": "أزرق"
+  },
+  "Roles / Color / Gray": {
+    "defaultMessage": "رمادي"
+  },
+  "Roles / Color / Green": {
+    "defaultMessage": "أخضر"
+  },
+  "Roles / Color / Orange": {
+    "defaultMessage": "برتقالي"
+  },
+  "Roles / Color / Pink": {
+    "defaultMessage": "وردي"
+  },
+  "Roles / Color / Purple": {
+    "defaultMessage": "بنفسجي"
+  },
+  "Roles / Color / Red": {
+    "defaultMessage": "أحمر"
+  },
+  "Roles / Color / Teal": {
+    "defaultMessage": "فيروزي"
+  },
+  "Roles / Color / Yellow": {
+    "defaultMessage": "أصفر"
+  },
   "Roles / Color Label": {
     "defaultMessage": "اللون"
   },
@@ -3212,6 +3290,9 @@
   "Roles / Description Label": {
     "defaultMessage": "الوصف"
   },
+  "Roles / Description Optional Suffix": {
+    "defaultMessage": "(اختياري)"
+  },
   "Roles / Description Placeholder": {
     "defaultMessage": "صف الغرض من هذا الدور..."
   },
@@ -3223,6 +3304,12 @@
   },
   "Roles / Edit Title": {
     "defaultMessage": "تعديل الدور"
+  },
+  "Roles / Load Error": {
+    "defaultMessage": "تعذّر تحميل الأدوار. يرجى المحاولة مرة أخرى."
+  },
+  "Roles / Load Error Retry": {
+    "defaultMessage": "إعادة المحاولة"
   },
   "Roles / Member singular": {
     "defaultMessage": "عضو"
@@ -3244,6 +3331,156 @@
   },
   "Roles / No Custom Roles Description": {
     "defaultMessage": "أنشئ أدوارًا مخصصة لضبط وصول الأعضاء وصلاحياتهم بدقة"
+  },
+  "Roles / Permission / backup.manage / Description": {
+    "defaultMessage": "تهيئة النسخ الاحتياطي، وتشغيل نسخ احتياطية يدوية، وإدارة إعداداته"
+  },
+  "Roles / Permission / backup.manage / Name": {
+    "defaultMessage": "إدارة النسخ الاحتياطي"
+  },
+  "Roles / Permission / backup.view / Description": {
+    "defaultMessage": "عرض إعدادات النسخ الاحتياطي وسجلّه"
+  },
+  "Roles / Permission / backup.view / Name": {
+    "defaultMessage": "عرض إعدادات النسخ الاحتياطي"
+  },
+  "Roles / Permission / billing.manage / Description": {
+    "defaultMessage": "تغيير خطة الاشتراك وتحديث طرق الدفع وإدارة الفوترة"
+  },
+  "Roles / Permission / billing.manage / Name": {
+    "defaultMessage": "إدارة الفوترة"
+  },
+  "Roles / Permission / billing.view / Description": {
+    "defaultMessage": "عرض حالة الاشتراك والفواتير وطرق الدفع"
+  },
+  "Roles / Permission / billing.view / Name": {
+    "defaultMessage": "عرض الفوترة"
+  },
+  "Roles / Permission / dashboard.view / Description": {
+    "defaultMessage": "الوصول إلى لوحة التحكم الرئيسية/الصفحة الرئيسية للتطبيق"
+  },
+  "Roles / Permission / dashboard.view / Name": {
+    "defaultMessage": "عرض لوحة التحكم"
+  },
+  "Roles / Permission / features.ai.use / Description": {
+    "defaultMessage": "الوصول إلى تكامل OpenAI والميزات المعتمدة على الذكاء الاصطناعي واستخدامها"
+  },
+  "Roles / Permission / features.ai.use / Name": {
+    "defaultMessage": "استخدام ميزات الذكاء الاصطناعي"
+  },
+  "Roles / Permission / features.content.view / Description": {
+    "defaultMessage": "عرض عناصر المحتوى من نظام إدارة المحتوى"
+  },
+  "Roles / Permission / features.content.view / Name": {
+    "defaultMessage": "عرض عناصر المحتوى"
+  },
+  "Roles / Permission / features.crud.manage / Description": {
+    "defaultMessage": "إنشاء عناصر عرض CRUD التجريبية وتعديلها وحذفها"
+  },
+  "Roles / Permission / features.crud.manage / Name": {
+    "defaultMessage": "إدارة عناصر عرض CRUD التجريبية"
+  },
+  "Roles / Permission / features.crud.view / Description": {
+    "defaultMessage": "عرض عناصر CRUD التجريبية"
+  },
+  "Roles / Permission / features.crud.view / Name": {
+    "defaultMessage": "عرض عناصر CRUD التجريبية"
+  },
+  "Roles / Permission / features.documents.manage / Description": {
+    "defaultMessage": "رفع المستندات وتعديلها وحذفها"
+  },
+  "Roles / Permission / features.documents.manage / Name": {
+    "defaultMessage": "إدارة المستندات"
+  },
+  "Roles / Permission / features.documents.view / Description": {
+    "defaultMessage": "عرض المستندات المرفوعة"
+  },
+  "Roles / Permission / features.documents.view / Name": {
+    "defaultMessage": "عرض المستندات"
+  },
+  "Roles / Permission / members.invite / Description": {
+    "defaultMessage": "إرسال دعوات إلى أعضاء جدد"
+  },
+  "Roles / Permission / members.invite / Name": {
+    "defaultMessage": "دعوة الأعضاء"
+  },
+  "Roles / Permission / members.remove / Description": {
+    "defaultMessage": "إزالة أعضاء من المؤسسة"
+  },
+  "Roles / Permission / members.remove / Name": {
+    "defaultMessage": "إزالة الأعضاء"
+  },
+  "Roles / Permission / members.roles.edit / Description": {
+    "defaultMessage": "تغيير الأدوار المسندة إلى الأعضاء الحاليين"
+  },
+  "Roles / Permission / members.roles.edit / Name": {
+    "defaultMessage": "تعديل أدوار الأعضاء"
+  },
+  "Roles / Permission / members.view / Description": {
+    "defaultMessage": "عرض قائمة أعضاء المؤسسة وأدوارهم"
+  },
+  "Roles / Permission / members.view / Name": {
+    "defaultMessage": "عرض الأعضاء"
+  },
+  "Roles / Permission / org.delete / Description": {
+    "defaultMessage": "حذف المؤسسة وجميع بياناتها نهائيًا"
+  },
+  "Roles / Permission / org.delete / Name": {
+    "defaultMessage": "حذف المؤسسة"
+  },
+  "Roles / Permission / org.roles.manage / Description": {
+    "defaultMessage": "إنشاء أدوار مخصصة وتعديلها وحذفها"
+  },
+  "Roles / Permission / org.roles.manage / Name": {
+    "defaultMessage": "إدارة أدوار المؤسسة"
+  },
+  "Roles / Permission / org.roles.view / Description": {
+    "defaultMessage": "عرض الأدوار المعرّفة وصلاحياتها"
+  },
+  "Roles / Permission / org.roles.view / Name": {
+    "defaultMessage": "عرض أدوار المؤسسة"
+  },
+  "Roles / Permission / org.settings.edit / Description": {
+    "defaultMessage": "تعديل اسم المؤسسة والبريد الإلكتروني للفوترة والإعدادات العامة"
+  },
+  "Roles / Permission / org.settings.edit / Name": {
+    "defaultMessage": "تعديل إعدادات المؤسسة"
+  },
+  "Roles / Permission / org.settings.view / Description": {
+    "defaultMessage": "عرض اسم المؤسسة والبريد الإلكتروني للفوترة والإعدادات العامة"
+  },
+  "Roles / Permission / org.settings.view / Name": {
+    "defaultMessage": "عرض إعدادات المؤسسة"
+  },
+  "Roles / Permission / security.logs.export / Description": {
+    "defaultMessage": "تصدير سجلات النشاط بصيغة CSV أو صيغ أخرى"
+  },
+  "Roles / Permission / security.logs.export / Name": {
+    "defaultMessage": "تصدير سجلات النشاط"
+  },
+  "Roles / Permission / security.logs.view / Description": {
+    "defaultMessage": "عرض سجلات التدقيق للإجراءات المنفَّذة في المؤسسة"
+  },
+  "Roles / Permission / security.logs.view / Name": {
+    "defaultMessage": "عرض سجلات النشاط"
+  },
+  "Roles / Permission / security.passkeys.manage / Description": {
+    "defaultMessage": "عرض سياسات مفاتيح المرور (Passkeys) الخاصة بالمؤسسة وإدارتها"
+  },
+  "Roles / Permission / security.passkeys.manage / Name": {
+    "defaultMessage": "إدارة مفاتيح المرور"
+  },
+  "Roles / Permission / security.sso.manage / Description": {
+    "defaultMessage": "تهيئة اتصالات تسجيل الدخول الموحد (SSO) وتوفير SCIM"
+  },
+  "Roles / Permission / security.sso.manage / Name": {
+    "defaultMessage": "إدارة تسجيل الدخول الموحد"
+  },
+  "Roles / Permission / security.view / Description": {
+    "defaultMessage": "عرض اتصالات تسجيل الدخول الموحد ومفاتيح المرور وإعدادات الأمان"
+  },
+  "Roles / Permission / security.view / Name": {
+    "defaultMessage": "عرض إعدادات الأمان"
   },
   "Roles / Permission Required": {
     "defaultMessage": "مطلوب إذن واحد على الأقل"
@@ -3277,6 +3514,24 @@
   },
   "Roles / System Badge": {
     "defaultMessage": "نظام"
+  },
+  "Roles / System Role / Administrator / Description": {
+    "defaultMessage": "إدارة إعدادات المؤسسة وأعضائها"
+  },
+  "Roles / System Role / Administrator / Name": {
+    "defaultMessage": "مسؤول"
+  },
+  "Roles / System Role / Member / Description": {
+    "defaultMessage": "إمكانية الاطلاع على بيانات المؤسسة"
+  },
+  "Roles / System Role / Member / Name": {
+    "defaultMessage": "عضو"
+  },
+  "Roles / System Role / Owner / Description": {
+    "defaultMessage": "وصول كامل إلى جميع ميزات المؤسسة"
+  },
+  "Roles / System Role / Owner / Name": {
+    "defaultMessage": "مالك"
   },
   "Roles / System Roles Header": {
     "defaultMessage": "أدوار النظام"
@@ -4379,11 +4634,20 @@
   "Tenant invitation form / Roles label": {
     "defaultMessage": "الأدوار:"
   },
+  "Tenant invitation form / Roles load error": {
+    "defaultMessage": "تعذّر تحميل الأدوار. يرجى المحاولة مرة أخرى."
+  },
+  "Tenant invitation form / Roles loading": {
+    "defaultMessage": "جارٍ التحميل..."
+  },
   "Tenant invitation form / Roles placeholder": {
     "defaultMessage": "اختر الأدوار"
   },
   "Tenant invitation form / Submit button": {
     "defaultMessage": "دعوة"
+  },
+  "Tenant invitation form / System role suffix": {
+    "defaultMessage": "(نظام)"
   },
   "Tenant members list / Actions": {
     "defaultMessage": "إجراءات"

@@ -1940,3 +1940,49 @@ class TestTenantQuery:
         executed = graphene_client.query(query, variable_values={"id": to_global_id("TenantType", tenant.pk)})
 
         assert executed["data"]["tenant"] is None
+
+
+class TestAllOrganizationRolesQuery:
+    """Regression coverage for the custom-role creation bug: a custom OrganizationRole is
+    persisted with system_role_type='' (the model's correct "not a system role" sentinel),
+    and OrganizationRoleType.system_role_type must convert that to None before the strict
+    SystemRoleTypeEnum tries to serialize it - otherwise the whole allOrganizationRoles
+    response errors out, hiding system roles too."""
+
+    query = """
+    query getAllOrganizationRoles($tenantId: ID!) {
+        allOrganizationRoles(tenantId: $tenantId) {
+            edges {
+                node {
+                    name
+                    systemRoleType
+                    isSystemRole
+                }
+            }
+        }
+    }
+    """
+
+    def test_all_organization_roles_with_custom_role(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER)
+        create_system_roles_for_tenant(tenant)
+        OrganizationRole.objects.create(tenant=tenant, name="Custom Role", description="")
+
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = graphene_client.query(
+            self.query, variable_values={"tenantId": to_global_id("TenantType", tenant.id)}
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        roles_by_name = {
+            edge["node"]["name"]: edge["node"] for edge in executed["data"]["allOrganizationRoles"]["edges"]
+        }
+        assert roles_by_name["Custom Role"]["systemRoleType"] is None
+        assert roles_by_name["Custom Role"]["isSystemRole"] is False
+        assert roles_by_name["Owner"]["systemRoleType"] == "OWNER"
+        assert roles_by_name["Administrator"]["systemRoleType"] == "ADMIN"
+        assert roles_by_name["Member"]["systemRoleType"] == "MEMBER"

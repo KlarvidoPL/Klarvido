@@ -125,6 +125,11 @@ class OrganizationRoleType(DjangoObjectType):
     def resolve_id(self, info):
         return to_global_id("OrganizationRoleType", self.id)
 
+    def resolve_system_role_type(self, info):
+        # Custom roles store '' (not None) as the "no system type" sentinel - the enum has
+        # no member for '', so it must be converted to None before graphene serializes it.
+        return self.system_role_type or None
+
     def resolve_is_system_role(self, info):
         return self.is_system_role
 
