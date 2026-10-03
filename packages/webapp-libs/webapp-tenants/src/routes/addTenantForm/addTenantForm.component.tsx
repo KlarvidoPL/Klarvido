@@ -5,6 +5,7 @@ import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { useToast } from '@sb/webapp-core/toast';
+import { Alert, AlertDescription } from '@sb/webapp-core/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
@@ -290,30 +291,32 @@ const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFie
 
   if (found && missingFields.length > 0) {
     return (
-      <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-        {/* One text node: FormattedMessage with rich values renders several siblings, which the flex row would split */}
-        <span>
+      <Alert
+        variant="destructive"
+        className="flex items-center gap-3 py-3 text-sm [&>svg]:static [&>svg]:shrink-0 [&>svg~*]:pl-0 [&>svg+div]:translate-y-0"
+      >
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
           <FormattedMessage
             defaultMessage="We found your company in the Ministry of Finance register, but it has no {fields} for it. Please check the details below and fill in what's missing."
             id="Tenant form / AddTenant / Lookup found partial"
             values={{ fields: <strong key="missing-fields">{formatCompanyFields(missingFields)}</strong> }}
           />
-        </span>
-      </div>
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
     <div
       className={cn(
-        'flex items-start gap-2 rounded-md border px-3 py-2 text-sm',
-        found ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-muted/50'
+        'flex items-center gap-3 rounded-lg border px-4 py-3 text-sm',
+        found ? 'border-green-500/30 bg-green-500/5 text-green-600 dark:text-green-400' : 'border-border bg-muted/50'
       )}
     >
       {found ? (
         <>
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
           <FormattedMessage
             defaultMessage="We found your company in the Ministry of Finance register and filled in the details below. Please check them before continuing."
             id="Tenant form / AddTenant / Lookup found"
@@ -321,7 +324,7 @@ const LookupResultNote = ({ found, missingFields }: { found: boolean; missingFie
         </>
       ) : (
         <>
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+          <Info className="h-4 w-4 shrink-0 text-muted-foreground" />
           <FormattedMessage
             defaultMessage="We couldn't find this NIP in the Ministry of Finance register. Please fill in the company details yourself."
             id="Tenant form / AddTenant / Lookup not found"

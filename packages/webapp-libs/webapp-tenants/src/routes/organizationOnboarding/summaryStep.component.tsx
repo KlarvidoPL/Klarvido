@@ -22,7 +22,7 @@ export const SummaryStep = ({ rows, onEdit }: { rows: SummaryRow[]; onEdit: (ste
     </div>
     <dl className="divide-y rounded-lg border">
       {rows.map(({ label, value, editStep }) => (
-        <div key={label} className="grid grid-cols-[7rem_1fr_auto] items-start gap-4 px-4 py-3 text-sm">
+        <div key={label} className="grid grid-cols-[7rem_1fr_auto] lg:grid-cols-[11rem_1fr_auto] items-start gap-4 px-4 py-3 text-sm">
           <dt className="text-muted-foreground">{label}</dt>
           <dd className="min-w-0 break-words">{value}</dd>
           <button
