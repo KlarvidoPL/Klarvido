@@ -398,14 +398,14 @@ def create_system_roles_for_tenant(tenant, apps=None):
     else:
         from .models import OrganizationRole, OrganizationRolePermission, Permission
 
-    from .constants import RoleColor
+    from .constants import OWNER_ROLE_COLOR, RoleColor
 
     role_configs = [
         {
             "system_role_type": SystemRoleType.OWNER,
             "name": "Owner",
             "description": "Full access to all organization features",
-            "color": RoleColor.PURPLE,
+            "color": OWNER_ROLE_COLOR,
         },
         {
             "system_role_type": SystemRoleType.ADMIN,
