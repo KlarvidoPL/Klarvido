@@ -1475,6 +1475,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "备份设置更新成功"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "跳到今天"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "现在"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "今天"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "当前套餐："
   },

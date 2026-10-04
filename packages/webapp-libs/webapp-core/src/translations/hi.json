@@ -1475,6 +1475,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "बैकअप सेटिंग्स सफलतापूर्वक अपडेट की गईं"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "आज पर जाएँ"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "अभी"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "आज"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "सक्रिय प्लान:"
   },

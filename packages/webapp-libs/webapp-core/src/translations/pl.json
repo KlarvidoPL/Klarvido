@@ -1475,6 +1475,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Ustawienia kopii zapasowej zostały zaktualizowane"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Przejdź do dzisiaj"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Teraz"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Dziś"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Aktywny plan:"
   },

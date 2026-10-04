@@ -1475,6 +1475,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Sicherungseinstellungen erfolgreich aktualisiert"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Zu heute springen"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Jetzt"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Heute"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Aktiver Tarif:"
   },
