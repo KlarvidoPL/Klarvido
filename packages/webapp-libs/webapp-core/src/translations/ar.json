@@ -4094,6 +4094,12 @@
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "مفروض"
   },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "تم تعطيل فرض SSO. يمكن للمستخدمين الآن تسجيل الدخول بكلمة المرور."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "تم تفعيل فرض SSO. يجب على المستخدمين من النطاقات المسموح بها استخدام SSO."
+  },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "فشل تحديث إعداد فرض SSO."
   },
@@ -4219,6 +4225,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "تسجيل الدخول عبر SSO"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "عنوان API"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "تم إعداد عنوان API للإنتاج"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "عنوان API مضبوط على localhost - لن يعمل SSO مع مزودي الهوية الخارجيين"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "متغير البيئة API_URL غير مضبوط"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "جميع نقاط نهاية OIDC المطلوبة موجودة"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "عنوان رد الاتصال"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "قد يكون إعداد عنوان رد الاتصال غير مكتمل"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "عنوان رد الاتصال يستخدم localhost - لا يمكن لمزودي الهوية الخارجيين الوصول إليه"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "انتهت صلاحية الشهادة منذ {days} يومًا"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "ستنتهي صلاحية الشهادة خلال {days} يومًا"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "يُوصى بالشهادة للتحقق من التوقيع"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "الشهادة صالحة (تنتهي خلال {days} يومًا)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "معرّف العميل"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "السر الخاص بالعميل"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "انتهت مهلة جلب مستند الاكتشاف"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "انتهت مهلة الاتصال بنقطة نهاية SSO"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "ضع في اعتبارك تجديد الشهادة قريبًا"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "تعذّر جلب مستند الاكتشاف"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "عنوان ACS"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "نقطة نهاية التفويض"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "نقاط النهاية المكتشفة"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "معرّف الكيان"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "خطأ"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "تنتهي في"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "تلميح"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "تنسيق معرّف الطلب"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "نقطة نهاية الرمز"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "القيمة"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "أعادت نقطة الاكتشاف الاستجابة HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "أعادت نقطة الاكتشاف JSON غير صالح"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "تأكد من أن الشهادة بصيغة PEM أو base64 صالحة"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "تعذّر الاتصال بنقطة نهاية SSO"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "تعذّر إنشاء طلب SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "تعذّر تحليل الشهادة"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "شهادة IdP"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "معرّف كيان IdP"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "لم يتم إعداد شهادة IdP"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "تم إعداد معرّف كيان مزود الهوية"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "لم يتم إعداد معرّف كيان مزود الهوية"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "تم إعداد عنوان المُصدِر"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "لم يتم إعداد عنوان المُصدِر"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "قد يلزم إعداد نقاط النهاية يدويًا"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "نقاط نهاية مفقودة في مستند الاكتشاف: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "تم إعداد معرّف عميل OAuth"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "لم يتم إعداد معرّف عميل OAuth"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "تم إعداد السر الخاص بعميل OAuth"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "لم يتم إعداد السر الخاص بعميل OAuth"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "تم إعداد عنوان رد اتصال OAuth"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "اكتشاف OIDC"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "مُصدِر OIDC"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "نقطة اكتشاف OpenID Connect قابلة للوصول"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "نقاط النهاية المطلوبة"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "يمكن إنشاء طلب SAML AuthnRequest بنجاح"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "إنشاء طلب SAML"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "إعداد مزود الخدمة"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "خطأ SSL/TLS عند الاتصال بنقطة نهاية SSO"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "خطأ SSL/TLS عند الاتصال بالمُصدِر"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "تنسيق عنوان SSO"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "عنوان SSO قابل للوصول"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "نقطة نهاية SSO موجودة (أعادت 405 - متوقع لنقاط SAML)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "نقطة نهاية SSO قابلة للوصول (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "أعادت نقطة نهاية SSO الاستجابة HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "تم إعداد عناوين مزود الخدمة"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "عناوين مزود الخدمة تستخدم localhost - لا يمكن لمزودي الهوية الخارجيين الوصول إليها"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "قد يكون إعداد مزود الخدمة غير مكتمل"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "اضبط متغير البيئة API_URL على نطاق API العام الخاص بك"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "اضبط متغير البيئة API_URL على نطاق API العام الخاص بك"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "تم إعداد عنوان تسجيل الدخول الموحد"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "لم يتم إعداد عنوان تسجيل الدخول الموحد"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "قد لا تدعم بعض مزودي الهوية الاكتشاف التلقائي"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "قد يكون مزود الهوية خلف جدار حماية أو بطيئًا في الاستجابة"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "قد تظل نقطة النهاية تعمل لطلبات SAML"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "سيؤدي هذا إلى فشل عمليات إعادة توجيه SSO. اضبط API_URL على نطاق API العام الخاص بك."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - مولّد أفكار SaaS"

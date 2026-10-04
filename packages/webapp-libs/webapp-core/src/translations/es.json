@@ -4094,6 +4094,12 @@
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "Aplicado"
   },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "Imposición de SSO desactivada. Los usuarios ahora pueden iniciar sesión con contraseña."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "Imposición de SSO activada. Los usuarios de los dominios permitidos deben usar SSO."
+  },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "No se pudo actualizar la configuración de aplicación de SSO."
   },
@@ -4219,6 +4225,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "Inicio de sesión SSO"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "URL de la API"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "La URL de la API está configurada para producción"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "La URL de la API apunta a localhost; el SSO no funcionará con proveedores de identidad externos"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "La variable de entorno API_URL no está definida"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "Todos los puntos de conexión OIDC requeridos están presentes"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "URL de callback"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "La configuración de la URL de callback podría estar incompleta"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "La URL de callback usa localhost; los proveedores de identidad externos no pueden acceder a ella"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "El certificado venció hace {days} días"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "El certificado vence en {days} días"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "Se recomienda un certificado para validar firmas"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "El certificado es válido (vence en {days} días)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "ID de cliente"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "Secreto de cliente"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "Se agotó el tiempo al obtener el documento de descubrimiento"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "Se agotó el tiempo de conexión con el punto de conexión SSO"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "Considere renovar el certificado pronto"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "No se pudo obtener el documento de descubrimiento"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "URL de ACS"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "Punto de autorización"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "Puntos de conexión descubiertos"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "ID de entidad"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "Error"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "Vence"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "Sugerencia"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "Formato del ID de solicitud"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "Punto de token"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "Valor"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "El punto de descubrimiento devolvió HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "El punto de descubrimiento devolvió JSON no válido"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "Asegúrese de que el certificado esté en formato PEM o base64 válido"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "No se pudo conectar con el punto de conexión SSO"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "No se pudo generar la solicitud SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "No se pudo analizar el certificado"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "Certificado del IdP"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "ID de entidad IdP"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "El certificado del IdP no está configurado"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "El ID de entidad del proveedor de identidad está configurado"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "El ID de entidad del proveedor de identidad no está configurado"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "La URL del emisor está configurada"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "La URL del emisor no está configurada"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "Puede ser necesario configurar los puntos de conexión manualmente"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "Faltan puntos de conexión en el documento de descubrimiento: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "El ID de cliente OAuth está configurado"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "El ID de cliente OAuth no está configurado"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "El secreto de cliente OAuth está configurado"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "El secreto de cliente OAuth no está configurado"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "La URL de callback OAuth está configurada"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "Descubrimiento OIDC"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "Emisor OIDC"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "El punto de descubrimiento de OpenID Connect es accesible"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "Puntos de conexión requeridos"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "La solicitud SAML AuthnRequest se puede generar correctamente"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "Generación de solicitud SAML"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "Configuración de SP"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "Error SSL/TLS al conectar con el punto de conexión SSO"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "Error SSL/TLS al conectar con el emisor"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "Formato de URL SSO"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "URL SSO accesible"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "El punto de conexión SSO existe (devolvió 405, esperado para puntos SAML)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "El punto de conexión SSO es accesible (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "El punto de conexión SSO devolvió HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "Las URL del proveedor de servicios están configuradas"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "Las URL del proveedor de servicios usan localhost; los proveedores de identidad externos no pueden acceder a ellas"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "La configuración del proveedor de servicios podría estar incompleta"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "Establezca la variable de entorno API_URL en su dominio público de la API"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "Establezca la variable de entorno API_URL en su dominio público de la API"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "La URL de inicio de sesión único está configurada"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "La URL de inicio de sesión único no está configurada"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "Algunos proveedores podrían no admitir el descubrimiento automático"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "El proveedor de identidad podría estar tras un cortafuegos o responder lentamente"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "El punto de conexión podría seguir funcionando para solicitudes SAML"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "Esto hará que fallen las redirecciones SSO. Establezca API_URL en su dominio público de la API."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - Generador de ideas para SaaS"

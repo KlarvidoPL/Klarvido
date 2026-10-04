@@ -4295,6 +4295,12 @@
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "Wymuszone"
   },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "Wymuszanie SSO wyłączone. Użytkownicy mogą teraz logować się hasłem."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "Wymuszanie SSO włączone. Użytkownicy z dozwolonych domen muszą logować się przez SSO."
+  },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "Nie udało się zaktualizować ustawienia wymuszania SSO."
   },
@@ -4420,6 +4426,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "Logowanie SSO"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "Adres API"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "Adres API jest skonfigurowany dla środowiska produkcyjnego"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "Adres API wskazuje na localhost – SSO nie będzie działać z zewnętrznymi dostawcami tożsamości"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "Zmienna środowiskowa API_URL nie jest ustawiona"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "Wszystkie wymagane punkty końcowe OIDC są obecne"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "Adres callback"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "Konfiguracja adresu callback może być niepełna"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "Adres callback używa localhost – zewnętrzni dostawcy tożsamości nie mogą go osiągnąć"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "Certyfikat wygasł {days} dni temu"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "Certyfikat wygasa za {days} dni"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "Certyfikat jest zalecany do weryfikacji podpisu"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "Certyfikat jest ważny (wygasa za {days} dni)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "Identyfikator klienta"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "Sekret klienta"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "Przekroczono limit czasu pobierania dokumentu wykrywania"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "Przekroczono limit czasu połączenia z punktem SSO"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "Rozważ wkrótce odnowienie certyfikatu"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "Nie udało się pobrać dokumentu wykrywania"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "Adres ACS"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "Punkt autoryzacji"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "Wykryte punkty końcowe"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "Identyfikator encji"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "Błąd"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "Wygasa"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "Wskazówka"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "Format identyfikatora żądania"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "Punkt tokenów"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "Wartość"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "Punkt wykrywania zwrócił HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "Punkt wykrywania zwrócił nieprawidłowy JSON"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "Upewnij się, że certyfikat ma poprawny format PEM lub base64"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "Nie udało się połączyć z punktem SSO"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "Nie udało się wygenerować żądania SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "Nie udało się przetworzyć certyfikatu"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "Certyfikat IdP"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "Identyfikator IdP"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "Certyfikat IdP nie jest skonfigurowany"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "Identyfikator dostawcy tożsamości jest skonfigurowany"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "Identyfikator dostawcy tożsamości nie jest skonfigurowany"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "Adres wystawcy jest skonfigurowany"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "Adres wystawcy nie jest skonfigurowany"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "Może być wymagana ręczna konfiguracja punktów końcowych"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "Brakujące punkty końcowe w dokumencie wykrywania: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "Identyfikator klienta OAuth jest skonfigurowany"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "Identyfikator klienta OAuth nie jest skonfigurowany"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "Sekret klienta OAuth jest skonfigurowany"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "Sekret klienta OAuth nie jest skonfigurowany"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "Adres callback OAuth jest skonfigurowany"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "Wykrywanie OIDC"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "Wystawca OIDC"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "Punkt wykrywania OpenID Connect jest osiągalny"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "Wymagane punkty końcowe"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "Żądanie SAML AuthnRequest można wygenerować"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "Generowanie żądania SAML"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "Konfiguracja SP"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "Błąd SSL/TLS podczas łączenia z punktem SSO"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "Błąd SSL/TLS podczas łączenia z wystawcą"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "Format adresu SSO"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "Adres SSO osiągalny"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "Punkt SSO istnieje (zwrócono 405 – oczekiwane dla punktów SAML)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "Punkt SSO jest osiągalny (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "Punkt SSO zwrócił HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "Adresy Service Provider są skonfigurowane"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "Adresy Service Provider używają localhost – zewnętrzni dostawcy tożsamości nie mogą ich osiągnąć"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "Konfiguracja Service Provider może być niepełna"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "Ustaw zmienną środowiskową API_URL na publiczną domenę API"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "Ustaw zmienną środowiskową API_URL na publiczną domenę API"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "Adres Single Sign-On jest skonfigurowany"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "Adres Single Sign-On nie jest skonfigurowany"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "Niektórzy dostawcy mogą nie obsługiwać automatycznego wykrywania"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "Dostawca tożsamości może być za zaporą lub odpowiadać wolno"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "Punkt może nadal działać dla żądań SAML"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "Spowoduje to błąd przekierowań SSO. Ustaw API_URL na publiczną domenę API."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - Generator pomysłów na SaaS"

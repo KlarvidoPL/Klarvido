@@ -4268,6 +4268,12 @@
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "Enforced"
   },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "SSO enforcement disabled. Users can now log in with password."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "SSO enforcement enabled. Users from allowed domains must use SSO."
+  },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "Failed to update SSO enforcement setting."
   },
@@ -4393,6 +4399,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "SSO Login"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "API URL"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "API URL is configured for production"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "API URL is set to localhost - SSO will not work with external identity providers"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "API_URL environment variable is not set"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "All required OIDC endpoints are present"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "Callback URL"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "Callback URL configuration may be incomplete"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "Callback URL is using localhost - external IdPs cannot reach this URL"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "Certificate expired {days} days ago"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "Certificate expires in {days} days"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "Certificate is recommended for signature validation"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "Certificate is valid (expires in {days} days)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "Client ID"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "Client Secret"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "Connection timed out when fetching discovery document"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "Connection timed out when reaching SSO endpoint"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "Consider renewing the certificate soon"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "Could not fetch discovery document"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "ACS URL"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "Authorization endpoint"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "Discovered endpoints"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "Entity ID"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "Error"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "Expires"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "Hint"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "Request ID format"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "Token endpoint"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "Value"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "Discovery endpoint returned HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "Discovery endpoint returned invalid JSON"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "Ensure the certificate is in valid PEM or base64 format"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "Failed to connect to SSO endpoint"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "Failed to generate SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "Failed to parse certificate"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "IdP Certificate"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "IdP Entity ID"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "IdP certificate is not configured"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "Identity Provider Entity ID is configured"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "Identity Provider Entity ID is not configured"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "Issuer URL is configured"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "Issuer URL is not configured"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "Manual endpoint configuration may be required"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "Missing endpoints in discovery: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "OAuth Client ID is configured"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "OAuth Client ID is not configured"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "OAuth Client Secret is configured"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "OAuth Client Secret is not configured"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "OAuth callback URL is configured"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "OIDC Discovery"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "OIDC Issuer"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "OpenID Connect discovery endpoint is accessible"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "Required Endpoints"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "SAML AuthnRequest can be generated successfully"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "SAML Request Generation"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "SP Configuration"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "SSL/TLS error when connecting to SSO endpoint"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "SSL/TLS error when connecting to issuer"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "SSO URL Format"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "SSO URL Reachable"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "SSO endpoint exists (returned 405 - expected for SAML endpoints)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "SSO endpoint is reachable (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "SSO endpoint returned HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "Service Provider URLs are configured"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "Service Provider URLs are using localhost - external IdPs cannot reach these URLs"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "Service Provider configuration may be incomplete"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "Set API_URL environment variable to your public API domain"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "Set the API_URL environment variable to your public API domain"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "Single Sign-On URL is configured"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "Single Sign-On URL is not configured"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "Some IdPs may not support automatic discovery"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "The IdP might be behind a firewall or slow to respond"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "The endpoint might still work for SAML requests"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "This will cause SSO redirects to fail. Set API_URL to your public API domain."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - SaaS Ideas Generator"

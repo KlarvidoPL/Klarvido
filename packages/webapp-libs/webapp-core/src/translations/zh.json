@@ -4094,6 +4094,12 @@
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "已强制"
   },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "已停用 SSO 强制登录。用户现在可以使用密码登录。"
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "已启用 SSO 强制登录。允许域名中的用户必须使用 SSO。"
+  },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "更新 SSO 强制执行设置失败。"
   },
@@ -4219,6 +4225,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "SSO 登录"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "API URL"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "API URL 已为生产环境配置"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "API URL 设置为 localhost，SSO 无法与外部身份提供商配合使用"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "未设置环境变量 API_URL"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "所有必需的 OIDC 端点均已存在"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "回调 URL"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "回调 URL 配置可能不完整"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "回调 URL 使用 localhost，外部身份提供商无法访问"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "证书已于 {days} 天前过期"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "证书将在 {days} 天后过期"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "建议提供证书以验证签名"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "证书有效（将在 {days} 天后过期）"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "客户端 ID"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "客户端密钥"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "获取发现文档超时"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "连接 SSO 端点超时"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "建议尽快更新证书"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "无法获取发现文档"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "ACS URL"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "授权端点"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "已发现的端点"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "实体 ID"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "错误"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "过期时间"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "提示"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "请求 ID 格式"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "令牌端点"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "值"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "发现端点返回 HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "发现端点返回了无效的 JSON"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "请确保证书为有效的 PEM 或 base64 格式"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "无法连接到 SSO 端点"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "无法生成 SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "无法解析证书"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "IdP 证书"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "IdP 实体 ID"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "未配置 IdP 证书"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "身份提供商实体 ID 已配置"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "未配置身份提供商实体 ID"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "颁发者 URL 已配置"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "未配置颁发者 URL"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "可能需要手动配置端点"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "发现文档中缺少端点：{endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "OAuth 客户端 ID 已配置"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "未配置 OAuth 客户端 ID"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "OAuth 客户端密钥已配置"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "未配置 OAuth 客户端密钥"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "OAuth 回调 URL 已配置"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "OIDC 发现"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "OIDC 颁发者"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "OpenID Connect 发现端点可访问"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "必需的端点"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "可以成功生成 SAML AuthnRequest"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "SAML 请求生成"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "SP 配置"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "连接 SSO 端点时出现 SSL/TLS 错误"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "连接颁发者时出现 SSL/TLS 错误"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "SSO URL 格式"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "SSO URL 可访问"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "SSO 端点存在（返回 405，属于 SAML 端点的预期结果）"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "SSO 端点可访问（HTTP {status}）"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "SSO 端点返回 HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "服务提供商 URL 已配置"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "服务提供商 URL 使用 localhost，外部身份提供商无法访问这些 URL"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "服务提供商配置可能不完整"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "将环境变量 API_URL 设置为您的公共 API 域名"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "将环境变量 API_URL 设置为您的公共 API 域名"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "单点登录 URL 已配置"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "未配置单点登录 URL"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "部分身份提供商可能不支持自动发现"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "身份提供商可能位于防火墙之后或响应较慢"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "该端点可能仍可用于 SAML 请求"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "这会导致 SSO 重定向失败。请将 API_URL 设置为您的公共 API 域名。"
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - SaaS 创意生成器"

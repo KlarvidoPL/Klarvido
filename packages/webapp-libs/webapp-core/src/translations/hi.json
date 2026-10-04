@@ -4094,6 +4094,12 @@
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "प्रवर्तित"
   },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "SSO अनिवार्यता अक्षम है। उपयोगकर्ता अब पासवर्ड से लॉगिन कर सकते हैं।"
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "SSO अनिवार्यता सक्षम है। अनुमत डोमेन के उपयोगकर्ताओं को SSO का उपयोग करना होगा।"
+  },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "SSO प्रवर्तन सेटिंग अपडेट करने में विफल।"
   },
@@ -4219,6 +4225,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "SSO लॉगिन"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "API URL"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "API URL उत्पादन के लिए कॉन्फ़िगर है"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "API URL localhost पर सेट है – SSO बाहरी IdP के साथ काम नहीं करेगा"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "API_URL पर्यावरण चर सेट नहीं है"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "सभी आवश्यक OIDC एंडपॉइंट मौजूद हैं"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "कॉलबैक URL"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "कॉलबैक URL कॉन्फ़िगरेशन अधूरा हो सकता है"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "कॉलबैक URL localhost का उपयोग कर रहा है – बाहरी IdP इस तक नहीं पहुँच सकते"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "प्रमाणपत्र की समय सीमा {days} दिन पहले समाप्त हो गई"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "प्रमाणपत्र {days} दिन में समाप्त हो जाएगा"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "हस्ताक्षर सत्यापन के लिए प्रमाणपत्र की सिफ़ारिश की जाती है"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "प्रमाणपत्र मान्य है ({days} दिन में समाप्त होगा)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "क्लाइंट ID"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "क्लाइंट सीक्रेट"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "डिस्कवरी दस्तावेज़ प्राप्त करते समय कनेक्शन का समय समाप्त हो गया"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "SSO एंडपॉइंट से कनेक्शन का समय समाप्त हो गया"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "जल्द ही प्रमाणपत्र नवीनीकृत करने पर विचार करें"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "डिस्कवरी दस्तावेज़ प्राप्त नहीं हो सका"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "ACS URL"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "प्राधिकरण एंडपॉइंट"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "खोजे गए एंडपॉइंट"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "एंटिटी ID"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "त्रुटि"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "समाप्ति"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "सुझाव"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "अनुरोध ID प्रारूप"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "टोकन एंडपॉइंट"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "मान"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "डिस्कवरी एंडपॉइंट ने HTTP {status} लौटाया"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "डिस्कवरी एंडपॉइंट ने अमान्य JSON लौटाया"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "सुनिश्चित करें कि प्रमाणपत्र मान्य PEM या base64 प्रारूप में है"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "SSO एंडपॉइंट से कनेक्ट नहीं हो सका"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "SAML AuthnRequest बनाने में विफल"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "प्रमाणपत्र पार्स नहीं हो सका"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "IdP प्रमाणपत्र"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "IdP एंटिटी ID"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "IdP प्रमाणपत्र कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "पहचान प्रदाता एंटिटी ID कॉन्फ़िगर है"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "पहचान प्रदाता एंटिटी ID कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "जारीकर्ता URL कॉन्फ़िगर है"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "जारीकर्ता URL कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "मैन्युअल एंडपॉइंट कॉन्फ़िगरेशन आवश्यक हो सकता है"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "डिस्कवरी दस्तावेज़ में गायब एंडपॉइंट: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "OAuth क्लाइंट ID कॉन्फ़िगर है"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "OAuth क्लाइंट ID कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "OAuth क्लाइंट सीक्रेट कॉन्फ़िगर है"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "OAuth क्लाइंट सीक्रेट कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "OAuth कॉलबैक URL कॉन्फ़िगर है"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "OIDC डिस्कवरी"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "OIDC जारीकर्ता"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "OpenID Connect डिस्कवरी एंडपॉइंट पहुँच योग्य है"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "आवश्यक एंडपॉइंट"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "SAML AuthnRequest सफलतापूर्वक बनाया जा सकता है"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "SAML अनुरोध निर्माण"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "SP कॉन्फ़िगरेशन"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "SSO एंडपॉइंट से कनेक्ट करते समय SSL/TLS त्रुटि"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "जारीकर्ता से कनेक्ट करते समय SSL/TLS त्रुटि"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "SSO URL प्रारूप"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "SSO URL पहुँच योग्य"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "SSO एंडपॉइंट मौजूद है (405 लौटाया – SAML एंडपॉइंट के लिए अपेक्षित)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "SSO एंडपॉइंट पहुँच योग्य है (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "SSO एंडपॉइंट ने HTTP {status} लौटाया"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "सेवा प्रदाता URL कॉन्फ़िगर हैं"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "सेवा प्रदाता URL localhost का उपयोग कर रहे हैं – बाहरी IdP इन तक नहीं पहुँच सकते"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "सेवा प्रदाता कॉन्फ़िगरेशन अधूरा हो सकता है"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "API_URL पर्यावरण चर को अपने सार्वजनिक API डोमेन पर सेट करें"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "API_URL पर्यावरण चर को अपने सार्वजनिक API डोमेन पर सेट करें"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "सिंगल साइन-ऑन URL कॉन्फ़िगर है"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "सिंगल साइन-ऑन URL कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "कुछ IdP स्वचालित डिस्कवरी का समर्थन नहीं कर सकते"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "IdP फ़ायरवॉल के पीछे हो सकता है या धीरे प्रतिक्रिया दे रहा है"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "यह एंडपॉइंट अब भी SAML अनुरोधों के लिए काम कर सकता है"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "इससे SSO रीडायरेक्ट विफल होंगे। API_URL को अपने सार्वजनिक API डोमेन पर सेट करें।"
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - SaaS Ideas Generator"

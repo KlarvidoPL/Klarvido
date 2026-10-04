@@ -158,9 +158,7 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-    }).format(new Date(dateStr));
+    return intl.formatDate(dateStr, { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
   const scimEndpointUrl = apiURL('/sso/scim/v2');

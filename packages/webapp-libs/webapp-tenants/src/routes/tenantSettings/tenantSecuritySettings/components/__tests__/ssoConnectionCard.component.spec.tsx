@@ -184,7 +184,7 @@ describe('SSOConnectionCard: Component', () => {
         await screen.findByText('Okta Production');
 
         const actionsButtons = screen.getAllByRole('button');
-        const actionsButton = actionsButtons.find((btn) => btn.classList.contains('opacity-0'));
+        const actionsButton = actionsButtons.find((btn) => btn.classList.contains('sm:opacity-0'));
         expect(actionsButton).toBeDefined();
       });
     });
