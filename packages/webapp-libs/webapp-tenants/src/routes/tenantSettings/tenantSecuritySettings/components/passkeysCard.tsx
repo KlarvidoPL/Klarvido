@@ -1,5 +1,4 @@
 import { Button } from '@sb/webapp-core/components/buttons';
-import { Input } from '@sb/webapp-core/components/forms';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import {
@@ -8,6 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@sb/webapp-core/components/ui/dialog';
+import { Input } from '@sb/webapp-core/components/ui/input';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { Fingerprint, Key, Loader2, Plus, Search, Smartphone, Trash2, User, X } from 'lucide-react';
@@ -173,9 +173,9 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : passkeys.length === 0 ? (
-            <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full bg-muted p-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+                <div className="shrink-0 rounded-full bg-muted p-2">
                   <Key className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div>
@@ -212,7 +212,7 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)}>
+              <Button variant="outline" size="sm" className="w-full" onClick={() => setIsModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 {canManagePasskeys ? (
                   <FormattedMessage defaultMessage="Add my passkey" id="Passkeys Card / Add My Passkey Button" />
