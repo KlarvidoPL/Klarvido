@@ -10,8 +10,8 @@
 # e.g. via VPS crontab:
 #   0 3 * * * cd /opt/klarvido && ./scripts/backup-postgres-to-s3.sh >> /var/log/klarvido-backup.log 2>&1
 #
-# Requires in .env: POSTGRES_PASSWORD, BACKUP_S3_BUCKET, AWS_ACCESS_KEY_ID,
-# AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION. Requires /opt/klarvido/.env-backup-key (see
+# Requires in .env: POSTGRES_PASSWORD, BACKUP_S3_BUCKET, BACKUP_AWS_ACCESS_KEY_ID,
+# BACKUP_AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION (the backup IAM user, which can write and read backups but not delete). Requires /opt/klarvido/.env-backup-key (see
 # backup-env-to-s3.sh for how to create it). Retention is handled by an S3 lifecycle
 # rule on the bucket, not by this script.
 #
@@ -32,9 +32,13 @@ source "$ENV_FILE"
 set +a
 
 : "${BACKUP_S3_BUCKET:?BACKUP_S3_BUCKET must be set in $ENV_FILE}"
-: "${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID must be set in $ENV_FILE}"
-: "${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY must be set in $ENV_FILE}"
+: "${BACKUP_AWS_ACCESS_KEY_ID:?BACKUP_AWS_ACCESS_KEY_ID must be set in $ENV_FILE}"
+: "${BACKUP_AWS_SECRET_ACCESS_KEY:?BACKUP_AWS_SECRET_ACCESS_KEY must be set in $ENV_FILE}"
 : "${AWS_DEFAULT_REGION:?AWS_DEFAULT_REGION must be set in $ENV_FILE}"
+
+# Backups use their own scoped AWS key (klarvido-backup: put and get, no delete), never the app key
+export AWS_ACCESS_KEY_ID="$BACKUP_AWS_ACCESS_KEY_ID"
+export AWS_SECRET_ACCESS_KEY="$BACKUP_AWS_SECRET_ACCESS_KEY"
 
 if [ ! -f "$KEY_FILE" ]; then
   echo "Missing $KEY_FILE - see backup-env-to-s3.sh for how to create it." >&2
