@@ -429,15 +429,19 @@ backups only live in a VPS Docker volume, with no offsite copy if the VPS itself
 ### Full Database Backups (Postgres -> S3)
 
 `scripts/backup-postgres-to-s3.sh` (checked into the repo, kept in sync on the VPS by
-`deploy-vps.yml`) dumps the database via the running `db` container and uploads it to
-S3 using a one-off `amazon/aws-cli` container - no extra long-running service needed.
+`deploy-vps.yml`) dumps the database via the running `db` container, encrypts the dump with the
+passphrase in `/opt/klarvido/.env-backup-key`, and uploads it to S3 as `postgres/<timestamp>.sql.gz.enc`
+using a one-off `amazon/aws-cli` container - no extra long-running service needed. The plaintext dump
+never touches the VPS disk.
 
-Add to `.env` on the VPS:
+Add to `.env` on the VPS. The backup scripts use their own IAM user, not the app's key, so a compromised
+app key cannot remove backups. That user needs `PutObject`/`GetObject`/`ListBucket` on the backup prefixes
+and no delete permission:
 
 ```bash
 BACKUP_S3_BUCKET=your-backups-bucket
-AWS_ACCESS_KEY_ID=your-key
-AWS_SECRET_ACCESS_KEY=your-secret
+BACKUP_AWS_ACCESS_KEY_ID=your-backup-key
+BACKUP_AWS_SECRET_ACCESS_KEY=your-backup-secret
 AWS_DEFAULT_REGION=eu-central-1
 ```
 

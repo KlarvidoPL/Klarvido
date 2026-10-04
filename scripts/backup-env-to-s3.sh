@@ -16,8 +16,8 @@
 #   0 3 * * * cd /opt/klarvido && ./scripts/backup-postgres-to-s3.sh >> /var/log/klarvido-backup.log 2>&1
 #   15 3 * * * cd /opt/klarvido && ./scripts/backup-env-to-s3.sh >> /var/log/klarvido-backup.log 2>&1
 #
-# Requires in .env: BACKUP_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,
-# AWS_DEFAULT_REGION. Requires /opt/klarvido/.env-backup-key (see setup above).
+# Requires in .env: BACKUP_S3_BUCKET, BACKUP_AWS_ACCESS_KEY_ID, BACKUP_AWS_SECRET_ACCESS_KEY,
+# AWS_DEFAULT_REGION (the backup IAM user, which can write and read backups but not delete). Requires /opt/klarvido/.env-backup-key (see setup above).
 #
 # To restore after a VPS loss (on the new VPS, before starting containers):
 #   aws s3 cp s3://<bucket>/env-backups/<timestamp>.env.enc ./env-backup.enc
@@ -34,9 +34,13 @@ source "$ENV_FILE"
 set +a
 
 : "${BACKUP_S3_BUCKET:?BACKUP_S3_BUCKET must be set in $ENV_FILE}"
-: "${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID must be set in $ENV_FILE}"
-: "${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY must be set in $ENV_FILE}"
+: "${BACKUP_AWS_ACCESS_KEY_ID:?BACKUP_AWS_ACCESS_KEY_ID must be set in $ENV_FILE}"
+: "${BACKUP_AWS_SECRET_ACCESS_KEY:?BACKUP_AWS_SECRET_ACCESS_KEY must be set in $ENV_FILE}"
 : "${AWS_DEFAULT_REGION:?AWS_DEFAULT_REGION must be set in $ENV_FILE}"
+
+# Backups use their own scoped AWS key (klarvido-backup: put and get, no delete), never the app key
+export AWS_ACCESS_KEY_ID="$BACKUP_AWS_ACCESS_KEY_ID"
+export AWS_SECRET_ACCESS_KEY="$BACKUP_AWS_SECRET_ACCESS_KEY"
 
 if [ ! -f "$KEY_FILE" ]; then
   echo "Missing $KEY_FILE - run: openssl rand -base64 48 > $KEY_FILE && chmod 600 $KEY_FILE" >&2
