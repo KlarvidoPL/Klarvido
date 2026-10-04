@@ -8,8 +8,13 @@ Security Features:
 - Proper input validation
 """
 
+import base64
 import logging
+import re
+from urllib.parse import urlencode
 from functools import wraps
+
+from defusedxml.ElementTree import fromstring as parse_xml
 
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -119,6 +124,57 @@ class SAMLMetadataView(View):
         )
 
 
+def _normalize_login_hint(login_hint: str | None) -> str | None:
+    """The email the user typed on the SSO login page, normalized for comparison."""
+    return (login_hint or "").strip().lower() or None
+
+
+def _ensure_matches_login_hint(login_hint: str | None, email: str | None) -> None:
+    """The account signed in at the identity provider must be the one the user asked for.
+
+    Without this, an existing identity-provider session (for example another user signed in
+    to the IdP) would silently log the user into a different account.
+    """
+    if login_hint and (not email or email.strip().lower() != login_hint):
+        raise ValueError("Signed-in account does not match the email entered for SSO login")
+
+
+def _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, login_hint):
+    """The IdP signed in a different account than the one requested.
+
+    Ends that identity-provider session and returns the user to the SSO login page, where the
+    requested email is pre-filled. Nothing is provisioned or logged in for the other account.
+    """
+    SSOAuditLog.log_event(
+        event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
+        tenant=connection.tenant,
+        sso_connection=connection,
+        description="OIDC login with a different account than requested - restarting SSO login",
+        error_message="Signed-in account does not match the email entered for SSO login",
+        success=False,
+        ip_address=get_client_ip(request),
+    )
+
+    # After the identity provider session is ended, start this login again with the requested email,
+    # so the identity provider's login page opens with that email already filled in
+    restart_query = urlencode({"next": stored_data.get("next", "/"), "login_hint": login_hint})
+    post_logout_redirect = f"{settings.API_URL.rstrip('/')}/api/sso/oidc/{connection.id}/login?{restart_query}"
+    logout_url = OIDCService(connection).build_logout_url(
+        post_logout_redirect, id_token_hint=user_attrs.get("id_token")
+    )
+    if logout_url:
+        return HttpResponseRedirect(logout_url)
+    return HttpResponse("Signed in with a different account. Sign out of your identity provider and try again.", status=403)
+
+
+def _saml_in_response_to(saml_response: str) -> str | None:
+    """Return the InResponseTo of a base64 SAML response, used to find the stored login request."""
+    try:
+        return parse_xml(base64.b64decode(saml_response)).get("InResponseTo")
+    except Exception:
+        return None
+
+
 @method_decorator(ratelimit(key="ip", rate="20/m", method="GET", block=True), name="get")
 class SAMLLoginView(View):
     """Initiate SAML SSO login with rate limiting."""
@@ -141,6 +197,8 @@ class SAMLLoginView(View):
         # Store relay state (return URL)
         relay_state = request.GET.get("next", "/")
 
+        login_hint = _normalize_login_hint(request.GET.get("login_hint"))
+
         try:
             saml_service = SAMLService(connection)
             redirect_url, request_id = saml_service.create_authn_request(
@@ -158,6 +216,7 @@ class SAMLLoginView(View):
             {
                 "connection_id": str(connection_id),
                 "relay_state": relay_state,
+                "login_hint": login_hint,
             },
             timeout=600,
         )  # 10 minutes
@@ -192,6 +251,13 @@ class SAMLACSView(View):
         if not saml_response:
             return HttpResponse("Missing SAMLResponse", status=400)
 
+        # Each AuthnRequest is single-use: take its stored login hint and remove it
+        in_response_to = _saml_in_response_to(saml_response)
+        stored_request = cache.get(f"saml_request_{in_response_to}") if in_response_to else None
+        if in_response_to:
+            cache.delete(f"saml_request_{in_response_to}")
+        login_hint = (stored_request or {}).get("login_hint")
+
         saml_service = SAMLService(connection)
 
         try:
@@ -207,6 +273,7 @@ class SAMLACSView(View):
                     f"raw_attrs: {list(user_attrs.get('raw_attributes', {}).keys())}"
                 )
                 raise ValueError("No email found in SAML response. Check attribute mapping in your IdP.")
+            _ensure_matches_login_hint(login_hint, email)
 
             # Provision or update user
             logger.info(f"Provisioning user with email: {email}")
@@ -333,6 +400,7 @@ class OIDCLoginView(View):
                 "nonce": auth_params["nonce"],
                 "code_verifier": code_verifier,
                 "next": request.GET.get("next", "/"),
+                "login_hint": _normalize_login_hint(request.GET.get("login_hint")),
             },
             timeout=600,
         )  # 10 minutes
@@ -403,6 +471,9 @@ class OIDCCallbackView(View):
                 stored_nonce=stored_data["nonce"],
                 code_verifier=stored_data["code_verifier"],
             )
+            login_hint = stored_data.get("login_hint")
+            if login_hint and (user_attrs.get("email") or "").strip().lower() != login_hint:
+                return _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, login_hint)
 
             # Provision or update user
             provisioning_service = JITProvisioningService(connection)
@@ -422,7 +493,6 @@ class OIDCCallbackView(View):
             from .services import SessionService
 
             tokens = create_jwt_tokens(user, auth_method='sso')
-
             # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
             try:

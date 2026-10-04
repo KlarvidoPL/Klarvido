@@ -16,10 +16,12 @@ from urllib.parse import urlencode
 import defusedxml.ElementTree as ET
 from xml.etree.ElementTree import Element
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, ec
 from cryptography.hazmat.backends import default_backend
 from cryptography.exceptions import InvalidSignature
+from signxml import XMLVerifier
+from signxml.exceptions import SignXMLException
 
 from django.conf import settings
 
@@ -121,6 +123,27 @@ class SAMLService:
         except Exception as e:
             logger.error(f"Failed to load IdP certificate: {e}")
             return None
+
+    def _verify_xml_signature(self, response_xml: bytes, root: Element, idp_cert: x509.Certificate):
+        """
+        Verify the XML signature on the raw SAML response with signxml.
+
+        Uses exclusive XML canonicalization and checks the digest of the signed element, so a
+        signature cannot be moved onto other content. Returns the verified (signed) element, or
+        None when the response is unsigned and signatures are not required.
+        """
+        if root.find(".//ds:Signature", SAML_NS) is None:
+            if self.connection.saml_want_response_signed or self.connection.saml_want_assertions_signed:
+                raise ValueError("SAML response/assertion signature required but not found")
+            logger.warning("No signature found in SAML response (signature not required)")
+            return None
+
+        cert_pem = idp_cert.public_bytes(serialization.Encoding.PEM)
+        try:
+            result = XMLVerifier().verify(response_xml, x509_cert=cert_pem)
+        except SignXMLException as e:
+            raise ValueError(f"SAML signature verification failed: {e}") from e
+        return result.signed_xml
 
     def _verify_signature(self, root: Element, idp_cert: x509.Certificate) -> bool:
         """
@@ -424,17 +447,20 @@ class SAMLService:
         # SECURITY: Always require IdP certificate for SAML authentication
         idp_cert = self._load_idp_certificate()
         if idp_cert:
-            # Verify signature on Response or Assertion
+            # Verify the XML signature (exclusive C14N, digests and signature) on the raw response
             try:
-                self._verify_signature(root, idp_cert)
+                signed_element = self._verify_xml_signature(response_xml, root, idp_cert)
             except ValueError as e:
                 logger.error(f"SAML signature verification failed: {e}")
                 raise ValueError("SAML signature verification failed")
 
-            # Also validate assertion-level signature if present
-            assertion_signature = assertion.find(".//ds:Signature", SAML_NS)
-            if assertion_signature is not None:
-                self._verify_signature(assertion, idp_cert)
+            # The signed element must be the Response, or the exact Assertion we read user attributes from
+            if signed_element is not None:
+                signed_tag = signed_element.tag.rsplit("}", 1)[-1]
+                is_same_assertion = signed_tag == "Assertion" and signed_element.get("ID") == assertion.get("ID")
+                if signed_tag != "Response" and not is_same_assertion:
+                    logger.error("SAML signature does not cover the assertion used for login")
+                    raise ValueError("SAML signature verification failed")
         else:
             # SECURITY: Never accept SAML responses without certificate verification
             # This prevents authentication bypass attacks with forged SAML assertions

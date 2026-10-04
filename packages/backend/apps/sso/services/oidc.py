@@ -81,6 +81,20 @@ class OIDCService:
             logger.error(f"OIDC discovery failed: {e}")
             raise ValueError(f"Failed to fetch OIDC configuration: {e}")
 
+    def get_end_session_endpoint(self) -> str:
+        """The identity provider's logout endpoint, from its discovery document (empty if not advertised)."""
+        return self.discover_configuration().get("end_session_endpoint", "")
+
+    def build_logout_url(self, post_logout_redirect_uri: str, id_token_hint: str = None) -> str:
+        """URL that ends the identity provider session and returns the user to post_logout_redirect_uri."""
+        endpoint = self.get_end_session_endpoint()
+        if not endpoint:
+            return ""
+        params = {"client_id": self.connection.oidc_client_id, "post_logout_redirect_uri": post_logout_redirect_uri}
+        if id_token_hint:
+            params["id_token_hint"] = id_token_hint
+        return f"{endpoint}?{urlencode(params)}"
+
     def get_authorization_endpoint(self) -> str:
         """Get the authorization endpoint URL."""
         if self.connection.oidc_authorization_endpoint:
@@ -405,7 +419,10 @@ class OIDCService:
                 logger.warning(f"Failed to fetch userinfo (non-critical): {e}")
 
         # Map claims to user attributes
-        return self._map_claims(claims)
+        user_attrs = self._map_claims(claims)
+        # Kept for sign-out: the identity provider needs it as id_token_hint to end the session without a confirmation page
+        user_attrs["id_token"] = id_token
+        return user_attrs
 
     def _map_claims(self, claims: Dict[str, Any]) -> Dict[str, Any]:
         """Map OIDC claims to user fields using connection configuration."""
