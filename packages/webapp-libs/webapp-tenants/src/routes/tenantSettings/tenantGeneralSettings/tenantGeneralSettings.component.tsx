@@ -93,6 +93,7 @@ export const TenantGeneralSettings = () => {
           <CardContent>
             <Link
               to={generateTenantPath(RoutesConfig.tenant.onboarding)}
+              state={{ returnTo: generateTenantPath(RoutesConfig.tenant.settings.general) }}
               className="flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground sm:inline-flex sm:w-auto"
             >
               <FormattedMessage defaultMessage="Open business profile" id="Onboarding / Settings action" />
