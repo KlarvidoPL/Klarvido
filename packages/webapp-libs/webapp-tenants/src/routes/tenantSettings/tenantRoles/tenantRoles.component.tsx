@@ -708,8 +708,10 @@ const RoleEditorDialog = ({
   const [color, setColor] = useState<string>('BLUE');
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
 
-  // Reset form when role changes
+  // Reset form whenever the dialog opens or the role changes. Create always passes role=null, so keying on
+  // `role` alone would keep the previous values when creating a second role.
   useEffect(() => {
+    if (!open) return;
     if (role) {
       setName(role.name);
       setDescription(role.description || '');
@@ -721,7 +723,7 @@ const RoleEditorDialog = ({
       setColor('BLUE');
       setSelectedPermissions(new Set());
     }
-  }, [role]);
+  }, [open, role]);
 
   const [createRole, { loading: creating }] = useMutation(createOrganizationRoleMutation, {
     onCompleted: () => {
