@@ -83,6 +83,11 @@ class SSOAuditEventType(models.TextChoices):
     # Security events
     SECURITY_ANOMALY = "security_anomaly", "Security Anomaly Detected"
 
+    # KSeF events (organization token for invoice import)
+    KSEF_TOKEN_SAVED = "ksef_token_saved", "KSeF Token Saved"
+    KSEF_TOKEN_TESTED = "ksef_token_tested", "KSeF Token Tested"
+    KSEF_TOKEN_DELETED = "ksef_token_deleted", "KSeF Token Deleted"
+
 
 class Notification(Enum):
     """

@@ -5,7 +5,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { DayPicker, type DayPickerProps, useDayPicker, type DayButtonProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { addYears, subYears, format, isToday } from 'date-fns';
+import { useIntl } from 'react-intl';
 import { cn } from '../../../lib/utils';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 import { buttonVariants } from '../button';
 
 export type CalendarProps = DayPickerProps & {
@@ -314,10 +316,15 @@ const calendarAnimationStyles = `
 
 // Custom DayButton component with tooltip
 function CustomDayButton({ day, modifiers, className, children, ...props }: DayButtonProps) {
+  const intl = useIntl();
+  const dateLocale = useDateFnsLocale();
   // day.date is the actual Date object in react-day-picker v9
   const dateObj = day.date;
   const today = isToday(dateObj);
-  const tooltipText = format(dateObj, 'EEEE, MMMM d, yyyy') + (today ? ' (Today)' : '');
+  const dateText = format(dateObj, 'EEEE, MMMM d, yyyy', { locale: dateLocale });
+  const tooltipText = today
+    ? intl.formatMessage({ id: 'Calendar / Today tooltip', defaultMessage: '{date} (Today)' }, { date: dateText })
+    : dateText;
   
   return (
     <div className="calendar-day-wrapper">
@@ -343,6 +350,7 @@ function Calendar({
   onMonthChange,
   ...props
 }: CalendarProps) {
+  const dateLocale = useDateFnsLocale();
   const [internalMonth, setInternalMonth] = useState<Date>(
     controlledMonth ?? props.defaultMonth ?? new Date()
   );
@@ -384,6 +392,7 @@ function Calendar({
         weekStartsOn={weekStartsOn}
         month={currentMonth}
         onMonthChange={handleMonthChange}
+        locale={dateLocale}
       className={cn('p-3', className)}
         modifiers={{
           weekend: { dayOfWeek: [0, 6] }, // Sunday (0) and Saturday (6)

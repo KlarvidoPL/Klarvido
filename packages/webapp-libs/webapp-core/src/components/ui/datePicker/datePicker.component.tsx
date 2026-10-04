@@ -10,6 +10,7 @@ import { Button } from '../../buttons';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { Calendar } from '../calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 
 export interface DatePickerProps {
   /** The selected date as ISO string (YYYY-MM-DD or YYYY-MM-DDTHH:mm) or Date object */
@@ -214,6 +215,7 @@ export function DatePicker({
   showTime = false,
   timeStep = 5,
 }: DatePickerProps) {
+  const dateLocale = useDateFnsLocale();
   const [open, setOpen] = useState(false);
   
   // Parse the value into a Date - memoized to prevent infinite loops
@@ -305,7 +307,7 @@ export function DatePicker({
   }, [onChange, showTime]);
 
   const displayText = selectedDate 
-    ? format(selectedDate, actualDisplayFormat) 
+    ? format(selectedDate, actualDisplayFormat, { locale: dateLocale }) 
     : actualPlaceholder;
 
   const currentHours = selectedDate ? getHours(selectedDate) : 9;

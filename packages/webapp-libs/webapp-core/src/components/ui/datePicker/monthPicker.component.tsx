@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../buttons';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 
 export interface MonthPickerProps {
   /** The selected month as YYYY-MM string (e.g., "2026-01") */
@@ -80,6 +81,7 @@ export function MonthPicker({
   name,
   id,
 }: MonthPickerProps) {
+  const dateLocale = useDateFnsLocale();
   const intl = useIntl();
   const [open, setOpen] = useState(false);
 
@@ -142,8 +144,8 @@ export function MonthPicker({
   const displayText = useMemo(() => {
     if (!parsed) return resolvedPlaceholder;
     const date = new Date(parsed.year, parsed.month, 1);
-    return format(date, displayFormat);
-  }, [parsed, resolvedPlaceholder, displayFormat]);
+    return format(date, displayFormat, { locale: dateLocale });
+  }, [parsed, resolvedPlaceholder, displayFormat, dateLocale]);
 
   // Check if a month is selected
   const isSelected = useCallback((monthIndex: number) => {

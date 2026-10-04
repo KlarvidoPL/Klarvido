@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "Error"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Group Mapping Applied"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "IdP Configuration Activated"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "IdP Configuration Created"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "IdP Configuration Deactivated"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "IdP Configuration Deleted"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "IdP Configuration Updated"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "KSeF token removed"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "KSeF token saved"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "KSeF token tested"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "SCIM Group Created"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "SCIM Group Deleted"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "SCIM Group Updated"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "SCIM User Created"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "SCIM User Deleted"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "SCIM User Updated"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "SSO Enforce Bypass Login"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO Login Failed"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "SSO Login Initiated"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO Login Success"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO Logout"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "User Provisioned via JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "User Updated via SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Failed"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP Address"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Rejected by KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Not verified yet"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Verified"
+  },
   "Audit / Last page": {
     "defaultMessage": "Last page"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Select start date"
   },
+  "Audit / Status": {
+    "defaultMessage": "Status"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Failed"
   },
   "Audit / Status Success": {
     "defaultMessage": "Success"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Action"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "New token saved"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Token removed"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Replaced existing token"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token ending in"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Token name in KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Filter by email..."
@@ -4710,7 +4806,7 @@
     "defaultMessage": "Configure SSO"
   },
   "Tenant Security Settings / Audit Description": {
-    "defaultMessage": "View recent security events for your organization"
+    "defaultMessage": "View recent SSO, SCIM and KSeF events for your organization"
   },
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Security Audit Log"
@@ -4728,7 +4824,7 @@
     "defaultMessage": "No security events yet"
   },
   "Tenant Security Settings / No Audit Events Hint": {
-    "defaultMessage": "Security events like SSO logins, user provisioning, and configuration changes will appear here."
+    "defaultMessage": "SSO and SCIM events, such as SSO logins, user provisioning and configuration changes, and KSeF token changes, will appear here."
   },
   "Tenant Security Settings / No Filtered Audit Events": {
     "defaultMessage": "No events match your filters"

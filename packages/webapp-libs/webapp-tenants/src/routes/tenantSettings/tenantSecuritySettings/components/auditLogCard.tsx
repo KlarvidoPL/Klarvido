@@ -23,6 +23,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Clock,
+  KeyRound,
   Filter,
   Fingerprint,
   Loader2,
@@ -40,7 +41,7 @@ import {
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl, type IntlShape } from 'react-intl';
 
 import { useCurrentTenant } from '../../../../providers';
 
@@ -121,6 +122,9 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
   device_removed: <Smartphone className="h-4 w-4" />,
 
   // Passkey events
+  ksef_token_saved: <KeyRound className="h-4 w-4" />,
+  ksef_token_tested: <KeyRound className="h-4 w-4" />,
+  ksef_token_deleted: <KeyRound className="h-4 w-4" />,
   passkey_registered: <Fingerprint className="h-4 w-4" />,
   passkey_removed: <Fingerprint className="h-4 w-4" />,
   passkey_auth_success: <Fingerprint className="h-4 w-4" />,
@@ -134,8 +138,41 @@ const getEventIcon = (eventType: string) => {
   return EVENT_ICONS[eventType] || <Shield className="h-4 w-4" />;
 };
 
-const getLogEventLabel = (log: AuditLog): string => {
-  return log.eventTypeLabel || log.eventType;
+// Labels for event types that are translated in the frontend. Other types fall back to the label sent by the backend.
+const EVENT_TYPE_MESSAGES = defineMessages({
+  ksef_token_saved: { id: 'Audit / Event / KSeF token saved', defaultMessage: 'KSeF token saved' },
+  ksef_token_tested: { id: 'Audit / Event / KSeF token tested', defaultMessage: 'KSeF token tested' },
+  ksef_token_deleted: { id: 'Audit / Event / KSeF token removed', defaultMessage: 'KSeF token removed' },
+  idp_config_created: { id: 'Audit / Event / IdP Configuration Created', defaultMessage: 'IdP Configuration Created' },
+  idp_config_updated: { id: 'Audit / Event / IdP Configuration Updated', defaultMessage: 'IdP Configuration Updated' },
+  idp_config_deleted: { id: 'Audit / Event / IdP Configuration Deleted', defaultMessage: 'IdP Configuration Deleted' },
+  idp_config_activated: { id: 'Audit / Event / IdP Configuration Activated', defaultMessage: 'IdP Configuration Activated' },
+  idp_config_deactivated: { id: 'Audit / Event / IdP Configuration Deactivated', defaultMessage: 'IdP Configuration Deactivated' },
+  sso_login_initiated: { id: 'Audit / Event / SSO Login Initiated', defaultMessage: 'SSO Login Initiated' },
+  sso_login_success: { id: 'Audit / Event / SSO Login Success', defaultMessage: 'SSO Login Success' },
+  sso_login_failed: { id: 'Audit / Event / SSO Login Failed', defaultMessage: 'SSO Login Failed' },
+  sso_logout: { id: 'Audit / Event / SSO Logout', defaultMessage: 'SSO Logout' },
+  user_provisioned: { id: 'Audit / Event / User Provisioned via JIT', defaultMessage: 'User Provisioned via JIT' },
+  user_updated: { id: 'Audit / Event / User Updated via SSO', defaultMessage: 'User Updated via SSO' },
+  group_mapping_applied: { id: 'Audit / Event / Group Mapping Applied', defaultMessage: 'Group Mapping Applied' },
+  scim_user_created: { id: 'Audit / Event / SCIM User Created', defaultMessage: 'SCIM User Created' },
+  scim_user_updated: { id: 'Audit / Event / SCIM User Updated', defaultMessage: 'SCIM User Updated' },
+  scim_user_deleted: { id: 'Audit / Event / SCIM User Deleted', defaultMessage: 'SCIM User Deleted' },
+  scim_group_created: { id: 'Audit / Event / SCIM Group Created', defaultMessage: 'SCIM Group Created' },
+  scim_group_updated: { id: 'Audit / Event / SCIM Group Updated', defaultMessage: 'SCIM Group Updated' },
+  scim_group_deleted: { id: 'Audit / Event / SCIM Group Deleted', defaultMessage: 'SCIM Group Deleted' },
+  sso_enforce_bypass: { id: 'Audit / Event / SSO Enforce Bypass Login', defaultMessage: 'SSO Enforce Bypass Login' },
+});
+
+const KSEF_STATUS_MESSAGES = defineMessages({
+  VALID: { id: 'Audit / KSeF status verified', defaultMessage: 'Verified' },
+  UNVERIFIED: { id: 'Audit / KSeF status unverified', defaultMessage: 'Not verified yet' },
+  INVALID: { id: 'Audit / KSeF status rejected', defaultMessage: 'Rejected by KSeF' },
+});
+
+const getEventTypeLabel = (intl: IntlShape, eventType: string, fallback?: string): string => {
+  const message = EVENT_TYPE_MESSAGES[eventType as keyof typeof EVENT_TYPE_MESSAGES];
+  return message ? intl.formatMessage(message) : fallback || eventType;
 };
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -290,13 +327,79 @@ export const AuditLogCard = () => {
     fetchLogs(currentPage);
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(date);
+  // Only curated, translated fields are shown. Raw metadata (JSON payloads, internal ids) is never displayed.
+  const hasLogDetails = (log: AuditLog) =>
+    Boolean(log.connectionName || log.ipAddress || log.errorMessage || log.eventType.startsWith('ksef_'));
+
+  const renderKsefDetails = (log: AuditLog) => {
+    if (!log.eventType.startsWith('ksef_')) return null;
+    // The API returns metadata keys in camelCase
+    const { tokenHint, tokenName, status, created } = log.metadata as {
+      tokenHint?: unknown;
+      tokenName?: unknown;
+      status?: unknown;
+      created?: unknown;
+    };
+    const isRemoval = log.eventType === 'ksef_token_deleted';
+    const statusMessage =
+      typeof status === 'string' && status in KSEF_STATUS_MESSAGES
+        ? intl.formatMessage(KSEF_STATUS_MESSAGES[status as keyof typeof KSEF_STATUS_MESSAGES])
+        : null;
+
+    return (
+      <>
+        {typeof tokenName === 'string' && tokenName && (
+          <div className="col-span-2">
+            <dt className="text-xs font-medium text-muted-foreground mb-1">
+              <FormattedMessage defaultMessage="Token name in KSeF" id="Audit / Token name in KSeF" />
+            </dt>
+            <dd className="break-all">{tokenName}</dd>
+          </div>
+        )}
+        {typeof tokenHint === 'string' && (
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground mb-1">
+              <FormattedMessage defaultMessage="Token ending in" id="Audit / Token ending in" />
+            </dt>
+            <dd className="font-mono">••••{tokenHint}</dd>
+          </div>
+        )}
+        {(typeof created === 'boolean' || isRemoval) && (
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground mb-1">
+              <FormattedMessage defaultMessage="Action" id="Audit / Token action" />
+            </dt>
+            <dd>
+              {isRemoval ? (
+                <FormattedMessage defaultMessage="Token removed" id="Audit / Token action removed" />
+              ) : created ? (
+                <FormattedMessage defaultMessage="New token saved" id="Audit / Token action created" />
+              ) : (
+                <FormattedMessage defaultMessage="Replaced existing token" id="Audit / Token action replaced" />
+              )}
+            </dd>
+          </div>
+        )}
+        {statusMessage && (
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground mb-1">
+              <FormattedMessage defaultMessage="Status" id="Audit / Status" />
+            </dt>
+            <dd>{statusMessage}</dd>
+          </div>
+        )}
+      </>
+    );
   };
+
+  const formatDate = (dateStr: string) =>
+    intl.formatDate(dateStr, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
   const toggleLogExpand = (logId: string) => {
     setExpandedLogId(expandedLogId === logId ? null : logId);
@@ -366,7 +469,7 @@ export const AuditLogCard = () => {
                 </CardTitle>
                 <CardDescription className="mt-0.5">
                   <FormattedMessage
-                    defaultMessage="View recent security events for your organization"
+                    defaultMessage="View recent SSO, SCIM and KSeF events for your organization"
                     id="Tenant Security Settings / Audit Description"
                   />
                 </CardDescription>
@@ -462,7 +565,7 @@ export const AuditLogCard = () => {
                       </SelectItem>
                       {filterOptions.eventTypes.map((type) => (
                         <SelectItem key={type} value={type}>
-                          {filterOptions.eventTypeLabels[type] || type}
+                          {getEventTypeLabel(intl, type, filterOptions.eventTypeLabels[type])}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -611,7 +714,7 @@ export const AuditLogCard = () => {
                   />
                 ) : (
                   <FormattedMessage
-                    defaultMessage="Security events like SSO logins, user provisioning, and configuration changes will appear here."
+                    defaultMessage="SSO and SCIM events, such as SSO logins, user provisioning and configuration changes, and KSeF token changes, will appear here."
                     id="Tenant Security Settings / No Audit Events Hint"
                   />
                 )}
@@ -642,7 +745,7 @@ export const AuditLogCard = () => {
                   <div
                     key={log.id}
                     className={cn(
-                      'group rounded-lg border p-4 transition-all',
+                      'group rounded-lg border transition-all',
                       'hover:shadow-sm hover:border-primary/20',
                       log.success
                         ? 'border-l-2 border-l-emerald-500'
@@ -651,9 +754,10 @@ export const AuditLogCard = () => {
                   >
                     <button
                       type="button"
-                      className="flex w-full cursor-pointer items-center justify-between text-left"
-                      onClick={() => toggleLogExpand(log.id)}
-                      aria-expanded={expandedLogId === log.id}
+                      className="flex w-full cursor-pointer items-center justify-between rounded-lg p-4 text-left disabled:cursor-default"
+                      onClick={hasLogDetails(log) ? () => toggleLogExpand(log.id) : undefined}
+                      aria-expanded={hasLogDetails(log) ? expandedLogId === log.id : undefined}
+                      disabled={!hasLogDetails(log)}
                     >
                       <div className="flex items-center gap-4">
                         <div
@@ -668,7 +772,7 @@ export const AuditLogCard = () => {
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm">{getLogEventLabel(log)}</span>
+                            <span className="font-medium text-sm">{getEventTypeLabel(intl, log.eventType, log.eventTypeLabel)}</span>
                             {!log.success && (
                               <Badge variant="destructive" className="text-xs">
                                 <FormattedMessage defaultMessage="Failed" id="Audit / Failed badge" />
@@ -696,7 +800,7 @@ export const AuditLogCard = () => {
                         className="flex h-8 w-8 shrink-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         aria-hidden
                       >
-                        {expandedLogId === log.id ? (
+                        {!hasLogDetails(log) ? null : expandedLogId === log.id ? (
                           <ChevronUp className="h-4 w-4" />
                         ) : (
                           <ChevronDown className="h-4 w-4" />
@@ -704,17 +808,9 @@ export const AuditLogCard = () => {
                       </span>
                     </button>
 
-                    {expandedLogId === log.id && (
-                      <div className="mt-4 border-t pt-4">
+                    {hasLogDetails(log) && expandedLogId === log.id && (
+                      <div className="mx-4 mb-4 border-t pt-4">
                         <dl className="grid grid-cols-2 gap-3 text-sm">
-                          {log.eventDescription && (
-                            <div className="col-span-2">
-                              <dt className="text-xs font-medium text-muted-foreground mb-1">
-                                <FormattedMessage defaultMessage="Description" id="Audit / Description" />
-                              </dt>
-                              <dd>{log.eventDescription}</dd>
-                            </div>
-                          )}
                           {log.connectionName && (
                             <div>
                               <dt className="text-xs font-medium text-muted-foreground mb-1">
@@ -739,16 +835,7 @@ export const AuditLogCard = () => {
                               <dd className="text-destructive">{log.errorMessage}</dd>
                             </div>
                           )}
-                          {log.metadata && Object.keys(log.metadata).length > 0 && (
-                            <div className="col-span-2">
-                              <dt className="text-xs font-medium text-muted-foreground mb-1">
-                                <FormattedMessage defaultMessage="Details" id="Audit / Details" />
-                              </dt>
-                              <dd className="rounded-lg bg-muted/50 p-3 font-mono text-xs overflow-auto">
-                                <pre className="whitespace-pre-wrap">{JSON.stringify(log.metadata, null, 2)}</pre>
-                              </dd>
-                            </div>
-                          )}
+                          {renderKsefDetails(log)}
                         </dl>
                       </div>
                     )}
