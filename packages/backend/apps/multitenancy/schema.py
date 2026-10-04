@@ -34,6 +34,7 @@ from .constants import (
     TenantUserRole,
     TenantType as ConstantsTenantType,
     ActionType,
+    OWNER_ROLE_COLOR,
     PermissionCategory,
     RoleColor,
     SystemRoleType,
@@ -953,6 +954,9 @@ class CreateOrganizationRoleMutation(graphene.Mutation):
         if models.OrganizationRole.objects.filter(tenant=tenant, name=name).exists():
             raise exceptions.GraphQlValidationError(f"A role with the name '{name}' already exists.")
 
+        if color == OWNER_ROLE_COLOR:
+            raise exceptions.GraphQlValidationError("This color is reserved for the Owner role.")
+
         unavailable = get_permission_codes_unavailable_for_country(tenant.country)
         for perm_id in permission_ids:
             _, perm_pk = from_global_id(perm_id)
@@ -1042,6 +1046,10 @@ class UpdateOrganizationRoleMutation(graphene.Mutation):
         # Cannot modify OWNER role permissions
         if role.is_owner_role:
             raise exceptions.GraphQlValidationError("Cannot modify the Owner role.")
+
+        # Only reject a change to the reserved colour, so a role that already has it can still be edited.
+        if color is not None and color != role.color and color == OWNER_ROLE_COLOR:
+            raise exceptions.GraphQlValidationError("This color is reserved for the Owner role.")
 
         # SECURITY CHECK 2: If adding permissions, verify user has those permissions
         if permission_ids is not None:
