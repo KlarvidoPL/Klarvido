@@ -167,6 +167,30 @@ def _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, lo
     return HttpResponse("Signed in with a different account. Sign out of your identity provider and try again.", status=403)
 
 
+def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, stored_request):
+    """SAML counterpart of _restart_sso_login_for_hint: end the other identity-provider session, then sign in again."""
+    SSOAuditLog.log_event(
+        event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
+        tenant=connection.tenant,
+        sso_connection=connection,
+        description="SAML login with a different account than requested - restarting SSO login",
+        error_message="Signed-in account does not match the email entered for SSO login",
+        success=False,
+        ip_address=get_client_ip(request),
+    )
+
+    restart_query = urlencode({"next": (stored_request or {}).get("relay_state", "/"), "login_hint": login_hint})
+    post_logout_redirect = f"{settings.API_URL.rstrip('/')}/api/sso/saml/{connection.id}/login?{restart_query}"
+    try:
+        logout_url = saml_service.build_logout_url(post_logout_redirect)
+    except Exception as e:
+        logger.warning(f"Could not build identity provider logout URL for SAML connection {connection.id}: {e}")
+        logout_url = ""
+    if logout_url:
+        return HttpResponseRedirect(logout_url)
+    return HttpResponse("Signed in with a different account. Sign out of your identity provider and try again.", status=403)
+
+
 def _saml_in_response_to(saml_response: str) -> str | None:
     """Return the InResponseTo of a base64 SAML response, used to find the stored login request."""
     try:
@@ -273,6 +297,8 @@ class SAMLACSView(View):
                     f"raw_attrs: {list(user_attrs.get('raw_attributes', {}).keys())}"
                 )
                 raise ValueError("No email found in SAML response. Check attribute mapping in your IdP.")
+            if login_hint and email.strip().lower() != login_hint:
+                return _restart_saml_login_for_hint(request, connection, saml_service, login_hint, stored_request)
             _ensure_matches_login_hint(login_hint, email)
 
             # Provision or update user

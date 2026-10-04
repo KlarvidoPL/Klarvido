@@ -14,6 +14,7 @@ from typing import Optional, Dict, Any, Tuple
 from urllib.parse import urlencode
 
 import defusedxml.ElementTree as ET
+import requests
 from xml.etree.ElementTree import Element
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -67,6 +68,23 @@ class SAMLService:
         self.connection = sso_connection
         self.tenant = sso_connection.tenant
         self.secrets_service = get_secrets_service('sso')
+
+    def build_logout_url(self, post_logout_redirect_uri: str) -> str:
+        """Logout URL that ends the identity provider session and returns the user to post_logout_redirect_uri.
+
+        Uses the end-session endpoint advertised by the IdP's realm (Keycloak). Returns "" when none is advertised,
+        so the caller can fall back to asking the user to sign out at the identity provider.
+        """
+        issuer = (self.connection.saml_entity_id or "").rstrip("/")
+        if not issuer:
+            return ""
+        response = requests.get(f"{issuer}/.well-known/openid-configuration", timeout=10)
+        response.raise_for_status()
+        endpoint = response.json().get("end_session_endpoint", "")
+        if not endpoint:
+            return ""
+        params = {"client_id": self.get_sp_entity_id(), "post_logout_redirect_uri": post_logout_redirect_uri}
+        return f"{endpoint}?{urlencode(params)}"
 
     def get_sp_entity_id(self) -> str:
         """Get the Service Provider Entity ID.
