@@ -11,6 +11,7 @@ import { cn } from '../../../lib/utils';
 import { Button } from '../../buttons';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { Calendar } from '../calendar';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 
 export interface FormDateRangePickerProps {
   /** Start date value as ISO string (YYYY-MM-DD) */
@@ -101,6 +102,7 @@ export function FormDateRangePicker({
   hasError = false,
   errorMessage,
 }: FormDateRangePickerProps) {
+  const dateLocale = useDateFnsLocale();
   const intl = useIntl();
   const [open, setOpen] = useState(false);
 
@@ -173,8 +175,8 @@ export function FormDateRangePicker({
   // Format date for display
   const formatDateDisplay = useCallback((date: Date | undefined, placeholderText: string) => {
     if (!date) return placeholderText;
-    return format(date, 'dd MMM yyyy');
-  }, []);
+    return format(date, 'dd MMM yyyy', { locale: dateLocale });
+  }, [dateLocale]);
 
   // Get display text for trigger
   const displayText = useMemo(() => {
@@ -271,14 +273,14 @@ export function FormDateRangePicker({
                 'font-medium',
                 !tempRange?.from && 'text-muted-foreground'
               )}>
-                {tempRange?.from ? format(tempRange.from, 'dd MMM') : '—'}
+                {tempRange?.from ? format(tempRange.from, 'dd MMM', { locale: dateLocale }) : '—'}
               </span>
               <ArrowRight className="h-3 w-3 text-muted-foreground" />
               <span className={cn(
                 'font-medium',
                 !tempRange?.to && 'text-muted-foreground'
               )}>
-                {tempRange?.to ? format(tempRange.to, 'dd MMM') : '—'}
+                {tempRange?.to ? format(tempRange.to, 'dd MMM', { locale: dateLocale }) : '—'}
               </span>
             </div>
             

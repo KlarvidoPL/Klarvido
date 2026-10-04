@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "Fehler"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Gruppenzuordnung angewendet"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "IdP-Konfiguration aktiviert"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "IdP-Konfiguration erstellt"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "IdP-Konfiguration deaktiviert"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "IdP-Konfiguration gelöscht"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "IdP-Konfiguration aktualisiert"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "KSeF-Token entfernt"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "KSeF-Token gespeichert"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "KSeF-Token geprüft"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "SCIM-Gruppe erstellt"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "SCIM-Gruppe gelöscht"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "SCIM-Gruppe aktualisiert"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "SCIM-Benutzer erstellt"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "SCIM-Benutzer gelöscht"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "SCIM-Benutzer aktualisiert"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "Anmeldung unter Umgehung von SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO-Anmeldung fehlgeschlagen"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "SSO-Anmeldung gestartet"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO-Anmeldung erfolgreich"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO-Abmeldung"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "Benutzer per JIT bereitgestellt"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "Benutzer per SSO aktualisiert"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Fehlgeschlagen"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP-Adresse"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Von KSeF abgelehnt"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Noch nicht verifiziert"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Verifiziert"
+  },
   "Audit / Last page": {
     "defaultMessage": "Letzte Seite"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Startdatum auswählen"
   },
+  "Audit / Status": {
+    "defaultMessage": "Status"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Fehlgeschlagen"
   },
   "Audit / Status Success": {
     "defaultMessage": "Erfolgreich"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Aktion"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "Neues Token gespeichert"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Token entfernt"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Vorhandenes Token ersetzt"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token endet auf"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Token-Name in KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Nach E-Mail filtern..."
