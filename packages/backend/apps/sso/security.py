@@ -151,6 +151,7 @@ SSO_ERROR_CODES = {
     "signature_invalid": "Security validation failed. Please try again.",
     "state_mismatch": "Security check failed. Please start the sign-in process again.",
     "rate_limited": "Too many attempts. Please wait before trying again.",
+    "account_mismatch": "You signed in with a different account than the one you entered. Please try again.",
     "generic": "An error occurred during sign-in. Please try again or contact support.",
 }
 
@@ -172,6 +173,9 @@ def get_safe_error_code(exception: Exception) -> str:
 
     # Log the actual error for debugging (server-side only)
     logger.error(f"SSO error mapped to safe code: {exception}")
+
+    if "account" in error_msg and "does not match" in error_msg:
+        return "account_mismatch"
 
     # Map common error patterns to safe codes
     if "email" in error_msg and ("missing" in error_msg or "not found" in error_msg or "no email" in error_msg):

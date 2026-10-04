@@ -3983,14 +3983,50 @@
   "SSO / Edit": {
     "defaultMessage": "编辑"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "您登录的账户与输入的邮箱不一致，请重试。"
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "使用其他登录方式"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "身份验证失败，请重试。"
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO 配置不正确，请联系管理员。"
   },
   "SSO / Error / description": {
     "defaultMessage": "如果问题仍然存在，请联系您的 IT 管理员或尝试其他登录方式。"
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "您的电子邮件域名未获此组织授权。"
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "登录时出错，请重试或联系支持人员。"
+  },
   "SSO / Error / heading": {
     "defaultMessage": "登录失败"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "身份提供商返回了无效的响应。"
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "身份提供商未提供电子邮件地址。"
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "自动创建账户已禁用，请联系管理员。"
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "尝试次数过多，请稍后再试。"
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "您的会话已过期，请重新登录。"
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "安全验证失败，请重试。"
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "安全检查失败，请重新开始登录。"
   },
   "SSO / Error / try again button": {
     "defaultMessage": "重试"

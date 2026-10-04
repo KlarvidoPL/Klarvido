@@ -3983,14 +3983,50 @@
   "SSO / Edit": {
     "defaultMessage": "Bearbeiten"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "Sie haben sich mit einem anderen Konto angemeldet als dem eingegebenen. Bitte versuchen Sie es erneut."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Andere Anmeldemethode verwenden"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO ist nicht richtig konfiguriert. Wenden Sie sich an Ihren Administrator."
   },
   "SSO / Error / description": {
     "defaultMessage": "Wenn dieses Problem weiterhin besteht, wenden Sie sich an Ihre IT-Administration oder versuchen Sie eine andere Anmeldemethode."
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "Ihre E-Mail-Domain ist für diese Organisation nicht zugelassen."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "Beim Anmelden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Anmeldung fehlgeschlagen"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Ungültige Antwort des Identitätsanbieters."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "Der Identitätsanbieter hat keine E-Mail-Adresse übermittelt."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "Die automatische Kontoerstellung ist deaktiviert. Wenden Sie sich an Ihren Administrator."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Zu viele Versuche. Bitte warten Sie, bevor Sie es erneut versuchen."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "Sicherheitsprüfung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "Sicherheitsprüfung fehlgeschlagen. Bitte starten Sie die Anmeldung erneut."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Erneut versuchen"

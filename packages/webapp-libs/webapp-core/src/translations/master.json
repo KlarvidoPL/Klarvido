@@ -4160,14 +4160,50 @@
   "SSO / Edit": {
     "defaultMessage": "Edit"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "You signed in with a different account than the one you entered. Please try again."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Use another sign in method"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Authentication failed. Please try again."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO is not properly configured. Contact your administrator."
   },
   "SSO / Error / description": {
     "defaultMessage": "If this problem persists, please contact your IT administrator or try an alternative sign in method."
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "Your email domain is not authorized for this organization."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "An error occurred during sign-in. Please try again or contact support."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Sign in failed"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Invalid response from identity provider."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "Email address not provided by identity provider."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "Automatic account creation is disabled. Contact your administrator."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Too many attempts. Please wait before trying again."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Your session has expired. Please sign in again."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "Security validation failed. Please try again."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "Security check failed. Please start the sign-in process again."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Try again"

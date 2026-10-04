@@ -3983,14 +3983,50 @@
   "SSO / Edit": {
     "defaultMessage": "Modifier"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "Vous vous êtes connecté avec un autre compte que celui saisi. Veuillez réessayer."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Utiliser une autre méthode de connexion"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Échec de l'authentification. Veuillez réessayer."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "Le SSO n'est pas correctement configuré. Contactez votre administrateur."
   },
   "SSO / Error / description": {
     "defaultMessage": "Si le problème persiste, contactez votre administrateur informatique ou essayez une autre méthode de connexion."
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "Le domaine de votre adresse e-mail n'est pas autorisé pour cette organisation."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "Une erreur est survenue lors de la connexion. Veuillez réessayer ou contacter le support."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Échec de la connexion"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Réponse non valide du fournisseur d'identité."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "L'adresse e-mail n'a pas été fournie par le fournisseur d'identité."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "La création automatique de compte est désactivée. Contactez votre administrateur."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Trop de tentatives. Veuillez patienter avant de réessayer."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Votre session a expiré. Veuillez vous reconnecter."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "La validation de sécurité a échoué. Veuillez réessayer."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "Échec de la vérification de sécurité. Veuillez recommencer la connexion."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Réessayer"

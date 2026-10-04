@@ -4184,14 +4184,50 @@
   "SSO / Edit": {
     "defaultMessage": "Edytuj"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "Zalogowano innym kontem niż podany adres e-mail. Spróbuj ponownie."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Użyj innej metody logowania"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Uwierzytelnienie nie powiodło się. Spróbuj ponownie."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO nie jest poprawnie skonfigurowane. Skontaktuj się z administratorem."
   },
   "SSO / Error / description": {
     "defaultMessage": "Jeśli problem będzie się powtarzał, skontaktuj się z administratorem IT lub spróbuj innej metody logowania."
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "Domena Twojego adresu e-mail nie jest dozwolona dla tej organizacji."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "Wystąpił błąd podczas logowania. Spróbuj ponownie lub skontaktuj się z pomocą techniczną."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Logowanie nie powiodło się"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Nieprawidłowa odpowiedź dostawcy tożsamości."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "Dostawca tożsamości nie przekazał adresu e-mail."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "Automatyczne tworzenie kont jest wyłączone. Skontaktuj się z administratorem."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Zbyt wiele prób. Odczekaj chwilę przed ponowną próbą."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Twoja sesja wygasła. Zaloguj się ponownie."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "Weryfikacja bezpieczeństwa nie powiodła się. Spróbuj ponownie."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "Kontrola bezpieczeństwa nie powiodła się. Rozpocznij logowanie ponownie."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Spróbuj ponownie"

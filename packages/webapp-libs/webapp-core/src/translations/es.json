@@ -3983,14 +3983,50 @@
   "SSO / Edit": {
     "defaultMessage": "Editar"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "Ha iniciado sesión con una cuenta distinta a la introducida. Inténtelo de nuevo."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Usar otro método de inicio de sesión"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Error de autenticación. Inténtelo de nuevo."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "El SSO no está configurado correctamente. Contacte con su administrador."
   },
   "SSO / Error / description": {
     "defaultMessage": "Si el problema persiste, contacta a tu administrador de TI o prueba un método de inicio de sesión alternativo."
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "El dominio de su correo no está autorizado para esta organización."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "Se produjo un error al iniciar sesión. Inténtelo de nuevo o contacte con soporte."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Error al iniciar sesión"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Respuesta no válida del proveedor de identidad."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "El proveedor de identidad no proporcionó una dirección de correo."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "La creación automática de cuentas está desactivada. Contacte con su administrador."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Demasiados intentos. Espere antes de volver a intentarlo."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Su sesión ha caducado. Inicie sesión de nuevo."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "La validación de seguridad falló. Inténtelo de nuevo."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "La comprobación de seguridad falló. Inicie el proceso de inicio de sesión de nuevo."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Intentar de nuevo"

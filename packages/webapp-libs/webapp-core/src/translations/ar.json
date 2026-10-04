@@ -3983,14 +3983,50 @@
   "SSO / Edit": {
     "defaultMessage": "تعديل"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "سجلت الدخول بحساب مختلف عن البريد الذي أدخلته. يرجى المحاولة مرة أخرى."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "استخدم طريقة تسجيل دخول أخرى"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "فشلت المصادقة. يرجى المحاولة مرة أخرى."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "لم يتم إعداد SSO بشكل صحيح. تواصل مع المسؤول."
   },
   "SSO / Error / description": {
     "defaultMessage": "إذا استمرت هذه المشكلة، يُرجى التواصل مع مسؤول تقنية المعلومات لديك أو تجربة طريقة أخرى لتسجيل الدخول."
   },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "نطاق بريدك الإلكتروني غير مصرح به لهذه المؤسسة."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "فشل تسجيل الدخول"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "استجابة غير صالحة من مزود الهوية."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "لم يُقدَّم عنوان البريد الإلكتروني من مزود الهوية."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "إنشاء الحسابات تلقائيًا معطل. تواصل مع المسؤول."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "محاولات كثيرة جدًا. يرجى الانتظار قبل المحاولة مرة أخرى."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "فشل التحقق الأمني. يرجى المحاولة مرة أخرى."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "فشل فحص الأمان. يرجى بدء عملية تسجيل الدخول من جديد."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "المحاولة مرة أخرى"

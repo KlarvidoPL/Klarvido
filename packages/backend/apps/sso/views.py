@@ -150,7 +150,7 @@ def _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, lo
         tenant=connection.tenant,
         sso_connection=connection,
         description="OIDC login with a different account than requested - restarting SSO login",
-        error_message="Signed-in account does not match the email entered for SSO login",
+        error_message="account_mismatch",
         success=False,
         ip_address=get_client_ip(request),
     )
@@ -164,7 +164,7 @@ def _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, lo
     )
     if logout_url:
         return HttpResponseRedirect(logout_url)
-    return HttpResponse("Signed in with a different account. Sign out of your identity provider and try again.", status=403)
+    return _sso_error_redirect("account_mismatch")
 
 
 def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, stored_request):
@@ -174,7 +174,7 @@ def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, 
         tenant=connection.tenant,
         sso_connection=connection,
         description="SAML login with a different account than requested - restarting SSO login",
-        error_message="Signed-in account does not match the email entered for SSO login",
+        error_message="account_mismatch",
         success=False,
         ip_address=get_client_ip(request),
     )
@@ -188,7 +188,13 @@ def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, 
         logout_url = ""
     if logout_url:
         return HttpResponseRedirect(logout_url)
-    return HttpResponse("Signed in with a different account. Sign out of your identity provider and try again.", status=403)
+    return _sso_error_redirect("account_mismatch")
+
+
+def _sso_error_redirect(error_code: str):
+    """Send the user to the sign-in error page, which shows a translated message for the code."""
+    web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000").rstrip("/")
+    return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
 
 
 def _saml_in_response_to(saml_response: str) -> str | None:
@@ -232,7 +238,7 @@ class SAMLLoginView(View):
             # SECURITY: Log detailed error server-side, return generic message to client
             logger.error(f"Failed to create SAML AuthnRequest for connection {connection_id}: {e}", exc_info=True)
             error_code = get_safe_error_code(e)
-            return HttpResponse(f"Failed to initiate SSO login. Error code: {error_code}", status=500)
+            return _sso_error_redirect(error_code)
 
         # Store request ID for validation
         cache.set(
@@ -359,20 +365,19 @@ class SAMLACSView(View):
             # Log detailed error server-side only (not exposed to client)
             logger.error(f"SAML authentication failed for connection {connection_id}: {e}", exc_info=True)
 
+            error_code = get_safe_error_code(e)
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
                 tenant=connection.tenant,
                 sso_connection=connection,
                 description="SAML login failed",
-                error_message=str(e)[:500],  # Store for admin review
+                error_message=error_code,  # Stable code; the detailed message stays in the server log
                 ip_address=get_client_ip(request),
                 success=False,
             )
 
-            # SECURITY: Return safe error code instead of raw exception message
-            web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-            error_code = get_safe_error_code(e)
-            return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
+            # SECURITY: Return the safe error code, never the raw exception message
+            return _sso_error_redirect(error_code)
 
 
 # ==================
@@ -416,7 +421,7 @@ class OIDCLoginView(View):
             # SECURITY: Log detailed error server-side, return generic message to client
             logger.error(f"Failed to create OIDC authorization URL for connection {connection_id}: {e}", exc_info=True)
             error_code = get_safe_error_code(e)
-            return HttpResponse(f"Failed to initiate SSO login. Error code: {error_code}", status=500)
+            return _sso_error_redirect(error_code)
 
         # Store state for callback validation
         cache.set(
@@ -558,20 +563,19 @@ class OIDCCallbackView(View):
             # Log detailed error server-side only
             logger.error(f"OIDC authentication failed for connection {connection_id}: {e}", exc_info=True)
 
+            error_code = get_safe_error_code(e)
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
                 tenant=connection.tenant,
                 sso_connection=connection,
                 description="OIDC login failed",
-                error_message=str(e)[:500],  # Store for admin review
+                error_message=error_code,  # Stable code; the detailed message stays in the server log
                 success=False,
                 ip_address=get_client_ip(request),
             )
 
-            # SECURITY: Return safe error code instead of raw exception
-            web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-            error_code = get_safe_error_code(e)
-            return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
+            # SECURITY: Return the safe error code, never the raw exception message
+            return _sso_error_redirect(error_code)
 
 
 # ==================

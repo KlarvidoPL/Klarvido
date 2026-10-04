@@ -54,6 +54,10 @@ const ERROR_MESSAGES: Record<string, { id: string; defaultMessage: string }> = {
     id: 'SSO / Error / rate_limited',
     defaultMessage: 'Too many attempts. Please wait before trying again.',
   },
+  account_mismatch: {
+    id: 'SSO / Error / account_mismatch',
+    defaultMessage: 'You signed in with a different account than the one you entered. Please try again.',
+  },
   generic: {
     id: 'SSO / Error / generic',
     defaultMessage: 'An error occurred during sign-in. Please try again or contact support.',
@@ -94,9 +98,7 @@ export const SSOError = () => {
             <CardTitle className="text-2xl font-semibold tracking-tight text-destructive dark:text-red-400">
               <FormattedMessage defaultMessage="Sign in failed" id="SSO / Error / heading" />
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              {errorMessage}
-            </CardDescription>
+            <CardDescription className="text-muted-foreground">{errorMessage}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center text-sm text-muted-foreground">
@@ -125,4 +127,3 @@ export const SSOError = () => {
     </>
   );
 };
-

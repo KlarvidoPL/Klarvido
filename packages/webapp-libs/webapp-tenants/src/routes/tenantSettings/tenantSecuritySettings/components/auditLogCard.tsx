@@ -172,6 +172,60 @@ const KSEF_STATUS_MESSAGES = defineMessages({
   INVALID: { id: 'Audit / KSeF status rejected', defaultMessage: 'Rejected by KSeF' },
 });
 
+// Stable SSO error codes stored with failed logins; shown translated, unknown values are shown as they are.
+const SSO_ERROR_MESSAGES = defineMessages({
+  auth_failed: { id: 'SSO / Error / auth_failed', defaultMessage: 'Authentication failed. Please try again.' },
+  invalid_response: {
+    id: 'SSO / Error / invalid_response',
+    defaultMessage: 'Invalid response from identity provider.',
+  },
+  missing_email: {
+    id: 'SSO / Error / missing_email',
+    defaultMessage: 'Email address not provided by identity provider.',
+  },
+  domain_not_allowed: {
+    id: 'SSO / Error / domain_not_allowed',
+    defaultMessage: 'Your email domain is not authorized for this organization.',
+  },
+  provisioning_disabled: {
+    id: 'SSO / Error / provisioning_disabled',
+    defaultMessage: 'Automatic account creation is disabled. Contact your administrator.',
+  },
+  session_expired: {
+    id: 'SSO / Error / session_expired',
+    defaultMessage: 'Your session has expired. Please sign in again.',
+  },
+  config_error: {
+    id: 'SSO / Error / config_error',
+    defaultMessage: 'SSO is not properly configured. Contact your administrator.',
+  },
+  signature_invalid: {
+    id: 'SSO / Error / signature_invalid',
+    defaultMessage: 'Security validation failed. Please try again.',
+  },
+  state_mismatch: {
+    id: 'SSO / Error / state_mismatch',
+    defaultMessage: 'Security check failed. Please start the sign-in process again.',
+  },
+  rate_limited: {
+    id: 'SSO / Error / rate_limited',
+    defaultMessage: 'Too many attempts. Please wait before trying again.',
+  },
+  account_mismatch: {
+    id: 'SSO / Error / account_mismatch',
+    defaultMessage: 'You signed in with a different account than the one you entered. Please try again.',
+  },
+  generic: {
+    id: 'SSO / Error / generic',
+    defaultMessage: 'An error occurred during sign-in. Please try again or contact support.',
+  },
+});
+
+const getSsoErrorMessage = (intl: IntlShape, errorCode: string): string => {
+  const message = SSO_ERROR_MESSAGES[errorCode as keyof typeof SSO_ERROR_MESSAGES];
+  return message ? intl.formatMessage(message) : errorCode;
+};
+
 const getEventTypeLabel = (intl: IntlShape, eventType: string, fallback?: string): string => {
   const message = EVENT_TYPE_MESSAGES[eventType as keyof typeof EVENT_TYPE_MESSAGES];
   return message ? intl.formatMessage(message) : fallback || eventType;
@@ -844,7 +898,7 @@ export const AuditLogCard = () => {
                               <dt className="text-xs font-medium text-destructive mb-1">
                                 <FormattedMessage defaultMessage="Error" id="Audit / Error" />
                               </dt>
-                              <dd className="text-destructive">{log.errorMessage}</dd>
+                              <dd className="text-destructive">{getSsoErrorMessage(intl, log.errorMessage)}</dd>
                             </div>
                           )}
                           {renderKsefDetails(log)}
