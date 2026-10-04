@@ -717,8 +717,8 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
                 );
               })}
 
-              {/* Enforce SSO Info Box - shown when any connection has enforce_sso enabled */}
-              {connections.some((c) => c.enforceSso) && (
+              {/* Enforce SSO Info Box - shown only when an active connection enforces SSO */}
+              {connections.some((c) => c.isActive && c.enforceSso) && (
                 <div className="rounded-lg border border-amber-500/30 bg-card p-4">
                   <div className="flex gap-3">
                     <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
