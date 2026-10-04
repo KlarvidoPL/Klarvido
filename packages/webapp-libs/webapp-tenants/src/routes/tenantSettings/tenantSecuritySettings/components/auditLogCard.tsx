@@ -86,6 +86,8 @@ interface Filters {
   search: string;
 }
 
+const FILTER_DEBOUNCE_MS = 300;
+
 const EVENT_ICONS: Record<string, React.ReactNode> = {
   // SSO events
   sso_login_initiated: <LogIn className="h-4 w-4" />,
@@ -218,24 +220,31 @@ export const AuditLogCard = () => {
     return Object.values(filters).some((v) => v !== '');
   }, [filters]);
 
-  const buildQueryParams = useCallback(
-    (page: number, includeFilterOptions = false) => {
-      const params = new URLSearchParams();
-      params.set('page', String(page));
-      params.set('limit', String(DEFAULT_PAGE_SIZE));
+  // Read the latest filters from a ref, so fetching does not change identity on every keystroke
+  const filtersRef = useRef(filters);
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
 
-      if (filters.eventType) params.set('event_type', filters.eventType);
-      if (filters.userEmail) params.set('user_email', filters.userEmail);
-      if (filters.success) params.set('success', filters.success);
-      if (filters.startDate) params.set('start_date', filters.startDate);
-      if (filters.endDate) params.set('end_date', filters.endDate);
-      if (filters.search) params.set('search', filters.search);
-      if (includeFilterOptions) params.set('include_filter_options', 'true');
+  // Only the most recent request may update the list, so slow responses cannot overwrite newer results
+  const latestRequestId = useRef(0);
 
-      return params.toString();
-    },
-    [filters]
-  );
+  const buildQueryParams = useCallback((page: number, includeFilterOptions = false) => {
+    const currentFilters = filtersRef.current;
+    const params = new URLSearchParams();
+    params.set('page', String(page));
+    params.set('limit', String(DEFAULT_PAGE_SIZE));
+
+    if (currentFilters.eventType) params.set('event_type', currentFilters.eventType);
+    if (currentFilters.userEmail) params.set('user_email', currentFilters.userEmail);
+    if (currentFilters.success) params.set('success', currentFilters.success);
+    if (currentFilters.startDate) params.set('start_date', currentFilters.startDate);
+    if (currentFilters.endDate) params.set('end_date', currentFilters.endDate);
+    if (currentFilters.search) params.set('search', currentFilters.search);
+    if (includeFilterOptions) params.set('include_filter_options', 'true');
+
+    return params.toString();
+  }, []);
 
   const fetchLogs = useCallback(
     async (page = 1, fetchFilterOptions = false) => {
@@ -251,11 +260,15 @@ export const AuditLogCard = () => {
         setIsFetching(true);
       }
 
+      const requestId = ++latestRequestId.current;
+      const isLatestRequest = () => requestId === latestRequestId.current;
+
       try {
         const queryParams = buildQueryParams(page, fetchFilterOptions);
         const response = await apiClient.get<AuditLogResponse>(
           apiURL(`/sso/tenant/${tenantId}/audit-logs/?${queryParams}`)
         );
+        if (!isLatestRequest()) return;
         setLogs(response.data.logs || []);
         setTotalCount(response.data.totalCount || 0);
         setTotalPages(response.data.totalPages || 0);
@@ -283,17 +296,28 @@ export const AuditLogCard = () => {
           console.warn('Failed to fetch audit logs (this is expected if user lacks permissions):', error);
         }
       } finally {
-        setInitialLoading(false);
-        setIsFetching(false);
+        if (isLatestRequest()) {
+          setInitialLoading(false);
+          setIsFetching(false);
+        }
       }
     },
     [tenantId, buildQueryParams]
   );
 
+  // Load the list and filter options once per organization
   useEffect(() => {
-    // Fetch with filter options on initial load
     fetchLogs(1, true);
   }, [fetchLogs]);
+
+  // Filter changes (including search typing) refresh the list after a short pause
+  const lastRequestedFilters = useRef(filters);
+  useEffect(() => {
+    if (lastRequestedFilters.current === filters) return;
+    lastRequestedFilters.current = filters;
+    const timeout = setTimeout(() => fetchLogs(1), FILTER_DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
+  }, [filters, fetchLogs]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
@@ -319,8 +343,6 @@ export const AuditLogCard = () => {
       search: '',
     };
     setFilters(clearedFilters);
-    // Need to fetch with cleared filters
-    setTimeout(() => fetchLogs(1), 0);
   };
 
   const handleRefresh = () => {

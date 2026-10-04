@@ -1,6 +1,6 @@
 import { TenantUserRole, apiClient } from '@sb/webapp-api-client';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { RoutesConfig } from '../../../../../config/routes';
@@ -121,6 +121,19 @@ describe('AuditLogCard: Component', () => {
     renderComponent();
 
     expect(await screen.findByText('KSeF token saved', { selector: 'span' })).toBeInTheDocument();
+  });
+
+  it('should refresh the list once after typing in the search, not on every keystroke', async () => {
+    renderComponent();
+
+    await userEvent.click(await screen.findByRole('button', { name: /filters/i }));
+    const search = await screen.findByPlaceholderText(/search logs/i);
+    await waitFor(() => expect(mockedApiClient.get).toHaveBeenCalledTimes(1));
+
+    await userEvent.type(search, 'abc');
+
+    await waitFor(() => expect(mockedApiClient.get).toHaveBeenCalledTimes(2));
+    expect(mockedApiClient.get).toHaveBeenLastCalledWith(expect.stringContaining('search=abc'));
   });
 
   it('should toggle filters panel', async () => {
