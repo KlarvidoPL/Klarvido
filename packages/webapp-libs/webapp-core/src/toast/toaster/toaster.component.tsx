@@ -38,12 +38,12 @@ const variantIcons: Record<ToastVariant, ToastIconConfig> = {
 const variantStyles: Record<ToastVariant, string> = {
   default: 'bg-background border border-border',
   success:
-    'border-l-4 border-l-green-500 border-y border-r border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950/50 dark:text-green-100',
+    'border-l-4 border-l-green-500 border-y border-r border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-100',
   destructive:
-    'border-l-4 border-l-destructive border-y border-r border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950/50 dark:text-red-100',
+    'border-l-4 border-l-destructive border-y border-r border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-100',
   warning:
-    'border-l-4 border-l-amber-500 border-y border-r border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-100',
-  info: 'border-l-4 border-l-blue-500 border-y border-r border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-100',
+    'border-l-4 border-l-amber-500 border-y border-r border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100',
+  info: 'border-l-4 border-l-blue-500 border-y border-r border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100',
 };
 
 const closeButtonStyles: Record<ToastVariant, string> = {
