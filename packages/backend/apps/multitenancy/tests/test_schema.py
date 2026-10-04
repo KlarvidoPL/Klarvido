@@ -2283,7 +2283,7 @@ class TestCustomRoleColorRestriction:
             },
         )
 
-        assert "errors" in executed
+        assert "This color is reserved for the Owner role." in str(executed["errors"])
         assert not OrganizationRole.objects.filter(tenant=tenant, name="Purple Role").exists()
 
     def test_owner_cannot_recolor_custom_role_to_reserved_color(
@@ -2291,7 +2291,9 @@ class TestCustomRoleColorRestriction:
     ):
         tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
         tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER, is_accepted=True)
-        custom_role = OrganizationRole.objects.create(tenant=tenant, name="Custom", description="", color=RoleColor.BLUE)
+        custom_role = OrganizationRole.objects.create(
+            tenant=tenant, name="Custom", description="", color=RoleColor.BLUE
+        )
 
         graphene_client.force_authenticate(user)
         graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
@@ -2300,11 +2302,11 @@ class TestCustomRoleColorRestriction:
             variable_values={
                 "id": to_global_id("OrganizationRoleType", custom_role.id),
                 "tenantId": to_global_id("TenantType", tenant.id),
-                "color": OWNER_ROLE_COLOR,
+                "color": OWNER_ROLE_COLOR.name,
             },
         )
 
-        assert "errors" in executed
+        assert "This color is reserved for the Owner role." in str(executed["errors"])
         custom_role.refresh_from_db()
         assert custom_role.color == RoleColor.BLUE
 
@@ -2325,7 +2327,7 @@ class TestCustomRoleColorRestriction:
                 "id": to_global_id("OrganizationRoleType", legacy_role.id),
                 "tenantId": to_global_id("TenantType", tenant.id),
                 "name": "Renamed",
-                "color": OWNER_ROLE_COLOR,
+                "color": OWNER_ROLE_COLOR.name,
             },
         )
 
