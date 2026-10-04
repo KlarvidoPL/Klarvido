@@ -10,7 +10,7 @@ import {
 } from '@sb/webapp-core/components/ui/dialog';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { Fingerprint, Key, Loader2, Plus, Search, Smartphone, Trash2, User } from 'lucide-react';
+import { Fingerprint, Key, Loader2, Plus, Search, Smartphone, Trash2, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -107,22 +107,22 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
   return (
     <>
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-primary" />
+        <CardHeader className="pb-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Key className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <FormattedMessage
                   defaultMessage="Passkeys (WebAuthn)"
                   id="Tenant Security Settings / Passkeys Header"
                 />
                 {passkeys.length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {passkeys.length}
-                  </Badge>
+                  <Badge variant="secondary">{passkeys.length}</Badge>
                 )}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="mt-0.5">
                 {canManagePasskeys ? (
                   <FormattedMessage
                     defaultMessage="Manage passkeys for all users in your organization"
@@ -139,8 +139,8 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search Input - only show for admins with passkeys */}
-          {canManagePasskeys && passkeys.length > 0 && (
+          {/* Search Input - always visible for admins so a no-match search can be cleared */}
+          {canManagePasskeys && (
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -150,8 +150,21 @@ export const PasskeysCard = ({ canManagePasskeys = false }: PasskeysCardProps) =
                 })}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 pr-10"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  aria-label={intl.formatMessage({
+                    defaultMessage: 'Clear search',
+                    id: 'Passkeys Card / Clear Search',
+                  })}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
           )}
 
