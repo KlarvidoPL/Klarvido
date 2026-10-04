@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 
 import type { Option } from './onboardingOptions.hook';
 
-// Tiles share one width per row: the grid stretches to the widest label, capped so long labels wrap instead.
+// Below the sm breakpoint tiles stack in one column and span the full width, like the Back/Next buttons.
+// From sm up they share one width per row: the grid stretches to the widest label, capped so long labels wrap instead.
 export const ChoiceGroup = ({
   options,
   selected,
@@ -22,7 +23,7 @@ export const ChoiceGroup = ({
   };
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,14rem))] gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(9rem,14rem))]">
       {options.map((option) => {
         const active = selected.includes(option.value);
         return (
