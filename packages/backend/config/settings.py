@@ -562,6 +562,10 @@ BACKUP_MASTER_KEY = env("BACKUP_MASTER_KEY", default=None)
 #   python -c "import base64,os; print(base64.b64encode(os.urandom(32)).decode())"
 KSEF_ENVIRONMENT = env("KSEF_ENVIRONMENT", default="test")
 KSEF_ENCRYPTION_KEYS = env("KSEF_ENCRYPTION_KEYS", default="")
+# Path to a file holding the same content. Preferred in production: the file is mounted as a Docker secret, so
+# the key never appears in the container environment (`docker inspect`). When set, it takes precedence over
+# KSEF_ENCRYPTION_KEYS.
+KSEF_ENCRYPTION_KEYS_FILE = env("KSEF_ENCRYPTION_KEYS_FILE", default="")
 
 LAMBDA_TASKS_BASE_HANDLER = env("LAMBDA_TASKS_BASE_HANDLER", default="common.tasks.LambdaTask")
 LAMBDA_TASKS_LOCAL_URL = env("LAMBDA_TASKS_LOCAL_URL", default=None)

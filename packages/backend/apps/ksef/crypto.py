@@ -32,8 +32,20 @@ class KsefDecryptionError(Exception):
     """The stored payload cannot be decrypted with any configured key."""
 
 
+def _raw_keys() -> str:
+    key_file = getattr(settings, "KSEF_ENCRYPTION_KEYS_FILE", "") or ""
+    if key_file:
+        try:
+            with open(key_file, encoding="utf-8") as f:
+                return f.read()
+        except OSError as e:
+            # The message names the path only, never the key material
+            raise KsefEncryptionNotConfigured(f"KSEF_ENCRYPTION_KEYS_FILE cannot be read: {key_file}") from e
+    return getattr(settings, "KSEF_ENCRYPTION_KEYS", "") or ""
+
+
 def _load_keys() -> list[bytes]:
-    raw = getattr(settings, "KSEF_ENCRYPTION_KEYS", "") or ""
+    raw = _raw_keys()
     keys = []
     for item in raw.split(","):
         item = item.strip()

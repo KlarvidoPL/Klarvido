@@ -50,3 +50,6 @@ Thumbs.db
 # Nx
 .nx/cache
 .nx/workspace-data
+
+# Docker secrets mounted by docker-compose.prod.yml (KSeF encryption key lives here on the VPS)
+/secrets/
