@@ -3680,6 +3680,9 @@
   "Roles / Error / Role assigned to members": {
     "defaultMessage": "This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / Role name exists": {
     "defaultMessage": "A role named \"{name}\" already exists. Choose a different name."
   },

@@ -118,7 +118,6 @@ const ROLE_COLORS = [
   { value: 'GREEN', className: 'bg-emerald-500', ring: 'ring-emerald-500/30' },
   { value: 'RED', className: 'bg-rose-500', ring: 'ring-rose-500/30' },
   { value: 'YELLOW', className: 'bg-amber-500', ring: 'ring-amber-500/30' },
-  { value: 'PURPLE', className: 'bg-violet-500', ring: 'ring-violet-500/30' },
   { value: 'ORANGE', className: 'bg-orange-500', ring: 'ring-orange-500/30' },
   { value: 'PINK', className: 'bg-pink-500', ring: 'ring-pink-500/30' },
   { value: 'TEAL', className: 'bg-teal-500', ring: 'ring-teal-500/30' },
@@ -243,6 +242,13 @@ const getRoleMutationErrorMessage = (intl: IntlShape, error: ApolloErrorLike): s
       },
       { permission }
     );
+  }
+
+  if (message === 'This color is reserved for the Owner role.') {
+    return intl.formatMessage({
+      defaultMessage: 'This color is reserved for the owner role. Choose a different color.',
+      id: 'Roles / Error / Color reserved for owner',
+    });
   }
 
   const nameExistsMatch = message.match(/^A role with the name '(.+)' already exists\.$/);

@@ -3680,6 +3680,9 @@
   "Roles / Error / Role assigned to members": {
     "defaultMessage": "Ta rola jest przypisana do {count, plural, one {# członka} few {# członków} many {# członków} other {# członka}}. Wybierz rolę zastępczą."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Ten kolor jest zarezerwowany dla roli właściciela. Wybierz inny kolor."
+  },
   "Roles / Error / Role name exists": {
     "defaultMessage": "Rola o nazwie „{name}” już istnieje. Wybierz inną nazwę."
   },
