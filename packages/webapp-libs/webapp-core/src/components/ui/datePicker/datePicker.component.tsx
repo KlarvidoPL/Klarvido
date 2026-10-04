@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { format, parse, parseISO, isValid, setHours, setMinutes, getHours, getMinutes, startOfDay } from 'date-fns';
 import { CalendarIcon, X, Clock } from 'lucide-react';
+import { useIntl } from 'react-intl';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../buttons';
@@ -215,6 +216,7 @@ export function DatePicker({
   showTime = false,
   timeStep = 5,
 }: DatePickerProps) {
+  const intl = useIntl();
   const dateLocale = useDateFnsLocale();
   const [open, setOpen] = useState(false);
   
@@ -406,7 +408,9 @@ export function DatePicker({
             onClick={showTime ? handleNowClick : handleTodayClick}
             className="text-xs h-7"
           >
-            {showTime ? 'Now' : 'Today'}
+            {showTime
+              ? intl.formatMessage({ id: 'Calendar / Now button', defaultMessage: 'Now' })
+              : intl.formatMessage({ id: 'Calendar / Today button', defaultMessage: 'Today' })}
           </Button>
           <div className="flex items-center gap-2">
             {clearable && selectedDate && (

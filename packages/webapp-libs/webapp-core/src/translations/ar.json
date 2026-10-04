@@ -1475,6 +1475,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "تم تحديث إعدادات النسخ الاحتياطي بنجاح"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "الانتقال إلى اليوم"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "الآن"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "اليوم"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "الخطة الحالية:"
   },
