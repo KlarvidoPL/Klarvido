@@ -45,6 +45,37 @@ describe('TenantSettings: Component', () => {
     expect(screen.getByText(/manage your organization/i)).toBeInTheDocument();
   });
 
+  describe('Security tab for KSeF-only roles', () => {
+    const renderWithPermissions = (country: string, permissions: string[]) => {
+      const polishTenant = tenantFactory({
+        id: 'tenant-1',
+        country,
+        membership: membershipFactory({ role: 'OWNER' }),
+      });
+      const polishUser = currentUserFactory({ tenants: [polishTenant] });
+      const apolloMocks = [fillCommonQueryWithUser(polishUser), createPermissionsMock(polishTenant.id, permissions)];
+      const routerProps = createMockRouterProps(RoutesConfig.tenant.settings.general, {
+        tenantId: polishTenant.id,
+      });
+
+      render(<Component />, { apolloMocks, routerProps });
+    };
+
+    it('shows the Security tab to a role that can only view KSeF on a Polish organization', async () => {
+      renderWithPermissions('PL', ['security.ksef.view', 'org.settings.view']);
+
+      expect(await screen.findByRole('tab', { name: /general|organization/i })).toBeInTheDocument();
+      expect(await screen.findByRole('tab', { name: /security/i })).toBeInTheDocument();
+    });
+
+    it('hides the Security tab for KSeF permissions on a non-Polish organization', async () => {
+      renderWithPermissions('DE', ['security.ksef.view', 'org.settings.view']);
+
+      expect(await screen.findByRole('tab', { name: /general|organization/i })).toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /security/i })).not.toBeInTheDocument();
+    });
+  });
+
   it('should render Members tab when user has members.view permission', async () => {
     const apolloMocks = [
       fillCommonQueryWithUser(user),

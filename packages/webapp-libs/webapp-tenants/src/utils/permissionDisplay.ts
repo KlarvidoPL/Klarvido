@@ -207,6 +207,22 @@ export const getPermissionDisplay = (
           id: 'Roles / Permission / backup.manage / Description',
         }),
       };
+    case 'security.ksef.view':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'View KSeF Connection', id: 'Roles / Permission / security.ksef.view / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'View whether a KSeF token is connected and when it was last verified',
+          id: 'Roles / Permission / security.ksef.view / Description',
+        }),
+      };
+    case 'security.ksef.manage':
+      return {
+        name: intl.formatMessage({ defaultMessage: 'Manage KSeF Connection', id: 'Roles / Permission / security.ksef.manage / Name' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Add, test, replace or remove the KSeF token',
+          id: 'Roles / Permission / security.ksef.manage / Description',
+        }),
+      };
     default:
       return { name: fallbackName, description: fallbackDescription };
   }

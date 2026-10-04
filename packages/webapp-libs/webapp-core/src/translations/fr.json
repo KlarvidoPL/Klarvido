@@ -2588,6 +2588,153 @@
   "Home / t&c link": {
     "defaultMessage": "Conditions générales"
   },
+  "KSeF / Cancel button": {
+    "defaultMessage": "Annuler"
+  },
+  "KSeF / Card description": {
+    "defaultMessage": "Le jeton KSeF permet à Klarvido de lire les factures de votre entreprise depuis KSeF."
+  },
+  "KSeF / Card title": {
+    "defaultMessage": "Connexion KSeF"
+  },
+  "KSeF / Connect token button": {
+    "defaultMessage": "Connecter le jeton KSeF"
+  },
+  "KSeF / Empty state": {
+    "defaultMessage": "Connectez un jeton pour commencer à lire les factures de votre entreprise depuis KSeF."
+  },
+  "KSeF / Empty title": {
+    "defaultMessage": "Aucun jeton KSeF connecté"
+  },
+  "KSeF / Error NIP missing": {
+    "defaultMessage": "Ajoutez le NIP de l'organisation avant de connecter KSeF."
+  },
+  "KSeF / Error country not supported": {
+    "defaultMessage": "KSeF n'est disponible que pour les organisations polonaises."
+  },
+  "KSeF / Error decryption failed": {
+    "defaultMessage": "Le jeton enregistré ne peut pas être lu. Remplacez-le par un nouveau jeton."
+  },
+  "KSeF / Error encryption not configured": {
+    "defaultMessage": "La connexion KSeF n'est pas disponible sur ce serveur. Contactez le support."
+  },
+  "KSeF / Error generic": {
+    "defaultMessage": "Une erreur s'est produite lors de la connexion à KSeF. Réessayez."
+  },
+  "KSeF / Error invalid token": {
+    "defaultMessage": "KSeF n'a pas accepté ce jeton. Vérifiez qu'il a été copié correctement et qu'il n'a pas été révoqué."
+  },
+  "KSeF / Error no permissions": {
+    "defaultMessage": "Ce jeton n'a aucune autorisation pour l'entreprise. Générez un nouveau jeton avec l'accès en lecture aux factures."
+  },
+  "KSeF / Error service unavailable": {
+    "defaultMessage": "KSeF est injoignable pour le moment. Réessayez plus tard."
+  },
+  "KSeF / Error token empty": {
+    "defaultMessage": "Collez le jeton KSeF avant d'enregistrer."
+  },
+  "KSeF / Invalid hint": {
+    "defaultMessage": "KSeF n'accepte plus ce jeton. Remplacez-le par un nouveau."
+  },
+  "KSeF / Last verified label": {
+    "defaultMessage": "Dernière vérification"
+  },
+  "KSeF / Loading": {
+    "defaultMessage": "Chargement de la connexion KSeF..."
+  },
+  "KSeF / Modal description sr": {
+    "defaultMessage": "Instructions pour générer et coller un jeton KSeF"
+  },
+  "KSeF / Modal subtitle": {
+    "defaultMessage": "Connectez un jeton KSeF pour lire les factures depuis KSeF"
+  },
+  "KSeF / Modal title": {
+    "defaultMessage": "Connecter KSeF"
+  },
+  "KSeF / Modal title sr": {
+    "defaultMessage": "Connecter KSeF"
+  },
+  "KSeF / Never verified": {
+    "defaultMessage": "Jamais"
+  },
+  "KSeF / Remove dialog description": {
+    "defaultMessage": "Klarvido arrêtera de lire les factures depuis KSeF jusqu'à la connexion d'un nouveau jeton."
+  },
+  "KSeF / Remove dialog title": {
+    "defaultMessage": "Supprimer le jeton KSeF"
+  },
+  "KSeF / Remove token button": {
+    "defaultMessage": "Supprimer"
+  },
+  "KSeF / Removed toast": {
+    "defaultMessage": "Jeton KSeF supprimé."
+  },
+  "KSeF / Replace token button": {
+    "defaultMessage": "Remplacer le jeton"
+  },
+  "KSeF / Saved toast": {
+    "defaultMessage": "Jeton KSeF vérifié et enregistré."
+  },
+  "KSeF / Saved unverified toast": {
+    "defaultMessage": "Jeton enregistré. KSeF était injoignable, le jeton n'est donc pas encore vérifié. Testez la connexion plus tard."
+  },
+  "KSeF / Status invalid": {
+    "defaultMessage": "Jeton refusé"
+  },
+  "KSeF / Status unverified": {
+    "defaultMessage": "Non vérifié"
+  },
+  "KSeF / Status valid": {
+    "defaultMessage": "Connecté"
+  },
+  "KSeF / Step 1 description": {
+    "defaultMessage": "Connectez-vous à KSeF avec un compte autorisé pour votre entreprise."
+  },
+  "KSeF / Step 1 title": {
+    "defaultMessage": "Ouvrir l'application web KSeF"
+  },
+  "KSeF / Step 2 description": {
+    "defaultMessage": "Ouvrez la section Jetons et générez un nouveau jeton. N'accordez que le droit de lecture des factures (InvoiceRead). N'accordez aucun droit d'écriture."
+  },
+  "KSeF / Step 2 title": {
+    "defaultMessage": "Générer un nouveau jeton"
+  },
+  "KSeF / Step 3 description": {
+    "defaultMessage": "KSeF n'affiche le jeton qu'une seule fois. Copiez-le immédiatement, avant de fermer cette fenêtre."
+  },
+  "KSeF / Step 3 title": {
+    "defaultMessage": "Copier le jeton"
+  },
+  "KSeF / Step 4 description": {
+    "defaultMessage": "Nous vérifions le jeton auprès de KSeF avant de l'enregistrer. Les jetons enregistrés sont chiffrés et ne sont plus jamais affichés."
+  },
+  "KSeF / Step 4 title": {
+    "defaultMessage": "Collez-le ci-dessous"
+  },
+  "KSeF / Test connection button": {
+    "defaultMessage": "Tester la connexion"
+  },
+  "KSeF / Test passed toast": {
+    "defaultMessage": "Le jeton KSeF est valide."
+  },
+  "KSeF / Token input label": {
+    "defaultMessage": "Jeton KSeF"
+  },
+  "KSeF / Token name label": {
+    "defaultMessage": "Nom du jeton dans KSeF"
+  },
+  "KSeF / Token required": {
+    "defaultMessage": "Collez le jeton KSeF"
+  },
+  "KSeF / Token security note": {
+    "defaultMessage": "Le jeton est chiffré avant d'être enregistré et ne peut plus être affiché après l'enregistrement."
+  },
+  "KSeF / Unverified hint": {
+    "defaultMessage": "KSeF était injoignable lors de l'enregistrement du jeton. Testez la connexion pour le vérifier."
+  },
+  "KSeF / Verify and save button": {
+    "defaultMessage": "Vérifier et enregistrer"
+  },
   "Login form / error / authentication failed": {
     "defaultMessage": "Identifiants d'authentification incorrects."
   },
@@ -3478,6 +3625,18 @@
   },
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "Afficher les paramètres de l'organisation"
+  },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "Ajouter, tester, remplacer ou supprimer le jeton KSeF"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "Gérer la connexion KSeF"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "Voir si un jeton KSeF est connecté et date de sa dernière vérification"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "Afficher la connexion KSeF"
   },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "Exporter les journaux d'activité au format CSV ou autres"

@@ -197,6 +197,9 @@ services:
 
       # Per-tenant backup export encryption (apps.backup) - Fernet key, DB-fallback mode (no AWS Secrets Manager on VPS)
       - BACKUP_MASTER_KEY=${BACKUP_MASTER_KEY:-}
+      # KSeF token connection (apps.ksef) - test | demo | prod. The AES key is a Docker secret, not an env var.
+      - KSEF_ENVIRONMENT=${KSEF_ENVIRONMENT:-test}
+      - KSEF_ENCRYPTION_KEYS_FILE=/run/secrets/ksef_encryption_keys
 
       # Email (SMTP)
       - EMAIL_HOST=${EMAIL_HOST:-}
@@ -248,6 +251,9 @@ services:
       # MCP Server for AI Assistant (optional)
       - MCP_SERVER_URL=http://mcp-server:4000
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    secrets:
+      - ksef_encryption_keys
+
     volumes:
       - media_data:/app/media
     networks:
@@ -340,6 +346,11 @@ services:
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
       - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME:-}
       - BACKUP_MASTER_KEY=${BACKUP_MASTER_KEY:-}
+      # KSeF token connection (apps.ksef) - test | demo | prod. The AES key is a Docker secret, not an env var.
+      - KSEF_ENVIRONMENT=${KSEF_ENVIRONMENT:-test}
+      - KSEF_ENCRYPTION_KEYS_FILE=/run/secrets/ksef_encryption_keys
+    secrets:
+      - ksef_encryption_keys
     volumes:
       - media_data:/app/media
     networks:
@@ -391,6 +402,10 @@ services:
       - backend
     networks:
       - internal
+
+secrets:
+  ksef_encryption_keys:
+    file: ./secrets/ksef_encryption_keys
 
 networks:
   web:

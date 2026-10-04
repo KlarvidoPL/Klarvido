@@ -2588,6 +2588,153 @@
   "Home / t&c link": {
     "defaultMessage": "الشروط والأحكام"
   },
+  "KSeF / Cancel button": {
+    "defaultMessage": "إلغاء"
+  },
+  "KSeF / Card description": {
+    "defaultMessage": "يتيح رمز KSeF لـ Klarvido قراءة فواتير شركتك من KSeF."
+  },
+  "KSeF / Card title": {
+    "defaultMessage": "اتصال KSeF"
+  },
+  "KSeF / Connect token button": {
+    "defaultMessage": "ربط رمز KSeF"
+  },
+  "KSeF / Empty state": {
+    "defaultMessage": "اربط رمزًا لبدء قراءة فواتير شركتك من KSeF."
+  },
+  "KSeF / Empty title": {
+    "defaultMessage": "لم يتم ربط أي رمز KSeF"
+  },
+  "KSeF / Error NIP missing": {
+    "defaultMessage": "أضف رقم NIP الخاص بالمؤسسة قبل ربط KSeF."
+  },
+  "KSeF / Error country not supported": {
+    "defaultMessage": "KSeF متاح فقط للمؤسسات البولندية."
+  },
+  "KSeF / Error decryption failed": {
+    "defaultMessage": "لا يمكن قراءة الرمز المحفوظ. استبدله برمز جديد."
+  },
+  "KSeF / Error encryption not configured": {
+    "defaultMessage": "اتصال KSeF غير متاح على هذا الخادم. تواصل مع الدعم."
+  },
+  "KSeF / Error generic": {
+    "defaultMessage": "حدث خطأ أثناء الاتصال بـ KSeF. حاول مرة أخرى."
+  },
+  "KSeF / Error invalid token": {
+    "defaultMessage": "لم يقبل KSeF هذا الرمز. تحقق من أنه نُسخ بشكل صحيح ولم يتم إلغاؤه."
+  },
+  "KSeF / Error no permissions": {
+    "defaultMessage": "لا يملك هذا الرمز أذونات لشركتك. أنشئ رمزًا جديدًا مع إذن قراءة الفواتير."
+  },
+  "KSeF / Error service unavailable": {
+    "defaultMessage": "تعذر الوصول إلى KSeF حاليًا. حاول لاحقًا."
+  },
+  "KSeF / Error token empty": {
+    "defaultMessage": "الصق رمز KSeF قبل الحفظ."
+  },
+  "KSeF / Invalid hint": {
+    "defaultMessage": "لم يعد KSeF يقبل هذا الرمز. استبدله برمز جديد."
+  },
+  "KSeF / Last verified label": {
+    "defaultMessage": "آخر تحقق"
+  },
+  "KSeF / Loading": {
+    "defaultMessage": "جارٍ تحميل اتصال KSeF..."
+  },
+  "KSeF / Modal description sr": {
+    "defaultMessage": "تعليمات لإنشاء رمز KSeF ولصقه"
+  },
+  "KSeF / Modal subtitle": {
+    "defaultMessage": "اربط رمز KSeF لقراءة الفواتير من KSeF"
+  },
+  "KSeF / Modal title": {
+    "defaultMessage": "ربط KSeF"
+  },
+  "KSeF / Modal title sr": {
+    "defaultMessage": "ربط KSeF"
+  },
+  "KSeF / Never verified": {
+    "defaultMessage": "أبدًا"
+  },
+  "KSeF / Remove dialog description": {
+    "defaultMessage": "سيتوقف Klarvido عن قراءة الفواتير من KSeF حتى يتم ربط رمز جديد."
+  },
+  "KSeF / Remove dialog title": {
+    "defaultMessage": "إزالة رمز KSeF"
+  },
+  "KSeF / Remove token button": {
+    "defaultMessage": "إزالة"
+  },
+  "KSeF / Removed toast": {
+    "defaultMessage": "تمت إزالة رمز KSeF."
+  },
+  "KSeF / Replace token button": {
+    "defaultMessage": "استبدال الرمز"
+  },
+  "KSeF / Saved toast": {
+    "defaultMessage": "تم التحقق من رمز KSeF وحفظه."
+  },
+  "KSeF / Saved unverified toast": {
+    "defaultMessage": "تم حفظ الرمز. تعذر الوصول إلى KSeF، لذلك لم يتم التحقق منه بعد. اختبر الاتصال لاحقًا."
+  },
+  "KSeF / Status invalid": {
+    "defaultMessage": "تم رفض الرمز"
+  },
+  "KSeF / Status unverified": {
+    "defaultMessage": "لم يتم التحقق"
+  },
+  "KSeF / Status valid": {
+    "defaultMessage": "متصل"
+  },
+  "KSeF / Step 1 description": {
+    "defaultMessage": "سجّل الدخول إلى KSeF بحساب مخوّل لشركتك."
+  },
+  "KSeF / Step 1 title": {
+    "defaultMessage": "فتح تطبيق KSeF على الويب"
+  },
+  "KSeF / Step 2 description": {
+    "defaultMessage": "افتح قسم الرموز (Tokens) وأنشئ رمزًا جديدًا. امنح إذن قراءة الفواتير فقط (InvoiceRead). لا تمنح أذونات الكتابة."
+  },
+  "KSeF / Step 2 title": {
+    "defaultMessage": "إنشاء رمز جديد"
+  },
+  "KSeF / Step 3 description": {
+    "defaultMessage": "يعرض KSeF الرمز مرة واحدة فقط. انسخه فورًا قبل إغلاق هذه النافذة."
+  },
+  "KSeF / Step 3 title": {
+    "defaultMessage": "نسخ الرمز"
+  },
+  "KSeF / Step 4 description": {
+    "defaultMessage": "نتحقق من الرمز مع KSeF قبل حفظه. يتم تشفير الرموز المحفوظة ولا تُعرض مرة أخرى أبدًا."
+  },
+  "KSeF / Step 4 title": {
+    "defaultMessage": "الصقه أدناه"
+  },
+  "KSeF / Test connection button": {
+    "defaultMessage": "اختبار الاتصال"
+  },
+  "KSeF / Test passed toast": {
+    "defaultMessage": "رمز KSeF صالح."
+  },
+  "KSeF / Token input label": {
+    "defaultMessage": "رمز KSeF"
+  },
+  "KSeF / Token name label": {
+    "defaultMessage": "اسم الرمز في KSeF"
+  },
+  "KSeF / Token required": {
+    "defaultMessage": "الصق رمز KSeF"
+  },
+  "KSeF / Token security note": {
+    "defaultMessage": "يتم تشفير الرمز قبل حفظه ولا يمكن عرضه مرة أخرى بعد الحفظ."
+  },
+  "KSeF / Unverified hint": {
+    "defaultMessage": "تعذر الوصول إلى KSeF عند حفظ الرمز. اختبر الاتصال للتحقق منه."
+  },
+  "KSeF / Verify and save button": {
+    "defaultMessage": "تحقق واحفظ"
+  },
   "Login form / error / authentication failed": {
     "defaultMessage": "بيانات اعتماد مصادقة غير صحيحة."
   },
@@ -3478,6 +3625,18 @@
   },
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "عرض إعدادات المؤسسة"
+  },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "إضافة رمز KSeF أو اختباره أو استبداله أو إزالته"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "إدارة اتصال KSeF"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "عرض ما إذا كان رمز KSeF متصلًا ووقت آخر تحقق منه"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "عرض اتصال KSeF"
   },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "تصدير سجلات النشاط بصيغة CSV أو صيغ أخرى"

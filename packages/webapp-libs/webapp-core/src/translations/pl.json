@@ -2588,6 +2588,153 @@
   "Home / t&c link": {
     "defaultMessage": "Regulamin"
   },
+  "KSeF / Cancel button": {
+    "defaultMessage": "Anuluj"
+  },
+  "KSeF / Card description": {
+    "defaultMessage": "Klarvido odczytuje Twoje faktury z KSeF dzięki tokenowi KSeF."
+  },
+  "KSeF / Card title": {
+    "defaultMessage": "Połączenie z KSeF"
+  },
+  "KSeF / Connect token button": {
+    "defaultMessage": "Połącz token KSeF"
+  },
+  "KSeF / Empty state": {
+    "defaultMessage": "Połącz token, aby zacząć odczytywać faktury firmy z KSeF."
+  },
+  "KSeF / Empty title": {
+    "defaultMessage": "Brak połączonego tokenu KSeF"
+  },
+  "KSeF / Error NIP missing": {
+    "defaultMessage": "Przed połączeniem z KSeF dodaj NIP organizacji."
+  },
+  "KSeF / Error country not supported": {
+    "defaultMessage": "KSeF jest dostępny tylko dla polskich organizacji."
+  },
+  "KSeF / Error decryption failed": {
+    "defaultMessage": "Zapisanego tokenu nie można odczytać. Zastąp go nowym tokenem."
+  },
+  "KSeF / Error encryption not configured": {
+    "defaultMessage": "Połączenie z KSeF nie jest dostępne na tym serwerze. Skontaktuj się z pomocą techniczną."
+  },
+  "KSeF / Error generic": {
+    "defaultMessage": "Wystąpił błąd podczas łączenia z KSeF. Spróbuj ponownie."
+  },
+  "KSeF / Error invalid token": {
+    "defaultMessage": "KSeF nie zaakceptował tego tokenu. Sprawdź, czy został skopiowany poprawnie i nie został unieważniony."
+  },
+  "KSeF / Error no permissions": {
+    "defaultMessage": "Ten token nie ma uprawnień do danych firmy. Wygeneruj nowy token z dostępem do odczytu faktur."
+  },
+  "KSeF / Error service unavailable": {
+    "defaultMessage": "Nie udało się połączyć z KSeF. Spróbuj ponownie później."
+  },
+  "KSeF / Error token empty": {
+    "defaultMessage": "Przed zapisaniem wklej token KSeF."
+  },
+  "KSeF / Invalid hint": {
+    "defaultMessage": "KSeF nie akceptuje już tego tokenu. Zastąp go nowym."
+  },
+  "KSeF / Last verified label": {
+    "defaultMessage": "Ostatnia weryfikacja"
+  },
+  "KSeF / Loading": {
+    "defaultMessage": "Ładowanie połączenia z KSeF..."
+  },
+  "KSeF / Modal description sr": {
+    "defaultMessage": "Instrukcje generowania i wklejania tokenu KSeF"
+  },
+  "KSeF / Modal subtitle": {
+    "defaultMessage": "Połącz token KSeF, aby odczytywać faktury z KSeF"
+  },
+  "KSeF / Modal title": {
+    "defaultMessage": "Połącz KSeF"
+  },
+  "KSeF / Modal title sr": {
+    "defaultMessage": "Połącz KSeF"
+  },
+  "KSeF / Never verified": {
+    "defaultMessage": "Nigdy"
+  },
+  "KSeF / Remove dialog description": {
+    "defaultMessage": "Klarvido przestanie odczytywać faktury z KSeF, dopóki nie zostanie połączony nowy token."
+  },
+  "KSeF / Remove dialog title": {
+    "defaultMessage": "Usuń token KSeF"
+  },
+  "KSeF / Remove token button": {
+    "defaultMessage": "Usuń"
+  },
+  "KSeF / Removed toast": {
+    "defaultMessage": "Token KSeF został usunięty."
+  },
+  "KSeF / Replace token button": {
+    "defaultMessage": "Zastąp token"
+  },
+  "KSeF / Saved toast": {
+    "defaultMessage": "Token KSeF został zweryfikowany i zapisany."
+  },
+  "KSeF / Saved unverified toast": {
+    "defaultMessage": "Token zapisany. KSeF był niedostępny, więc token nie został jeszcze zweryfikowany. Sprawdź połączenie później."
+  },
+  "KSeF / Status invalid": {
+    "defaultMessage": "Token odrzucony"
+  },
+  "KSeF / Status unverified": {
+    "defaultMessage": "Nie zweryfikowano"
+  },
+  "KSeF / Status valid": {
+    "defaultMessage": "Połączono"
+  },
+  "KSeF / Step 1 description": {
+    "defaultMessage": "Zaloguj się do KSeF na koncie uprawnionym do działania w imieniu Twojej firmy."
+  },
+  "KSeF / Step 1 title": {
+    "defaultMessage": "Otwórz aplikację webową KSeF"
+  },
+  "KSeF / Step 2 description": {
+    "defaultMessage": "Otwórz sekcję Tokeny i wygeneruj nowy token. Nadaj wyłącznie uprawnienie do odczytu faktur (InvoiceRead). Nie nadawaj uprawnień do zapisu."
+  },
+  "KSeF / Step 2 title": {
+    "defaultMessage": "Wygeneruj nowy token"
+  },
+  "KSeF / Step 3 description": {
+    "defaultMessage": "KSeF pokazuje token tylko raz. Skopiuj go od razu, zanim zamkniesz to okno."
+  },
+  "KSeF / Step 3 title": {
+    "defaultMessage": "Skopiuj token"
+  },
+  "KSeF / Step 4 description": {
+    "defaultMessage": "Sprawdzimy token w KSeF przed zapisaniem. Zapisane tokeny są szyfrowane i nigdy nie są ponownie wyświetlane."
+  },
+  "KSeF / Step 4 title": {
+    "defaultMessage": "Wklej poniżej"
+  },
+  "KSeF / Test connection button": {
+    "defaultMessage": "Sprawdź połączenie"
+  },
+  "KSeF / Test passed toast": {
+    "defaultMessage": "Token KSeF jest prawidłowy."
+  },
+  "KSeF / Token input label": {
+    "defaultMessage": "Token KSeF"
+  },
+  "KSeF / Token name label": {
+    "defaultMessage": "Nazwa tokenu w KSeF"
+  },
+  "KSeF / Token required": {
+    "defaultMessage": "Wklej token KSeF"
+  },
+  "KSeF / Token security note": {
+    "defaultMessage": "Token jest szyfrowany przed zapisaniem i po zapisie nie można go ponownie wyświetlić."
+  },
+  "KSeF / Unverified hint": {
+    "defaultMessage": "KSeF był niedostępny podczas zapisywania tokenu. Sprawdź połączenie, aby go zweryfikować."
+  },
+  "KSeF / Verify and save button": {
+    "defaultMessage": "Zweryfikuj i zapisz"
+  },
   "Login form / error / authentication failed": {
     "defaultMessage": "Nieprawidłowe dane logowania."
   },
@@ -3676,6 +3823,18 @@
   },
   "Roles / Permission / org.settings.view / Name": {
     "defaultMessage": "Wyświetlanie ustawień organizacji"
+  },
+  "Roles / Permission / security.ksef.manage / Description": {
+    "defaultMessage": "Dodawanie, testowanie, zmiana i usuwanie tokenu KSeF"
+  },
+  "Roles / Permission / security.ksef.manage / Name": {
+    "defaultMessage": "Zarządzanie połączeniem z KSeF"
+  },
+  "Roles / Permission / security.ksef.view / Description": {
+    "defaultMessage": "Sprawdzanie, czy token KSeF jest połączony i kiedy był ostatnio weryfikowany"
+  },
+  "Roles / Permission / security.ksef.view / Name": {
+    "defaultMessage": "Wyświetlanie połączenia z KSeF"
   },
   "Roles / Permission / security.logs.export / Description": {
     "defaultMessage": "Eksportuj dzienniki aktywności do CSV lub innych formatów"
