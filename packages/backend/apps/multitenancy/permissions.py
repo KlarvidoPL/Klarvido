@@ -190,13 +190,6 @@ PERMISSIONS: List[PermissionDefinition] = [
         sort_order=20,
     ),
     PermissionDefinition(
-        code="security.passkeys.manage",
-        name="Manage Passkeys",
-        description="View and manage organization passkey policies",
-        category=PermissionCategory.SECURITY,
-        sort_order=30,
-    ),
-    PermissionDefinition(
         code="security.logs.view",
         name="View Activity Logs",
         description="View audit logs of actions performed in the organization",
@@ -317,7 +310,6 @@ ROLE_TEMPLATE_PERMISSIONS = {
         # Security
         "security.view",
         "security.sso.manage",
-        "security.passkeys.manage",
         "security.logs.view",
         "security.logs.export",
         # Billing (view only)
