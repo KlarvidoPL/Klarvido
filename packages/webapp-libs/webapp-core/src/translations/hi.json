@@ -3227,6 +3227,219 @@
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "जैसे, Google Workspace"
   },
+  "Onboarding / Back": {
+    "defaultMessage": "वापस"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "ड्राफ़्ट हटाएँ"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "ड्राफ़्ट हटाएँ"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "इस नई संगठन के सभी उत्तर हटा दिए जाएँगे। इसे वापस नहीं किया जा सकता।"
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "यह ड्राफ़्ट हटाया नहीं जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "क्या यह ड्राफ़्ट हटाएँ?"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "ऑनबोर्डिंग पूरी हुई"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "प्रोफ़ाइल की पुष्टि करें"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "कर्मचारियों का समय"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "मार्केटिंग / कमीशन"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "सामग्री / माल"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "उप-ठेकेदार"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "तकनीक / बुनियादी ढाँचा"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "परिवहन / लॉजिस्टिक्स"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "अधिकतम तीन उत्तर चुनें।"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "आपकी बिक्री के साथ कौन-सी लागतें बढ़ती हैं?"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "मुख्यतः व्यवसाय (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "मुख्यतः उपभोक्ता (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "व्यवसाय और उपभोक्ता दोनों"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "सार्वजनिक संस्थाएँ"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "इससे अनुमान लगता है कि भविष्य के एकीकरण कितने बिक्री डेटा को कवर करेंगे।"
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "आपको सबसे ज़्यादा कौन भुगतान करता है?"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "हमें बताएँ कि आपका व्यवसाय कैसे काम करता है। आप पिछले चरणों पर वापस जा सकते हैं।"
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "संपादित करें"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "मैं कड़ी मेहनत करता हूँ, पर नकदी नहीं है"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "मुझे किसी बड़े ग्राहक को खोने की चिंता है"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "लागतें लगातार बढ़ रही हैं"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "मैं समस्याओं को जल्दी पहचानना चाहता हूँ"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "क्या मैं टीम का विस्तार करने का खर्च उठा सकता हूँ?"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "मुझे अपने मूल्य निर्धारण पर भरोसा नहीं है"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "आप सबसे ज़्यादा किस पर नियंत्रण रखना चाहते हैं?"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "कंपनी की प्रोफ़ाइल लोड नहीं हो सकी।"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "आगे"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "संगठन अपडेट नहीं हो सका। फ़ील्ड जाँचें और फिर से कोशिश करें।"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "लागत प्लस मार्जिन"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "निश्चित मूल्य / कोटेशन"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "ग्राहक के अनुसार अलग मूल्य"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "आप आमतौर पर कीमतें कैसे तय करते हैं?"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "सब्सक्रिप्शन / पैकेज"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "समय / इकाई"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "How do you make key decisions?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "कंपनी में आपकी भूमिका"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "यह उत्तर केवल विवरण के लिए है और संगठन में आपकी अनुमतियाँ नहीं बदलता।"
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "कमीशन / परिणाम"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "अधिकतम दो उत्तर चुनें।"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "उत्पाद / ऑर्डर"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "प्रोजेक्ट / असाइनमेंट"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "सेवाओं की संख्या"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "सब्सक्रिप्शन / आवर्ती सेवा"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "काम किए गए घंटे"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "ग्राहक आपको किस चीज़ के लिए भुगतान करते हैं?"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "लेखा"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "सलाहकार"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "कर्मचारी"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "मालिक / प्रबंधन"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Open business profile"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complete or update your organization onboarding answers."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "लागत"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "ग्राहक"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "मूल्य और लक्ष्य"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "राजस्व"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "सारांश"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "ऑनबोर्डिंग चरण"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "मुख्य लक्ष्य"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "यह भविष्य के विश्लेषण के लिए एक शुरुआती बिंदु है।"
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "मूल्य निर्धारण"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "आपकी भूमिका"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "आपकी व्यावसायिक प्रोफ़ाइल"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "अपना संगठन सेट करें"
+  },
   "Passkeys / Add another": {
     "defaultMessage": "एक और पासकी जोड़ें"
   },
@@ -3334,24 +3547,6 @@
   },
   "Passkeys / Use count label": {
     "defaultMessage": "उपयोग की बार"
-  },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "एक और passkey जोड़ें"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "मेरा पासकी जोड़ें"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Passkey हटाने में विफल। कृपया दोबारा प्रयास करें।"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey सफलतापूर्वक हटा दिया गया।"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "उपयोगकर्ता नाम या ईमेल से खोजें..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "पासकी हटाने के लिए संगठन संदर्भ आवश्यक है।"
   },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ अक्षर"
@@ -3575,6 +3770,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "आप सदस्यों को ऐसी प्रतिस्थापन भूमिका पर पुनः असाइन नहीं कर सकते जिसमें \"{permissions}\" अनुमति(याँ) शामिल हों, क्योंकि आपके पास स्वयं ये नहीं हैं। पहले किसी संगठन स्वामी या व्यवस्थापक से उन्हें प्राप्त करने के लिए कहें।"
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "आपके पास संगठन की भूमिकाओं को प्रबंधित करने की अनुमति नहीं है।"
   },
@@ -3754,12 +3952,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "गतिविधि लॉग देखें"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "संगठन की पासकी नीतियां देखें और प्रबंधित करें"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "पासकी प्रबंधित करें"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "सिंगल साइन-ऑन (SSO) कनेक्शन और SCIM प्रोविज़निंग कॉन्फ़िगर करें"
@@ -4892,9 +5084,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "हाँ"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Passkey जोड़ें"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Token जोड़ें"
   },
@@ -4931,35 +5120,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "सभी इवेंट देखने के लिए अपने फ़िल्टर बदलें या उन्हें साफ़ करें।"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "कोई और सर्च शब्द आज़माएँ"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "कोई पासकी रजिस्टर्ड नहीं"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "आपकी खोज से कोई पासकी मेल नहीं खा रही"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "डायरेक्टरी सिंक के लिए SSO आवश्यक है"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "कोई SSO कनेक्शन कॉन्फ़िगर नहीं है"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "आपके संगठन में अभी तक किसी यूज़र ने पासकी रजिस्टर नहीं की है"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "तेज़ और अधिक सुरक्षित साइन-इन के लिए पासकी रजिस्टर करें"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "अपने संगठन के सभी यूज़र्स के लिए पासकीज़ प्रबंधित करें"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "पासवर्ड-रहित ऑथेंटिकेशन के लिए बायोमेट्रिक्स या सिक्योरिटी कीज़ का उपयोग करें"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "संगत Identity Providers"
@@ -5107,6 +5272,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "VAT स्थिति"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "सहेजने के बाद यह मान बदला नहीं जा सकता।"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "यह मान जाँचें और फिर से कोशिश करें।"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "अमान्य NIP नंबर"
@@ -5356,212 +5527,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "त्वरित शुरुआत"
-  },
-  "Onboarding / Save failed": {
-    "defaultMessage": "यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।"
-  },
-  "Onboarding / Organization save failed": {
-    "defaultMessage": "संगठन अपडेट नहीं हो सका। फ़ील्ड जाँचें और फिर से कोशिश करें।"
-  },
-  "Onboarding / Load failed": {
-    "defaultMessage": "कंपनी की प्रोफ़ाइल लोड नहीं हो सकी।"
-  },
-  "Onboarding / Completed": {
-    "defaultMessage": "ऑनबोर्डिंग पूरी हुई"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "यह मान जाँचें और फिर से कोशिश करें।"
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "सहेजने के बाद यह मान बदला नहीं जा सकता।"
-  },
-  "Onboarding / Revenue hint": {
-    "defaultMessage": "अधिकतम दो उत्तर चुनें।"
-  },
-  "Onboarding / Costs hint": {
-    "defaultMessage": "अधिकतम तीन उत्तर चुनें।"
-  },
-  "Onboarding / Back": {
-    "defaultMessage": "वापस"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "ड्राफ़्ट हटाएँ"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "ड्राफ़्ट हटाएँ"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "इस नई संगठन के सभी उत्तर हटा दिए जाएँगे। इसे वापस नहीं किया जा सकता।"
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "यह ड्राफ़्ट हटाया नहीं जा सका। कृपया फिर से कोशिश करें।"
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "क्या यह ड्राफ़्ट हटाएँ?"
-  },
-  "Onboarding / Confirm": {
-    "defaultMessage": "प्रोफ़ाइल की पुष्टि करें"
-  },
-  "Onboarding / Cost employees": {
-    "defaultMessage": "कर्मचारियों का समय"
-  },
-  "Onboarding / Cost marketing": {
-    "defaultMessage": "मार्केटिंग / कमीशन"
-  },
-  "Onboarding / Cost materials": {
-    "defaultMessage": "सामग्री / माल"
-  },
-  "Onboarding / Cost subcontractors": {
-    "defaultMessage": "उप-ठेकेदार"
-  },
-  "Onboarding / Cost technology": {
-    "defaultMessage": "तकनीक / बुनियादी ढाँचा"
-  },
-  "Onboarding / Cost transport": {
-    "defaultMessage": "परिवहन / लॉजिस्टिक्स"
-  },
-  "Onboarding / Costs title": {
-    "defaultMessage": "आपकी बिक्री के साथ कौन-सी लागतें बढ़ती हैं?"
-  },
-  "Onboarding / Customer B2B": {
-    "defaultMessage": "मुख्यतः व्यवसाय (B2B)"
-  },
-  "Onboarding / Customer B2C": {
-    "defaultMessage": "मुख्यतः उपभोक्ता (B2C)"
-  },
-  "Onboarding / Customer mixed": {
-    "defaultMessage": "व्यवसाय और उपभोक्ता दोनों"
-  },
-  "Onboarding / Customer public": {
-    "defaultMessage": "सार्वजनिक संस्थाएँ"
-  },
-  "Onboarding / Customers hint": {
-    "defaultMessage": "इससे अनुमान लगता है कि भविष्य के एकीकरण कितने बिक्री डेटा को कवर करेंगे।"
-  },
-  "Onboarding / Customers title": {
-    "defaultMessage": "आपको सबसे ज़्यादा कौन भुगतान करता है?"
-  },
-  "Onboarding / Description": {
-    "defaultMessage": "हमें बताएँ कि आपका व्यवसाय कैसे काम करता है। आप पिछले चरणों पर वापस जा सकते हैं।"
-  },
-  "Onboarding / Edit": {
-    "defaultMessage": "संपादित करें"
-  },
-  "Onboarding / Goal cash": {
-    "defaultMessage": "मैं कड़ी मेहनत करता हूँ, पर नकदी नहीं है"
-  },
-  "Onboarding / Goal client loss": {
-    "defaultMessage": "मुझे किसी बड़े ग्राहक को खोने की चिंता है"
-  },
-  "Onboarding / Goal costs": {
-    "defaultMessage": "लागतें लगातार बढ़ रही हैं"
-  },
-  "Onboarding / Goal early warning": {
-    "defaultMessage": "मैं समस्याओं को जल्दी पहचानना चाहता हूँ"
-  },
-  "Onboarding / Goal hiring": {
-    "defaultMessage": "क्या मैं टीम का विस्तार करने का खर्च उठा सकता हूँ?"
-  },
-  "Onboarding / Goal pricing": {
-    "defaultMessage": "मुझे अपने मूल्य निर्धारण पर भरोसा नहीं है"
-  },
-  "Onboarding / Goal question": {
-    "defaultMessage": "आप सबसे ज़्यादा किस पर नियंत्रण रखना चाहते हैं?"
-  },
-  "Onboarding / Next": {
-    "defaultMessage": "आगे"
-  },
-  "Onboarding / Pricing cost plus": {
-    "defaultMessage": "लागत प्लस मार्जिन"
-  },
-  "Onboarding / Pricing fixed": {
-    "defaultMessage": "निश्चित मूल्य / कोटेशन"
-  },
-  "Onboarding / Pricing individual": {
-    "defaultMessage": "ग्राहक के अनुसार अलग मूल्य"
-  },
-  "Onboarding / Pricing question": {
-    "defaultMessage": "आप आमतौर पर कीमतें कैसे तय करते हैं?"
-  },
-  "Onboarding / Pricing subscription": {
-    "defaultMessage": "सब्सक्रिप्शन / पैकेज"
-  },
-  "Onboarding / Pricing time unit": {
-    "defaultMessage": "समय / इकाई"
-  },
-  "Onboarding / Respondent role label": {
-    "defaultMessage": "कंपनी में आपकी भूमिका"
-  },
-  "Onboarding / Respondent role profile hint": {
-    "defaultMessage": "यह उत्तर केवल विवरण के लिए है और संगठन में आपकी अनुमतियाँ नहीं बदलता।"
-  },
-  "Onboarding / Revenue commission": {
-    "defaultMessage": "कमीशन / परिणाम"
-  },
-  "Onboarding / Revenue product": {
-    "defaultMessage": "उत्पाद / ऑर्डर"
-  },
-  "Onboarding / Revenue project": {
-    "defaultMessage": "प्रोजेक्ट / असाइनमेंट"
-  },
-  "Onboarding / Revenue service": {
-    "defaultMessage": "सेवाओं की संख्या"
-  },
-  "Onboarding / Revenue subscription": {
-    "defaultMessage": "सब्सक्रिप्शन / आवर्ती सेवा"
-  },
-  "Onboarding / Revenue time": {
-    "defaultMessage": "काम किए गए घंटे"
-  },
-  "Onboarding / Revenue title": {
-    "defaultMessage": "ग्राहक आपको किस चीज़ के लिए भुगतान करते हैं?"
-  },
-  "Onboarding / Role accounting": {
-    "defaultMessage": "लेखा"
-  },
-  "Onboarding / Role advisor": {
-    "defaultMessage": "सलाहकार"
-  },
-  "Onboarding / Role employee": {
-    "defaultMessage": "कर्मचारी"
-  },
-  "Onboarding / Role owner management": {
-    "defaultMessage": "मालिक / प्रबंधन"
-  },
-  "Onboarding / Step costs": {
-    "defaultMessage": "लागत"
-  },
-  "Onboarding / Step customers": {
-    "defaultMessage": "ग्राहक"
-  },
-  "Onboarding / Step pricing goal": {
-    "defaultMessage": "मूल्य और लक्ष्य"
-  },
-  "Onboarding / Step revenue": {
-    "defaultMessage": "राजस्व"
-  },
-  "Onboarding / Step summary": {
-    "defaultMessage": "सारांश"
-  },
-  "Onboarding / Steps label": {
-    "defaultMessage": "ऑनबोर्डिंग चरण"
-  },
-  "Onboarding / Summary goal": {
-    "defaultMessage": "मुख्य लक्ष्य"
-  },
-  "Onboarding / Summary hint": {
-    "defaultMessage": "यह भविष्य के विश्लेषण के लिए एक शुरुआती बिंदु है।"
-  },
-  "Onboarding / Summary pricing": {
-    "defaultMessage": "मूल्य निर्धारण"
-  },
-  "Onboarding / Summary role": {
-    "defaultMessage": "आपकी भूमिका"
-  },
-  "Onboarding / Summary title": {
-    "defaultMessage": "आपकी व्यावसायिक प्रोफ़ाइल"
-  },
-  "Onboarding / Title": {
-    "defaultMessage": "अपना संगठन सेट करें"
   }
 }

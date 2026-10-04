@@ -45,3 +45,52 @@ class TestSamlInResponseTo:
 
     def test_invalid_response_returns_none(self):
         assert _saml_in_response_to("not-base64-xml!!") is None
+
+
+class TestAccountMismatchErrorCode:
+    def test_mismatch_maps_to_account_mismatch_code(self):
+        from apps.sso.security import get_safe_error_code
+
+        error = ValueError("Signed-in account does not match the email entered for SSO login")
+
+        assert get_safe_error_code(error) == "account_mismatch"
+
+    def test_error_redirect_points_at_the_translated_error_page(self, settings):
+        from apps.sso.views import _sso_error_redirect
+
+        settings.WEB_APP_URL = "http://localhost:3000/"
+
+        response = _sso_error_redirect("account_mismatch")
+
+        assert response.status_code == 302
+        assert response["Location"] == "http://localhost:3000/en/auth/sso/error?code=account_mismatch"
+
+
+class TestIdentityProviderLogoutUrls:
+    def test_oidc_logout_url_carries_the_id_token_hint(self):
+        from unittest import mock
+
+        from apps.sso.services.oidc import OIDCService
+
+        connection = mock.Mock(oidc_client_id="klarvido")
+        service = OIDCService(connection)
+        with mock.patch.object(
+            service, "discover_configuration", return_value={"end_session_endpoint": "https://idp/logout"}
+        ):
+            url = service.build_logout_url("https://app/login", id_token_hint="token-123")
+
+        assert url.startswith("https://idp/logout?")
+        assert "id_token_hint=token-123" in url
+        assert "client_id=klarvido" in url
+
+    def test_saml_logout_url_is_empty_when_idp_has_no_logout_endpoint(self):
+        from unittest import mock
+
+        from apps.sso.services.saml import SAMLService
+
+        connection = mock.Mock(saml_entity_id="https://idp/realms/x", tenant=None)
+        service = SAMLService(connection)
+        response = mock.Mock()
+        response.json.return_value = {}
+        with mock.patch("apps.sso.services.saml.requests.get", return_value=response):
+            assert service.build_logout_url("https://app/login") == ""

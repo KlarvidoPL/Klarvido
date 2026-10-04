@@ -3230,6 +3230,21 @@
   "Onboarding / Back": {
     "defaultMessage": "Wstecz"
   },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Wszystkie odpowiedzi dla tej nowej organizacji zostaną usunięte. Tej operacji nie można cofnąć."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Wyczyścić ten szkic?"
+  },
   "Onboarding / Completed": {
     "defaultMessage": "Onboarding ukończony"
   },
@@ -3278,11 +3293,11 @@
   "Onboarding / Customers title": {
     "defaultMessage": "Kto najczęściej Ci płaci?"
   },
-  "Onboarding / Edit": {
-    "defaultMessage": "Edytuj"
-  },
   "Onboarding / Description": {
     "defaultMessage": "Opowiedz nam, jak działa Twoja firma. Możesz wracać do wcześniejszych kroków."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Edytuj"
   },
   "Onboarding / Goal cash": {
     "defaultMessage": "Dużo pracuję, ale nie widać tego na koncie"
@@ -3533,24 +3548,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Liczba użyć"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Dodaj kolejną passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Dodaj mój passkey"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Nie udało się usunąć passkey. Spróbuj ponownie."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey została pomyślnie usunięta."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Szukaj po nazwisku lub e‑mailu..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Do usunięcia kluczy dostępu wymagany jest kontekst organizacji."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "Co najmniej 8 znaków"
   },
@@ -3773,6 +3770,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "Nie możesz przypisać członków do roli zastępczej, która zawiera uprawnienie(a) \"{permissions}\", ponieważ sam(a) ich nie posiadasz. Poproś właściciela lub administratora organizacji o ich nadanie."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Ten kolor jest zarezerwowany dla roli właściciela. Wybierz inny kolor."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "Nie masz uprawnień do zarządzania rolami organizacji."
   },
@@ -3784,9 +3784,6 @@
   },
   "Roles / Error / Role assigned to members": {
     "defaultMessage": "Ta rola jest przypisana do {count, plural, one {# członka} few {# członków} many {# członków} other {# członka}}. Wybierz rolę zastępczą."
-  },
-  "Roles / Error / Color reserved for owner": {
-    "defaultMessage": "Ten kolor jest zarezerwowany dla roli właściciela. Wybierz inny kolor."
   },
   "Roles / Error / Role name exists": {
     "defaultMessage": "Rola o nazwie „{name}” już istnieje. Wybierz inną nazwę."
@@ -3955,12 +3952,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "Wyświetlanie dzienników aktywności"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "Wyświetlaj i zarządzaj politykami kluczy dostępu (passkey) organizacji"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Zarządzanie kluczami dostępu"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Konfiguruj połączenia Single Sign-On (SSO) i obsługę SCIM"
@@ -5093,9 +5084,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Tak"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Dodaj Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Dodaj token"
   },
@@ -5132,35 +5120,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Spróbuj zmienić filtry lub wyczyść je, aby zobaczyć wszystkie zdarzenia."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Spróbuj innego hasła wyszukiwania"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "Brak zarejestrowanych passkeyów"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "Brak passkeyów spełniających kryteria wyszukiwania"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "Synchronizacja katalogu wymaga SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "Brak skonfigurowanych połączeń SSO"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "Żaden użytkownik w Twojej organizacji nie zarejestrował jeszcze passkeya"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Zarejestruj passkey, aby logować się szybciej i bezpieczniej"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Zarządzaj passkeyami wszystkich użytkowników w organizacji"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Używaj biometrii lub kluczy bezpieczeństwa do logowania bez hasła"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Kompatybilni dostawcy tożsamości"
@@ -5308,6 +5272,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "statusu VAT"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Sprawdź tę wartość i spróbuj ponownie."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Nieprawidłowy numer NIP"
@@ -5557,26 +5527,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Szybki start"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "Sprawdź tę wartość i spróbuj ponownie."
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "Wyczyścić ten szkic?"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "Wszystkie odpowiedzi dla tej nowej organizacji zostaną usunięte. Tej operacji nie można cofnąć."
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "Wyczyść szkic"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "Wyczyść szkic"
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
   }
 }

@@ -3227,6 +3227,219 @@
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "例如：Google Workspace"
   },
+  "Onboarding / Back": {
+    "defaultMessage": "返回"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "清除草稿"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "清除草稿"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "此新组织的所有答案都将被删除，此操作无法撤销。"
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "无法清除此草稿，请重试。"
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "清除此草稿？"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "引导流程已完成"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "确认档案"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "员工工时"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "营销 / 佣金"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "材料 / 商品"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "分包商"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "技术 / 基础设施"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "运输 / 物流"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "最多选择三个答案。"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "哪些成本会随销售增长？"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "主要是企业客户 (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "主要是个人消费者 (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "企业和个人消费者"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "公共机构"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "这有助于估算未来集成能覆盖多少销售数据。"
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "通常是谁向您付款？"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "请告诉我们您的业务如何运作。您可以返回之前的步骤。"
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "编辑"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "我很努力，但现金不足"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "我担心失去一个重要客户"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "成本持续上涨"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "我希望尽早发现问题"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "我能负担扩大团队的费用吗？"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "我对自己的定价没有把握"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "您最希望掌控的是什么？"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "无法加载公司资料。"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "下一步"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "无法更新组织，请检查字段后重试。"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "成本加利润"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "固定价格 / 报价"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "按客户单独定价"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "您通常如何定价？"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "订阅 / 套餐"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "按时间 / 单位计价"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "How do you make key decisions?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "您在公司中的角色"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "此回答仅作描述，不会改变您在组织中的权限。"
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "佣金 / 业绩"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "最多选择两个答案。"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "产品 / 订单"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "项目 / 委托"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "服务次数"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "订阅 / 定期服务"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "工时"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "客户为什么向您付费？"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "会计"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "顾问"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "员工"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "所有者 / 管理层"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "无法保存此步骤，请重试。"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Open business profile"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complete or update your organization onboarding answers."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "成本"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "客户"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "定价与目标"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "收入"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "摘要"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "设置步骤"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "主要目标"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "这是未来分析的起点。"
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "定价"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "您的角色"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "您的企业档案"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "设置您的组织"
+  },
   "Passkeys / Add another": {
     "defaultMessage": "添加另一把通行密钥"
   },
@@ -3334,24 +3547,6 @@
   },
   "Passkeys / Use count label": {
     "defaultMessage": "使用次数"
-  },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "添加另一个 Passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "添加我的通行密钥"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "删除 Passkey 失败。请重试。"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey 删除成功。"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "按用户名或邮箱搜索…"
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "删除通行密钥需要组织上下文。"
   },
   "Password Requirements / Min length": {
     "defaultMessage": "至少 8 个字符"
@@ -3575,6 +3770,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "您无法将成员重新分配到包含“{permissions}”权限的替代角色，因为您自己没有这些权限。请先让组织所有者或管理员授予您这些权限。"
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "您没有管理组织角色的权限。"
   },
@@ -3754,12 +3952,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "查看活动日志"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "查看和管理组织的通行密钥（Passkey）策略"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "管理通行密钥"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "配置单点登录（SSO）连接和 SCIM 预配置"
@@ -4892,9 +5084,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "是"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "添加 Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "添加 Token"
   },
@@ -4931,35 +5120,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "尝试调整或清除筛选条件以查看所有事件。"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "尝试使用其他搜索词"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "尚未注册任何 Passkey"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "没有与搜索条件匹配的 Passkey"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "目录同步需要先启用 SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "尚未配置任何 SSO 连接"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "您组织中的用户尚未注册任何 Passkey"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "注册 Passkey，享受更快捷、更安全的登录体验"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "为组织内所有用户管理 Passkey"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "使用生物识别或安全密钥实现无密码认证"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys（WebAuthn）"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "兼容的身份提供商"
@@ -5107,6 +5272,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "增值税状态"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "此值保存后无法更改。"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "请检查此值后重试。"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "NIP 号码无效"
@@ -5356,212 +5527,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "快速开始"
-  },
-  "Onboarding / Save failed": {
-    "defaultMessage": "无法保存此步骤，请重试。"
-  },
-  "Onboarding / Organization save failed": {
-    "defaultMessage": "无法更新组织，请检查字段后重试。"
-  },
-  "Onboarding / Load failed": {
-    "defaultMessage": "无法加载公司资料。"
-  },
-  "Onboarding / Completed": {
-    "defaultMessage": "引导流程已完成"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "请检查此值后重试。"
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "此值保存后无法更改。"
-  },
-  "Onboarding / Revenue hint": {
-    "defaultMessage": "最多选择两个答案。"
-  },
-  "Onboarding / Costs hint": {
-    "defaultMessage": "最多选择三个答案。"
-  },
-  "Onboarding / Back": {
-    "defaultMessage": "返回"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "清除草稿"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "清除草稿"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "此新组织的所有答案都将被删除，此操作无法撤销。"
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "无法清除此草稿，请重试。"
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "清除此草稿？"
-  },
-  "Onboarding / Confirm": {
-    "defaultMessage": "确认档案"
-  },
-  "Onboarding / Cost employees": {
-    "defaultMessage": "员工工时"
-  },
-  "Onboarding / Cost marketing": {
-    "defaultMessage": "营销 / 佣金"
-  },
-  "Onboarding / Cost materials": {
-    "defaultMessage": "材料 / 商品"
-  },
-  "Onboarding / Cost subcontractors": {
-    "defaultMessage": "分包商"
-  },
-  "Onboarding / Cost technology": {
-    "defaultMessage": "技术 / 基础设施"
-  },
-  "Onboarding / Cost transport": {
-    "defaultMessage": "运输 / 物流"
-  },
-  "Onboarding / Costs title": {
-    "defaultMessage": "哪些成本会随销售增长？"
-  },
-  "Onboarding / Customer B2B": {
-    "defaultMessage": "主要是企业客户 (B2B)"
-  },
-  "Onboarding / Customer B2C": {
-    "defaultMessage": "主要是个人消费者 (B2C)"
-  },
-  "Onboarding / Customer mixed": {
-    "defaultMessage": "企业和个人消费者"
-  },
-  "Onboarding / Customer public": {
-    "defaultMessage": "公共机构"
-  },
-  "Onboarding / Customers hint": {
-    "defaultMessage": "这有助于估算未来集成能覆盖多少销售数据。"
-  },
-  "Onboarding / Customers title": {
-    "defaultMessage": "通常是谁向您付款？"
-  },
-  "Onboarding / Description": {
-    "defaultMessage": "请告诉我们您的业务如何运作。您可以返回之前的步骤。"
-  },
-  "Onboarding / Edit": {
-    "defaultMessage": "编辑"
-  },
-  "Onboarding / Goal cash": {
-    "defaultMessage": "我很努力，但现金不足"
-  },
-  "Onboarding / Goal client loss": {
-    "defaultMessage": "我担心失去一个重要客户"
-  },
-  "Onboarding / Goal costs": {
-    "defaultMessage": "成本持续上涨"
-  },
-  "Onboarding / Goal early warning": {
-    "defaultMessage": "我希望尽早发现问题"
-  },
-  "Onboarding / Goal hiring": {
-    "defaultMessage": "我能负担扩大团队的费用吗？"
-  },
-  "Onboarding / Goal pricing": {
-    "defaultMessage": "我对自己的定价没有把握"
-  },
-  "Onboarding / Goal question": {
-    "defaultMessage": "您最希望掌控的是什么？"
-  },
-  "Onboarding / Next": {
-    "defaultMessage": "下一步"
-  },
-  "Onboarding / Pricing cost plus": {
-    "defaultMessage": "成本加利润"
-  },
-  "Onboarding / Pricing fixed": {
-    "defaultMessage": "固定价格 / 报价"
-  },
-  "Onboarding / Pricing individual": {
-    "defaultMessage": "按客户单独定价"
-  },
-  "Onboarding / Pricing question": {
-    "defaultMessage": "您通常如何定价？"
-  },
-  "Onboarding / Pricing subscription": {
-    "defaultMessage": "订阅 / 套餐"
-  },
-  "Onboarding / Pricing time unit": {
-    "defaultMessage": "按时间 / 单位计价"
-  },
-  "Onboarding / Respondent role label": {
-    "defaultMessage": "您在公司中的角色"
-  },
-  "Onboarding / Respondent role profile hint": {
-    "defaultMessage": "此回答仅作描述，不会改变您在组织中的权限。"
-  },
-  "Onboarding / Revenue commission": {
-    "defaultMessage": "佣金 / 业绩"
-  },
-  "Onboarding / Revenue product": {
-    "defaultMessage": "产品 / 订单"
-  },
-  "Onboarding / Revenue project": {
-    "defaultMessage": "项目 / 委托"
-  },
-  "Onboarding / Revenue service": {
-    "defaultMessage": "服务次数"
-  },
-  "Onboarding / Revenue subscription": {
-    "defaultMessage": "订阅 / 定期服务"
-  },
-  "Onboarding / Revenue time": {
-    "defaultMessage": "工时"
-  },
-  "Onboarding / Revenue title": {
-    "defaultMessage": "客户为什么向您付费？"
-  },
-  "Onboarding / Role accounting": {
-    "defaultMessage": "会计"
-  },
-  "Onboarding / Role advisor": {
-    "defaultMessage": "顾问"
-  },
-  "Onboarding / Role employee": {
-    "defaultMessage": "员工"
-  },
-  "Onboarding / Role owner management": {
-    "defaultMessage": "所有者 / 管理层"
-  },
-  "Onboarding / Step costs": {
-    "defaultMessage": "成本"
-  },
-  "Onboarding / Step customers": {
-    "defaultMessage": "客户"
-  },
-  "Onboarding / Step pricing goal": {
-    "defaultMessage": "定价与目标"
-  },
-  "Onboarding / Step revenue": {
-    "defaultMessage": "收入"
-  },
-  "Onboarding / Step summary": {
-    "defaultMessage": "摘要"
-  },
-  "Onboarding / Steps label": {
-    "defaultMessage": "设置步骤"
-  },
-  "Onboarding / Summary goal": {
-    "defaultMessage": "主要目标"
-  },
-  "Onboarding / Summary hint": {
-    "defaultMessage": "这是未来分析的起点。"
-  },
-  "Onboarding / Summary pricing": {
-    "defaultMessage": "定价"
-  },
-  "Onboarding / Summary role": {
-    "defaultMessage": "您的角色"
-  },
-  "Onboarding / Summary title": {
-    "defaultMessage": "您的企业档案"
-  },
-  "Onboarding / Title": {
-    "defaultMessage": "设置您的组织"
   }
 }

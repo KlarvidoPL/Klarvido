@@ -136,6 +136,37 @@ describe('AuditLogCard: Component', () => {
     expect(mockedApiClient.get).toHaveBeenLastCalledWith(expect.stringContaining('search=abc'));
   });
 
+  it('should show a stored SSO error code as its translated message', async () => {
+    mockedApiClient.get.mockResolvedValue({
+      data: {
+        logs: [
+          createMockAuditLog({
+            eventType: 'sso_login_failed',
+            eventTypeLabel: 'SSO login failed',
+            eventDescription: 'OIDC login failed',
+            success: false,
+            errorMessage: 'account_mismatch',
+          }),
+        ],
+        totalCount: 1,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 20,
+        hasMore: false,
+        hasPrevious: false,
+      },
+    });
+
+    renderComponent();
+
+    await userEvent.click(await screen.findByText(/SSO login failed/i));
+
+    expect(
+      await screen.findByText('You signed in with a different account than the one you entered. Please try again.')
+    ).toBeInTheDocument();
+    expect(screen.queryByText('account_mismatch')).not.toBeInTheDocument();
+  });
+
   it('should toggle filters panel', async () => {
     renderComponent();
 

@@ -3230,6 +3230,21 @@
   "Onboarding / Back": {
     "defaultMessage": "Back"
   },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Clear draft"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Clear draft"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "All answers for this new organization will be deleted. This cannot be undone."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Could not clear this draft. Please try again."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Clear this draft?"
+  },
   "Onboarding / Completed": {
     "defaultMessage": "Onboarding completed"
   },
@@ -3278,11 +3293,11 @@
   "Onboarding / Customers title": {
     "defaultMessage": "Who usually pays you?"
   },
-  "Onboarding / Edit": {
-    "defaultMessage": "Edit"
-  },
   "Onboarding / Description": {
     "defaultMessage": "Tell us how your business works. You can return to earlier steps."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Edit"
   },
   "Onboarding / Goal cash": {
     "defaultMessage": "I work hard, but the cash is not there"
@@ -3754,6 +3769,9 @@
   },
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "You can’t reassign members to a replacement role that includes the \"{permissions}\" permission(s) because you don’t have them yourself. Ask an organization owner or admin to grant them to you first."
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
   },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "You don't have permission to manage organization roles."
@@ -5255,6 +5273,12 @@
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "VAT status"
   },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "This value can't be changed once saved."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Check this value and try again."
+  },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Invalid NIP number"
   },
@@ -5503,26 +5527,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Quick start"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "Check this value and try again."
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "This value can't be changed once saved."
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "Clear draft"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "Clear draft"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "All answers for this new organization will be deleted. This cannot be undone."
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "Could not clear this draft. Please try again."
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "Clear this draft?"
   }
 }
