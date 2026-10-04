@@ -4178,6 +4178,9 @@
   "SSO / Error / account_mismatch": {
     "defaultMessage": "Ha iniciado sesión con una cuenta distinta a la introducida. Inténtelo de nuevo."
   },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "Ya existe una cuenta con este correo. Pida al administrador de su organización que le invite."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Usar otro método de inicio de sesión"
   },

@@ -21,7 +21,8 @@ class TenantSSOConnectionFactory(DjangoModelFactory):
     name = factory.Sequence(lambda n: f"SSO Connection {n}")
     connection_type = constants.IdentityProviderType.SAML
     status = constants.SSOConnectionStatus.DRAFT
-    allowed_domains = factory.LazyFunction(list)
+    # A connection must list its email domains: an empty list allows no one to sign in
+    allowed_domains = factory.LazyFunction(lambda: ["example.com"])
     jit_provisioning_enabled = True
     group_role_mapping = factory.LazyFunction(dict)
 

@@ -19,6 +19,12 @@ from apps.sso.models import (
     SSOAuditLog,
 )
 from apps.sso.constants import SSOAuditEventType
+from apps.sso.services.account_linking import (
+    ensure_can_link_existing_user,
+    ensure_can_use_linked_user,
+    ensure_domain_allowed,
+    is_user_managed_only_by,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +94,10 @@ class JITProvisioningService:
         if existing_link:
             # Update existing user
             user = existing_link.user
+            ensure_can_use_linked_user(user)
+            # SECURITY: links made before membership was required, or users an admin removed, must not
+            # regain access just by signing in again
+            ensure_can_link_existing_user(user, self.tenant)
             is_new = False
 
             # Update link attributes
@@ -98,8 +108,9 @@ class JITProvisioningService:
             existing_link.idp_raw_attributes = raw_attributes
             existing_link.save()
 
-            # Update user profile if attributes changed
-            self._update_user_profile(user, first_name, last_name)
+            # Profile names are account-wide: only this organization's IdP may change them if it owns the account
+            if is_user_managed_only_by(user, self.tenant):
+                self._update_user_profile(user, first_name, last_name)
 
             # Ensure tenant membership exists (handles case where user was removed or never added)
             role = self.connection.get_role_for_groups(groups)
@@ -123,15 +134,15 @@ class JITProvisioningService:
             if not self.connection.jit_provisioning_enabled:
                 raise ValueError("JIT provisioning is disabled. User must be pre-provisioned via SCIM.")
 
-            # Check domain restrictions
-            if not self._is_domain_allowed(email):
-                raise ValueError("Email domain is not allowed for this SSO connection.")
+            # The email's domain must be explicitly allowed on this connection (an empty list allows none)
+            ensure_domain_allowed(self.connection, email)
 
             # Look for existing user by email
             user = User.objects.filter(email__iexact=email).first()
 
             if user:
-                # Link existing user to SSO
+                # SECURITY: never take over an account that does not already belong to this organization
+                ensure_can_link_existing_user(user, self.tenant)
                 is_new = False
             else:
                 # Create new user
@@ -325,15 +336,6 @@ class JITProvisioningService:
                 role=org_role,
                 defaults={'assigned_by': user},
             )
-
-    def _is_domain_allowed(self, email: str) -> bool:
-        """Check if the email domain is allowed for this SSO connection."""
-        if not self.connection.allowed_domains:
-            # No restrictions
-            return True
-
-        domain = email.split("@")[-1].lower()
-        return domain in [d.lower() for d in self.connection.allowed_domains]
 
     def _log_event(
         self,

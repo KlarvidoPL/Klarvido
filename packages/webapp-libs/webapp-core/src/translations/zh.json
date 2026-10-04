@@ -4178,6 +4178,9 @@
   "SSO / Error / account_mismatch": {
     "defaultMessage": "您登录的账户与输入的邮箱不一致，请重试。"
   },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "使用此电子邮件的账户已存在。请联系组织管理员邀请您。"
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "使用其他登录方式"
   },

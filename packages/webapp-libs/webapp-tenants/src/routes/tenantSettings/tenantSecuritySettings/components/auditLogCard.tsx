@@ -215,6 +215,10 @@ const SSO_ERROR_MESSAGES = defineMessages({
     id: 'SSO / Error / account_mismatch',
     defaultMessage: 'You signed in with a different account than the one you entered. Please try again.',
   },
+  account_not_member: {
+    id: 'SSO / Error / account_not_member',
+    defaultMessage: 'An account with this email already exists. Ask your organization administrator to invite you.',
+  },
   generic: {
     id: 'SSO / Error / generic',
     defaultMessage: 'An error occurred during sign-in. Please try again or contact support.',

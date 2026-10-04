@@ -4178,6 +4178,9 @@
   "SSO / Error / account_mismatch": {
     "defaultMessage": "Zalogowano innym kontem niż podany adres e-mail. Spróbuj ponownie."
   },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "Konto z tym adresem e-mail już istnieje. Poproś administratora organizacji o zaproszenie."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Użyj innej metody logowania"
   },

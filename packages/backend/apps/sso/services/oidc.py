@@ -420,7 +420,7 @@ class OIDCService:
 
         # Map claims to user attributes
         user_attrs = self._map_claims(claims)
-        # Kept for sign-out: the identity provider needs it as id_token_hint to end the session without a confirmation page
+        # Kept for sign-out: the IdP needs it as id_token_hint to end the session without a confirmation page
         user_attrs["id_token"] = id_token
         return user_attrs
 

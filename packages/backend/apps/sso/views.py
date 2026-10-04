@@ -10,7 +10,6 @@ Security Features:
 
 import base64
 import logging
-import re
 from urllib.parse import urlencode
 from functools import wraps
 

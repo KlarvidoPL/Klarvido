@@ -4178,6 +4178,9 @@
   "SSO / Error / account_mismatch": {
     "defaultMessage": "आपने जिस ईमेल को दर्ज किया था उससे अलग खाते से साइन इन किया है। कृपया फिर से प्रयास करें।"
   },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "इस ईमेल वाला खाता पहले से मौजूद है। अपने संगठन के व्यवस्थापक से आपको आमंत्रित करने के लिए कहें।"
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "कोई और साइन-इन तरीका उपयोग करें"
   },

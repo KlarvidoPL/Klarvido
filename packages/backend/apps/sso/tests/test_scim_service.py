@@ -55,12 +55,13 @@ class TestSCIMServiceListUsers:
 
     def test_list_users_with_scim_provisioned_user(self, scim_service_setup, user, tenant):
         service, token, _ = scim_service_setup
-        link = factories.SSOUserLinkFactory(
+        factories.SSOUserLinkFactory(
             user=user,
             sso_connection=token.sso_connection,
             idp_user_id="idp_123",
             provisioned_via_scim=True,
         )
+        TenantMembershipFactory(user=user, tenant=token.tenant, is_accepted=True)
 
         result = service.list_users()
         assert result["totalResults"] == 1
@@ -84,6 +85,8 @@ class TestSCIMServiceListUsers:
             idp_user_id="bob_id",
             provisioned_via_scim=True,
         )
+        TenantMembershipFactory(user=user1, tenant=token.tenant, is_accepted=True)
+        TenantMembershipFactory(user=user2, tenant=token.tenant, is_accepted=True)
 
         service, token, _ = scim_service_setup
         result = service.list_users(filter_expr='userName eq "alice@example.com"')
@@ -100,6 +103,7 @@ class TestSCIMServiceListUsers:
                 idp_user_id=f"idp_{i}",
                 provisioned_via_scim=True,
             )
+            TenantMembershipFactory(user=u, tenant=token.tenant, is_accepted=True)
 
         service, _, _ = scim_service_setup
         result = service.list_users(start_index=1, count=2)

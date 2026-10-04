@@ -4178,6 +4178,9 @@
   "SSO / Error / account_mismatch": {
     "defaultMessage": "سجلت الدخول بحساب مختلف عن البريد الذي أدخلته. يرجى المحاولة مرة أخرى."
   },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "يوجد حساب بهذا البريد الإلكتروني بالفعل. اطلب من مسؤول مؤسستك دعوتك."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "استخدم طريقة تسجيل دخول أخرى"
   },

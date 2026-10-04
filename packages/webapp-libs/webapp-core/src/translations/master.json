@@ -4163,6 +4163,9 @@
   "SSO / Error / account_mismatch": {
     "defaultMessage": "You signed in with a different account than the one you entered. Please try again."
   },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "An account with this email already exists. Ask your organization administrator to invite you."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Use another sign in method"
   },
