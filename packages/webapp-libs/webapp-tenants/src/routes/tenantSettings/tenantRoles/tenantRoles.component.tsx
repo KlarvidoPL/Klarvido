@@ -350,7 +350,7 @@ const RoleColorBadge = ({ color, size = 'sm' }: { color: string; size?: 'sm' | '
   const colorConfig = ROLE_COLORS.find((c) => c.value.toUpperCase() === color?.toUpperCase()) || ROLE_COLORS[0];
   const sizeClass = size === 'lg' ? 'h-4 w-4' : size === 'md' ? 'h-3.5 w-3.5' : 'h-3 w-3';
   return (
-    <div className={cn('rounded-full ring-2', colorConfig.className, colorConfig.ring, sizeClass)} />
+    <div className={cn('shrink-0 rounded-full ring-2', colorConfig.className, colorConfig.ring, sizeClass)} />
   );
 };
 
@@ -851,7 +851,7 @@ const RoleEditorDialog = ({
                 <FormattedMessage defaultMessage="Role Details" id="Roles / Details Section" />
               </h3>
               
-              <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="role-name" className="text-sm font-medium">
                     <FormattedMessage defaultMessage="Name" id="Roles / Name Label" />
@@ -873,7 +873,7 @@ const RoleEditorDialog = ({
                     <FormattedMessage defaultMessage="Color" id="Roles / Color Label" />
                   </Label>
                   <Select value={color} onValueChange={setColor} disabled={isLoading}>
-                    <SelectTrigger id="role-color" className="w-[140px] h-10">
+                    <SelectTrigger id="role-color" className="w-full h-10">
                       <SelectValue>
                         <div className="flex items-center gap-2">
                           <RoleColorBadge color={color} size="sm" />
