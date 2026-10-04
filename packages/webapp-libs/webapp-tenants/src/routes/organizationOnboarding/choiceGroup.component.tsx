@@ -23,7 +23,7 @@ export const ChoiceGroup = ({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(9rem,14rem))]">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
       {options.map((option) => {
         const active = selected.includes(option.value);
         return (
