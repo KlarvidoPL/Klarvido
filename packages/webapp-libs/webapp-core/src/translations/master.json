@@ -3428,24 +3428,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Times used"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Add another passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Add my passkey"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Failed to delete passkey. Please try again."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey deleted successfully."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Search by user name or email..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Tenant context is required to delete passkeys."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ characters"
   },
@@ -3850,12 +3832,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "View Activity Logs"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "View and manage organization passkey policies"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Manage Passkeys"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Configure Single Sign-On connections and SCIM provisioning"
@@ -4727,9 +4703,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Yes"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Add Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Add Token"
   },
@@ -4766,35 +4739,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Try adjusting your filters or clearing them to see all events."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Try a different search term"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "No passkeys registered"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "No passkeys match your search"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "Directory sync requires SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "No SSO connections configured"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "No users in your organization have registered passkeys yet"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Register a passkey for faster, more secure sign-in"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Manage passkeys for all users in your organization"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Use biometrics or security keys for passwordless authentication"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Compatible Identity Providers"

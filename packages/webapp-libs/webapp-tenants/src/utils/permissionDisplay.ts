@@ -103,14 +103,6 @@ export const getPermissionDisplay = (
           id: 'Roles / Permission / security.sso.manage / Description',
         }),
       };
-    case 'security.passkeys.manage':
-      return {
-        name: intl.formatMessage({ defaultMessage: 'Manage Passkeys', id: 'Roles / Permission / security.passkeys.manage / Name' }),
-        description: intl.formatMessage({
-          defaultMessage: 'View and manage organization passkey policies',
-          id: 'Roles / Permission / security.passkeys.manage / Description',
-        }),
-      };
     case 'security.logs.view':
       return {
         name: intl.formatMessage({ defaultMessage: 'View Activity Logs', id: 'Roles / Permission / security.logs.view / Name' }),
