@@ -26,7 +26,10 @@ interface SSOConnection {
 
 function handleSSOLoginRedirect(connection: SSOConnection, email: string) {
   const urlParams = new URLSearchParams(window.location.search);
-  const intendedDestination = urlParams.get('next') || '/';
+  // Keep the language the user chose: return to the home page of the current locale (e.g. /pl/)
+  const localeMatch = window.location.pathname.match(/^\/([a-z]{2})\//);
+  const locale = localeMatch ? localeMatch[1] : 'en';
+  const intendedDestination = urlParams.get('next') || `/${locale}/`;
   const next = encodeURIComponent(intendedDestination);
 
   const loginUrl = connection.login_url.startsWith('http')

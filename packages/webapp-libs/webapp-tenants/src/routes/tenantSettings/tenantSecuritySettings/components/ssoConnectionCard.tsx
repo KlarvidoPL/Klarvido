@@ -625,7 +625,7 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
                     </div>
 
                     {/* Actions Dropdown - pinned to the tile corner, visible without hover on touch screens */}
-                    <div className="absolute right-2 top-2">
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button

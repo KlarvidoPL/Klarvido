@@ -161,7 +161,8 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
     return intl.formatDate(dateStr, { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
-  const scimEndpointUrl = apiURL('/sso/scim/v2');
+  // Identity providers need the full address; resolve a relative API base against this site
+  const scimEndpointUrl = new URL(apiURL('/sso/scim/v2'), window.location.origin).toString();
 
   return (
     <TooltipProvider>
@@ -401,7 +402,7 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                   </div>
 
                   {/* Actions Dropdown - pinned to the tile corner, visible without hover on touch screens */}
-                  <div className="absolute right-2 top-2">
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
