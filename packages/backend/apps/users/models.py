@@ -115,6 +115,9 @@ class UserProfile(models.Model):
         UserAvatar, on_delete=models.SET_NULL, null=True, blank=True, related_name="user_profile"
     )
     has_seen_welcome_modal = models.BooleanField(default=False)
+    default_organization = models.ForeignKey(
+        'multitenancy.Tenant', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_for_profiles'
+    )
 
     def __str__(self) -> str:
         full_name = f"{self.first_name} {self.last_name}".strip()

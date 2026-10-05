@@ -16,6 +16,7 @@ export const currentUserFactory = createFactory<CurrentUserType>(() => ({
   hasSeenWelcomeModal: true,
   isConfirmed: true,
   isSuperuser: false,
+  defaultOrganizationId: null,
   tenants: [
     {
       id: makeId(32),
@@ -24,6 +25,8 @@ export const currentUserFactory = createFactory<CurrentUserType>(() => ({
       // scenario most tests want; specifically testing the personal/no-org state
       // should opt in explicitly (e.g. `tenants: [{ ...  type: TenantType.PERSONAL }]`).
       type: TenantType.ORGANIZATION,
+      onboardingRequired: false,
+      onboardingCompleted: true,
       __typename: 'TenantType',
       membership: {
         id: makeId(32),
