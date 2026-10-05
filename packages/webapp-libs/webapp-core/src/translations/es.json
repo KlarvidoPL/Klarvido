@@ -2031,10 +2031,13 @@
     "defaultMessage": "Aún no hay dominios. Añade el dominio de tu empresa para empezar la verificación."
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "El registro de verificación lleva varias comprobaciones sin aparecer, así que este dominio ya no funciona para SSO. Sus conexiones SSO se desactivaron. Vuelve a publicar el registro y verifica el dominio para usarlo."
+    "defaultMessage": "El registro de verificación lleva siete días sin aparecer, así que este dominio ya no funciona para SSO. Sus conexiones SSO se desactivaron. Vuelve a publicar el registro y verifica el dominio para usarlo."
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "Última comprobación {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Falta el registro de verificación desde el {since}. El SSO se desactivará el {deadline} si no se restaura el registro."
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Nombre"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "Dominio SSO caducado"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "Falta el registro de verificación de \"{domain}\" ({tenant_name}). El SSO de este dominio se desactivará en {grace_days} días si no se restaura el registro."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "Falta el registro de verificación del dominio SSO"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "«{name}» ha eliminado la organización «{tenant_name}»"

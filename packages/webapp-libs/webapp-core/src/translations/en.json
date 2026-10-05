@@ -2031,10 +2031,13 @@
     "defaultMessage": "No domains claimed yet. Add your company domain to start verification."
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "The verification record has been missing for several checks, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
+    "defaultMessage": "The verification record has been missing for seven days, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "Last checked {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Verification record missing since {since}. SSO will be deactivated on {deadline} unless it is restored."
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Name"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "SSO Domain Lapsed"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "The verification record for \"{domain}\" ({tenant_name}) is missing. SSO for this domain will be deactivated in {grace_days} days unless the record is restored."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO domain verification record missing"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Organization \"{tenant_name}\" was deleted by \"{name}\""

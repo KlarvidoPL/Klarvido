@@ -2031,10 +2031,13 @@
     "defaultMessage": "Aucun domaine ajouté pour le moment. Ajoutez le domaine de votre entreprise pour démarrer la vérification."
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "L'enregistrement de vérification est absent depuis plusieurs contrôles, ce domaine ne fonctionne donc plus pour le SSO. Ses connexions SSO ont été désactivées. Publiez de nouveau l'enregistrement et vérifiez le domaine pour l'utiliser."
+    "defaultMessage": "L'enregistrement de vérification est absent depuis sept jours, ce domaine ne fonctionne donc plus pour le SSO. Ses connexions SSO ont été désactivées. Publiez de nouveau l'enregistrement et vérifiez le domaine pour l'utiliser."
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "Dernière vérification {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Enregistrement de vérification manquant depuis le {since}. Le SSO sera désactivé le {deadline}, sauf si l'enregistrement est rétabli."
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Nom"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "Domaine SSO expiré"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "L'enregistrement de vérification de \"{domain}\" ({tenant_name}) est manquant. Le SSO pour ce domaine sera désactivé dans {grace_days} jours, sauf si l'enregistrement est rétabli."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "Enregistrement de vérification du domaine SSO manquant"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "L’organisation « {tenant_name} » a été supprimée par « {name} »"

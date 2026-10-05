@@ -2031,10 +2031,13 @@
     "defaultMessage": "لم تتم إضافة أي نطاقات بعد. أضف نطاق شركتك لبدء التحقق."
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "سجل التحقق مفقود منذ عدة فحوصات، لذلك لم يعد هذا النطاق يعمل مع SSO وتم إلغاء تفعيل اتصالات SSO الخاصة به. أعد نشر السجل وتحقق من النطاق لاستخدامه."
+    "defaultMessage": "سجل التحقق مفقود منذ سبعة أيام، لذلك لم يعد هذا النطاق يعمل مع SSO وتم إلغاء تفعيل اتصالات SSO الخاصة به. أعد نشر السجل وتحقق من النطاق لاستخدامه."
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "آخر فحص {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "سجل التحقق مفقود منذ {since}. سيتم إلغاء تفعيل SSO في {deadline} ما لم يتم استعادة السجل."
   },
   "Domain Verification / Record name": {
     "defaultMessage": "الاسم"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "انتهاء نطاق SSO"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "سجل التحقق الخاص بـ \"{domain}\" ({tenant_name}) مفقود. سيتم إلغاء تفعيل SSO لهذا النطاق خلال {grace_days} يوماً ما لم يتم استعادة السجل."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "سجل التحقق من نطاق SSO مفقود"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "قام \"{name}\" بحذف المؤسسة \"{tenant_name}\""

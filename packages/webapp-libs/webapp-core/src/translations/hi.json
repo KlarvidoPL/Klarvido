@@ -2031,10 +2031,13 @@
     "defaultMessage": "अभी तक कोई डोमेन नहीं जोड़ा गया है। सत्यापन शुरू करने के लिए अपनी कंपनी का डोमेन जोड़ें।"
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "सत्यापन रिकॉर्ड कई जाँचों से गायब है, इसलिए यह डोमेन अब SSO के लिए काम नहीं करता। इसके SSO कनेक्शन निष्क्रिय कर दिए गए हैं। रिकॉर्ड फिर से प्रकाशित करें और डोमेन सत्यापित करें।"
+    "defaultMessage": "सत्यापन रिकॉर्ड सात दिनों से गायब है, इसलिए यह डोमेन अब SSO के लिए काम नहीं करता। इसके SSO कनेक्शन निष्क्रिय कर दिए गए हैं। रिकॉर्ड फिर से प्रकाशित करें और डोमेन सत्यापित करें।"
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "अंतिम जाँच {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "सत्यापन रिकॉर्ड {since} से गायब है। रिकॉर्ड बहाल न होने पर SSO {deadline} को निष्क्रिय कर दिया जाएगा।"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "नाम"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "SSO डोमेन समाप्त"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "\"{domain}\" ({tenant_name}) का सत्यापन रिकॉर्ड गायब है। रिकॉर्ड बहाल न होने पर इस डोमेन के लिए SSO {grace_days} दिनों में निष्क्रिय कर दिया जाएगा।"
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO डोमेन सत्यापन रिकॉर्ड गायब है"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "संगठन \"{tenant_name}\" को \"{name}\" ने हटा दिया"

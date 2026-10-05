@@ -2031,10 +2031,13 @@
     "defaultMessage": "尚未添加任何域名。添加贵公司的域名以开始验证。"
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "验证记录已连续多次检查缺失，因此该域名不再可用于 SSO。其 SSO 连接已被停用。请重新发布该记录并验证域名以继续使用。"
+    "defaultMessage": "验证记录已缺失七天，因此该域名不再可用于 SSO。其 SSO 连接已被停用。请重新发布该记录并验证域名以继续使用。"
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "上次检查：{date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "验证记录自 {since} 起缺失。除非恢复该记录，否则 SSO 将于 {deadline} 停用。"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "名称"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "SSO 域名已失效"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "\"{domain}\"（{tenant_name}）的验证记录缺失。如果不恢复该记录，此域名的 SSO 将在 {grace_days} 天后停用。"
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO 域名验证记录缺失"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "组织“{tenant_name}”已被“{name}”删除"

@@ -474,9 +474,11 @@ type TenantDomainType implements Node {
   verifiedAt: DateTime
   lastCheckedAt: DateTime
   consecutiveFailures: Int!
+  firstFailedAt: DateTime
   id: ID!
   verificationRecordName: String
   verificationRecordValue: String
+  gracePeriodEndsAt: DateTime
 }
 type SSOAuditLogConnection {
   "Pagination data for this connection."

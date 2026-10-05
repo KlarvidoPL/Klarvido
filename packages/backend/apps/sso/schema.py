@@ -136,14 +136,29 @@ class TenantDomainType(DjangoObjectType):
     id = graphene.ID(required=True)
     verification_record_name = graphene.String()
     verification_record_value = graphene.String()
+    grace_period_ends_at = graphene.DateTime()
 
     class Meta:
         model = models.TenantDomain
-        fields = ["domain", "status", "verified_at", "last_checked_at", "consecutive_failures", "created_at"]
+        fields = [
+            "domain",
+            "status",
+            "verified_at",
+            "last_checked_at",
+            "consecutive_failures",
+            "first_failed_at",
+            "created_at",
+        ]
         interfaces = (relay.Node,)
 
     def resolve_id(self, info):
         return to_global_id("TenantDomainType", self.id)
+
+    def resolve_grace_period_ends_at(self, info):
+        # When a missing record turns into a lapse; None while the record is present
+        if self.first_failed_at is None:
+            return None
+        return self.first_failed_at + domain_verification.LAPSE_AFTER_FAILURES
 
 
 class SCIMTokenType(DjangoObjectType):

@@ -2,11 +2,13 @@
 Tests for SSO email domain ownership verification (DNS TXT record).
 """
 
+from datetime import timedelta
 from types import SimpleNamespace
 from unittest import mock
 
 import dns.resolver
 import pytest
+from django.utils import timezone
 from graphql import GraphQLError
 from graphql_relay import to_global_id
 from rest_framework import serializers as drf_serializers
@@ -413,6 +415,17 @@ class TestDomainMutations:
         assert str(exc.value) == dv.DOMAIN_IN_USE_CODE
 
 
+def _record_missing_past_grace(tenant_domain):
+    """Simulate a record that has been missing for longer than the grace period, then re-check."""
+    with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+        dv.recheck_domain(tenant_domain)  # first failed check: owners are warned, grace period starts
+        TenantDomain.objects.filter(pk=tenant_domain.pk).update(
+            first_failed_at=timezone.now() - dv.LAPSE_AFTER_FAILURES - timedelta(days=1)
+        )
+        tenant_domain.refresh_from_db()
+        return dv.recheck_domain(tenant_domain)
+
+
 class TestPeriodicRecheck:
     def _verified(self, org, domain="client.pl"):
         claim = dv.add_domain(org, domain)
@@ -446,16 +459,45 @@ class TestPeriodicRecheck:
         assert domain.consecutive_failures == 0
         assert domain.last_checked_at is not None
 
-    def test_missing_record_lapses_after_three_failed_checks(self, org):
+    def test_missing_record_lapses_only_after_the_grace_period(self, org):
         domain = self._verified(org)
 
         with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
-            assert dv.recheck_domain(domain) == VERIFIED
-            assert dv.recheck_domain(domain) == VERIFIED
-            assert dv.recheck_domain(domain) == constants.SSODomainStatus.LAPSED
+            assert dv.recheck_domain(domain) == VERIFIED  # first failure: warning, grace period starts
+            assert dv.recheck_domain(domain) == VERIFIED  # still inside the grace period
 
         domain.refresh_from_db()
+        assert domain.status == VERIFIED
+        assert domain.first_failed_at is not None
+
+        assert _record_missing_past_grace(domain) == constants.SSODomainStatus.LAPSED
+        domain.refresh_from_db()
         assert domain.status == constants.SSODomainStatus.LAPSED
+
+    def test_first_failed_check_warns_owners_and_does_not_lapse(self, org):
+        from apps.notifications.models import Notification
+
+        domain = self._verified(org)
+        owner = UserFactory(email="warn-owner@sso-test.invalid")
+        TenantMembershipFactory(user=owner, tenant=org, role=TenantUserRole.OWNER, is_accepted=True)
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            dv.recheck_domain(domain)
+
+        assert Notification.objects.filter(user=owner, type="SSO_DOMAIN_RECORD_MISSING").count() == 1
+        domain.refresh_from_db()
+        assert domain.status == VERIFIED
+
+    def test_record_found_again_resets_the_grace_period(self, org):
+        domain = self._verified(org)
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            dv.recheck_domain(domain)
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[domain.verification_record_value]):
+            dv.recheck_domain(domain)
+
+        domain.refresh_from_db()
+        assert domain.first_failed_at is None
+        assert domain.consecutive_failures == 0
 
     def test_dns_error_changes_nothing(self, org):
         domain = self._verified(org)
@@ -478,9 +520,7 @@ class TestPeriodicRecheck:
         member = UserFactory(email="jan@client.pl")
         TenantMembershipFactory(user=member, tenant=org, is_accepted=True)
 
-        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
-            for _ in range(3):
-                dv.recheck_domain(domain)
+        _record_missing_past_grace(domain)
 
         connection.refresh_from_db()
         assert connection.status == constants.SSOConnectionStatus.INACTIVE
@@ -490,18 +530,14 @@ class TestPeriodicRecheck:
     def test_lapsed_domain_no_longer_routes_or_links_users(self, org):
         domain = self._verified(org)
         connection = factories.TenantSSOConnectionFactory(tenant=org, allowed_domains=["client.pl"])
-        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
-            for _ in range(3):
-                dv.recheck_domain(domain)
+        _record_missing_past_grace(domain)
 
         assert not is_email_domain_allowed(connection, "jan@client.pl")
         assert Query.resolve_sso_discover(None, None, "jan@client.pl")["sso_available"] is False
 
     def test_lapsed_domain_can_be_claimed_by_another_organization(self, org, other_org):
         domain = self._verified(org)
-        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
-            for _ in range(3):
-                dv.recheck_domain(domain)
+        _record_missing_past_grace(domain)
 
         claim = dv.add_domain(other_org, "client.pl")
         with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
@@ -513,9 +549,7 @@ class TestPeriodicRecheck:
     def test_lapsed_connection_cannot_be_reactivated_until_verified(self, org):
         domain = self._verified(org)
         connection = factories.TenantSSOConnectionFactory(tenant=org, allowed_domains=["client.pl"])
-        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
-            for _ in range(3):
-                dv.recheck_domain(domain)
+        _record_missing_past_grace(domain)
 
         with pytest.raises(dv.DomainVerificationError) as exc:
             dv.ensure_connection_domains_verified(connection)
@@ -547,9 +581,7 @@ class TestPeriodicRecheck:
 
 class TestLapseNotifications:
     def _lapse(self, tenant_domain):
-        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
-            for _ in range(3):
-                dv.recheck_domain(tenant_domain)
+        _record_missing_past_grace(tenant_domain)
 
     def test_lapse_notifies_owners_and_the_connection_creator_once(self, org):
         from apps.notifications.models import Notification

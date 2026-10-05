@@ -3,7 +3,7 @@ import { Input } from '@sb/webapp-core/components/forms';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { Check, Copy, Globe, Trash2 } from 'lucide-react';
+import { AlertTriangle, Check, Copy, Globe, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -21,6 +21,8 @@ interface SSODomain {
   status: string;
   lastCheckedAt?: string | null;
   consecutiveFailures?: number | null;
+  firstFailedAt?: string | null;
+  gracePeriodEndsAt?: string | null;
   verificationRecordName?: string | null;
   verificationRecordValue?: string | null;
 }
@@ -172,7 +174,7 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
                     </Badge>
                   )}
                   {lapsed && (
-                    <Badge variant="destructive" className="shrink-0">
+                    <Badge variant="destructive" className="shrink-0 dark:bg-red-400 dark:hover:bg-red-400/90">
                       <FormattedMessage id="Domain Verification / Status lapsed" defaultMessage="Lapsed" />
                     </Badge>
                   )}
@@ -205,6 +207,22 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
                 )}
               </div>
 
+              {verified && domain.firstFailedAt && domain.gracePeriodEndsAt && (
+                <p className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-400">
+                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    <FormattedMessage
+                      id="Domain Verification / Record missing"
+                      defaultMessage="Verification record missing since {since}. SSO will be deactivated on {deadline} unless it is restored."
+                      values={{
+                        since: intl.formatDate(domain.firstFailedAt, { dateStyle: 'medium' }),
+                        deadline: intl.formatDate(domain.gracePeriodEndsAt, { dateStyle: 'medium' }),
+                      }}
+                    />
+                  </span>
+                </p>
+              )}
+
               {verified && domain.lastCheckedAt && (
                 <p className="text-xs text-muted-foreground">
                   <FormattedMessage
@@ -224,10 +242,10 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
               )}
 
               {lapsed && (
-                <p className="text-sm text-destructive">
+                <p className="text-sm text-destructive dark:text-red-400">
                   <FormattedMessage
                     id="Domain Verification / Lapsed explanation"
-                    defaultMessage="The verification record has been missing for several checks, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
+                    defaultMessage="The verification record has been missing for seven days, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
                   />
                 </p>
               )}

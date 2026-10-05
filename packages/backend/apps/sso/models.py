@@ -754,6 +754,8 @@ class TenantDomain(TimestampedMixin, models.Model):
     verified_at = models.DateTimeField(null=True, blank=True)
     last_checked_at = models.DateTimeField(null=True, blank=True)
     consecutive_failures = models.PositiveSmallIntegerField(default=0)
+    # When the record was first found missing in the current run of failures; the grace period counts from here
+    first_failed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         constraints = [

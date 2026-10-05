@@ -7,6 +7,7 @@ a domain it does not own and pre-register accounts (or redirect sign-ins) for th
 """
 
 import logging
+from datetime import timedelta
 
 import dns.exception
 import dns.resolver
@@ -24,8 +25,8 @@ from common.action_logging.service import log_action
 logger = logging.getLogger(__name__)
 
 DNS_TIMEOUT_SECONDS = 5
-# Consecutive failed daily checks before a verified domain lapses (about three days)
-LAPSE_AFTER_FAILURES = 3
+# A verified domain lapses after its record has been missing for this long (checked daily)
+LAPSE_AFTER_FAILURES = timedelta(days=7)
 
 # Public mail providers: anyone can register an address here, so no organization can prove ownership.
 PUBLIC_EMAIL_DOMAINS = frozenset(
@@ -278,26 +279,33 @@ def verify_domain(tenant_domain: TenantDomain) -> TenantDomain:
 
 def recheck_domain(tenant_domain: TenantDomain) -> str:
     """
-    Re-check a verified domain's TXT record. A missing record counts as a failure; after
-    LAPSE_AFTER_FAILURES consecutive failures the domain lapses. DNS errors change nothing,
+    Re-check a verified domain's TXT record. A missing record starts a grace period: the owners are
+    warned on the first failed check, and the domain lapses once the record has been missing for
+    LAPSE_AFTER_FAILURES (seven days). Found again, the grace period resets. DNS errors change nothing,
     so a resolver outage can never lock a company out. Returns the resulting status.
     """
     if tenant_domain.status != constants.SSODomainStatus.VERIFIED:
         return tenant_domain.status
 
     present = record_present(tenant_domain)
-    tenant_domain.last_checked_at = timezone.now()
+    now = timezone.now()
+    tenant_domain.last_checked_at = now
     if present is None:
         tenant_domain.save(update_fields=["last_checked_at", "updated_at"])
         return tenant_domain.status
 
     if present:
         tenant_domain.consecutive_failures = 0
-        tenant_domain.save(update_fields=["last_checked_at", "consecutive_failures", "updated_at"])
+        tenant_domain.first_failed_at = None
+        tenant_domain.save(update_fields=["last_checked_at", "consecutive_failures", "first_failed_at", "updated_at"])
         return tenant_domain.status
 
     tenant_domain.consecutive_failures += 1
-    if tenant_domain.consecutive_failures >= LAPSE_AFTER_FAILURES:
+    if tenant_domain.first_failed_at is None:
+        tenant_domain.first_failed_at = now
+        tenant_domain.save(update_fields=["last_checked_at", "consecutive_failures", "first_failed_at", "updated_at"])
+        _notify_record_missing(tenant_domain)
+    elif now - tenant_domain.first_failed_at >= LAPSE_AFTER_FAILURES:
         _lapse_domain(tenant_domain)
     else:
         tenant_domain.save(update_fields=["last_checked_at", "consecutive_failures", "updated_at"])
@@ -362,17 +370,26 @@ def _notify_domain_lapsed(tenant_domain: TenantDomain, deactivated_connections) 
         "tenant_name": tenant_domain.tenant.name,
         "connection_names": [connection.name for connection in deactivated_connections],
     }
-    for user in recipients.values():
+    _send_to(recipients.values(), SSONotification.SSO_DOMAIN_LAPSED, data)
+
+
+def _notify_record_missing(tenant_domain: TenantDomain) -> None:
+    """Warn the tenant owners on the first failed check, while there is still time to restore the record."""
+    data = {
+        "domain": tenant_domain.domain,
+        "tenant_name": tenant_domain.tenant.name,
+        "grace_days": LAPSE_AFTER_FAILURES.days,
+    }
+    _send_to(tenant_domain.tenant.owners, SSONotification.SSO_DOMAIN_RECORD_MISSING, data)
+
+
+def _send_to(users, notification, data) -> None:
+    for user in users:
         try:
-            sender.send_notification(
-                user=user,
-                type=SSONotification.SSO_DOMAIN_LAPSED.value,
-                data=data,
-                issuer=None,
-            )
+            sender.send_notification(user=user, type=notification.value, data=data, issuer=None)
         except Exception:
-            # A notification failure must not undo the lapse or stop the other recipients
-            logger.warning("Failed to send SSO domain lapsed notification", exc_info=True)
+            # A notification failure must not undo a lapse or stop the other recipients
+            logger.warning("Failed to send SSO domain notification %s", notification.value, exc_info=True)
 
 
 def remove_domain(tenant_domain: TenantDomain) -> None:

@@ -2031,10 +2031,13 @@
     "defaultMessage": "Nie zgłoszono jeszcze żadnych domen. Dodaj domenę firmy, aby rozpocząć weryfikację."
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "Rekord weryfikacyjny nie jest obecny od kilku sprawdzeń, więc ta domena nie działa już w SSO. Jej połączenia SSO zostały dezaktywowane. Opublikuj rekord ponownie i zweryfikuj domenę, aby z niej korzystać."
+    "defaultMessage": "Rekord weryfikacyjny był nieobecny przez siedem dni, więc domena przestała działać w SSO. Połączenia SSO tej domeny zostały dezaktywowane. Opublikuj rekord ponownie i zweryfikuj domenę, aby ponownie z niej korzystać."
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "Ostatnio sprawdzono {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Brakuje rekordu weryfikacyjnego od {since}. Jeśli nie zostanie przywrócony, SSO dla tej domeny zostanie dezaktywowane dnia {deadline}."
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Nazwa"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "Wygasła domena SSO"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "Rekord weryfikacyjny dla \"{domain}\" ({tenant_name}) jest niedostępny. SSO dla tej domeny zostanie dezaktywowane za {grace_days} dni, chyba że rekord zostanie przywrócony."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "Brak rekordu weryfikacyjnego domeny SSO"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Organizacja „{tenant_name}” została usunięta przez „{name}”"

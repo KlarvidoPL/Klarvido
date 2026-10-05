@@ -2031,10 +2031,13 @@
     "defaultMessage": "Noch keine Domains angemeldet. Füge die Domain deines Unternehmens hinzu, um die Verifizierung zu starten."
   },
   "Domain Verification / Lapsed explanation": {
-    "defaultMessage": "Der Verifizierungseintrag fehlt seit mehreren Prüfungen, daher funktioniert diese Domain nicht mehr für SSO. Die SSO-Verbindungen wurden deaktiviert. Veröffentliche den Eintrag erneut und verifiziere die Domain, um sie zu nutzen."
+    "defaultMessage": "Der Verifizierungseintrag fehlte sieben Tage lang, daher funktioniert diese Domain nicht mehr für SSO. Die SSO-Verbindungen wurden deaktiviert. Veröffentliche den Eintrag erneut und verifiziere die Domain, um sie zu nutzen."
   },
   "Domain Verification / Last checked": {
     "defaultMessage": "Zuletzt geprüft {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Verifizierungseintrag fehlt seit {since}. SSO wird am {deadline} deaktiviert, sofern der Eintrag nicht wiederhergestellt wird."
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Name"
@@ -3271,6 +3274,12 @@
   },
   "Notifications / SSO Domain Lapsed / Title": {
     "defaultMessage": "SSO-Domain abgelaufen"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "Der Verifizierungseintrag für \"{domain}\" ({tenant_name}) fehlt. SSO für diese Domain wird in {grace_days} Tagen deaktiviert, sofern der Eintrag nicht wiederhergestellt wird."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO-Domain-Verifizierungseintrag fehlt"
   },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Die Organisation „{tenant_name}“ wurde von „{name}“ gelöscht"

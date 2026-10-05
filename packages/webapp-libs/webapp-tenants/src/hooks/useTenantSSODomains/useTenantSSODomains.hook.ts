@@ -11,6 +11,8 @@ const SSO_DOMAINS_QUERY = gql(`
       verifiedAt
       lastCheckedAt
       consecutiveFailures
+      firstFailedAt
+      gracePeriodEndsAt
       verificationRecordName
       verificationRecordValue
     }
