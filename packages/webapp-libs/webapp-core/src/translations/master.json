@@ -5229,10 +5229,10 @@
     "defaultMessage": "Domyślna"
   },
   "Companies / Default hint": {
-    "defaultMessage": "Wybierz firmę, aby przełączyć kontekst Klarvido. Ustaw domyślną, jeśli chcesz otwierać ją automatycznie po zalogowaniu."
+    "defaultMessage": "Domyślna firma otworzy się automatycznie po zalogowaniu."
   },
   "Companies / Default removed": {
-    "defaultMessage": "Usunięto domyślną firmę. Po zalogowaniu wybierzesz ją na ekranie Firmy."
+    "defaultMessage": "Usunięto domyślną firmę."
   },
   "Companies / Default saved": {
     "defaultMessage": "Zapisano domyślną firmę. Otworzy się automatycznie po zalogowaniu."
@@ -5293,5 +5293,20 @@
   },
   "TenantSwitch / All companies": {
     "defaultMessage": "Wszystkie firmy"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "Usuń domyślną firmę: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "Zapisywanie…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "Zapisywanie domyślnej firmy: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "Ustaw jako domyślną firmę: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "Administrator systemu"
   }
 }
