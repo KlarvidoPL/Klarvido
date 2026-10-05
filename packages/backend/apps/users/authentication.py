@@ -1,10 +1,33 @@
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.http import parse_cookie
+from django.middleware.csrf import CsrfViewMiddleware
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework_simplejwt import authentication
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+
+CSRF_SAFE_METHODS = ("GET", "HEAD", "OPTIONS")
+
+
+class _CSRFCheck(CsrfViewMiddleware):
+    """Returns the rejection reason instead of a response, the same way DRF's session CSRF check does."""
+
+    def _reject(self, request, reason):
+        return reason
+
+
+def enforce_csrf(request):
+    """Reject a cookie-authenticated write that does not echo the CSRF cookie in X-CSRFToken.
+
+    The browser attaches the auth cookie to cross-site requests too, depending on SameSite, so the cookie alone
+    does not prove the request came from the app. Same check DRF applies for session authentication.
+    """
+    check = _CSRFCheck(lambda request: None)
+    check.process_request(request)
+    reason = check.process_view(request, None, (), {})
+    if reason:
+        raise PermissionDenied(f"CSRF Failed: {reason}")
 
 
 class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
@@ -47,12 +70,18 @@ class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
         and SSO options even if the user has expired cookies.
         """
         try:
-            return super().authenticate(request)
+            result = super().authenticate(request)
         except (InvalidToken, TokenError, AuthenticationFailed):
             # Token is expired, invalid, or no longer matches its account (user gone/inactive, password changed,
             # see CHECK_REVOKE_TOKEN) - treat as unauthenticated rather than raising a 401 error, so a valid
             # Authorization header can still authenticate the request
             return None
+
+        # This class only reads the cookie, so a result means the request is cookie-authenticated. Writes must
+        # prove they came from the app (see enforce_csrf). Header-authenticated requests are not checked here.
+        if result is not None and request.method not in CSRF_SAFE_METHODS:
+            enforce_csrf(request)
+        return result
 
 
 class JSONWebTokenChannelsAuthentication(authentication.JWTAuthentication):

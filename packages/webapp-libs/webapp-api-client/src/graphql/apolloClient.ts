@@ -11,7 +11,7 @@ import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
 import { GraphQLFormattedError } from 'graphql';
 import { Kind, OperationTypeNode } from 'graphql/language';
 
-import { apiURL, auth } from '../api';
+import { CSRF_HEADER_NAME, apiURL, auth, ensureCsrfToken } from '../api';
 import { Emitter } from '../utils/eventEmitter';
 import { SchemaType } from './types';
 import { WebSocketLink } from './webSocketLink';
@@ -144,9 +144,11 @@ const httpApiLink = new UploadHttpLink({
  * 1. Cookie-based auth (via JSONWebTokenCookieAuthentication)
  * 2. Header-based auth (via JWTAuthentication with Authorization: Bearer token)
  */
-const authLink = setContext((_, { headers }) => {
+const authLink = setContext(async (_, { headers }) => {
   // Get token from localStorage (set by login, SSO callback, etc.)
   const token = localStorage.getItem('token');
+  // The backend refuses cookie-authenticated writes without this (apps/users/authentication.py)
+  const csrfToken = await ensureCsrfToken();
 
   // Return headers with Authorization if token exists
   // Cookies are still sent via credentials: 'include', so this is additive
@@ -154,6 +156,7 @@ const authLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
       ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...(csrfToken ? { [CSRF_HEADER_NAME]: csrfToken } : {}),
     },
   };
 });
@@ -237,7 +240,7 @@ const handleApiErrors = (
 
 const refreshTokenLink = onError((error: any) => {
   let { graphQLErrors, networkError, operation, forward } = error;
-  
+
   if (!networkError && error.error) {
     networkError = error.error;
   }

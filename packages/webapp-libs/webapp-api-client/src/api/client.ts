@@ -2,6 +2,7 @@ import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
 import { Emitter } from '../utils/eventEmitter';
+import { CSRF_HEADER_NAME, ensureCsrfToken } from './csrf';
 import { validateStatus } from './helpers';
 import { createRefreshTokenInterceptor } from './interceptors';
 
@@ -16,16 +17,22 @@ export const client = applyCaseMiddleware(
 
 /**
  * Request interceptor that adds Authorization header from localStorage.
- * 
+ *
  * This is essential for Safari and mobile browsers that block third-party cookies
  * due to Intelligent Tracking Prevention (ITP). When cookies are blocked,
  * we fall back to sending the access token via Authorization header.
+ *
+ * It also adds the CSRF token. The backend checks it for every cookie-authenticated write.
  */
 client.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const token = localStorage.getItem('token');
     if (token && config.headers) {
       config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    const csrfToken = await ensureCsrfToken();
+    if (csrfToken && config.headers) {
+      config.headers[CSRF_HEADER_NAME] = csrfToken;
     }
     return config;
   },

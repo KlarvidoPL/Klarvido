@@ -1,3 +1,5 @@
+import { resetCsrfToken } from '../csrf';
+
 /**
  * Store auth tokens in localStorage for Safari/mobile fallback.
  * Safari and iOS block third-party cookies (ITP), so we use the Authorization
@@ -6,6 +8,8 @@
  * Used by: login form, passkey login, SSO callback, OTP validation, token refresh.
  */
 export const storeAuthTokens = (access: string, refresh?: string) => {
+  // A new login can rotate the CSRF cookie, so the cached token must be fetched again
+  resetCsrfToken();
   try {
     localStorage.setItem('token', access);
     if (refresh) {

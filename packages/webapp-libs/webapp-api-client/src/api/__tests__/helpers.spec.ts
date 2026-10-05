@@ -78,6 +78,7 @@ describe('api', () => {
             expect(axiosRequestSpy).toHaveBeenCalledWith({
               ...error.config,
               baseURL: '/',
+              headers: { 'X-CSRFToken': 'test-csrf-token' },
             });
             expect(res).toEqual(requestResponse);
           });
