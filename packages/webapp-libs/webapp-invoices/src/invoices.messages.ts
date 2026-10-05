@@ -1,6 +1,8 @@
 import { defineMessages } from 'react-intl';
 
 export const invoiceMessages = defineMessages({
+  All: { id: 'Invoices / All', defaultMessage: 'Wszystkie' },
+  Purchases: { id: 'Invoices / Purchases', defaultMessage: 'Zakupy' },
   'KSeF sync': { id: 'Invoices / KSeF sync', defaultMessage: 'Synchronizacja KSeF' },
   'Connection needed': {
     id: 'Invoices / Connection needed',
@@ -37,7 +39,8 @@ export const invoiceMessages = defineMessages({
   Category: { id: 'Invoices / Category', defaultMessage: 'Kategoria' },
   'Issue from': { id: 'Invoices / Issue from', defaultMessage: 'Data wystawienia od' },
   'Issue to': { id: 'Invoices / Issue to', defaultMessage: 'Data wystawienia do' },
-  Sort: { id: 'Invoices / Sort', defaultMessage: 'Sortowanie' },
+  Ascending: { id: 'Invoices / Ascending', defaultMessage: 'rosnąco' },
+  Descending: { id: 'Invoices / Descending', defaultMessage: 'malejąco' },
   Loading: { id: 'Invoices / Loading', defaultMessage: 'Wczytywanie faktur…' },
   'No results': { id: 'Invoices / No results', defaultMessage: 'Brak faktur pasujących do filtrów.' },
   'No invoices': {

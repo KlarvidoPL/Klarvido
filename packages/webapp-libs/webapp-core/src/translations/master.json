@@ -2591,11 +2591,17 @@
   "Home / t&c link": {
     "defaultMessage": "Terms and conditions"
   },
+  "Invoices / All": {
+    "defaultMessage": "Wszystkie"
+  },
   "Invoices / All categories": {
     "defaultMessage": "Wszystkie kategorie"
   },
-  "Invoices / All directions": {
-    "defaultMessage": "Sprzedaż i zakupy"
+  "Invoices / Amount sorting note": {
+    "defaultMessage": "Kwoty są sortowane według wartości liczbowej, bez przeliczania walut."
+  },
+  "Invoices / Ascending": {
+    "defaultMessage": "rosnąco"
   },
   "Invoices / Ask": {
     "defaultMessage": "Zapytaj Klarvido"
@@ -2612,14 +2618,14 @@
   "Invoices / Buyer": {
     "defaultMessage": "Nabywca"
   },
-  "Invoices / By number": {
-    "defaultMessage": "Według numeru"
-  },
   "Invoices / CSV": {
     "defaultMessage": "Eksport CSV"
   },
   "Invoices / Category": {
     "defaultMessage": "Kategoria"
+  },
+  "Invoices / Clear filters": {
+    "defaultMessage": "Wyczyść filtry"
   },
   "Invoices / Completed": {
     "defaultMessage": "Zakończona"
@@ -2648,6 +2654,9 @@
   "Invoices / Date": {
     "defaultMessage": "Data"
   },
+  "Invoices / Descending": {
+    "defaultMessage": "malejąco"
+  },
   "Invoices / Description": {
     "defaultMessage": "Opis"
   },
@@ -2662,6 +2671,9 @@
   },
   "Invoices / Failed": {
     "defaultMessage": "Błąd"
+  },
+  "Invoices / Filter category": {
+    "defaultMessage": "Filtruj kategorię"
   },
   "Invoices / First range explanation": {
     "defaultMessage": "Wybierz historię według daty trwałego zapisu w KSeF, do chwili uruchomienia importu. Filtry na liście dotyczą daty wystawienia. Po uruchomieniu faktury będą synchronizowane co 2 godziny."
@@ -2708,9 +2720,6 @@
   "Invoices / Net": {
     "defaultMessage": "Netto"
   },
-  "Invoices / Newest": {
-    "defaultMessage": "Od najnowszych"
-  },
   "Invoices / Next": {
     "defaultMessage": "Następna"
   },
@@ -2722,9 +2731,6 @@
   },
   "Invoices / Number": {
     "defaultMessage": "Numer"
-  },
-  "Invoices / Oldest": {
-    "defaultMessage": "Od najstarszych"
   },
   "Invoices / Partial": {
     "defaultMessage": "Częściowo zakończona"
@@ -2738,11 +2744,17 @@
   "Invoices / Purchase": {
     "defaultMessage": "Zakup"
   },
+  "Invoices / Purchases": {
+    "defaultMessage": "Zakupy"
+  },
   "Invoices / Quantity": {
     "defaultMessage": "Ilość"
   },
   "Invoices / Queued": {
     "defaultMessage": "Oczekuje"
+  },
+  "Invoices / Remove filter": {
+    "defaultMessage": "Usuń filtr: {field}"
   },
   "Invoices / Running": {
     "defaultMessage": "Trwa"
@@ -2771,8 +2783,8 @@
   "Invoices / Six months": {
     "defaultMessage": "6 miesięcy"
   },
-  "Invoices / Sort": {
-    "defaultMessage": "Sortowanie"
+  "Invoices / Sort column": {
+    "defaultMessage": "{column}: sortuj {order}"
   },
   "Invoices / Start date": {
     "defaultMessage": "Data początkowa"
@@ -2797,6 +2809,9 @@
   },
   "Invoices / Unit": {
     "defaultMessage": "Jednostka"
+  },
+  "Invoices / Updating results": {
+    "defaultMessage": "Aktualizowanie wyników…"
   },
   "Invoices / VAT": {
     "defaultMessage": "VAT"

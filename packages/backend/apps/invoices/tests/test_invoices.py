@@ -66,7 +66,10 @@ def state(tenant_factory, settings):
     settings.KSEF_ENCRYPTION_KEYS = base64.b64encode(os.urandom(32)).decode()
     tenant = tenant_factory(nip='5252344078', country='PL', type=TenantType.ORGANIZATION)
     KsefCredential.objects.create(
-        tenant=tenant, encrypted_token=crypto.encrypt_token(tenant.pk, 'secret'), token_hint='cret', status='VALID'
+        tenant=tenant,
+        encrypted_token=crypto.encrypt_token(tenant.pk, 'secret'),
+        token_hint='secret'[-4:],
+        status='VALID',
     )
     return InvoiceSyncState.objects.create(
         tenant=tenant, context_nip=tenant.nip, environment='test', start_date=timezone.now() - timedelta(days=365)
@@ -372,7 +375,10 @@ def test_graphql_csv_all_filtered_rows_and_xml_authorization(state, user_factory
     for i in range(26):
         tasks.import_document(state, meta(str(i)), xml().replace('FV/1', '=unsafe-text'), 'Subject1')
     invoice = Invoice.objects.first()
-    query = 'query($tenantId:ID!, $id:ID!){ invoiceCsv(tenantId:$tenantId,filters:{direction:"SALE"}) invoiceXml(tenantId:$tenantId,id:$id) }'
+    query = (
+        'query($tenantId:ID!, $id:ID!){ invoiceCsv(tenantId:$tenantId,filters:{direction:"SALE"}) '
+        'invoiceXml(tenantId:$tenantId,id:$id) }'
+    )
     variables = {'tenantId': to_global_id('TenantType', str(state.tenant.pk)), 'id': str(invoice.pk)}
     response = (
         authenticated_client(user).post('/api/graphql/', {'query': query, 'variables': variables}, format='json').json()
@@ -440,3 +446,29 @@ def test_negative_correction_keeps_amount_signs(state):
     invoice = Invoice.objects.get()
     assert invoice.net == Decimal('-100') and invoice.gross == Decimal('-123')
     assert invoice.corrected_ksef_numbers == ['original-not-imported']
+
+
+@pytest.mark.parametrize(
+    'field', ['number', 'counterparty', 'direction', 'issue_date', 'currency', 'net', 'vat', 'gross', 'category__name']
+)
+def test_table_column_sorting_is_applied_before_pagination(state, field):
+    tasks.import_document(state, meta('one'), xml(), 'Subject1')
+    tasks.import_document(state, meta('two'), xml(), 'Subject2')
+    first, second = list(Invoice.objects.order_by('pk'))
+    first.number, second.number = 'A', 'Z'
+    first.buyer_name, second.seller_name = 'A buyer', 'Z seller'
+    first.issue_date, second.issue_date = date(2026, 1, 1), date(2026, 2, 1)
+    first.currency, second.currency = 'EUR', 'PLN'
+    first.net, second.net = Decimal('1'), Decimal('2')
+    first.vat, second.vat = Decimal('1'), Decimal('2')
+    first.gross, second.gross = Decimal('1'), Decimal('2')
+    first.category = InvoiceCategory.objects.create(tenant=state.tenant, name='A')
+    second.category = InvoiceCategory.objects.create(tenant=state.tenant, name='Z')
+    first.save()
+    second.save()
+    expected = [second.pk, first.pk] if field == 'direction' else [first.pk, second.pk]
+    assert list(invoice_queryset(state.tenant, sort=field).values_list('pk', flat=True)) == expected
+    assert list(invoice_queryset(state.tenant, sort='-' + field).values_list('pk', flat=True)) == list(
+        reversed(expected)
+    )
+    assert invoice_queryset(state.tenant, sort=field).first().pk == expected[0]

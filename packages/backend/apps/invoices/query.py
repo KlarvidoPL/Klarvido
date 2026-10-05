@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, Case, When, F, CharField
 from rest_framework.exceptions import ValidationError
 
 from .models import Invoice
@@ -28,8 +28,17 @@ def invoice_queryset(tenant, search='', direction='', date_from=None, date_to=No
         qs = qs.filter(category__isnull=True)
     elif category:
         qs = qs.filter(category_id=category)
-    if sort not in ['issue_date', '-issue_date', 'number', '-number', 'net', '-net', 'gross', '-gross']:
+    fields = {'issue_date', 'number', 'net', 'vat', 'gross', 'currency', 'direction', 'category__name', 'counterparty'}
+    if sort.removeprefix('-') not in fields:
         raise ValidationError('INVALID_SORT')
+    if sort.removeprefix('-') == 'counterparty':
+        qs = qs.annotate(
+            counterparty=Case(
+                When(direction='SALE', then=F('buyer_name')),
+                default=F('seller_name'),
+                output_field=CharField(),
+            )
+        )
     return qs.order_by(sort, '-pk')
 
 

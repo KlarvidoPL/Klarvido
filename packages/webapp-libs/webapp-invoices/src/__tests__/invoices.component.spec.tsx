@@ -51,7 +51,7 @@ const Location = () => {
 const wrapper = (element: React.ReactNode, mocks = [setup, list] as any[], path = '/') =>
   render(
     <MockedProvider mocks={mocks}>
-      <IntlProvider locale="pl">
+      <IntlProvider locale="pl" defaultLocale="pl">
         <MemoryRouter initialEntries={[path]}>
           {element}
           <Location />
@@ -86,7 +86,17 @@ it('defaults to twelve months and imports only after clicking', async () => {
 });
 
 it('attaches the filtered list and selected invoices, and stores filters in URL', async () => {
-  wrapper(<InvoiceList />);
+  wrapper(<InvoiceList />, [
+    setup,
+    list,
+    {
+      ...list,
+      request: {
+        query: invoicesQuery,
+        variables: { tenantId: 'tenant-1', filters: { direction: 'PURCHASE' }, page: 1 },
+      },
+    },
+  ]);
   await screen.findByText('FV/1');
   fireEvent.click(screen.getByRole('button', { name: 'Zapytaj Klarvido' }));
   expect(askKlarvido).toHaveBeenCalledWith('tenant-1', 'Lista faktur z filtrami', {
@@ -99,7 +109,7 @@ it('attaches the filtered list and selected invoices, and stores filters in URL'
     kind: ComponentKind.INVOICE_SELECTION,
     invoiceIds: ['invoice-1'],
   });
-  fireEvent.change(screen.getByLabelText('Typ'), { target: { value: 'PURCHASE' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Zakupy' }));
   expect(screen.getByTestId('location')).toHaveTextContent('direction=PURCHASE');
 });
 
@@ -110,7 +120,8 @@ it('keeps view-only users away from import, exports and category editing', async
   expect(screen.queryByRole('button', { name: 'Pobierz faktury z KSeF' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Eksport CSV' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Zapytaj Klarvido' })).not.toBeInTheDocument();
-  expect(screen.queryByRole('combobox', { name: 'Kategoria' })).toBeInTheDocument(); // Filter remains available.
+  fireEvent.click(screen.getByRole('button', { name: 'Filtruj kategorię' }));
+  expect(await screen.findByRole('combobox', { name: 'Kategoria' })).toBeInTheDocument(); // Filter remains available.
 });
 
 it('renders details and passes only the ID to AI', async () => {
@@ -152,4 +163,88 @@ it('renders details and passes only the ID to AI', async () => {
     kind: ComponentKind.INVOICE_DETAILS,
     invoiceIds: ['invoice-1'],
   });
+});
+
+it('sorts through column headers, resets pagination and passes ordering to the backend', async () => {
+  const variables = jest.fn(() => true);
+  wrapper(
+    <InvoiceList />,
+    [
+      setup,
+      {
+        request: { query: invoicesQuery, variables },
+        result: list.result,
+        maxUsageCount: Infinity,
+      },
+    ],
+    '/?page=3'
+  );
+  await screen.findByText('FV/1');
+  const date = screen.getByRole('button', { name: 'Data: sortuj rosnąco' });
+  expect(date.closest('th')).toHaveAttribute('aria-sort', 'descending');
+  fireEvent.click(date);
+  await waitFor(() =>
+    expect(variables).toHaveBeenLastCalledWith({ tenantId: 'tenant-1', filters: { sort: 'issue_date' }, page: 1 })
+  );
+  expect(screen.getByTestId('location')).toHaveTextContent('?sort=issue_date');
+  expect((await screen.findByRole('button', { name: 'Data: sortuj malejąco' })).closest('th')).toHaveAttribute(
+    'aria-sort',
+    'ascending'
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Data: sortuj malejąco' }));
+  await waitFor(() =>
+    expect(variables).toHaveBeenLastCalledWith({ tenantId: 'tenant-1', filters: { sort: '-issue_date' }, page: 1 })
+  );
+  fireEvent.click(await screen.findByRole('button', { name: 'Brutto: sortuj rosnąco' }));
+  await waitFor(() =>
+    expect(variables).toHaveBeenLastCalledWith({ tenantId: 'tenant-1', filters: { sort: 'gross' }, page: 1 })
+  );
+});
+
+it('shows removable filters and clears them without discarding sorting', async () => {
+  const variables = jest.fn(() => true);
+  wrapper(
+    <InvoiceList />,
+    [
+      setup,
+      {
+        request: { query: invoicesQuery, variables },
+        result: list.result,
+        maxUsageCount: Infinity,
+      },
+    ],
+    '/?direction=SALE&category=uncategorized&dateFrom=2026-01-01&sort=-gross&page=3'
+  );
+  await screen.findByText('FV/1');
+  expect(screen.getByRole('button', { name: 'Sprzedaż' })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByRole('button', { name: 'Usuń filtr: Kategoria' })).toHaveTextContent('Bez kategorii');
+  fireEvent.click(screen.getByRole('button', { name: 'Usuń filtr: Typ' }));
+  expect(screen.getByTestId('location')).not.toHaveTextContent('direction=');
+  expect(screen.getByTestId('location')).not.toHaveTextContent('page=');
+  fireEvent.click(screen.getByRole('button', { name: 'Wyczyść filtry' }));
+  expect(screen.getByTestId('location')).toHaveTextContent('?sort=-gross');
+  expect(screen.queryByRole('button', { name: /Usuń filtr:/ })).not.toBeInTheDocument();
+  await waitFor(() =>
+    expect(variables).toHaveBeenLastCalledWith({ tenantId: 'tenant-1', filters: { sort: '-gross' }, page: 1 })
+  );
+});
+
+it('keeps the category filter available when it returns no rows', async () => {
+  wrapper(
+    <InvoiceList />,
+    [
+      setup,
+      {
+        request: {
+          query: invoicesQuery,
+          variables: { tenantId: 'tenant-1', filters: { category: 'uncategorized', sort: 'number' }, page: 1 },
+        },
+        result: { data: { invoices: { totalCount: 0, items: [] } } },
+      },
+    ],
+    '/?category=uncategorized&sort=number'
+  );
+  await screen.findByText('Brak faktur pasujących do filtrów.');
+  fireEvent.click(screen.getByRole('button', { name: 'Filtruj kategorię' }));
+  expect(await screen.findByRole('combobox', { name: 'Kategoria' })).toHaveValue('uncategorized');
 });

@@ -5,11 +5,12 @@ import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { Input } from '@sb/webapp-core/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@sb/webapp-core/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@sb/webapp-core/components/ui/table';
 import { RoutesConfig as TenantRoutesConfig } from '@sb/webapp-tenants/config/routes';
 import { useGenerateTenantPath, usePermissionCheck } from '@sb/webapp-tenants/hooks';
 import { useCurrentTenant } from '@sb/webapp-tenants/providers';
-import { Download, Receipt, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Download, Filter, Receipt, RefreshCw, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link, Navigate, Route, Routes, useParams, useSearchParams } from 'react-router-dom';
@@ -285,6 +286,11 @@ const CategorySelect = ({
 };
 
 export const InvoiceList = () => {
+  const { data: tenant } = useCurrentTenant();
+  return <InvoiceListContent key={tenant?.id || ''} />;
+};
+
+const InvoiceListContent = () => {
   const intl = useIntl();
   const { data: tenant } = useCurrentTenant();
   const tenantId = tenant?.id || '';
@@ -294,7 +300,7 @@ export const InvoiceList = () => {
   const page = pageFromUrl(params);
   const { hasPermission: canExport } = usePermissionCheck('invoices.export');
   const { hasPermission: canAi } = usePermissionCheck('features.ai.use');
-  const { data, loading, error, refetch } = useQuery(invoicesQuery, {
+  const { data, previousData, loading, error, refetch } = useQuery(invoicesQuery, {
     variables: { tenantId, filters, page },
     skip: !tenantId,
     pollInterval: 10000,
@@ -315,8 +321,58 @@ export const InvoiceList = () => {
     if (key !== 'page') next.delete('page');
     setParams(next, { replace: true });
   };
-  const total = data?.invoices?.totalCount || 0;
-  const rows = data?.invoices?.items || [];
+  const filterKeys = ['search', 'direction', 'dateFrom', 'dateTo', 'category'] as const;
+  const activeFilters = filterKeys.filter((key) => params.get(key));
+  const sort = filters.sort || '-issue_date';
+  const clearFilters = () => {
+    const next = new URLSearchParams(params);
+    filterKeys.forEach((key) => next.delete(key));
+    next.delete('page');
+    setParams(next, { replace: true });
+  };
+  const categoryFilter = (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={params.get('category') ? 'text-primary' : ''}
+          aria-label={intl.formatMessage({ id: 'Invoices / Filter category', defaultMessage: 'Filtruj kategorię' })}
+        >
+          <Filter className="h-4 w-4" aria-hidden="true" />
+          {params.get('category') && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end">
+        <label className="flex flex-col gap-2 text-sm">
+          <T id="Category" defaultMessage="Kategoria" />
+          <select
+            className={selectClass}
+            value={params.get('category') || ''}
+            onChange={(event) => update('category', event.target.value)}
+          >
+            <option value="">
+              {intl.formatMessage({ id: 'Invoices / All categories', defaultMessage: 'Wszystkie kategorie' })}
+            </option>
+            <option value="uncategorized">
+              {intl.formatMessage({ id: 'Invoices / Uncategorized', defaultMessage: 'Bez kategorii' })}
+            </option>
+            {setup?.invoiceCategories?.map(
+              (category) =>
+                category && (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                )
+            )}
+          </select>
+        </label>
+      </PopoverContent>
+    </Popover>
+  );
+  const result = data || previousData;
+  const total = result?.invoices?.totalCount || 0;
+  const rows = result?.invoices?.items || [];
   const money = (amount: unknown) => String(amount ?? '—');
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-8">
@@ -381,52 +437,32 @@ export const InvoiceList = () => {
       <SyncPanel key={tenantId} tenantId={tenantId} />
       <Card>
         <CardContent className="space-y-4 pt-6">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid items-end gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_auto_170px_170px]">
             <label className="space-y-1 text-sm">
               <T id="Search" defaultMessage="Numer, kontrahent lub NIP" />
               <Input value={params.get('search') || ''} onChange={(event) => update('search', event.target.value)} />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <T id="Direction" defaultMessage="Typ" />
-              <select
-                className={selectClass}
-                value={params.get('direction') || ''}
-                onChange={(event) => update('direction', event.target.value)}
-              >
-                <option value="">
-                  {intl.formatMessage({ id: 'Invoices / All directions', defaultMessage: 'Sprzedaż i zakupy' })}
-                </option>
-                <option value="SALE">
-                  {intl.formatMessage({ id: 'Invoices / Sale', defaultMessage: 'Sprzedaż' })}
-                </option>
-                <option value="PURCHASE">
-                  {intl.formatMessage({ id: 'Invoices / Purchase', defaultMessage: 'Zakup' })}
-                </option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <T id="Category" defaultMessage="Kategoria" />
-              <select
-                className={selectClass}
-                value={params.get('category') || ''}
-                onChange={(event) => update('category', event.target.value)}
-              >
-                <option value="">
-                  {intl.formatMessage({ id: 'Invoices / All categories', defaultMessage: 'Wszystkie kategorie' })}
-                </option>
-                <option value="uncategorized">
-                  {intl.formatMessage({ id: 'Invoices / Uncategorized', defaultMessage: 'Bez kategorii' })}
-                </option>
-                {setup?.invoiceCategories?.map(
-                  (category) =>
-                    category && (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    )
-                )}
-              </select>
-            </label>
+            <div
+              role="group"
+              aria-label={intl.formatMessage({ id: 'Invoices / Direction', defaultMessage: 'Typ' })}
+              className="flex rounded-md border p-1"
+            >
+              {[
+                { value: '', message: invoiceMessages.All },
+                { value: 'SALE', message: invoiceMessages.Sale },
+                { value: 'PURCHASE', message: invoiceMessages.Purchases },
+              ].map(({ value, message }) => (
+                <Button
+                  key={value}
+                  size="sm"
+                  variant={(params.get('direction') || '') === value ? 'secondary' : 'ghost'}
+                  aria-pressed={(params.get('direction') || '') === value}
+                  onClick={() => update('direction', value)}
+                >
+                  {intl.formatMessage(message)}
+                </Button>
+              ))}
+            </div>
             <label className="space-y-1 text-sm">
               <T id="Issue from" defaultMessage="Data wystawienia od" />
               <Input
@@ -443,42 +479,93 @@ export const InvoiceList = () => {
                 onChange={(event) => update('dateTo', event.target.value)}
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <T id="Sort" defaultMessage="Sortowanie" />
-              <select
-                className={selectClass}
-                value={params.get('sort') || '-issue_date'}
-                onChange={(event) => update('sort', event.target.value)}
-              >
-                <option value="-issue_date">
-                  {intl.formatMessage({ id: 'Invoices / Newest', defaultMessage: 'Od najnowszych' })}
-                </option>
-                <option value="issue_date">
-                  {intl.formatMessage({ id: 'Invoices / Oldest', defaultMessage: 'Od najstarszych' })}
-                </option>
-                <option value="number">
-                  {intl.formatMessage({ id: 'Invoices / By number', defaultMessage: 'Według numeru' })}
-                </option>
-              </select>
-            </label>
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {activeFilters.map((key) => {
+              const value = params.get(key)!;
+              const label =
+                key === 'category'
+                  ? value === 'uncategorized'
+                    ? intl.formatMessage({ id: 'Invoices / Uncategorized', defaultMessage: 'Bez kategorii' })
+                    : setup?.invoiceCategories?.find((category) => category?.id === value)?.name || value
+                  : key === 'direction'
+                    ? intl.formatMessage(
+                        value === 'SALE'
+                          ? { id: 'Invoices / Sale', defaultMessage: 'Sprzedaż' }
+                          : { id: 'Invoices / Purchases', defaultMessage: 'Zakupy' }
+                      )
+                    : value;
+              const field = intl.formatMessage(
+                invoiceMessages[
+                  {
+                    search: 'Search',
+                    direction: 'Direction',
+                    dateFrom: 'Issue from',
+                    dateTo: 'Issue to',
+                    category: 'Category',
+                  }[key] as keyof typeof invoiceMessages
+                ]
+              );
+              return (
+                <Button
+                  key={key}
+                  variant="secondary"
+                  size="sm"
+                  className="h-auto gap-2 whitespace-normal py-1"
+                  aria-label={intl.formatMessage(
+                    { id: 'Invoices / Remove filter', defaultMessage: 'Usuń filtr: {field}' },
+                    { field }
+                  )}
+                  onClick={() => update(key, '')}
+                >
+                  {field}: {label}
+                  <X className="h-3 w-3 shrink-0" aria-hidden="true" />
+                </Button>
+              );
+            })}
+            {activeFilters.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                <FormattedMessage id="Invoices / Clear filters" defaultMessage="Wyczyść filtry" />
+              </Button>
+            )}
+            {!rows.length && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <T id="Category" defaultMessage="Kategoria" />
+                {categoryFilter}
+              </div>
+            )}
+          </div>
+          {['net', 'vat', 'gross'].includes(sort.replace(/^-/, '')) && (
+            <p className="text-xs text-muted-foreground">
+              <FormattedMessage
+                id="Invoices / Amount sorting note"
+                defaultMessage="Kwoty są sortowane według wartości liczbowej, bez przeliczania walut."
+              />
+            </p>
+          )}
           {(error || exportError) && <ErrorNotice />}
-          {loading && !data && (
+          {loading && !result && (
             <p role="status">
               <T id="Loading" defaultMessage="Wczytywanie faktur…" />
             </p>
           )}
           {!loading && !error && !rows.length && (
             <p className="py-8 text-center text-muted-foreground">
-              {Object.keys(filters).length ? (
+              {activeFilters.length ? (
                 <T id="No results" defaultMessage="Brak faktur pasujących do filtrów." />
               ) : (
                 <T id="No invoices" defaultMessage="Brak pobranych faktur. Uruchom import z KSeF, aby je zobaczyć." />
               )}
             </p>
           )}
+          {loading && result && (
+            <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              <FormattedMessage id="Invoices / Updating results" defaultMessage="Aktualizowanie wyników…" />
+            </p>
+          )}
           {rows.length > 0 && (
-            <Table>
+            <Table aria-busy={loading}>
               <TableHeader>
                 <TableRow>
                   {canAi && (
@@ -495,20 +582,50 @@ export const InvoiceList = () => {
                     </TableHead>
                   )}
                   {[
-                    ['Number', 'Numer'],
-                    ['Counterparty', 'Kontrahent'],
-                    ['Direction', 'Typ'],
-                    ['Date', 'Data'],
-                    ['Currency', 'Waluta'],
-                    ['Net', 'Netto'],
-                    ['VAT', 'VAT'],
-                    ['Gross', 'Brutto'],
-                    ['Category', 'Kategoria'],
-                  ].map(([id, label]) => (
-                    <TableHead key={id}>
-                      <T id={id} defaultMessage={label} />
-                    </TableHead>
-                  ))}
+                    ['Number', 'number'],
+                    ['Counterparty', 'counterparty'],
+                    ['Direction', 'direction'],
+                    ['Date', 'issue_date'],
+                    ['Currency', 'currency'],
+                    ['Net', 'net'],
+                    ['VAT', 'vat'],
+                    ['Gross', 'gross'],
+                    ['Category', 'category__name'],
+                  ].map(([id, field]) => {
+                    const active = sort.replace(/^-/, '') === field;
+                    const descending = active && sort.startsWith('-');
+                    const label = intl.formatMessage(invoiceMessages[id as keyof typeof invoiceMessages]);
+                    const Icon = active ? (descending ? ArrowDown : ArrowUp) : ArrowUpDown;
+                    return (
+                      <TableHead key={id} aria-sort={active ? (descending ? 'descending' : 'ascending') : 'none'}>
+                        <div
+                          className={[
+                            'flex items-center gap-1',
+                            ['net', 'vat', 'gross'].includes(field) ? 'justify-end' : '',
+                          ].join(' ')}
+                        >
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-2 rounded-sm py-2 text-left hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            aria-label={intl.formatMessage(
+                              { id: 'Invoices / Sort column', defaultMessage: '{column}: sortuj {order}' },
+                              {
+                                column: label,
+                                order: intl.formatMessage(
+                                  active && !descending ? invoiceMessages.Descending : invoiceMessages.Ascending
+                                ),
+                              }
+                            )}
+                            onClick={() => update('sort', active && !descending ? `-${field}` : field)}
+                          >
+                            {label}
+                            <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                          </button>
+                          {id === 'Category' && categoryFilter}
+                        </div>
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -554,9 +671,9 @@ export const InvoiceList = () => {
                     </TableCell>
                     <TableCell className="whitespace-nowrap">{intl.formatDate(row.issueDate)}</TableCell>
                     <TableCell>{row.currency}</TableCell>
-                    <TableCell>{money(row.net)}</TableCell>
-                    <TableCell>{money(row.vat)}</TableCell>
-                    <TableCell>{money(row.gross)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{money(row.net)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{money(row.vat)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{money(row.gross)}</TableCell>
                     <TableCell>
                       <CategorySelect
                         tenantId={tenantId}
