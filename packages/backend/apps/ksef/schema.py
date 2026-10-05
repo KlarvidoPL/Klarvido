@@ -45,9 +45,10 @@ class KsefCredentialResult(graphene.ObjectType):
     ksef_credential = graphene.Field(KsefCredentialType)
 
 
-def _result(result: services.CredentialResult) -> KsefCredentialResult:
+def _result(result: services.CredentialResult, allow_saved_unverified=False) -> KsefCredentialResult:
     return KsefCredentialResult(
-        ok=not result.error_code,
+        ok=result.credential is not None
+        and (not result.error_code or (allow_saved_unverified and result.credential.status == "UNVERIFIED")),
         error_code=result.error_code or None,
         ksef_credential=result.credential,
     )
@@ -79,7 +80,7 @@ class SetKsefTokenMutation(graphene.Mutation):
     @graphql_ratelimit(rate="5/min", key=RateLimitKey.USER)
     def mutate(cls, root, info, tenant_id, token):
         tenant = get_checked_tenant(info)
-        return _result(services.save_token(tenant, info.context.user, token))
+        return _result(services.save_token(tenant, info.context.user, token), allow_saved_unverified=True)
 
 
 class TestKsefTokenMutation(graphene.Mutation):
