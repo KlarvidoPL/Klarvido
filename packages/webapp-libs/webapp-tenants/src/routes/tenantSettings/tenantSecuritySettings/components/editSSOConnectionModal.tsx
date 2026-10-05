@@ -10,6 +10,9 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useTenantSSO } from '../../../../hooks/useTenantSSO';
+import { useTenantSSODomains } from '../../../../hooks/useTenantSSODomains';
+import { DomainChip, getDomainVerification } from './domainChip';
+import { translateSsoDomainFieldError } from './ssoDomainErrors';
 
 export type EditSSOConnectionModalProps = {
   connection: {
@@ -39,6 +42,7 @@ export const EditSSOConnectionModal = ({
   tenantId,
 }: EditSSOConnectionModalProps) => {
   const intl = useIntl();
+  const { domains: tenantDomains, loading: domainsLoading } = useTenantSSODomains(tenantId);
   const { toast } = useToast();
   const { updateConnection } = useTenantSSO(tenantId);
 
@@ -426,24 +430,19 @@ export const EditSSOConnectionModal = ({
             {formData.allowedDomains.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.allowedDomains.map((domain) => (
-                  <span
+                  <DomainChip
                     key={domain}
-                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                  >
-                    {domain}
-                    <button
-                      type="button"
-                      onClick={() => removeDomain(domain)}
-                      className="ml-1 rounded-full p-0.5 hover:bg-primary/20 transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
+                    domain={domain}
+                    verified={getDomainVerification(tenantDomains, domainsLoading, domain)}
+                    onRemove={() => removeDomain(domain)}
+                  />
                 ))}
               </div>
             )}
             {fieldErrors['allowedDomains'] && (
-              <p className="text-destructive text-sm">{fieldErrors['allowedDomains']}</p>
+              <p className="text-destructive dark:text-red-400 text-sm">
+                {translateSsoDomainFieldError(intl, fieldErrors['allowedDomains'])}
+              </p>
             )}
             <p className="text-xs text-muted-foreground">
               <FormattedMessage
@@ -491,7 +490,9 @@ export const EditSSOConnectionModal = ({
                   value={formData.certificate}
                   onChange={(e) => updateFormData('certificate', e.target.value)}
                 />
-                {fieldErrors['certificate'] && <p className="text-destructive text-sm">{fieldErrors['certificate']}</p>}
+                {fieldErrors['certificate'] && (
+                  <p className="text-destructive dark:text-red-400 text-sm">{fieldErrors['certificate']}</p>
+                )}
               </div>
             </>
           )}

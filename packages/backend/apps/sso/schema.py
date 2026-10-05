@@ -139,7 +139,7 @@ class TenantDomainType(DjangoObjectType):
 
     class Meta:
         model = models.TenantDomain
-        fields = ["domain", "status", "verified_at", "created_at"]
+        fields = ["domain", "status", "verified_at", "last_checked_at", "consecutive_failures", "created_at"]
         interfaces = (relay.Node,)
 
     def resolve_id(self, info):
@@ -541,7 +541,7 @@ class AddSSODomainMutation(graphene.Mutation):
         try:
             tenant_domain = domain_verification.add_domain(tenant, domain)
         except DomainVerificationError as exc:
-            raise GraphQLError(exc.code)
+            raise GraphQLError(exc.code, extensions=exc.details or None)
         _log_domain_event(
             tenant=tenant,
             user=info.context.user,
@@ -580,7 +580,7 @@ class VerifySSODomainMutation(graphene.Mutation):
                 success=False,
                 error_message=exc.code,
             )
-            raise GraphQLError(exc.code)
+            raise GraphQLError(exc.code, extensions=exc.details or None)
         _log_domain_event(
             tenant=tenant,
             user=info.context.user,
@@ -610,7 +610,7 @@ class DeleteSSODomainMutation(graphene.Mutation):
         try:
             domain_verification.remove_domain(tenant_domain)
         except DomainVerificationError as exc:
-            raise GraphQLError(exc.code)
+            raise GraphQLError(exc.code, extensions=exc.details or None)
         _log_domain_event(
             tenant=tenant,
             user=info.context.user,

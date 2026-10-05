@@ -739,6 +739,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.sso.tasks.cleanup_expired_sessions',
         'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
     },
+    'recheck-sso-domains-daily': {
+        'task': 'apps.sso.tasks.recheck_verified_domains',
+        'schedule': 60 * 60 * 24,  # Every 24 hours: a lapsed domain deactivates its SSO connections
+    },
 }
 
 # Contentful CMS settings (optional)

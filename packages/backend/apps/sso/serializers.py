@@ -7,6 +7,8 @@ from . import constants
 from .services.domain_verification import (
     DOMAINS_NOT_VERIFIED_CODE,
     DomainVerificationError,
+    check_claimable,
+    claim_domains,
     ensure_connection_domains_verified,
     get_verified_domains,
 )
@@ -72,6 +74,25 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
             "status",
         ]
 
+    def validate_domain_claims(self, attrs, tenant):
+        """
+        Refuse domains the organization may not claim (public providers, or domains verified by another
+        organization) before anything is saved. New domains are added to the verification list on save.
+        """
+        for domain in attrs.get("allowed_domains") or []:
+            try:
+                check_claimable(tenant, domain)
+            except DomainVerificationError as exc:
+                raise serializers.ValidationError({"allowed_domains": exc.code})
+
+    def validate(self, attrs):
+        if "tenant_id" in attrs:
+            from apps.multitenancy.models import Tenant
+
+            tenant = Tenant.objects.filter(pk=attrs["tenant_id"]).first()
+            self.validate_domain_claims(attrs, tenant)
+        return attrs
+
     def validate_connection_type(self, value):
         """Validate connection type is a valid choice."""
         if value not in dict(constants.IdentityProviderType.choices):
@@ -79,6 +100,19 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
                 f"Invalid connection type. Must be one of: {list(dict(constants.IdentityProviderType.choices).keys())}"
             )
         return value
+
+    def create(self, validated_data):
+        from apps.multitenancy.models import Tenant
+
+        tenant_id = validated_data.pop("tenant_id")
+        tenant = Tenant.objects.get(pk=tenant_id)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        created_by = user if user is not None and user.is_authenticated else None
+
+        connection = models.TenantSSOConnection.objects.create(tenant=tenant, created_by=created_by, **validated_data)
+        claim_domains(tenant, connection.allowed_domains)
+        return connection
 
 
 class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
@@ -153,6 +187,9 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
                 if not attrs.get(field) and not getattr(self.instance, field, None):
                     raise serializers.ValidationError({field: f"{field} is required for OIDC connections."})
 
+        if "allowed_domains" in attrs:
+            self.validate_domain_claims(attrs, self.instance.tenant)
+
         # SECURITY: an active connection may only list domains its tenant has verified
         is_active = self.instance is not None and self.instance.status == constants.SSOConnectionStatus.ACTIVE
         if is_active and "allowed_domains" in attrs:
@@ -167,15 +204,10 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
         oidc_client_secret = validated_data.pop('oidc_client_secret', None)
         if oidc_client_secret is not None and oidc_client_secret.strip():
             validated_data['oidc_client_secret'] = oidc_client_secret
-        return super().update(instance, validated_data)
-
-    def create(self, validated_data):
-        from apps.multitenancy.models import Tenant
-
-        tenant_id = validated_data.pop("tenant_id")
-        tenant = Tenant.objects.get(pk=tenant_id)
-
-        return models.TenantSSOConnection.objects.create(tenant=tenant, **validated_data)
+        connection = super().update(instance, validated_data)
+        # Domains the connection now lists become pending claims in the verification list
+        claim_domains(connection.tenant, connection.allowed_domains)
+        return connection
 
 
 class ActivateSSOConnectionSerializer(serializers.Serializer):

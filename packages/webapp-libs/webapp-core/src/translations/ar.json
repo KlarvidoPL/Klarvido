@@ -626,6 +626,9 @@
   "Audit / Event / SSO Domain Added": {
     "defaultMessage": "تمت إضافة نطاق SSO"
   },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "انتهاء نطاق SSO"
+  },
   "Audit / Event / SSO Domain Removed": {
     "defaultMessage": "تمت إزالة نطاق SSO"
   },
@@ -2010,7 +2013,7 @@
     "defaultMessage": "نسخ قيمة السجل"
   },
   "Domain Verification / DNS instructions": {
-    "defaultMessage": "أضف سجل TXT هذا إلى DNS الخاص بك، ثم انقر على تحقق."
+    "defaultMessage": "أضف سجل TXT هذا إلى DNS الخاص بك، ثم انقر على تحقق. أبقِ السجل في مكانه: يتحقق SSO منه يومياً، وحذفه يؤدي إلى انتهاء النطاق."
   },
   "Domain Verification / Delete Error": {
     "defaultMessage": "تعذرت إزالة النطاق."
@@ -2022,10 +2025,16 @@
     "defaultMessage": "النطاق"
   },
   "Domain Verification / Domain placeholder": {
-    "defaultMessage": "example.com"
+    "defaultMessage": "company.ae"
   },
   "Domain Verification / Empty": {
     "defaultMessage": "لم تتم إضافة أي نطاقات بعد. أضف نطاق شركتك لبدء التحقق."
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "سجل التحقق مفقود منذ عدة فحوصات، لذلك لم يعد هذا النطاق يعمل مع SSO وتم إلغاء تفعيل اتصالات SSO الخاصة به. أعد نشر السجل وتحقق من النطاق لاستخدامه."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "آخر فحص {date}"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "الاسم"
@@ -2038,6 +2047,9 @@
   },
   "Domain Verification / Remove domain": {
     "defaultMessage": "إزالة النطاق"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "منتهية"
   },
   "Domain Verification / Status pending": {
     "defaultMessage": "قيد الانتظار"
@@ -3251,6 +3263,15 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "تم إلغاء تفعيل اتصال SSO"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "النطاق \"{domain}\" الخاص بـ \"{tenant_name}\" لم يعد مُتحققاً لأن سجل التحقق مفقود. الاتصالات التي تم إلغاء تفعيلها: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "النطاق \"{domain}\" الخاص بـ \"{tenant_name}\" لم يعد مُتحققاً لأن سجل التحقق مفقود."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "انتهاء نطاق SSO"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "قام \"{name}\" بحذف المؤسسة \"{tenant_name}\""
   },
@@ -4271,6 +4292,9 @@
   "SSO / Error / domain_in_use": {
     "defaultMessage": "أزل هذا النطاق من جميع اتصالات SSO أولاً."
   },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "أزل هذا النطاق من اتصالات SSO التالية أولاً: {connections}."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "نطاق بريدك الإلكتروني غير مصرح به لهذه المؤسسة."
   },
@@ -4361,6 +4385,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "تم تفعيل اتصال SSO."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "أضف نطاقاً إلى هذا الاتصال قبل تفعيله."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "تحقق من {domains} في التحقق من النطاق قبل تفعيل هذا الاتصال. يبقى التفعيل معطلاً حتى يتم التحقق من جميع النطاقات."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "نشط"
   },
@@ -4396,6 +4426,9 @@
   },
   "SSO Card / Delete Success": {
     "defaultMessage": "تم حذف اتصال SSO."
+  },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(غير متحقق)"
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "النطاقات:"
@@ -4504,6 +4537,12 @@
   },
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "مثال: company.com"
+  },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "غير متحقق"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "تحقق من هذا النطاق في التحقق من النطاق قبل تفعيل الاتصال."
   },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "معرّف كيان IdP / المُصدِر"

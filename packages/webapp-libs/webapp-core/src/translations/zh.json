@@ -626,6 +626,9 @@
   "Audit / Event / SSO Domain Added": {
     "defaultMessage": "已添加 SSO 域名"
   },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO 域名已失效"
+  },
   "Audit / Event / SSO Domain Removed": {
     "defaultMessage": "已删除 SSO 域名"
   },
@@ -2010,7 +2013,7 @@
     "defaultMessage": "复制记录值"
   },
   "Domain Verification / DNS instructions": {
-    "defaultMessage": "将此 TXT 记录添加到您的 DNS，然后点击“验证”。"
+    "defaultMessage": "将此 TXT 记录添加到您的 DNS，然后点击“验证”。请保留该记录：SSO 每天都会检查它，删除后域名将失效。"
   },
   "Domain Verification / Delete Error": {
     "defaultMessage": "无法删除域名。"
@@ -2022,10 +2025,16 @@
     "defaultMessage": "域名"
   },
   "Domain Verification / Domain placeholder": {
-    "defaultMessage": "example.com"
+    "defaultMessage": "company.cn"
   },
   "Domain Verification / Empty": {
     "defaultMessage": "尚未添加任何域名。添加贵公司的域名以开始验证。"
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "验证记录已连续多次检查缺失，因此该域名不再可用于 SSO。其 SSO 连接已被停用。请重新发布该记录并验证域名以继续使用。"
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "上次检查：{date}"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "名称"
@@ -2038,6 +2047,9 @@
   },
   "Domain Verification / Remove domain": {
     "defaultMessage": "删除域名"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "已失效"
   },
   "Domain Verification / Status pending": {
     "defaultMessage": "待处理"
@@ -3251,6 +3263,15 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO 连接已停用"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "\"{tenant_name}\" 的域名 \"{domain}\" 因缺少验证记录而不再验证。已停用的连接：{connections}。"
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "\"{tenant_name}\" 的域名 \"{domain}\" 因缺少验证记录而不再验证。"
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO 域名已失效"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "组织“{tenant_name}”已被“{name}”删除"
   },
@@ -4271,6 +4292,9 @@
   "SSO / Error / domain_in_use": {
     "defaultMessage": "请先将此域名从所有 SSO 连接中移除。"
   },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "请先将此域名从以下 SSO 连接中移除：{connections}。"
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "您的电子邮件域名未获此组织授权。"
   },
@@ -4361,6 +4385,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO 连接已启用。"
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "激活前，请为此连接添加域名。"
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "激活此连接前，请在“域名验证”中验证 {domains}。在所有域名验证通过之前，激活将保持禁用。"
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "启用"
   },
@@ -4396,6 +4426,9 @@
   },
   "SSO Card / Delete Success": {
     "defaultMessage": "已删除 SSO 连接。"
+  },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(未验证)"
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "域:"
@@ -4504,6 +4537,12 @@
   },
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "例如 company.com"
+  },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "未验证"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "请先在“域名验证”中验证此域名，然后才能激活连接。"
   },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"

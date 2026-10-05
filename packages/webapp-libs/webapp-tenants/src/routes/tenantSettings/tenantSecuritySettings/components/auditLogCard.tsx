@@ -99,6 +99,7 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
   domain_added: <Globe className="h-4 w-4" />,
   domain_verified: <ShieldCheck className="h-4 w-4" />,
   domain_removed: <Trash2 className="h-4 w-4" />,
+  domain_lapsed: <AlertTriangle className="h-4 w-4" />,
   idp_config_deactivated: <X className="h-4 w-4" />,
 
   // Provisioning events
@@ -150,6 +151,7 @@ const EVENT_TYPE_MESSAGES = defineMessages({
   domain_added: { id: 'Audit / Event / SSO Domain Added', defaultMessage: 'SSO Domain Added' },
   domain_verified: { id: 'Audit / Event / SSO Domain Verified', defaultMessage: 'SSO Domain Verified' },
   domain_removed: { id: 'Audit / Event / SSO Domain Removed', defaultMessage: 'SSO Domain Removed' },
+  domain_lapsed: { id: 'Audit / Event / SSO Domain Lapsed', defaultMessage: 'SSO Domain Lapsed' },
   idp_config_activated: {
     id: 'Audit / Event / IdP Configuration Activated',
     defaultMessage: 'IdP Configuration Activated',

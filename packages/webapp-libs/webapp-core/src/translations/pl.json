@@ -626,6 +626,9 @@
   "Audit / Event / SSO Domain Added": {
     "defaultMessage": "Dodano domenę SSO"
   },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "Wygasła domena SSO"
+  },
   "Audit / Event / SSO Domain Removed": {
     "defaultMessage": "Usunięto domenę SSO"
   },
@@ -2010,7 +2013,7 @@
     "defaultMessage": "Kopiuj wartość rekordu"
   },
   "Domain Verification / DNS instructions": {
-    "defaultMessage": "Dodaj ten rekord TXT w DNS swojej domeny, a następnie kliknij Zweryfikuj."
+    "defaultMessage": "Dodaj ten rekord TXT w DNS, a następnie kliknij Zweryfikuj. Zostaw rekord na miejscu: SSO sprawdza go codziennie, a jego usunięcie spowoduje wygaszenie domeny."
   },
   "Domain Verification / Delete Error": {
     "defaultMessage": "Nie udało się usunąć domeny."
@@ -2022,10 +2025,16 @@
     "defaultMessage": "Domena"
   },
   "Domain Verification / Domain placeholder": {
-    "defaultMessage": "example.com"
+    "defaultMessage": "firma.pl"
   },
   "Domain Verification / Empty": {
     "defaultMessage": "Nie zgłoszono jeszcze żadnych domen. Dodaj domenę firmy, aby rozpocząć weryfikację."
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "Rekord weryfikacyjny nie jest obecny od kilku sprawdzeń, więc ta domena nie działa już w SSO. Jej połączenia SSO zostały dezaktywowane. Opublikuj rekord ponownie i zweryfikuj domenę, aby z niej korzystać."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "Ostatnio sprawdzono {date}"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Nazwa"
@@ -2038,6 +2047,9 @@
   },
   "Domain Verification / Remove domain": {
     "defaultMessage": "Usuń domenę"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "Wygasła"
   },
   "Domain Verification / Status pending": {
     "defaultMessage": "Oczekuje"
@@ -3251,6 +3263,15 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "Połączenie SSO dezaktywowane"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "Domena \"{domain}\" dla \"{tenant_name}\" nie jest już zweryfikowana, ponieważ brakuje jej rekordu weryfikacyjnego. Dezaktywowane połączenia: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "Domena \"{domain}\" dla \"{tenant_name}\" nie jest już zweryfikowana, ponieważ brakuje jej rekordu weryfikacyjnego."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "Wygasła domena SSO"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Organizacja „{tenant_name}” została usunięta przez „{name}”"
   },
@@ -4271,6 +4292,9 @@
   "SSO / Error / domain_in_use": {
     "defaultMessage": "Najpierw usuń tę domenę ze wszystkich połączeń SSO."
   },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "Najpierw usuń tę domenę z tych połączeń SSO: {connections}."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "Domena Twojego adresu e-mail nie jest dozwolona dla tej organizacji."
   },
@@ -4361,6 +4385,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "Połączenie SSO zostało aktywowane."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "Przed aktywacją dodaj domenę do tego połączenia."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "Zweryfikuj {domains} w sekcji Weryfikacja domeny przed aktywacją tego połączenia. Aktywacja pozostaje zablokowana, dopóki wszystkie domeny nie zostaną zweryfikowane."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "Aktywne"
   },
@@ -4396,6 +4426,9 @@
   },
   "SSO Card / Delete Success": {
     "defaultMessage": "Połączenie SSO zostało usunięte."
+  },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(niezweryfikowana)"
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "Domeny:"
@@ -4504,6 +4537,12 @@
   },
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "np. firma.pl"
+  },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "Niezweryfikowana"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "Zweryfikuj tę domenę w sekcji Weryfikacja domeny, zanim będzie można aktywować połączenie."
   },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"

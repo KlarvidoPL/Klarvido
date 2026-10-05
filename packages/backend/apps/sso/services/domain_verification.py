@@ -14,12 +14,18 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
+from apps.notifications import sender
 from apps.sso import constants
-from apps.sso.models import TenantDomain, TenantSSOConnection
+from apps.sso.constants import Notification as SSONotification
+from apps.multitenancy.constants import ActionActorType, ActionType
+from apps.sso.models import SSOAuditLog, TenantDomain, TenantSSOConnection
+from common.action_logging.service import log_action
 
 logger = logging.getLogger(__name__)
 
 DNS_TIMEOUT_SECONDS = 5
+# Consecutive failed daily checks before a verified domain lapses (about three days)
+LAPSE_AFTER_FAILURES = 3
 
 # Public mail providers: anyone can register an address here, so no organization can prove ownership.
 PUBLIC_EMAIL_DOMAINS = frozenset(
@@ -100,9 +106,11 @@ DOMAINS_NOT_VERIFIED_CODE = "domains_not_verified"
 class DomainVerificationError(ValueError):
     """A domain operation was refused. ``code`` is a stable, translatable identifier."""
 
-    def __init__(self, code: str):
+    def __init__(self, code: str, details: dict | None = None):
         super().__init__(code)
         self.code = code
+        # Extra context for the UI (e.g. which connections block a removal); never contains secrets
+        self.details = details or {}
 
 
 def normalize_domain(raw: str) -> str:
@@ -156,6 +164,29 @@ def get_verified_tenant_id_for_domain(domain: str):
     )
 
 
+def check_claimable(tenant, raw_domain: str) -> str:
+    """
+    Raise DomainVerificationError if the tenant could not claim this domain (invalid, public, or verified
+    by another organization). Returns the normalized domain. Used to reject a connection before it is saved.
+    """
+    domain = normalize_domain(raw_domain)
+    if is_public_email_domain(domain):
+        raise DomainVerificationError(PUBLIC_DOMAIN_CODE)
+    if (
+        TenantDomain.objects.filter(domain=domain, status=constants.SSODomainStatus.VERIFIED)
+        .exclude(tenant=tenant)
+        .exists()
+    ):
+        raise DomainVerificationError(DOMAIN_TAKEN_CODE)
+    return domain
+
+
+def claim_domains(tenant, raw_domains) -> None:
+    """Add every domain the connection lists to the tenant's verification list as a pending claim."""
+    for raw_domain in raw_domains or []:
+        add_domain(tenant, raw_domain)
+
+
 def add_domain(tenant, raw_domain: str) -> TenantDomain:
     """Claim a domain for a tenant. The claim stays pending until the TXT record is verified."""
     domain = normalize_domain(raw_domain)
@@ -176,35 +207,53 @@ def add_domain(tenant, raw_domain: str) -> TenantDomain:
     return TenantDomain.objects.create(tenant=tenant, domain=domain)
 
 
-def _dns_bypass_enabled() -> bool:
-    # SECURITY: never honoured outside DEBUG, so production always checks DNS.
+def dns_check_bypassed() -> bool:
+    """Development-only bypass. SECURITY: never honoured outside DEBUG, so production always checks DNS."""
     return bool(settings.DEBUG and getattr(settings, "SSO_DOMAIN_VERIFICATION_SKIP_DNS", False))
 
 
-def lookup_txt_records(domain: str) -> list:
-    """All TXT records published on the domain, each joined into one string."""
+def lookup_txt_records(name: str):
+    """
+    TXT records published at ``name``, each joined into one string.
+    Returns [] when the name does not exist, and None when DNS could not be queried (timeout, SERVFAIL).
+    """
     try:
-        answer = dns.resolver.resolve(domain, "TXT", lifetime=DNS_TIMEOUT_SECONDS)
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers, dns.exception.Timeout):
+        answer = dns.resolver.resolve(name, "TXT", lifetime=DNS_TIMEOUT_SECONDS)
+    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers):
         return []
     except dns.exception.DNSException:
-        logger.warning("SSO domain verification DNS lookup failed for %s", domain, exc_info=True)
-        return []
+        logger.warning("SSO domain verification DNS lookup failed for %s", name, exc_info=True)
+        return None
     return [b"".join(rdata.strings).decode("utf-8", errors="replace") for rdata in answer]
+
+
+def record_present(tenant_domain: TenantDomain):
+    """
+    True if the verification value is published on the challenge subdomain or on the apex,
+    False if it is missing, None if DNS could not be queried.
+    The apex is accepted so claims made before the subdomain existed keep working.
+    """
+    expected = tenant_domain.verification_record_value
+    unknown = False
+    for name in (tenant_domain.verification_record_name, tenant_domain.domain):
+        records = lookup_txt_records(name)
+        if records is None:
+            unknown = True
+        elif expected in records:
+            return True
+    return None if unknown else False
 
 
 def verify_domain(tenant_domain: TenantDomain) -> TenantDomain:
     """
     Check the TXT record and mark the domain verified. Refused if the record is missing or if another
-    tenant verified the domain in the meantime.
+    tenant verified the domain in the meantime. Also re-verifies a lapsed domain.
     """
     if tenant_domain.is_verified:
         return tenant_domain
 
-    if not _dns_bypass_enabled():
-        expected = tenant_domain.verification_record_value
-        if expected not in lookup_txt_records(tenant_domain.domain):
-            raise DomainVerificationError(DNS_RECORD_NOT_FOUND_CODE)
+    if not dns_check_bypassed() and record_present(tenant_domain) is not True:
+        raise DomainVerificationError(DNS_RECORD_NOT_FOUND_CODE)
 
     try:
         with transaction.atomic():
@@ -216,11 +265,114 @@ def verify_domain(tenant_domain: TenantDomain) -> TenantDomain:
                 raise DomainVerificationError(DOMAIN_TAKEN_CODE)
             tenant_domain.status = constants.SSODomainStatus.VERIFIED
             tenant_domain.verified_at = timezone.now()
-            tenant_domain.save(update_fields=["status", "verified_at", "updated_at"])
+            tenant_domain.consecutive_failures = 0
+            tenant_domain.last_checked_at = tenant_domain.verified_at
+            tenant_domain.save(
+                update_fields=["status", "verified_at", "consecutive_failures", "last_checked_at", "updated_at"]
+            )
     except IntegrityError:
         # The partial unique index on verified domains caught a concurrent verification
         raise DomainVerificationError(DOMAIN_TAKEN_CODE)
     return tenant_domain
+
+
+def recheck_domain(tenant_domain: TenantDomain) -> str:
+    """
+    Re-check a verified domain's TXT record. A missing record counts as a failure; after
+    LAPSE_AFTER_FAILURES consecutive failures the domain lapses. DNS errors change nothing,
+    so a resolver outage can never lock a company out. Returns the resulting status.
+    """
+    if tenant_domain.status != constants.SSODomainStatus.VERIFIED:
+        return tenant_domain.status
+
+    present = record_present(tenant_domain)
+    tenant_domain.last_checked_at = timezone.now()
+    if present is None:
+        tenant_domain.save(update_fields=["last_checked_at", "updated_at"])
+        return tenant_domain.status
+
+    if present:
+        tenant_domain.consecutive_failures = 0
+        tenant_domain.save(update_fields=["last_checked_at", "consecutive_failures", "updated_at"])
+        return tenant_domain.status
+
+    tenant_domain.consecutive_failures += 1
+    if tenant_domain.consecutive_failures >= LAPSE_AFTER_FAILURES:
+        _lapse_domain(tenant_domain)
+    else:
+        tenant_domain.save(update_fields=["last_checked_at", "consecutive_failures", "updated_at"])
+    return tenant_domain.status
+
+
+def _lapse_domain(tenant_domain: TenantDomain) -> None:
+    """
+    Stop trusting a domain whose record disappeared: connections that list it are deactivated (their
+    configuration is kept), and the change is recorded in the SSO audit log and the Activity Log.
+    Existing memberships are not removed.
+    """
+    tenant_domain.status = constants.SSODomainStatus.LAPSED
+    tenant_domain.save(update_fields=["status", "last_checked_at", "consecutive_failures", "updated_at"])
+
+    deactivated = []
+    for connection in TenantSSOConnection.objects.select_related("created_by").filter(
+        tenant=tenant_domain.tenant, status=constants.SSOConnectionStatus.ACTIVE
+    ):
+        if tenant_domain.domain in (connection.allowed_domains or []):
+            connection.status = constants.SSOConnectionStatus.INACTIVE
+            connection.save(update_fields=["status", "updated_at"])
+            deactivated.append(connection)
+
+    connection_names = [connection.name for connection in deactivated]
+    description = f"Domain {tenant_domain.domain} lapsed: its verification record is missing."
+    if connection_names:
+        description += " Deactivated connections: " + ", ".join(connection_names) + "."
+    SSOAuditLog.log_event(
+        event_type=constants.SSOAuditEventType.DOMAIN_LAPSED,
+        tenant=tenant_domain.tenant,
+        description=description,
+        metadata={"domain": tenant_domain.domain, "deactivated_connections": connection_names},
+        success=False,
+    )
+    log_action(
+        tenant_id=tenant_domain.tenant_id,
+        action_type=ActionType.DEACTIVATE,
+        entity_type="sso_domain",
+        entity_id=str(tenant_domain.pk),
+        entity_name=tenant_domain.domain,
+        actor_type=ActionActorType.SYSTEM_SCHEDULED,
+        changes={"status": {"old": constants.SSODomainStatus.VERIFIED, "new": constants.SSODomainStatus.LAPSED}},
+    )
+    _notify_domain_lapsed(tenant_domain, deactivated)
+
+
+def _notify_domain_lapsed(tenant_domain: TenantDomain, deactivated_connections) -> None:
+    """
+    Tell the tenant owners, and whoever configured each deactivated connection, that the domain lapsed.
+    Each person gets one notification, even when they are both an owner and a connection's creator.
+    """
+    recipients = {}
+    for owner in tenant_domain.tenant.owners:
+        recipients[owner.pk] = owner
+    for connection in deactivated_connections:
+        if connection.created_by is not None:
+            recipients[connection.created_by.pk] = connection.created_by
+
+    data = {
+        "domain": tenant_domain.domain,
+        "tenant_name": tenant_domain.tenant.name,
+        "connection_names": [connection.name for connection in deactivated_connections],
+    }
+    for user in recipients.values():
+        try:
+            sender.send_notification(
+                user=user,
+                type=SSONotification.SSO_DOMAIN_LAPSED.value,
+                data=data,
+                issuer=None,
+            )
+        except Exception:
+            # A notification failure must not undo the lapse or stop the other recipients
+            logger.warning("Failed to send SSO domain lapsed notification", exc_info=True)
 
 
 def remove_domain(tenant_domain: TenantDomain) -> None:
@@ -229,8 +381,11 @@ def remove_domain(tenant_domain: TenantDomain) -> None:
     active connection can never silently lose a domain it depends on.
     """
     connections = TenantSSOConnection.objects.filter(tenant=tenant_domain.tenant)
-    if any(tenant_domain.domain in (connection.allowed_domains or []) for connection in connections):
-        raise DomainVerificationError(DOMAIN_IN_USE_CODE)
+    blocking = [
+        connection.name for connection in connections if tenant_domain.domain in (connection.allowed_domains or [])
+    ]
+    if blocking:
+        raise DomainVerificationError(DOMAIN_IN_USE_CODE, {"connection_names": blocking})
     tenant_domain.delete()
 
 

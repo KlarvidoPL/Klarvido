@@ -626,6 +626,9 @@
   "Audit / Event / SSO Domain Added": {
     "defaultMessage": "SSO Domain Added"
   },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO Domain Lapsed"
+  },
   "Audit / Event / SSO Domain Removed": {
     "defaultMessage": "SSO Domain Removed"
   },
@@ -2010,7 +2013,7 @@
     "defaultMessage": "Copy record value"
   },
   "Domain Verification / DNS instructions": {
-    "defaultMessage": "Add this TXT record to your DNS, then click Verify."
+    "defaultMessage": "Add this TXT record to your DNS, then click Verify. Keep the record in place: SSO checks it every day, and removing it lapses the domain."
   },
   "Domain Verification / Delete Error": {
     "defaultMessage": "Failed to remove the domain."
@@ -2027,6 +2030,12 @@
   "Domain Verification / Empty": {
     "defaultMessage": "No domains claimed yet. Add your company domain to start verification."
   },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "The verification record has been missing for several checks, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "Last checked {date}"
+  },
   "Domain Verification / Record name": {
     "defaultMessage": "Name"
   },
@@ -2038,6 +2047,9 @@
   },
   "Domain Verification / Remove domain": {
     "defaultMessage": "Remove domain"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "Lapsed"
   },
   "Domain Verification / Status pending": {
     "defaultMessage": "Pending"
@@ -3251,6 +3263,15 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO Connection Deactivated"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "The domain \"{domain}\" for \"{tenant_name}\" is no longer verified because its verification record is missing. Connections deactivated: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "The domain \"{domain}\" for \"{tenant_name}\" is no longer verified because its verification record is missing."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO Domain Lapsed"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Organization \"{tenant_name}\" was deleted by \"{name}\""
   },
@@ -4271,6 +4292,9 @@
   "SSO / Error / domain_in_use": {
     "defaultMessage": "Remove this domain from every SSO connection before deleting it."
   },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "Remove this domain from these SSO connections before deleting it: {connections}."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "Your email domain is not authorized for this organization."
   },
@@ -4361,6 +4385,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO connection activated."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "Add a domain to this connection before activating it."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "Verify {domains} in Domain verification before activating this connection. Activation stays blocked until every domain is verified."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "Active"
   },
@@ -4396,6 +4426,9 @@
   },
   "SSO Card / Delete Success": {
     "defaultMessage": "SSO connection deleted."
+  },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(not verified)"
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "Domains:"
@@ -4504,6 +4537,12 @@
   },
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "e.g., company.com"
+  },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "Not verified"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "Verify this domain in Domain verification before the connection can be activated."
   },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"

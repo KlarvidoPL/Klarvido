@@ -48,10 +48,12 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useTenantSSO } from '../../../../hooks/useTenantSSO';
+import { useTenantSSODomains } from '../../../../hooks/useTenantSSODomains';
 import { useCurrentTenant } from '../../../../providers';
 import { AddSSOConnectionModal } from './addSSOConnectionModal';
+import { getDomainVerification } from './domainChip';
 import { EditSSOConnectionModal } from './editSSOConnectionModal';
-import { getSsoDomainErrorCode, getSsoDomainErrorMessage } from './ssoDomainErrors';
+import { getSsoDomainErrorDetail } from './ssoDomainErrors';
 import { translateSsoDetailLabel, translateSsoTestText } from './ssoTestMessages';
 
 type SSOConnection = {
@@ -151,6 +153,34 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
     }
   };
 
+  const { domains: tenantDomains, loading: domainsLoading } = useTenantSSODomains(tenantId);
+  const verifiedDomains = new Set(
+    tenantDomains.filter((domain) => domain.status.toLowerCase() === 'verified').map((domain) => domain.domain)
+  );
+
+  // Why a connection cannot be activated right now, or null if it can. Activation is also refused by the backend.
+  const getActivationBlockedReason = (connection: SSOConnection): string | null => {
+    if (connection.isActive) return null;
+    if (connection.allowedDomains.length === 0) {
+      return intl.formatMessage({
+        id: 'SSO Card / Activate blocked no domains',
+        defaultMessage: 'Add a domain to this connection before activating it.',
+      });
+    }
+    const unverified = connection.allowedDomains.filter((domain) => !verifiedDomains.has(domain));
+    if (unverified.length > 0) {
+      return intl.formatMessage(
+        {
+          id: 'SSO Card / Activate blocked unverified domains',
+          defaultMessage:
+            'Verify {domains} in Domain verification before activating this connection. Activation stays blocked until every domain is verified.',
+        },
+        { domains: unverified.join(', ') }
+      );
+    }
+    return null;
+  };
+
   const handleToggleActive = async (connection: SSOConnection) => {
     if (!tenantId) return;
     setToggling(connection.id);
@@ -179,14 +209,13 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
       window.dispatchEvent(new CustomEvent('sso-connections-changed', { detail: { tenantId } }));
     } catch (error) {
       // Activation is refused until every allowed domain is verified; say so instead of a generic failure
-      const domainErrorCode = getSsoDomainErrorCode(error);
       toast({
-        description: domainErrorCode
-          ? getSsoDomainErrorMessage(intl, domainErrorCode)
-          : intl.formatMessage({
-              defaultMessage: 'Failed to update SSO connection.',
-              id: 'SSO Card / Toggle Error',
-            }),
+        description:
+          getSsoDomainErrorDetail(intl, error) ??
+          intl.formatMessage({
+            defaultMessage: 'Failed to update SSO connection.',
+            id: 'SSO Card / Toggle Error',
+          }),
         variant: 'destructive',
       });
     } finally {
@@ -586,10 +615,28 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
                             {connection.allowedDomains.map((domain) => (
                               <Badge key={domain} variant="secondary" className="text-xs font-normal">
                                 {domain}
+                                {getDomainVerification(tenantDomains, domainsLoading, domain) === false && (
+                                  <span className="ml-1 text-amber-600 dark:text-amber-400">
+                                    <FormattedMessage
+                                      id="SSO Card / Domain not verified"
+                                      defaultMessage="(not verified)"
+                                    />
+                                  </span>
+                                )}
                               </Badge>
                             ))}
                           </div>
                         )}
+                        {!connection.isActive &&
+                          connection.allowedDomains.length > 0 &&
+                          getActivationBlockedReason(connection) && (
+                            <div className="flex items-start gap-2 mt-2">
+                              <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
+                              <span className="text-xs text-amber-600 dark:text-amber-400">
+                                {getActivationBlockedReason(connection)}
+                              </span>
+                            </div>
+                          )}
                         {(!connection.allowedDomains || connection.allowedDomains.length === 0) && (
                           <div className="flex items-center gap-2 mt-2">
                             <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
@@ -668,7 +715,8 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
 
                           <DropdownMenuItem
                             onClick={() => handleToggleActive(connection)}
-                            disabled={toggling === connection.id}
+                            disabled={toggling === connection.id || getActivationBlockedReason(connection) !== null}
+                            title={getActivationBlockedReason(connection) ?? undefined}
                           >
                             {toggling === connection.id ? (
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -800,7 +848,10 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
                 setIsEditModalOpen(false);
                 setEditingConnection(null);
               }}
-              onSuccess={refetch}
+              onSuccess={() => {
+                void refetch();
+                window.dispatchEvent(new CustomEvent('sso-connections-changed', { detail: { tenantId } }));
+              }}
               tenantId={tenantId}
             />
           )}
@@ -822,7 +873,14 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
             />
           </DialogDescription>
           {tenantId && (
-            <AddSSOConnectionModal closeModal={() => setIsModalOpen(false)} onSuccess={refetch} tenantId={tenantId} />
+            <AddSSOConnectionModal
+              closeModal={() => setIsModalOpen(false)}
+              onSuccess={() => {
+                void refetch();
+                window.dispatchEvent(new CustomEvent('sso-connections-changed', { detail: { tenantId } }));
+              }}
+              tenantId={tenantId}
+            />
           )}
         </DialogContent>
       </Dialog>

@@ -472,6 +472,8 @@ type TenantDomainType implements Node {
   domain: String!
   status: SsoTenantDomainStatusChoices!
   verifiedAt: DateTime
+  lastCheckedAt: DateTime
+  consecutiveFailures: Int!
   id: ID!
   verificationRecordName: String
   verificationRecordValue: String
@@ -2307,6 +2309,8 @@ enum SsoTenantDomainStatusChoices {
   PENDING
   "Verified"
   VERIFIED
+  "Lapsed (record missing for several checks)"
+  LAPSED
 }
 "An enumeration."
 enum SsoSSOAuditLogEventTypeChoices {
@@ -2354,6 +2358,8 @@ enum SsoSSOAuditLogEventTypeChoices {
   DOMAIN_VERIFIED
   "SSO Domain Removed"
   DOMAIN_REMOVED
+  "SSO Domain Lapsed"
+  DOMAIN_LAPSED
   "Session Created"
   SESSION_CREATED
   "Session Revoked"

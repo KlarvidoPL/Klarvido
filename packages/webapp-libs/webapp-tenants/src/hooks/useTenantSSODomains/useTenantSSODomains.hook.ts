@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client/react';
 import { gql } from '@sb/webapp-api-client/graphql';
+import { useEffect } from 'react';
 
 const SSO_DOMAINS_QUERY = gql(`
   query TenantSecuritySSODomainsQuery($tenantId: ID!) {
@@ -8,6 +9,8 @@ const SSO_DOMAINS_QUERY = gql(`
       domain
       status
       verifiedAt
+      lastCheckedAt
+      consecutiveFailures
       verificationRecordName
       verificationRecordValue
     }
@@ -58,17 +61,36 @@ export function useTenantSSODomains(tenantId: string | undefined) {
     skip: !tenantId,
   });
 
-  const [addDomain, { loading: adding }] = useMutation(ADD_SSO_DOMAIN, {
-    onCompleted: () => refetch(),
-  });
+  // Apollo 4 no longer supports onCompleted on useMutation, so each mutation refetches once it resolves
+  const [addDomainMutation, { loading: adding }] = useMutation(ADD_SSO_DOMAIN);
+  const addDomain: typeof addDomainMutation = async (options) => {
+    const result = await addDomainMutation(options);
+    await refetch();
+    return result;
+  };
 
-  const [verifyDomain, { loading: verifying }] = useMutation(VERIFY_SSO_DOMAIN, {
-    onCompleted: () => refetch(),
-  });
+  const [verifyDomainMutation, { loading: verifying }] = useMutation(VERIFY_SSO_DOMAIN);
+  const verifyDomain: typeof verifyDomainMutation = async (options) => {
+    const result = await verifyDomainMutation(options);
+    await refetch();
+    return result;
+  };
 
-  const [deleteDomain, { loading: deleting }] = useMutation(DELETE_SSO_DOMAIN, {
-    onCompleted: () => refetch(),
-  });
+  const [deleteDomainMutation, { loading: deleting }] = useMutation(DELETE_SSO_DOMAIN);
+  const deleteDomain: typeof deleteDomainMutation = async (options) => {
+    const result = await deleteDomainMutation(options);
+    await refetch();
+    return result;
+  };
+
+  // Connection saves can claim new domains; the SSO card announces them with this event
+  useEffect(() => {
+    const handleConnectionsChanged = () => {
+      void refetch();
+    };
+    window.addEventListener('sso-connections-changed', handleConnectionsChanged);
+    return () => window.removeEventListener('sso-connections-changed', handleConnectionsChanged);
+  }, [refetch]);
 
   const domains = (data?.ssoDomains ?? []).flatMap((domain) => (domain ? [domain] : []));
 

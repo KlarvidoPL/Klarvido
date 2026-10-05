@@ -626,6 +626,9 @@
   "Audit / Event / SSO Domain Added": {
     "defaultMessage": "SSO डोमेन जोड़ा गया"
   },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO डोमेन समाप्त"
+  },
   "Audit / Event / SSO Domain Removed": {
     "defaultMessage": "SSO डोमेन हटाया गया"
   },
@@ -2010,7 +2013,7 @@
     "defaultMessage": "रिकॉर्ड मान कॉपी करें"
   },
   "Domain Verification / DNS instructions": {
-    "defaultMessage": "इस TXT रिकॉर्ड को अपने DNS में जोड़ें, फिर सत्यापित करें पर क्लिक करें।"
+    "defaultMessage": "इस TXT रिकॉर्ड को अपने DNS में जोड़ें, फिर सत्यापित करें पर क्लिक करें। रिकॉर्ड को बनाए रखें: SSO इसे हर दिन जाँचता है, और इसे हटाने से डोमेन समाप्त हो जाएगा।"
   },
   "Domain Verification / Delete Error": {
     "defaultMessage": "डोमेन हटाने में विफल।"
@@ -2022,10 +2025,16 @@
     "defaultMessage": "डोमेन"
   },
   "Domain Verification / Domain placeholder": {
-    "defaultMessage": "example.com"
+    "defaultMessage": "company.in"
   },
   "Domain Verification / Empty": {
     "defaultMessage": "अभी तक कोई डोमेन नहीं जोड़ा गया है। सत्यापन शुरू करने के लिए अपनी कंपनी का डोमेन जोड़ें।"
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "सत्यापन रिकॉर्ड कई जाँचों से गायब है, इसलिए यह डोमेन अब SSO के लिए काम नहीं करता। इसके SSO कनेक्शन निष्क्रिय कर दिए गए हैं। रिकॉर्ड फिर से प्रकाशित करें और डोमेन सत्यापित करें।"
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "अंतिम जाँच {date}"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "नाम"
@@ -2038,6 +2047,9 @@
   },
   "Domain Verification / Remove domain": {
     "defaultMessage": "डोमेन हटाएं"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "समाप्त"
   },
   "Domain Verification / Status pending": {
     "defaultMessage": "लंबित"
@@ -3251,6 +3263,15 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO कनेक्शन निष्क्रिय किया गया"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "\"{tenant_name}\" का डोमेन \"{domain}\" अब सत्यापित नहीं है क्योंकि उसका सत्यापन रिकॉर्ड गायब है। निष्क्रिय कनेक्शन: {connections}।"
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "\"{tenant_name}\" का डोमेन \"{domain}\" अब सत्यापित नहीं है क्योंकि उसका सत्यापन रिकॉर्ड गायब है।"
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO डोमेन समाप्त"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "संगठन \"{tenant_name}\" को \"{name}\" ने हटा दिया"
   },
@@ -4271,6 +4292,9 @@
   "SSO / Error / domain_in_use": {
     "defaultMessage": "पहले इस डोमेन को सभी SSO कनेक्शन से हटाएं।"
   },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "पहले इस डोमेन को इन SSO कनेक्शन से हटाएं: {connections}।"
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "आपका ईमेल डोमेन इस संगठन के लिए अधिकृत नहीं है।"
   },
@@ -4361,6 +4385,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO कनेक्शन सक्रिय किया गया।"
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "सक्रिय करने से पहले इस कनेक्शन में एक डोमेन जोड़ें।"
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "इस कनेक्शन को सक्रिय करने से पहले डोमेन सत्यापन में {domains} सत्यापित करें। सभी डोमेन सत्यापित होने तक सक्रियता अवरुद्ध रहेगी।"
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "सक्रिय"
   },
@@ -4396,6 +4426,9 @@
   },
   "SSO Card / Delete Success": {
     "defaultMessage": "SSO कनेक्शन हटा दिया गया।"
+  },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(सत्यापित नहीं)"
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "डोमेन:"
@@ -4504,6 +4537,12 @@
   },
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "उदाहरण के लिए, company.com"
+  },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "सत्यापित नहीं"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "कनेक्शन सक्रिय करने से पहले डोमेन सत्यापन में इस डोमेन को सत्यापित करें।"
   },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"

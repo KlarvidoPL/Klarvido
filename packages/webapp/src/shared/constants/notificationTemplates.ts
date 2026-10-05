@@ -8,6 +8,7 @@ import {
   PasskeyRegistered,
   SSOConnectionActivated,
   SSOConnectionDeactivated,
+  SSODomainLapsed,
   TenantDeleted,
   TenantInvitationAccepted,
   TenantInvitationCreated,
@@ -25,6 +26,7 @@ const templates: Record<NotificationTypes, ElementType> = {
   [NotificationTypes.ACTION_LOG_EXPORT_FAILED]: ActionLogExportFailed,
   [NotificationTypes.SSO_CONNECTION_ACTIVATED]: SSOConnectionActivated,
   [NotificationTypes.SSO_CONNECTION_DEACTIVATED]: SSOConnectionDeactivated,
+  [NotificationTypes.SSO_DOMAIN_LAPSED]: SSODomainLapsed,
   [NotificationTypes.PASSKEY_REGISTERED]: PasskeyRegistered,
   [NotificationTypes.TENANT_DELETED]: TenantDeleted,
   // Backup notifications

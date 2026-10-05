@@ -25,6 +25,14 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
 
     id = hashid_field.HashidAutoField(primary_key=True)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="sso_connections")
+    # Who configured the connection: they are notified when it is deactivated because a domain lapsed
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_sso_connections",
+    )
 
     # Basic configuration
     name = models.CharField(max_length=255, help_text="Display name for this SSO connection")
@@ -734,6 +742,7 @@ class TenantDomain(TimestampedMixin, models.Model):
     """
 
     TXT_RECORD_PREFIX = "klarvido-domain-verification"
+    CHALLENGE_LABEL = "_klarvido-challenge"
 
     id = hashid_field.HashidAutoField(primary_key=True)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="sso_domains")
@@ -743,6 +752,8 @@ class TenantDomain(TimestampedMixin, models.Model):
     )
     verification_token = models.CharField(max_length=64, default=_generate_domain_verification_token, editable=False)
     verified_at = models.DateTimeField(null=True, blank=True)
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+    consecutive_failures = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         constraints = [
@@ -763,7 +774,8 @@ class TenantDomain(TimestampedMixin, models.Model):
 
     @property
     def verification_record_name(self) -> str:
-        return self.domain
+        # A dedicated subdomain, so the apex record is not needed after the claim
+        return f"{self.CHALLENGE_LABEL}.{self.domain}"
 
     @property
     def verification_record_value(self) -> str:

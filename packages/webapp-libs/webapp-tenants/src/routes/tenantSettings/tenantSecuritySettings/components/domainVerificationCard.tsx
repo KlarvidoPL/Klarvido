@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useTenantSSODomains } from '../../../../hooks/useTenantSSODomains';
 import { useCurrentTenant } from '../../../../providers';
-import { getSsoDomainErrorCode, getSsoDomainErrorMessage } from './ssoDomainErrors';
+import { getSsoDomainErrorDetail } from './ssoDomainErrors';
 
 interface DomainVerificationCardProps {
   canManageSSO: boolean;
@@ -19,6 +19,8 @@ interface SSODomain {
   id: string;
   domain: string;
   status: string;
+  lastCheckedAt?: string | null;
+  consecutiveFailures?: number | null;
   verificationRecordName?: string | null;
   verificationRecordValue?: string | null;
 }
@@ -33,9 +35,8 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const showError = (error: unknown, fallback: string) => {
-    const code = getSsoDomainErrorCode(error);
     toast({
-      description: code ? getSsoDomainErrorMessage(intl, code) : fallback,
+      description: getSsoDomainErrorDetail(intl, error) ?? fallback,
       variant: 'destructive',
     });
   };
@@ -103,9 +104,11 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
   return (
     <Card>
       <CardHeader className="pb-4">
-        <div className="flex items-center gap-2">
-          <Globe className="h-5 w-5 text-muted-foreground" />
-          <div>
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <Globe className="h-5 w-5 text-primary" />
+          </div>
+          <div className="min-w-0">
             <CardTitle className="text-lg">
               <FormattedMessage id="Domain Verification / Title" defaultMessage="Domain verification" />
             </CardTitle>
@@ -154,18 +157,26 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
         )}
 
         {domains.map((domain: SSODomain) => {
-          const verified = domain.status.toLowerCase() === 'verified';
+          const status = domain.status.toLowerCase();
+          const verified = status === 'verified';
+          const lapsed = status === 'lapsed';
           return (
             <div key={domain.id} className="space-y-3 rounded-md border p-4">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="truncate font-mono text-sm">{domain.domain}</span>
-                  {verified ? (
+                  {verified && (
                     <Badge variant="default" className="shrink-0">
                       <Check className="mr-1 h-3 w-3" />
                       <FormattedMessage id="Domain Verification / Status verified" defaultMessage="Verified" />
                     </Badge>
-                  ) : (
+                  )}
+                  {lapsed && (
+                    <Badge variant="destructive" className="shrink-0">
+                      <FormattedMessage id="Domain Verification / Status lapsed" defaultMessage="Lapsed" />
+                    </Badge>
+                  )}
+                  {!verified && !lapsed && (
                     <Badge variant="outline" className="shrink-0">
                       <FormattedMessage id="Domain Verification / Status pending" defaultMessage="Pending" />
                     </Badge>
@@ -194,12 +205,39 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
                 )}
               </div>
 
+              {verified && domain.lastCheckedAt && (
+                <p className="text-xs text-muted-foreground">
+                  <FormattedMessage
+                    id="Domain Verification / Last checked"
+                    defaultMessage="Last checked {date}"
+                    values={{
+                      date: intl.formatDate(domain.lastCheckedAt, {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      }),
+                    }}
+                  />
+                </p>
+              )}
+
+              {lapsed && (
+                <p className="text-sm text-destructive">
+                  <FormattedMessage
+                    id="Domain Verification / Lapsed explanation"
+                    defaultMessage="The verification record has been missing for several checks, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
+                  />
+                </p>
+              )}
+
               {!verified && domain.verificationRecordName && domain.verificationRecordValue && (
-                <div className="space-y-2 text-sm">
+                <div className="space-y-4 text-sm">
                   <p className="text-muted-foreground">
                     <FormattedMessage
                       id="Domain Verification / DNS instructions"
-                      defaultMessage="Add this TXT record to your DNS, then click Verify."
+                      defaultMessage="Add this TXT record to your DNS, then click Verify. Keep the record in place: SSO checks it every day, and removing it lapses the domain."
                     />
                   </p>
                   <div className="grid gap-1 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-2">

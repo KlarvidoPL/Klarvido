@@ -1,3 +1,4 @@
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import type { IntlShape } from 'react-intl';
 
 // Stable codes from apps/sso/services/domain_verification.py. Raw backend text never reaches the UI.
@@ -21,13 +22,43 @@ const collectStrings = (value: unknown): string[] => {
 };
 
 // Finds a known domain error code in the message or extensions of a GraphQL error.
+// extractGraphQLErrors reads both Apollo error shapes (graphQLErrors and Apollo 4's errors).
 export const getSsoDomainErrorCode = (error: unknown): SsoDomainErrorCode | null => {
-  const graphQLErrors = (error as { graphQLErrors?: unknown[] } | null)?.graphQLErrors ?? [];
-  const strings = graphQLErrors.flatMap(collectStrings);
+  const strings = (extractGraphQLErrors(error) ?? []).flatMap(collectStrings);
   const found = strings.find((value): value is SsoDomainErrorCode =>
     (SSO_DOMAIN_ERROR_CODES as readonly string[]).includes(value)
   );
   return found ?? null;
+};
+
+// Connection names the backend attached to a domain_in_use error (see DomainVerificationError.details)
+export const getSsoDomainErrorConnections = (error: unknown): string[] => {
+  const names = (extractGraphQLErrors(error) ?? []).flatMap((item) => {
+    const connectionNames = (item as { extensions?: { connection_names?: unknown } })?.extensions?.connection_names;
+    return Array.isArray(connectionNames)
+      ? connectionNames.filter((name): name is string => typeof name === 'string')
+      : [];
+  });
+  return names;
+};
+
+// Full translated explanation for a domain error, or null when the error is not a known domain error
+export const getSsoDomainErrorDetail = (intl: IntlShape, error: unknown): string | null => {
+  const code = getSsoDomainErrorCode(error);
+  if (!code) return null;
+  if (code === 'domain_in_use') {
+    const connections = getSsoDomainErrorConnections(error);
+    if (connections.length > 0) {
+      return intl.formatMessage(
+        {
+          id: 'SSO / Error / domain_in_use with connections',
+          defaultMessage: 'Remove this domain from these SSO connections before deleting it: {connections}.',
+        },
+        { connections: connections.join(', ') }
+      );
+    }
+  }
+  return getSsoDomainErrorMessage(intl, code);
 };
 
 export const getSsoDomainErrorMessage = (intl: IntlShape, code: SsoDomainErrorCode): string => {
@@ -68,4 +99,10 @@ export const getSsoDomainErrorMessage = (intl: IntlShape, code: SsoDomainErrorCo
         defaultMessage: 'Verify every allowed domain of this connection before activating it.',
       });
   }
+};
+
+// Field errors from the connection form can be a domain error code; show the translated text instead
+export const translateSsoDomainFieldError = (intl: IntlShape, message: string): string => {
+  const code = (SSO_DOMAIN_ERROR_CODES as readonly string[]).find((value) => value === message);
+  return code ? getSsoDomainErrorMessage(intl, code as SsoDomainErrorCode) : message;
 };

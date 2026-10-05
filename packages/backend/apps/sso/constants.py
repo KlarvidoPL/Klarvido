@@ -30,6 +30,7 @@ class SSODomainStatus(models.TextChoices):
 
     PENDING = "pending", "Pending verification"
     VERIFIED = "verified", "Verified"
+    LAPSED = "lapsed", "Lapsed (record missing for several checks)"
 
 
 class SAMLNameIdFormat(models.TextChoices):
@@ -81,6 +82,7 @@ class SSOAuditEventType(models.TextChoices):
     DOMAIN_ADDED = "domain_added", "SSO Domain Added"
     DOMAIN_VERIFIED = "domain_verified", "SSO Domain Verified"
     DOMAIN_REMOVED = "domain_removed", "SSO Domain Removed"
+    DOMAIN_LAPSED = "domain_lapsed", "SSO Domain Lapsed"
 
     # Session events
     SESSION_CREATED = "session_created", "Session Created"
@@ -112,5 +114,6 @@ class Notification(Enum):
     SSO_CONNECTION_ACTIVATED = "SSO_CONNECTION_ACTIVATED"
     SSO_CONNECTION_DEACTIVATED = "SSO_CONNECTION_DEACTIVATED"
     SSO_LOGIN_FROM_NEW_DEVICE = "SSO_LOGIN_FROM_NEW_DEVICE"
+    SSO_DOMAIN_LAPSED = "SSO_DOMAIN_LAPSED"
     PASSKEY_REGISTERED = "PASSKEY_REGISTERED"
     SESSION_REVOKED_REMOTELY = "SESSION_REVOKED_REMOTELY"

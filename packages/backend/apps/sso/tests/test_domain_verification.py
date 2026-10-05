@@ -11,10 +11,11 @@ from graphql import GraphQLError
 from graphql_relay import to_global_id
 from rest_framework import serializers as drf_serializers
 
-from apps.multitenancy.constants import TenantType
-from apps.multitenancy.tests.factories import TenantFactory
+from apps.multitenancy.constants import TenantType, TenantUserRole
+from apps.multitenancy.models import TenantMembership
+from apps.multitenancy.tests.factories import TenantFactory, TenantMembershipFactory
 from apps.sso import constants
-from apps.sso.models import SSOAuditLog, TenantDomain
+from apps.sso.models import SSOAuditLog, TenantDomain, TenantSSOConnection
 from apps.sso.schema import (
     AddSSODomainMutation,
     DeleteSSODomainMutation,
@@ -410,3 +411,245 @@ class TestDomainMutations:
             DeleteSSODomainMutation.mutate(None, self._info(org, user), id=global_id, tenant_id=str(org.pk))
 
         assert str(exc.value) == dv.DOMAIN_IN_USE_CODE
+
+
+class TestPeriodicRecheck:
+    def _verified(self, org, domain="client.pl"):
+        claim = dv.add_domain(org, domain)
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            return dv.verify_domain(claim)
+
+    def test_challenge_is_published_on_the_subdomain(self, org):
+        claim = dv.add_domain(org, "client.pl")
+
+        assert claim.verification_record_name == "_klarvido-challenge.client.pl"
+
+    def test_subdomain_record_verifies_a_claim(self, org):
+        claim = dv.add_domain(org, "client.pl")
+        subdomain_records = {"_klarvido-challenge.client.pl": [claim.verification_record_value]}
+
+        with mock.patch.object(dv, "lookup_txt_records", side_effect=lambda name: subdomain_records.get(name, [])):
+            dv.verify_domain(claim)
+
+        claim.refresh_from_db()
+        assert claim.status == VERIFIED
+
+    def test_present_record_resets_the_failure_count(self, org):
+        domain = self._verified(org)
+        domain.consecutive_failures = 2
+        domain.save()
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[domain.verification_record_value]):
+            assert dv.recheck_domain(domain) == VERIFIED
+
+        domain.refresh_from_db()
+        assert domain.consecutive_failures == 0
+        assert domain.last_checked_at is not None
+
+    def test_missing_record_lapses_after_three_failed_checks(self, org):
+        domain = self._verified(org)
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            assert dv.recheck_domain(domain) == VERIFIED
+            assert dv.recheck_domain(domain) == VERIFIED
+            assert dv.recheck_domain(domain) == constants.SSODomainStatus.LAPSED
+
+        domain.refresh_from_db()
+        assert domain.status == constants.SSODomainStatus.LAPSED
+
+    def test_dns_error_changes_nothing(self, org):
+        domain = self._verified(org)
+        domain.consecutive_failures = 2
+        domain.save()
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=None):
+            for _ in range(5):
+                dv.recheck_domain(domain)
+
+        domain.refresh_from_db()
+        assert domain.status == VERIFIED
+        assert domain.consecutive_failures == 2
+
+    def test_lapse_deactivates_connections_and_keeps_memberships(self, org):
+        domain = self._verified(org)
+        connection = factories.TenantSSOConnectionFactory(
+            tenant=org, allowed_domains=["client.pl"], status=constants.SSOConnectionStatus.ACTIVE
+        )
+        member = UserFactory(email="jan@client.pl")
+        TenantMembershipFactory(user=member, tenant=org, is_accepted=True)
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            for _ in range(3):
+                dv.recheck_domain(domain)
+
+        connection.refresh_from_db()
+        assert connection.status == constants.SSOConnectionStatus.INACTIVE
+        assert TenantMembership.objects.filter(user=member, tenant=org).exists()
+        assert SSOAuditLog.objects.filter(tenant=org, event_type=constants.SSOAuditEventType.DOMAIN_LAPSED).exists()
+
+    def test_lapsed_domain_no_longer_routes_or_links_users(self, org):
+        domain = self._verified(org)
+        connection = factories.TenantSSOConnectionFactory(tenant=org, allowed_domains=["client.pl"])
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            for _ in range(3):
+                dv.recheck_domain(domain)
+
+        assert not is_email_domain_allowed(connection, "jan@client.pl")
+        assert Query.resolve_sso_discover(None, None, "jan@client.pl")["sso_available"] is False
+
+    def test_lapsed_domain_can_be_claimed_by_another_organization(self, org, other_org):
+        domain = self._verified(org)
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            for _ in range(3):
+                dv.recheck_domain(domain)
+
+        claim = dv.add_domain(other_org, "client.pl")
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            dv.verify_domain(claim)
+
+        claim.refresh_from_db()
+        assert claim.status == VERIFIED
+
+    def test_lapsed_connection_cannot_be_reactivated_until_verified(self, org):
+        domain = self._verified(org)
+        connection = factories.TenantSSOConnectionFactory(tenant=org, allowed_domains=["client.pl"])
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            for _ in range(3):
+                dv.recheck_domain(domain)
+
+        with pytest.raises(dv.DomainVerificationError) as exc:
+            dv.ensure_connection_domains_verified(connection)
+
+        assert exc.value.code == dv.DOMAINS_NOT_VERIFIED_CODE
+
+    def test_scheduled_task_rechecks_verified_domains(self, org):
+        self._verified(org)
+        from apps.sso.tasks import recheck_verified_domains
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]) as lookup:
+            with mock.patch("apps.sso.tasks.recheck_domain", wraps=dv.recheck_domain) as recheck:
+                assert recheck_verified_domains() == 1
+
+        assert recheck.call_count == 1
+        assert lookup.called
+
+    def test_scheduled_task_is_skipped_with_dev_bypass(self, org, settings):
+        self._verified(org)
+        from apps.sso.tasks import recheck_verified_domains
+
+        settings.DEBUG = True
+        settings.SSO_DOMAIN_VERIFICATION_SKIP_DNS = True
+        with mock.patch.object(dv, "lookup_txt_records") as lookup:
+            assert recheck_verified_domains() == 0
+
+        lookup.assert_not_called()
+
+
+class TestLapseNotifications:
+    def _lapse(self, tenant_domain):
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            for _ in range(3):
+                dv.recheck_domain(tenant_domain)
+
+    def test_lapse_notifies_owners_and_the_connection_creator_once(self, org):
+        from apps.notifications.models import Notification
+
+        claim = dv.add_domain(org, "client.pl")
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            dv.verify_domain(claim)
+
+        owner = UserFactory(email="lapse-owner@sso-test.invalid")
+        TenantMembershipFactory(user=owner, tenant=org, role=TenantUserRole.OWNER, is_accepted=True)
+        creator = UserFactory(email="lapse-creator@sso-test.invalid")
+        TenantMembershipFactory(user=creator, tenant=org, role=TenantUserRole.ADMIN, is_accepted=True)
+        # The owner also created the connection: they must still get only one notification
+        factories.TenantSSOConnectionFactory(
+            tenant=org,
+            allowed_domains=["client.pl"],
+            status=constants.SSOConnectionStatus.ACTIVE,
+            created_by=owner,
+        )
+        factories.TenantSSOConnectionFactory(
+            tenant=org,
+            allowed_domains=["client.pl"],
+            status=constants.SSOConnectionStatus.ACTIVE,
+            created_by=creator,
+        )
+        outsider = UserFactory(email="lapse-outsider@sso-test.invalid")
+
+        self._lapse(claim)
+
+        lapsed = Notification.objects.filter(type="SSO_DOMAIN_LAPSED")
+        assert lapsed.filter(user=owner).count() == 1
+        assert lapsed.filter(user=creator).count() == 1
+        assert not lapsed.filter(user=outsider).exists()
+        assert lapsed.first().data["domain"] == "client.pl"
+
+    def test_lapse_still_happens_when_notifications_fail(self, org):
+        claim = dv.add_domain(org, "client.pl")
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            dv.verify_domain(claim)
+        TenantMembershipFactory(user=UserFactory(), tenant=org, role=TenantUserRole.OWNER, is_accepted=True)
+
+        with mock.patch.object(dv.sender, "send_notification", side_effect=RuntimeError("boom")):
+            self._lapse(claim)
+
+        claim.refresh_from_db()
+        assert claim.status == constants.SSODomainStatus.LAPSED
+
+
+class TestSavingConnectionClaimsDomains:
+    def _create_data(self, org, domains):
+        return {
+            "tenant_id": str(org.pk),
+            "name": "Keycloak",
+            "connection_type": constants.IdentityProviderType.SAML,
+            "allowed_domains": domains,
+            "saml_entity_id": "https://idp.example/entity",
+            "saml_sso_url": "https://idp.example/sso",
+        }
+
+    def test_saving_a_new_domain_adds_it_as_a_pending_claim(self, org):
+        serializer = TenantSSOConnectionSerializer(data=self._create_data(org, ["new-company.pl"]))
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        claim = TenantDomain.objects.get(tenant=org, domain="new-company.pl")
+        assert claim.status == PENDING
+
+    def test_public_domain_is_refused_before_saving(self, org):
+        serializer = TenantSSOConnectionSerializer(data=self._create_data(org, ["gmail.com"]))
+
+        assert not serializer.is_valid()
+        assert serializer.errors["allowed_domains"][0] == dv.PUBLIC_DOMAIN_CODE
+        assert not TenantSSOConnection.objects.filter(tenant=org).exists()
+
+    def test_domain_verified_by_another_organization_is_refused(self, org, other_org):
+        dv.add_domain(other_org, "taken.pl")
+        TenantDomain.objects.filter(tenant=other_org, domain="taken.pl").update(status=VERIFIED)
+
+        serializer = TenantSSOConnectionSerializer(data=self._create_data(org, ["taken.pl"]))
+
+        assert not serializer.is_valid()
+        assert serializer.errors["allowed_domains"][0] == dv.DOMAIN_TAKEN_CODE
+
+    def test_updating_a_connection_claims_its_new_domains(self, org):
+        connection = factories.TenantSSOConnectionFactory(tenant=org, allowed_domains=["client.pl"])
+        serializer = UpdateTenantSSOConnectionSerializer(
+            instance=connection, data={"allowed_domains": ["client.pl", "second.pl"]}, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        assert TenantDomain.objects.get(tenant=org, domain="second.pl").status == PENDING
+
+    def test_creating_a_connection_records_its_creator(self, org):
+        user = UserFactory(email="setup-admin@sso-test.invalid")
+        serializer = TenantSSOConnectionSerializer(
+            data=self._create_data(org, ["creator-check.pl"]),
+            context={"request": SimpleNamespace(user=user)},
+        )
+        serializer.is_valid(raise_exception=True)
+        connection = serializer.save()
+
+        assert connection.created_by == user

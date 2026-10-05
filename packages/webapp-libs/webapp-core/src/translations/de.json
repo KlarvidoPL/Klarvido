@@ -626,6 +626,9 @@
   "Audit / Event / SSO Domain Added": {
     "defaultMessage": "SSO-Domain hinzugefügt"
   },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO-Domain abgelaufen"
+  },
   "Audit / Event / SSO Domain Removed": {
     "defaultMessage": "SSO-Domain entfernt"
   },
@@ -2010,7 +2013,7 @@
     "defaultMessage": "Datensatzwert kopieren"
   },
   "Domain Verification / DNS instructions": {
-    "defaultMessage": "Füge diesen TXT-Eintrag zu deinem DNS hinzu und klicke dann auf Verifizieren."
+    "defaultMessage": "Füge diesen TXT-Eintrag in deinem DNS hinzu und klicke dann auf Verifizieren. Lass den Eintrag bestehen: SSO prüft ihn täglich, und ein Entfernen lässt die Domain auslaufen."
   },
   "Domain Verification / Delete Error": {
     "defaultMessage": "Die Domain konnte nicht entfernt werden."
@@ -2022,10 +2025,16 @@
     "defaultMessage": "Domain"
   },
   "Domain Verification / Domain placeholder": {
-    "defaultMessage": "example.com"
+    "defaultMessage": "firma.de"
   },
   "Domain Verification / Empty": {
     "defaultMessage": "Noch keine Domains angemeldet. Füge die Domain deines Unternehmens hinzu, um die Verifizierung zu starten."
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "Der Verifizierungseintrag fehlt seit mehreren Prüfungen, daher funktioniert diese Domain nicht mehr für SSO. Die SSO-Verbindungen wurden deaktiviert. Veröffentliche den Eintrag erneut und verifiziere die Domain, um sie zu nutzen."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "Zuletzt geprüft {date}"
   },
   "Domain Verification / Record name": {
     "defaultMessage": "Name"
@@ -2038,6 +2047,9 @@
   },
   "Domain Verification / Remove domain": {
     "defaultMessage": "Domain entfernen"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "Abgelaufen"
   },
   "Domain Verification / Status pending": {
     "defaultMessage": "Ausstehend"
@@ -3251,6 +3263,15 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO-Verbindung deaktiviert"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "Die Domain \"{domain}\" für \"{tenant_name}\" ist nicht mehr verifiziert, weil ihr Verifizierungseintrag fehlt. Deaktivierte Verbindungen: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "Die Domain \"{domain}\" für \"{tenant_name}\" ist nicht mehr verifiziert, weil ihr Verifizierungseintrag fehlt."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO-Domain abgelaufen"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Die Organisation „{tenant_name}“ wurde von „{name}“ gelöscht"
   },
@@ -4271,6 +4292,9 @@
   "SSO / Error / domain_in_use": {
     "defaultMessage": "Entferne diese Domain zuerst aus allen SSO-Verbindungen."
   },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "Entferne diese Domain zuerst aus diesen SSO-Verbindungen: {connections}."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "Ihre E-Mail-Domain ist für diese Organisation nicht zugelassen."
   },
@@ -4361,6 +4385,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO-Verbindung aktiviert."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "Füge vor der Aktivierung eine Domain zu dieser Verbindung hinzu."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "Verifiziere {domains} unter Domain-Verifizierung, bevor du diese Verbindung aktivierst. Die Aktivierung bleibt gesperrt, bis alle Domains verifiziert sind."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "Aktiv"
   },
@@ -4396,6 +4426,9 @@
   },
   "SSO Card / Delete Success": {
     "defaultMessage": "SSO-Verbindung gelöscht."
+  },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(nicht verifiziert)"
   },
   "SSO Card / Domains Label": {
     "defaultMessage": "Domains:"
@@ -4504,6 +4537,12 @@
   },
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "z. B. firma.de"
+  },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "Nicht verifiziert"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "Verifiziere diese Domain unter Domain-Verifizierung, bevor die Verbindung aktiviert werden kann."
   },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"
