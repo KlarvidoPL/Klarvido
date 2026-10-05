@@ -174,11 +174,13 @@ class BackupService:
         # Get all fields from the model
         for field in instance._meta.get_fields():
             # Skip reverse relations and many-to-many (we'll handle those separately)
-            if field.many_to_many or (hasattr(field, 'related_model') and field.related_model):
+            if field.many_to_many or (field.auto_created and not field.concrete):
+                continue
+            if field.is_relation and not getattr(instance, '_backup_include_relations', False):
                 continue
 
             field_name = field.name
-            field_value = getattr(instance, field_name, None)
+            field_value = getattr(instance, field.attname if isinstance(field, models.ForeignKey) else field_name, None)
 
             # Skip None values
             if field_value is None:

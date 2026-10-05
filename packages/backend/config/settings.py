@@ -91,6 +91,7 @@ LOCAL_APPS = [
     "apps.translations",
     "apps.backup",
     "apps.ksef",
+    "apps.invoices",
 ]
 
 INSTALLED_APPS = (
@@ -721,6 +722,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Don't prefetch tasks (reduces memory us
 
 # Celery Beat Schedule for periodic tasks
 CELERY_BEAT_SCHEDULE = {
+    "sync-ksef-invoices": {"task": "apps.invoices.tasks.schedule_invoice_syncs", "schedule": 300},
     # 'sync-fx-rates-every-4-hours': {
     #     'task': 'apps.example.tasks.example_sync',
     #     'schedule': 60 * 60 * 4,  # Every 4 hours (in seconds)

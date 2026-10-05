@@ -114,6 +114,12 @@ class RestoreService:
             # For SKIP/UPDATE, process each model in its own transaction
             self._import_all_models(sorted_models, model_data)
 
+        # Optional module-owned hook: reconcile technical state excluded from backup.
+        for model in sorted_models:
+            counts = self.model_counts.get(model.__name__, {})
+            callback = getattr(model, '_after_backup_restore', None)
+            if callback and (counts.get('created', 0) or counts.get('updated', 0)):
+                callback(self.tenant_id)
         return self.model_counts
 
     def _resolve_model_sections(self, model_sections: List[Element]) -> Dict[Type[models.Model], List[Element]]:
@@ -409,7 +415,18 @@ class RestoreService:
             # Deserialize the field value
             try:
                 value = self._deserialize_value(child_elem.text, field)
-                field_values[field_name] = value
+                if isinstance(field, models.ForeignKey):
+                    if value:
+                        related = field.related_model.objects.filter(pk=value)
+                        if hasattr(field.related_model, 'tenant_id'):
+                            related = related.filter(tenant_id=self.tenant_id)
+                        if not related.exists():
+                            raise RestoreValidationError('Invalid related record')
+                    field_values[field.attname] = value
+                else:
+                    field_values[field_name] = value
+            except RestoreValidationError:
+                raise
             except Exception as e:
                 logger.warning(f"Failed to deserialize {model_name}.{field_name}: {e}")
                 continue
@@ -453,7 +470,7 @@ class RestoreService:
 
         # Check if record already exists
         try:
-            existing = model_class.objects.filter(pk=pk_value).first()
+            existing = model_class.objects.filter(pk=pk_value, tenant_id=self.tenant_id).first()
         except Exception:
             existing = None
 

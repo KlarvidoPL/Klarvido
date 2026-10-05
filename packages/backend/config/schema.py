@@ -14,6 +14,7 @@ from apps.sso import schema as sso_schema
 from apps.translations import schema as translations_schema
 from apps.backup import schema as backup_schema
 from apps.ksef import schema as ksef_schema
+from apps.invoices import schema as invoices_schema
 from common.graphql.utils import graphql_query, graphql_mutation, graphql_subscription
 
 schema = graphene.Schema(
@@ -29,6 +30,7 @@ schema = graphene.Schema(
             translations_schema.TranslationsQuery,
             backup_schema.BackupQuery,
             ksef_schema.KsefQuery,
+            invoices_schema.Query,
         ]
     ),
     mutation=graphql_mutation(
@@ -49,6 +51,7 @@ schema = graphene.Schema(
             translations_schema.TranslationsMutation,
             backup_schema.BackupMutation,
             ksef_schema.KsefMutation,
+            invoices_schema.Mutation,
         ]
     ),
     subscription=graphql_subscription(
