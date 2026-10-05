@@ -73,6 +73,9 @@ TOOL_PERMISSIONS = {
     "get_notifications": None,
     "get_subscription_status": "billing.view",
     "get_documents": "features.documents.view",
+    "get_invoices": "invoices.view",
+    "get_invoice": "invoices.view",
+    "get_invoice_summary": "invoices.view",
     "get_crud_demo_items": "features.crud.view",
     "get_crud_demo_item": "features.crud.view",
     "create_crud_demo_item": "features.crud.manage",
@@ -656,13 +659,22 @@ class EntityTracker:
 
     def __init__(self):
         self.items = {}
+        self.invoices = {}
 
     def extract_from_tool_result(self, tool_name: str, result: str):
         """Extract entities from a tool result JSON."""
         try:
             data = json.loads(result) if isinstance(result, str) else result
 
-            if tool_name in ("get_crud_demo_items", "GetCrudDemoItems"):
+            if normalize_tool_name(tool_name) in {"get_invoices", "get_invoice"}:
+                invoice_data = self._unwrap_graphql_data(data)
+                nodes = (invoice_data.get('invoices') or {}).get('items', [])
+                if invoice_data.get('invoice'):
+                    nodes.append(invoice_data['invoice'])
+                for node in nodes:
+                    if node.get('id') and node.get('number'):
+                        self.invoices[node['number']] = node['id']
+            elif tool_name in ("get_crud_demo_items", "GetCrudDemoItems"):
                 self._extract_crud_items(data)
             elif tool_name in ("get_crud_demo_item", "GetCrudDemoItem"):
                 self._extract_crud_item(data)
@@ -692,8 +704,6 @@ class EntityTracker:
 
     def add_links_to_text(self, text: str) -> str:
         """Post-process text to add markdown links for known items."""
-        import re
-
         for name, entity_id in sorted(self.items.items(), key=lambda x: len(x[0]), reverse=True):
             if f"[{name}](" in text:
                 continue
@@ -701,6 +711,13 @@ class EntityTracker:
             replacement = f"[{name}](item:{entity_id})"
             text = pattern.sub(replacement, text, count=1)
 
+        for name, entity_id in sorted(self.invoices.items(), key=lambda x: len(x[0]), reverse=True):
+            if f"[{name}](" not in text:
+                text = re.sub(
+                    r"(?<!\[)" + re.escape(name) + r"(?!\]\()",
+                    lambda _, name=name, entity_id=entity_id: f"[{name}](invoice:{entity_id})",
+                    text, count=1,
+                )
         return text
 
 

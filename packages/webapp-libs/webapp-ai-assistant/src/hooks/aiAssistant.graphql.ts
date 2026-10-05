@@ -24,12 +24,14 @@ export const sendAiMessageMutation = gql(/* GraphQL */ `
     $tenantId: String!
     $conversationId: String!
     $history: [JSONString]
+    $context: [ComponentContextInput!]
   ) {
     sendAiMessage(
       message: $message
       tenantId: $tenantId
       conversationId: $conversationId
       history: $history
+      context: $context
     ) {
       ok
       error

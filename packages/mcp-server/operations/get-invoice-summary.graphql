@@ -1,0 +1,4 @@
+# @tool(name: "get_invoice_summary", description: "Calculate full filtered invoice counts and net/VAT/gross totals in backend, separately for each currency and SALE/PURCHASE. Never aggregate different currencies. Based on invoices only, not total company profit or taxes. Requires invoices.view.")
+query GetInvoiceSummary($tenantId: ID!, $filters: InvoiceFilters) {
+  invoiceSummary(tenantId: $tenantId, filters: $filters) { currency direction count net vat gross }
+}

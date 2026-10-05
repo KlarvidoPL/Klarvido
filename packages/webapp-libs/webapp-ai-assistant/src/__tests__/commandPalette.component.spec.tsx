@@ -31,14 +31,14 @@ const renderWithIntl = (component: React.ReactNode) => {
   return render(
     <IntlProvider locale="en" messages={{}}>
       {component}
-    </IntlProvider>
+    </IntlProvider>,
   );
 };
 
 describe('CommandPalette', () => {
   it('renders the trigger button', () => {
     renderWithIntl(<CommandPalette />);
-    
+
     // Should render a button
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
@@ -75,7 +75,9 @@ describe('CommandPalette', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    expect(await screen.findByText(/How can I help you today/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/How can I help you today/i),
+    ).toBeInTheDocument();
   });
 
   it('shows example prompts', async () => {
@@ -89,10 +91,12 @@ describe('CommandPalette', () => {
   });
 
   it('renders custom trigger when provided', () => {
-    const customTrigger = <button data-testid="custom-trigger">Custom Trigger</button>;
-    
+    const customTrigger = (
+      <button data-testid="custom-trigger">Custom Trigger</button>
+    );
+
     renderWithIntl(<CommandPalette trigger={customTrigger} />);
-    
+
     expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
   });
 });

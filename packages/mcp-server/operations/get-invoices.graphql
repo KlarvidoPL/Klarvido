@@ -1,0 +1,7 @@
+# @tool(name: "get_invoices", description: "Read Klarvido invoices imported from KSeF for the current organization. Filters use issue date (not KSeF storage date). Direction SALE or PURCHASE. category uncategorized or category ID. Each id is a source link invoice:id. Amounts are in invoice currency. Paginated; use get_invoice_summary for full filtered totals.")
+query GetInvoices($tenantId: ID!, $filters: InvoiceFilters, $page: Int = 1, $pageSize: Int = 25) {
+  invoices(tenantId: $tenantId, filters: $filters, page: $page, pageSize: $pageSize) {
+    totalCount
+    items { id number ksefNumber direction issueDate sellerName sellerNip buyerName buyerNip currency net vat gross category { name } }
+  }
+}
