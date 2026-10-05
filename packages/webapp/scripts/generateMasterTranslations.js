@@ -19,15 +19,9 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const OUTPUT_PATH = path.join(
-  __dirname,
-  '../../webapp-libs/webapp-core/src/translations/master.json'
-);
+const OUTPUT_PATH = path.join(__dirname, '../../webapp-libs/webapp-core/src/translations/master.json');
 
-const EN_TRANSLATIONS_PATH = path.join(
-  __dirname,
-  '../../webapp-libs/webapp-core/src/translations/en.json'
-);
+const EN_TRANSLATIONS_PATH = path.join(__dirname, '../../webapp-libs/webapp-core/src/translations/en.json');
 
 function generateMasterTranslations() {
   console.log('🔍 Extracting translations from source files...');
@@ -53,6 +47,7 @@ function generateMasterTranslations() {
       '../webapp-libs/webapp-emails/src/**/*.{ts,tsx}',
       '../webapp-libs/webapp-finances/src/**/*.{ts,tsx}',
       '../webapp-libs/webapp-generative-ai/src/**/*.{ts,tsx}',
+      '../webapp-libs/webapp-invoices/src/**/*.{ts,tsx}',
       '../webapp-libs/webapp-notifications/src/**/*.{ts,tsx}',
       '../webapp-libs/webapp-sso/src/**/*.{ts,tsx}',
       '../webapp-libs/webapp-tenants/src/**/*.{ts,tsx}',
@@ -67,21 +62,21 @@ function generateMasterTranslations() {
       '**/*.spec.tsx',
       '**/*.spec.ts',
       '**/tests/mocks/**',
-      ...sourcePatterns.map(p => p.replace(/\*\*\/\*\.\{ts,tsx\}$/, '**/*.d.ts')),
+      ...sourcePatterns.map((p) => p.replace(/\*\*\/\*\.\{ts,tsx\}$/, '**/*.d.ts')),
     ];
 
     const command = [
       'npx formatjs extract',
-      ...sourcePatterns.map(p => `'${p}'`),
+      ...sourcePatterns.map((p) => `'${p}'`),
       "--id-interpolation-pattern '[sha512:contenthash:base64:6]'",
       `--out-file '${OUTPUT_PATH}'`,
-      ...ignorePatterns.map(p => `--ignore '${p}'`),
+      ...ignorePatterns.map((p) => `--ignore '${p}'`),
     ].join(' ');
 
     execSync(command, {
       cwd: path.join(__dirname, '..'),
       stdio: 'inherit',
-      shell: '/bin/bash',  // Ensure proper shell with glob expansion
+      shell: '/bin/bash', // Ensure proper shell with glob expansion
     });
 
     // Check if the file was created
@@ -106,7 +101,6 @@ function generateMasterTranslations() {
     console.log('');
 
     return true;
-
   } catch (error) {
     console.error('❌ Failed to generate master translations:', error.message);
     process.exit(1);
@@ -114,4 +108,3 @@ function generateMasterTranslations() {
 }
 
 generateMasterTranslations();
-
