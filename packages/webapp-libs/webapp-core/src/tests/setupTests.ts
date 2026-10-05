@@ -71,6 +71,9 @@ MockDate.set('2020-11-22');
 
 jest.disableAutomock();
 
+// SSO settings are switched on in tests (the app keeps them off until SSO is ready, see config/env.ts)
+ENV.SSO_CONFIGURATION_ENABLED = true;
+
 // Mock import.meta for Jest (Vite uses import.meta.env, but Jest runs in Node.js)
 // We use a global mock that the getImportMeta helper can access
 (globalThis as any).__importMetaMock = {
@@ -90,6 +93,7 @@ jest.disableAutomock();
     VITE_ENABLE_PASSKEYS: 'true',
     VITE_ENABLE_SOCIAL_LOGIN: 'true',
     VITE_ENABLE_PASSWORD_LOGIN: 'true',
+    VITE_SSO_CONFIGURATION_ENABLED: 'true',
     VITE_USE_REMOTE_TRANSLATIONS: 'false',
     VITE_TRANSLATIONS_URL: '/api/translations',
     VITE_TRANSLATIONS_POLLING: 'false',

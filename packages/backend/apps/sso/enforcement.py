@@ -11,6 +11,7 @@ from typing import Optional
 from django.db import transaction
 from django.db.models import QuerySet
 
+from apps.sso.availability import sso_enabled
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import TenantSSOConnection, SSOAuditLog
 from apps.sso.services.domain_verification import get_verified_tenant_id_for_domain
@@ -24,6 +25,9 @@ def get_sso_enforced_tenant_ids(user) -> set:
     Return the set of tenant IDs that enforce SSO for this user's email domain.
     Only considers active connections with enforce_sso=True.
     """
+    if not sso_enabled():
+        # While SSO is switched off, no tenant can require it, so password sign-in keeps working
+        return set()
     if not user or not user.is_authenticated:
         return set()
 

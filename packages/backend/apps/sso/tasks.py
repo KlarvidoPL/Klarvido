@@ -6,6 +6,7 @@ import logging
 
 from celery import shared_task
 
+from .availability import sso_enabled
 from .models import TenantDomain
 from .constants import SSODomainStatus
 from .services import SessionService
@@ -34,7 +35,7 @@ def recheck_verified_domains():
     A domain whose record disappears for several checks lapses, and its SSO connections are deactivated.
     Skipped entirely when the development DNS bypass is on, so local data is never lapsed.
     """
-    if dns_check_bypassed():
+    if not sso_enabled() or dns_check_bypassed():
         return 0
 
     checked = 0

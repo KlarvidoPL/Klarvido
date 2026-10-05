@@ -572,6 +572,9 @@ KSEF_ENCRYPTION_KEYS_FILE = env("KSEF_ENCRYPTION_KEYS_FILE", default="")
 # they are stored. Without a key an OIDC connection cannot save a client secret (fails closed).
 SSO_ENCRYPTION_KEYS = env("SSO_ENCRYPTION_KEYS", default="")
 SSO_ENCRYPTION_KEYS_FILE = env("SSO_ENCRYPTION_KEYS_FILE", default="")
+# SSO is switched off until it is ready: no configuration, no sign-in through SSO, no enforcement, no SCIM.
+# Existing SSO data is kept. Set SSO_CONFIGURATION_ENABLED=true to turn it back on.
+SSO_CONFIGURATION_ENABLED = env.bool("SSO_CONFIGURATION_ENABLED", default=False)
 
 LAMBDA_TASKS_BASE_HANDLER = env("LAMBDA_TASKS_BASE_HANDLER", default="common.tasks.LambdaTask")
 LAMBDA_TASKS_LOCAL_URL = env("LAMBDA_TASKS_LOCAL_URL", default=None)

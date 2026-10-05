@@ -20,6 +20,7 @@ from apps.multitenancy.constants import ActionType
 from apps.users.services.users import get_user_from_resolver
 from . import models
 from . import serializers
+from .availability import SSOEnabledPermission, sso_enabled
 from . import constants
 from .services import domain_verification
 from .services.domain_verification import DomainVerificationError, get_verified_tenant_id_for_domain
@@ -992,6 +993,8 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     def resolve_sso_discover(root, info, email):
+        if not sso_enabled():
+            return {"sso_available": False, "require_sso": False, "connections": []}
         email = (email or "").strip().lower()
         if not email or "@" not in email:
             return {"sso_available": False, "require_sso": False, "connections": []}
@@ -1195,20 +1198,40 @@ class TenantOwnerMutation(graphene.ObjectType):
     """
 
     # SSO Connection management - requires security.sso.manage
-    create_sso_connection = permission_classes(requires("security.sso.manage"))(CreateSSOConnectionMutation.Field())
-    update_sso_connection = permission_classes(requires("security.sso.manage"))(UpdateSSOConnectionMutation.Field())
-    delete_sso_connection = permission_classes(requires("security.sso.manage"))(DeleteSSOConnectionMutation.Field())
-    activate_sso_connection = permission_classes(requires("security.sso.manage"))(ActivateSSOConnectionMutation.Field())
-    deactivate_sso_connection = permission_classes(requires("security.sso.manage"))(
+    create_sso_connection = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        CreateSSOConnectionMutation.Field()
+    )
+    update_sso_connection = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        UpdateSSOConnectionMutation.Field()
+    )
+    delete_sso_connection = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        DeleteSSOConnectionMutation.Field()
+    )
+    activate_sso_connection = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        ActivateSSOConnectionMutation.Field()
+    )
+    deactivate_sso_connection = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
         DeactivateSSOConnectionMutation.Field()
     )
-    test_sso_connection = permission_classes(requires("security.sso.manage"))(TestSSOConnectionMutation.Field())
+    test_sso_connection = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        TestSSOConnectionMutation.Field()
+    )
 
     # SSO domain ownership - requires security.sso.manage
-    add_sso_domain = permission_classes(requires("security.sso.manage"))(AddSSODomainMutation.Field())
-    verify_sso_domain = permission_classes(requires("security.sso.manage"))(VerifySSODomainMutation.Field())
-    delete_sso_domain = permission_classes(requires("security.sso.manage"))(DeleteSSODomainMutation.Field())
+    add_sso_domain = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        AddSSODomainMutation.Field()
+    )
+    verify_sso_domain = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        VerifySSODomainMutation.Field()
+    )
+    delete_sso_domain = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        DeleteSSODomainMutation.Field()
+    )
 
     # SCIM Token management - requires security.sso.manage
-    create_scim_token = permission_classes(requires("security.sso.manage"))(CreateSCIMTokenMutation.Field())
-    revoke_scim_token = permission_classes(requires("security.sso.manage"))(RevokeSCIMTokenMutation.Field())
+    create_scim_token = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        CreateSCIMTokenMutation.Field()
+    )
+    revoke_scim_token = permission_classes(SSOEnabledPermission, requires("security.sso.manage"))(
+        RevokeSCIMTokenMutation.Field()
+    )

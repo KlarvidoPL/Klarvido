@@ -21,7 +21,7 @@ export const Login = () => {
   const showSocialLogin = ENV.ENABLE_SOCIAL_LOGIN;
   const showPasskeyLogin = ENV.ENABLE_PASSKEYS;
   const showPasswordLogin = ENV.ENABLE_PASSWORD_LOGIN;
-  const showSSO = ENV.ENABLE_SSO;
+  const showSSO = ENV.ENABLE_SSO && ENV.SSO_CONFIGURATION_ENABLED;
   const hasMultipleAuthMethods =
     [showSocialLogin, showPasskeyLogin, showPasswordLogin, showSSO].filter(Boolean).length > 1;
 

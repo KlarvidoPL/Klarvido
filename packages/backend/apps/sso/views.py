@@ -38,6 +38,7 @@ from apps.multitenancy.constants import TenantUserRole
 
 from .models import TenantSSOConnection, SCIMToken, SSOAuditLog
 from .renderers import SCIMRenderer, SCIMParser
+from .availability import SSO_UNAVAILABLE_MESSAGE, sso_enabled
 from .constants import SSOConnectionStatus, SSOAuditEventType
 from .services import SAMLService, OIDCService, SCIMService, WebAuthnService
 from .services.scim import SCIMError
@@ -196,6 +197,11 @@ def _locale_from_next(next_url) -> str:
     return match.group(1) if match else "en"
 
 
+def _sso_unavailable():
+    """Sign-in through SSO is switched off (apps/sso/availability.py)."""
+    return HttpResponse(SSO_UNAVAILABLE_MESSAGE, status=503)
+
+
 def _sso_error_redirect(error_code: str, next_url=None):
     """Send the user to the sign-in error page in the language they were using, with a translated message."""
     web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000").rstrip("/")
@@ -244,6 +250,8 @@ class SAMLLoginView(View):
     """Initiate SAML SSO login with rate limiting."""
 
     def get(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -308,6 +316,8 @@ class SAMLACSView(View):
     """SAML Assertion Consumer Service - handles SAML responses."""
 
     def post(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
         response = self._process_response(request, connection_id)
         return _unbind_login_from_browser(response, SAML_REQUEST_COOKIE, _saml_acs_path(connection_id), "None")
 
@@ -447,6 +457,8 @@ class OIDCLoginView(View):
     """Initiate OIDC SSO login with rate limiting."""
 
     def get(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -514,6 +526,8 @@ class OIDCCallbackView(View):
     """Handle OIDC callback after authentication."""
 
     def get(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
         response = self._process_callback(request, connection_id)
         return _unbind_login_from_browser(response, OIDC_STATE_COOKIE, _oidc_callback_path(connection_id), "Lax")
 
@@ -662,6 +676,8 @@ def scim_auth_required(view_func):
 
     @wraps(view_func)
     def wrapper(self, request, *args, **kwargs):
+        if not sso_enabled():
+            return JsonResponse(SCIMError(SSO_UNAVAILABLE_MESSAGE, 503).to_response(), status=503)
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
 
         if not auth_header.startswith("Bearer "):
