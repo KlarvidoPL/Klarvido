@@ -9,6 +9,7 @@ Security Features:
 """
 
 import logging
+import re
 import secrets
 from urllib.parse import urlencode
 from functools import wraps
@@ -162,7 +163,7 @@ def _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, lo
     )
     if logout_url:
         return HttpResponseRedirect(logout_url)
-    return _sso_error_redirect("account_mismatch")
+    return _sso_error_redirect("account_mismatch", next_url=stored_data.get("next"))
 
 
 def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, stored_request):
@@ -186,13 +187,20 @@ def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, 
         logout_url = ""
     if logout_url:
         return HttpResponseRedirect(logout_url)
-    return _sso_error_redirect("account_mismatch")
+    return _sso_error_redirect("account_mismatch", next_url=(stored_request or {}).get("relay_state"))
 
 
-def _sso_error_redirect(error_code: str):
-    """Send the user to the sign-in error page, which shows a translated message for the code."""
+def _locale_from_next(next_url) -> str:
+    """The language the user was using when they started sign-in, from their return path (e.g. /pl/ -> pl)."""
+    match = re.match(r"^/([a-z]{2})(?:/|$)", next_url or "")
+    return match.group(1) if match else "en"
+
+
+def _sso_error_redirect(error_code: str, next_url=None):
+    """Send the user to the sign-in error page in the language they were using, with a translated message."""
     web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000").rstrip("/")
-    return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
+    locale = _locale_from_next(next_url)
+    return HttpResponseRedirect(f"{web_app_url}/{locale}/auth/sso/error?code={error_code}")
 
 
 SSO_BINDING_COOKIE_MAX_AGE = 600  # same lifetime as the stored login request (10 minutes)
@@ -264,7 +272,7 @@ class SAMLLoginView(View):
             # SECURITY: Log detailed error server-side, return generic message to client
             logger.error(f"Failed to create SAML AuthnRequest for connection {connection_id}: {e}", exc_info=True)
             error_code = get_safe_error_code(e)
-            return _sso_error_redirect(error_code)
+            return _sso_error_redirect(error_code, next_url=relay_state)
 
         # Store request ID for validation
         cache.set(
@@ -332,7 +340,7 @@ class SAMLACSView(View):
                 success=False,
                 ip_address=get_client_ip(request),
             )
-            return _sso_error_redirect("sso_request_expired")
+            return _sso_error_redirect("sso_request_expired", next_url=(stored_request or {}).get("relay_state"))
         login_hint = stored_request.get("login_hint")
 
         saml_service = SAMLService(connection)
@@ -426,7 +434,7 @@ class SAMLACSView(View):
             )
 
             # SECURITY: Return the safe error code, never the raw exception message
-            return _sso_error_redirect(error_code)
+            return _sso_error_redirect(error_code, next_url=(stored_request or {}).get("relay_state"))
 
 
 # ==================
@@ -470,7 +478,7 @@ class OIDCLoginView(View):
             # SECURITY: Log detailed error server-side, return generic message to client
             logger.error(f"Failed to create OIDC authorization URL for connection {connection_id}: {e}", exc_info=True)
             error_code = get_safe_error_code(e)
-            return _sso_error_redirect(error_code)
+            return _sso_error_redirect(error_code, next_url=request.GET.get("next"))
 
         # Store state for callback validation
         cache.set(
@@ -534,8 +542,9 @@ class OIDCCallbackView(View):
                 ip_address=get_client_ip(request),
             )
             # SECURITY: Return safe error code, not raw IdP error
-            web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-            return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code=auth_failed")
+            pending_state = request.GET.get("state")
+            pending = cache.get(f"oidc_state_{pending_state}") if pending_state else None
+            return _sso_error_redirect("auth_failed", next_url=(pending or {}).get("next"))
 
         code = request.GET.get("code")
         state = request.GET.get("state")
@@ -640,7 +649,7 @@ class OIDCCallbackView(View):
             )
 
             # SECURITY: Return the safe error code, never the raw exception message
-            return _sso_error_redirect(error_code)
+            return _sso_error_redirect(error_code, next_url=stored_data.get("next"))
 
 
 # ==================

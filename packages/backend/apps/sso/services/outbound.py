@@ -21,7 +21,8 @@ from urllib3.connection import HTTPSConnection
 from urllib3.connectionpool import HTTPSConnectionPool
 from urllib3.util.connection import create_connection
 
-LOCAL_HOSTS = {"localhost", "127.0.0.1"}
+# host.docker.internal lets the backend container reach a Keycloak published on the host
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "host.docker.internal"}
 REQUEST_TIMEOUT_SECONDS = 10
 
 

@@ -288,10 +288,18 @@ class ActivateSSOConnectionSerializer(serializers.Serializer):
         connection = self.validated_data["connection"]
         tenant = self.validated_data["tenant"]
 
-        # Deactivate any existing active connections
-        models.TenantSSOConnection.objects.filter(tenant=tenant, status=constants.SSOConnectionStatus.ACTIVE).exclude(
-            pk=connection.pk
-        ).update(status=constants.SSOConnectionStatus.INACTIVE)
+        # Deactivate any existing active connections. The queryset update skips the save signal, so their sessions
+        # are revoked here explicitly.
+        previously_active = list(
+            models.TenantSSOConnection.objects.filter(
+                tenant=tenant, status=constants.SSOConnectionStatus.ACTIVE
+            ).exclude(pk=connection.pk)
+        )
+        models.TenantSSOConnection.objects.filter(pk__in=[c.pk for c in previously_active]).update(
+            status=constants.SSOConnectionStatus.INACTIVE
+        )
+        for previous in previously_active:
+            previous.revoke_sessions(reason="SSO connection deactivated")
 
         # Activate this connection
         connection.status = constants.SSOConnectionStatus.ACTIVE

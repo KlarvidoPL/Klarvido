@@ -244,6 +244,18 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
         self.status = constants.SSOConnectionStatus.INACTIVE
         self.save(update_fields=["status", "updated_at"])
 
+    def revoke_sessions(self, reason: str) -> int:
+        """
+        Revoke the active sessions created through this connection, so a deactivated or lapsed connection stops
+        granting access. Sessions from other sign-in methods are left alone. Returns how many were revoked.
+        """
+        sessions = SSOSession.objects.filter(sso_link__sso_connection=self, is_active=True)
+        revoked = 0
+        for session in sessions:
+            session.revoke(reason=reason)
+            revoked += 1
+        return revoked
+
     def get_default_role(self) -> str:
         """Get the default role for users provisioned via this SSO connection."""
         return self.group_role_mapping.get("_default", TenantUserRole.MEMBER)

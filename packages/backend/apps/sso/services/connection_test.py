@@ -287,7 +287,7 @@ def _test_oidc_connection(connection, add_check):
     else:
         add_check("Client ID", "error", "OAuth Client ID is not configured")
 
-    if connection.oidc_client_secret or connection.oidc_client_secret_arn:
+    if connection.oidc_client_secret_encrypted or connection.oidc_client_secret or connection.oidc_client_secret_arn:
         add_check("Client Secret", "success", "OAuth Client Secret is configured")
     else:
         add_check("Client Secret", "error", "OAuth Client Secret is not configured")
