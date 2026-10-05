@@ -339,8 +339,6 @@ class SSODiscoveryConnectionType(graphene.ObjectType):
     id = graphene.String()
     name = graphene.String()
     type = graphene.String()
-    tenant_id = graphene.String()
-    tenant_name = graphene.String()
     login_url = graphene.String()
 
 
@@ -980,7 +978,7 @@ class Query(graphene.ObjectType):
                 status=constants.SSOConnectionStatus.ACTIVE,
                 tenant_id=verified_tenant_id,
                 allowed_domains__contains=[domain],
-            ).select_related("tenant")
+            )
         )
 
         if not unique_connections:
@@ -998,8 +996,6 @@ class Query(graphene.ObjectType):
                     "id": str(conn.id),
                     "name": conn.name,
                     "type": conn.connection_type,
-                    "tenant_id": str(conn.tenant.id),
-                    "tenant_name": conn.tenant.name,
                     "login_url": f"{api_url}/api/sso/{conn.connection_type}/{conn.id}/login",
                 }
                 for conn in unique_connections

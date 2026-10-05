@@ -14,7 +14,6 @@ from typing import Optional, Dict, Any, Tuple
 from urllib.parse import urlencode
 
 import defusedxml.ElementTree as ET
-import requests
 from xml.etree.ElementTree import Element
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
@@ -25,6 +24,7 @@ from signxml.exceptions import SignXMLException
 from django.conf import settings
 
 from common.secrets.service import get_secrets_service
+from apps.sso.services.outbound import safe_request
 from apps.sso.services.secrets_helpers import get_sp_signing_key
 from apps.sso.security import safe_log_user_identifier, validate_saml_response_basic
 
@@ -66,7 +66,7 @@ class SAMLService:
         issuer = (self.connection.saml_entity_id or "").rstrip("/")
         if not issuer:
             return ""
-        response = requests.get(f"{issuer}/.well-known/openid-configuration", timeout=10)
+        response = safe_request("GET", f"{issuer}/.well-known/openid-configuration")
         response.raise_for_status()
         endpoint = response.json().get("end_session_endpoint", "")
         if not endpoint:
@@ -341,6 +341,28 @@ class SAMLService:
 
         return redirect_url, request_id
 
+    def _validate_destination_and_issuer(self, root: Element, assertion: Element) -> None:
+        """SECURITY: the response must be addressed to this SP's ACS URL and issued by the configured IdP.
+
+        Without these checks a valid response meant for another service, or from another identity provider
+        that shares the signing setup, would be accepted here.
+        """
+        acs_url = self.get_acs_url()
+        if root.get("Destination") != acs_url:
+            raise ValueError("SAML response Destination does not match this service provider's ACS URL")
+
+        recipients = [el.get("Recipient") for el in assertion.findall(".//saml:SubjectConfirmationData", SAML_NS)]
+        if not recipients or any(recipient != acs_url for recipient in recipients):
+            raise ValueError("SAML assertion Recipient does not match this service provider's ACS URL")
+
+        expected_issuer = (self.connection.saml_entity_id or "").strip()
+        assertion_issuer = assertion.find("saml:Issuer", SAML_NS)
+        if not expected_issuer or assertion_issuer is None or (assertion_issuer.text or "").strip() != expected_issuer:
+            raise ValueError("SAML assertion Issuer does not match the configured identity provider")
+        response_issuer = root.find("saml:Issuer", SAML_NS)
+        if response_issuer is not None and (response_issuer.text or "").strip() != expected_issuer:
+            raise ValueError("SAML response Issuer does not match the configured identity provider")
+
     def parse_saml_response(
         self,
         saml_response: str,
@@ -428,6 +450,7 @@ class SAMLService:
 
         # Validate assertion conditions (time, audience)
         self._validate_assertion_conditions(assertion)
+        self._validate_destination_and_issuer(root, assertion)
 
         # SECURITY: Validate InResponseTo for replay protection
         in_response_to = root.get("InResponseTo")

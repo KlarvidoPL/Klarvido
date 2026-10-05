@@ -14,6 +14,7 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 
+from apps.sso.services.outbound import safe_request
 from common.secrets.service import get_secrets_service
 
 logger = logging.getLogger(__name__)
@@ -71,7 +72,7 @@ class OIDCService:
         discovery_url = f"{self.connection.oidc_issuer.rstrip('/')}/.well-known/openid-configuration"
 
         try:
-            response = requests.get(discovery_url, timeout=10)
+            response = safe_request("GET", discovery_url)
             response.raise_for_status()
             config = response.json()
 
@@ -240,11 +241,7 @@ class OIDCService:
             data["code_verifier"] = code_verifier
 
         try:
-            response = requests.post(
-                token_endpoint,
-                data=data,
-                timeout=30,
-            )
+            response = safe_request("POST", token_endpoint, data=data, timeout=30)
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:
@@ -262,6 +259,19 @@ class OIDCService:
         if not issuer:
             return issuer
         return issuer.rstrip('/')
+
+    def _fetch_jwks(self) -> Dict[str, Any]:
+        """The identity provider's public key set, cached like the discovery document."""
+        cache_key = f"oidc_jwks_{self.connection.id}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+
+        response = safe_request("GET", self.get_jwks_uri())
+        response.raise_for_status()
+        keys = response.json()
+        cache.set(cache_key, keys, self.JWKS_CACHE_TTL)
+        return keys
 
     def validate_id_token(
         self,
@@ -283,15 +293,18 @@ class OIDCService:
         """
         try:
             import jwt
-            from jwt import PyJWKClient
         except ImportError:
             raise ImportError("PyJWT with jwcrypto support is required for OIDC")
 
         try:
-            # Get JWKS
-            jwks_uri = self.get_jwks_uri()
-            jwks_client = PyJWKClient(jwks_uri)
-            signing_key = jwks_client.get_signing_key_from_jwt(id_token)
+            # Select the signing key by kid. PyJWKClient would fetch the JWKS itself, bypassing the outbound checks.
+            key_id = jwt.get_unverified_header(id_token).get("kid")
+            signing_key = next(
+                (key for key in jwt.PyJWKSet.from_dict(self._fetch_jwks()).keys if key.key_id == key_id),
+                None,
+            )
+            if signing_key is None:
+                raise ValueError("Signing key for this ID token was not found at the identity provider")
 
             # Decode with issuer check disabled - we'll validate issuer ourselves
             # to handle trailing slash differences (e.g. Okta, Auth0)
@@ -339,7 +352,8 @@ class OIDCService:
         userinfo_endpoint = self.get_userinfo_endpoint()
 
         try:
-            response = requests.get(
+            response = safe_request(
+                "GET",
                 userinfo_endpoint,
                 headers={"Authorization": f"Bearer {access_token}"},
                 timeout=30,

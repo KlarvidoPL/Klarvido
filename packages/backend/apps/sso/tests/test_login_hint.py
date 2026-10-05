@@ -80,5 +80,5 @@ class TestIdentityProviderLogoutUrls:
         service = SAMLService(connection)
         response = mock.Mock()
         response.json.return_value = {}
-        with mock.patch("apps.sso.services.saml.requests.get", return_value=response):
+        with mock.patch("apps.sso.services.saml.safe_request", return_value=response):
             assert service.build_logout_url("https://app/login") == ""

@@ -1,6 +1,7 @@
 """
 Login requests are bound to the browser that started them (login CSRF), SAML responses must answer
-exactly that request and be addressed to this SP, and OIDC logins need a verified email.
+exactly that request, be addressed to this SP and come from the configured IdP, and OIDC logins need
+a verified email.
 """
 
 import base64
@@ -19,18 +20,34 @@ SAML_PROTOCOL_NS = "urn:oasis:names:tc:SAML:2.0:protocol"
 SAML_ASSERTION_NS = "urn:oasis:names:tc:SAML:2.0:assertion"
 
 
-def _saml_response(entity_id, in_response_to=None, audience=True):
+def _saml_response(service, in_response_to="_req", audience=True, destination=None, recipient=None, issuer=None):
+    """A SAML response that is correct unless a value is overridden. An empty string leaves that value out."""
+    acs_url = service.get_acs_url()
+    destination = acs_url if destination is None else destination
+    recipient = acs_url if recipient is None else recipient
+    issuer = service.connection.saml_entity_id if issuer is None else issuer
+
     irt = f' InResponseTo="{in_response_to}"' if in_response_to else ""
+    dest_attr = f' Destination="{destination}"' if destination else ""
+    recipient_attr = f' Recipient="{recipient}"' if recipient else ""
+    issuer_xml = f"<saml:Issuer>{issuer}</saml:Issuer>" if issuer else ""
     audience_xml = (
-        f"<saml:AudienceRestriction><saml:Audience>{entity_id}</saml:Audience></saml:AudienceRestriction>"
+        "<saml:AudienceRestriction>"
+        f"<saml:Audience>{service.get_sp_entity_id()}</saml:Audience>"
+        "</saml:AudienceRestriction>"
         if audience
         else ""
     )
     return (
         f'<samlp:Response xmlns:samlp="{SAML_PROTOCOL_NS}" xmlns:saml="{SAML_ASSERTION_NS}" '
-        f'ID="_resp"{irt} Version="2.0">'
+        f'ID="_resp"{irt}{dest_attr} Version="2.0">'
+        f"{issuer_xml}"
         '<samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>'
         '<saml:Assertion ID="_assertion" Version="2.0">'
+        f"{issuer_xml}"
+        "<saml:Subject><saml:SubjectConfirmation>"
+        f"<saml:SubjectConfirmationData{recipient_attr}{irt}/>"
+        "</saml:SubjectConfirmation></saml:Subject>"
         f"<saml:Conditions>{audience_xml}</saml:Conditions>"
         "</saml:Assertion>"
         "</samlp:Response>"
@@ -115,32 +132,66 @@ class TestSamlStrictResponseChecks:
         return SAMLService(tenant_sso_connection)
 
     def test_response_without_in_response_to_is_rejected(self, saml_service):
-        xml = _saml_response(saml_service.get_sp_entity_id())
+        xml = _saml_response(saml_service, in_response_to="")
 
         with pytest.raises(ValueError, match="Request ID missing"):
             _parse_with_signature_skipped(saml_service, xml, request_id="_req-1")
 
     def test_response_answering_another_request_is_rejected(self, saml_service):
-        xml = _saml_response(saml_service.get_sp_entity_id(), in_response_to="_req-other")
+        xml = _saml_response(saml_service, in_response_to="_req-other")
 
         with pytest.raises(ValueError, match="Request ID mismatch"):
             _parse_with_signature_skipped(saml_service, xml, request_id="_req-1")
 
     def test_assertion_without_audience_is_rejected(self, saml_service):
-        xml = _saml_response(saml_service.get_sp_entity_id(), in_response_to="_req-2", audience=False)
+        xml = _saml_response(saml_service, in_response_to="_req-2", audience=False)
 
         with pytest.raises(ValueError, match="audience mismatch"):
             _parse_with_signature_skipped(saml_service, xml, request_id="_req-2")
 
     def test_assertion_for_another_service_provider_is_rejected(self, saml_service):
-        xml = _saml_response("https://another-sp.example.com", in_response_to="_req-3")
+        xml = _saml_response(saml_service, in_response_to="_req-3", audience=False).replace(
+            "</saml:Conditions>",
+            "<saml:AudienceRestriction><saml:Audience>https://other-sp.example.com</saml:Audience>"
+            "</saml:AudienceRestriction></saml:Conditions>",
+        )
 
         with pytest.raises(ValueError, match="audience mismatch"):
             _parse_with_signature_skipped(saml_service, xml, request_id="_req-3")
 
+    def test_wrong_destination_is_rejected(self, saml_service):
+        xml = _saml_response(saml_service, in_response_to="_req-5", destination="https://evil.example.com/acs")
+
+        with pytest.raises(ValueError, match="Destination"):
+            _parse_with_signature_skipped(saml_service, xml, request_id="_req-5")
+
+    def test_missing_destination_is_rejected(self, saml_service):
+        xml = _saml_response(saml_service, in_response_to="_req-6", destination="")
+
+        with pytest.raises(ValueError, match="Destination"):
+            _parse_with_signature_skipped(saml_service, xml, request_id="_req-6")
+
+    def test_wrong_recipient_is_rejected(self, saml_service):
+        xml = _saml_response(saml_service, in_response_to="_req-7", recipient="https://evil.example.com/acs")
+
+        with pytest.raises(ValueError, match="Recipient"):
+            _parse_with_signature_skipped(saml_service, xml, request_id="_req-7")
+
+    def test_wrong_issuer_is_rejected(self, saml_service):
+        xml = _saml_response(saml_service, in_response_to="_req-8", issuer="https://another-idp.example.com")
+
+        with pytest.raises(ValueError, match="Issuer"):
+            _parse_with_signature_skipped(saml_service, xml, request_id="_req-8")
+
+    def test_missing_issuer_is_rejected(self, saml_service):
+        xml = _saml_response(saml_service, in_response_to="_req-9", issuer="")
+
+        with pytest.raises(ValueError, match="Issuer"):
+            _parse_with_signature_skipped(saml_service, xml, request_id="_req-9")
+
     def test_already_consumed_request_is_rejected(self, saml_service):
         cache.add("saml_request_consumed__req-4", True, timeout=60)
-        xml = _saml_response(saml_service.get_sp_entity_id(), in_response_to="_req-4")
+        xml = _saml_response(saml_service, in_response_to="_req-4")
 
         with pytest.raises(ValueError, match="already processed"):
             _parse_with_signature_skipped(saml_service, xml, request_id="_req-4")
@@ -192,9 +243,7 @@ class TestOidcStateBinding:
         oidc_sso_connection.status = constants.SSOConnectionStatus.ACTIVE
         oidc_sso_connection.save()
 
-        with mock.patch.object(
-            OIDCService, "generate_pkce", return_value=("verifier", "challenge")
-        ), mock.patch.object(
+        with mock.patch.object(OIDCService, "generate_pkce", return_value=("verifier", "challenge")), mock.patch.object(
             OIDCService,
             "create_authorization_url",
             return_value=("https://idp.example.com/auth", {"state": "state-1", "nonce": "nonce-1"}),

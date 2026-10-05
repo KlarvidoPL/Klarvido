@@ -12,6 +12,30 @@ from .services.domain_verification import (
     ensure_connection_domains_verified,
     get_verified_domains,
 )
+from .services.outbound import UnsafeOutboundURL, validate_public_url
+
+# SECURITY: the server calls these addresses, so they must be public (see services/outbound.py)
+OUTBOUND_URL_FIELDS = (
+    "oidc_issuer",
+    "oidc_token_endpoint",
+    "oidc_userinfo_endpoint",
+    "oidc_jwks_uri",
+    "saml_sso_url",
+    "saml_slo_url",
+    "saml_entity_id",
+)
+
+
+def _validate_outbound_urls(attrs):
+    for field in OUTBOUND_URL_FIELDS:
+        value = attrs.get(field)
+        # SAML entity IDs are often URNs, which are not called and are not checked here
+        if not value or not str(value).lower().startswith(("http://", "https://")):
+            continue
+        try:
+            validate_public_url(value)
+        except UnsafeOutboundURL as e:
+            raise serializers.ValidationError({field: str(e)})
 
 
 class TenantSSOConnectionSerializer(serializers.ModelSerializer):
@@ -87,6 +111,7 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"allowed_domains": exc.code})
 
     def validate(self, attrs):
+        _validate_outbound_urls(attrs)
         if "tenant_id" in attrs:
             from apps.multitenancy.models import Tenant
 
@@ -170,6 +195,7 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
 
     def validate(self, attrs):
         """Cross-field validation based on connection type."""
+        _validate_outbound_urls(attrs)
         connection_type = attrs.get("connection_type", getattr(self.instance, "connection_type", None))
 
         if connection_type == constants.IdentityProviderType.SAML:

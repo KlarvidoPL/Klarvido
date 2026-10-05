@@ -11,6 +11,7 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from django.conf import settings
 
+from .outbound import UnsafeOutboundURL, safe_request
 from .saml import SAMLService
 
 logger = logging.getLogger(__name__)
@@ -73,7 +74,7 @@ def _test_saml_connection(connection, add_check):
             {"value": connection.saml_sso_url},
         )
         try:
-            resp = requests.head(connection.saml_sso_url, timeout=10, allow_redirects=True)
+            resp = safe_request("HEAD", connection.saml_sso_url)
             if resp.status_code < 400:
                 add_check("SSO URL Reachable", "success", f"SSO endpoint is reachable (HTTP {resp.status_code})")
             elif resp.status_code == 405:
@@ -89,6 +90,13 @@ def _test_saml_connection(connection, add_check):
                     f"SSO endpoint returned HTTP {resp.status_code}",
                     {"hint": "The endpoint might still work for SAML requests"},
                 )
+        except UnsafeOutboundURL as e:
+            add_check(
+                "SSO URL Reachable",
+                "error",
+                "SSO endpoint address is not allowed",
+                {"error": str(e)[:200]},
+            )
         except requests.exceptions.Timeout:
             add_check(
                 "SSO URL Reachable",
@@ -213,7 +221,7 @@ def _test_oidc_connection(connection, add_check):
         add_check("OIDC Issuer", "success", "Issuer URL is configured", {"value": connection.oidc_issuer})
         discovery_url = connection.oidc_issuer.rstrip("/") + "/.well-known/openid-configuration"
         try:
-            resp = requests.get(discovery_url, timeout=10)
+            resp = safe_request("GET", discovery_url)
             if resp.status_code == 200:
                 try:
                     config = resp.json()
@@ -250,6 +258,8 @@ def _test_oidc_connection(connection, add_check):
                     f"Discovery endpoint returned HTTP {resp.status_code}",
                     {"hint": "Some IdPs may not support automatic discovery"},
                 )
+        except UnsafeOutboundURL as e:
+            add_check("OIDC Discovery", "error", "Issuer address is not allowed", {"error": str(e)[:200]})
         except requests.exceptions.Timeout:
             add_check("OIDC Discovery", "warning", "Connection timed out when fetching discovery document")
         except requests.exceptions.SSLError as e:

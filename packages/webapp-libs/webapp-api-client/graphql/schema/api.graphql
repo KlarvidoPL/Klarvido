@@ -602,8 +602,6 @@ type SSODiscoveryConnectionType {
   id: String
   name: String
   type: String
-  tenantId: String
-  tenantName: String
   loginUrl: String
 }
 type OrganizationOnboardingProfileType {

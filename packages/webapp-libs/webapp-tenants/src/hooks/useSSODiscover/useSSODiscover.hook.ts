@@ -10,8 +10,6 @@ const SSO_DISCOVER_QUERY = gql(`
         id
         name
         type
-        tenantId
-        tenantName
         loginUrl
       }
     }
@@ -32,8 +30,6 @@ export function useSSODiscover() {
             id: c.id ?? '',
             name: c.name ?? '',
             type: ((c.type ?? '').toLowerCase() === 'oidc' ? 'oidc' : 'saml') as 'saml' | 'oidc',
-            tenant_id: c.tenantId ?? '',
-            tenant_name: c.tenantName ?? '',
             login_url: c.loginUrl ?? '',
           })),
       }
