@@ -719,3 +719,52 @@ class SSOAuditLog(TimestampedMixin, models.Model):
             success=success,
             error_message=error_message,
         )
+
+
+def _generate_domain_verification_token():
+    return secrets.token_urlsafe(32)
+
+
+class TenantDomain(TimestampedMixin, models.Model):
+    """
+    An email domain claimed by a tenant for SSO.
+
+    A claim does nothing until the tenant proves ownership by publishing the verification TXT record
+    on the domain. A verified domain belongs to exactly one tenant at a time.
+    """
+
+    TXT_RECORD_PREFIX = "klarvido-domain-verification"
+
+    id = hashid_field.HashidAutoField(primary_key=True)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="sso_domains")
+    domain = models.CharField(max_length=253, help_text="Lowercase email domain, e.g. example.com")
+    status = models.CharField(
+        choices=constants.SSODomainStatus.choices, max_length=20, default=constants.SSODomainStatus.PENDING
+    )
+    verification_token = models.CharField(max_length=64, default=_generate_domain_verification_token, editable=False)
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["tenant", "domain"], name="sso_tenant_domain_unique"),
+            models.UniqueConstraint(
+                fields=["domain"],
+                condition=models.Q(status="verified"),
+                name="sso_verified_domain_unique",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.domain} ({self.status})"
+
+    @property
+    def is_verified(self) -> bool:
+        return self.status == constants.SSODomainStatus.VERIFIED
+
+    @property
+    def verification_record_name(self) -> str:
+        return self.domain
+
+    @property
+    def verification_record_value(self) -> str:
+        return f"{self.TXT_RECORD_PREFIX}={self.verification_token}"

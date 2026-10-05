@@ -6,6 +6,7 @@ import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
 from graphene_django import DjangoObjectType
+from graphql import GraphQLError
 from graphql_relay import to_global_id, from_global_id
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
@@ -20,6 +21,8 @@ from apps.users.services.users import get_user_from_resolver
 from . import models
 from . import serializers
 from . import constants
+from .services import domain_verification
+from .services.domain_verification import DomainVerificationError, get_verified_tenant_id_for_domain
 
 
 def _resolve_tenant(info, tenant_id=None):
@@ -125,6 +128,22 @@ class SSOConnectionType(DjangoObjectType):
 class SSOConnectionConnection(graphene.Connection):
     class Meta:
         node = SSOConnectionType
+
+
+class TenantDomainType(DjangoObjectType):
+    """An email domain claimed by the tenant for SSO, with the DNS record that proves ownership."""
+
+    id = graphene.ID(required=True)
+    verification_record_name = graphene.String()
+    verification_record_value = graphene.String()
+
+    class Meta:
+        model = models.TenantDomain
+        fields = ["domain", "status", "verified_at", "created_at"]
+        interfaces = (relay.Node,)
+
+    def resolve_id(self, info):
+        return to_global_id("TenantDomainType", self.id)
 
 
 class SCIMTokenType(DjangoObjectType):
@@ -480,6 +499,129 @@ class DeactivateSSOConnectionMutation(graphene.Mutation):
         return cls(sso_connection=connection)
 
 
+def _get_tenant_domain(tenant, global_id):
+    _, pk = from_global_id(global_id)
+    return get_object_or_404(models.TenantDomain, pk=pk, tenant=tenant)
+
+
+def _log_domain_event(*, tenant, user, event_type, domain, description, log_type):
+    """Write both the tenant SSO audit log entry and the Activity Log entry for a domain change."""
+    models.SSOAuditLog.log_event(
+        event_type=event_type,
+        tenant=tenant,
+        user=user,
+        description=description,
+        metadata={"domain": domain.domain, "status": domain.status},
+    )
+    log_action(
+        tenant_id=tenant.pk,
+        action_type=log_type,
+        entity_type="sso_domain",
+        entity_id=str(domain.pk),
+        entity_name=domain.domain,
+        actor_user=user,
+        changes={"status": {"old": None, "new": domain.status}},
+    )
+
+
+class AddSSODomainMutation(graphene.Mutation):
+    """Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified."""
+
+    class Arguments:
+        tenant_id = graphene.ID(required=True)
+        domain = graphene.String(required=True)
+
+    sso_domain = graphene.Field(TenantDomainType)
+
+    @classmethod
+    def mutate(cls, root, info, tenant_id, domain):
+        tenant = _resolve_tenant(info, tenant_id)
+        if tenant is None:
+            raise PermissionDenied("Tenant context is required for this operation")
+        try:
+            tenant_domain = domain_verification.add_domain(tenant, domain)
+        except DomainVerificationError as exc:
+            raise GraphQLError(exc.code)
+        _log_domain_event(
+            tenant=tenant,
+            user=info.context.user,
+            event_type=constants.SSOAuditEventType.DOMAIN_ADDED,
+            domain=tenant_domain,
+            description=f"Domain {tenant_domain.domain} added for verification",
+            log_type=ActionType.CREATE,
+        )
+        return cls(sso_domain=tenant_domain)
+
+
+class VerifySSODomainMutation(graphene.Mutation):
+    """Check the domain's DNS TXT record and mark the domain as verified."""
+
+    class Arguments:
+        id = graphene.ID(required=True)
+        tenant_id = graphene.ID(required=True)
+
+    sso_domain = graphene.Field(TenantDomainType)
+
+    @classmethod
+    def mutate(cls, root, info, id, tenant_id):
+        tenant = _resolve_tenant(info, tenant_id)
+        if tenant is None:
+            raise PermissionDenied("Tenant context is required for this operation")
+        tenant_domain = _get_tenant_domain(tenant, id)
+        try:
+            tenant_domain = domain_verification.verify_domain(tenant_domain)
+        except DomainVerificationError as exc:
+            models.SSOAuditLog.log_event(
+                event_type=constants.SSOAuditEventType.DOMAIN_VERIFIED,
+                tenant=tenant,
+                user=info.context.user,
+                description=f"Verification of {tenant_domain.domain} failed",
+                metadata={"domain": tenant_domain.domain, "error": exc.code},
+                success=False,
+                error_message=exc.code,
+            )
+            raise GraphQLError(exc.code)
+        _log_domain_event(
+            tenant=tenant,
+            user=info.context.user,
+            event_type=constants.SSOAuditEventType.DOMAIN_VERIFIED,
+            domain=tenant_domain,
+            description=f"Domain {tenant_domain.domain} verified",
+            log_type=ActionType.UPDATE,
+        )
+        return cls(sso_domain=tenant_domain)
+
+
+class DeleteSSODomainMutation(graphene.Mutation):
+    """Remove a claimed domain. Refused while an SSO connection of the tenant still uses it."""
+
+    class Arguments:
+        id = graphene.ID(required=True)
+        tenant_id = graphene.ID(required=True)
+
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, id, tenant_id):
+        tenant = _resolve_tenant(info, tenant_id)
+        if tenant is None:
+            raise PermissionDenied("Tenant context is required for this operation")
+        tenant_domain = _get_tenant_domain(tenant, id)
+        try:
+            domain_verification.remove_domain(tenant_domain)
+        except DomainVerificationError as exc:
+            raise GraphQLError(exc.code)
+        _log_domain_event(
+            tenant=tenant,
+            user=info.context.user,
+            event_type=constants.SSOAuditEventType.DOMAIN_REMOVED,
+            domain=tenant_domain,
+            description=f"Domain {tenant_domain.domain} removed",
+            log_type=ActionType.DELETE,
+        )
+        return cls(ok=True)
+
+
 class TestSSOConnectionCheckType(graphene.ObjectType):
     name = graphene.String()
     status = graphene.String()
@@ -807,39 +949,23 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     def resolve_sso_discover(root, info, email):
-        from django.db import models as db_models
-
         email = (email or "").strip().lower()
         if not email or "@" not in email:
             return {"sso_available": False, "require_sso": False, "connections": []}
 
         domain = email.split("@")[-1]
-        connections = (
+        # SECURITY: only the tenant that verified this domain may route its users to an SSO connection
+        verified_tenant_id = get_verified_tenant_id_for_domain(domain)
+        if verified_tenant_id is None:
+            return {"sso_available": False, "require_sso": False, "connections": []}
+
+        unique_connections = list(
             models.TenantSSOConnection.objects.filter(
                 status=constants.SSOConnectionStatus.ACTIVE,
-            )
-            .filter(
-                db_models.Q(allowed_domains__contains=[domain])
-                | db_models.Q(allowed_domains=[])
-                | db_models.Q(allowed_domains__isnull=True)
-            )
-            .select_related("tenant")
+                tenant_id=verified_tenant_id,
+                allowed_domains__contains=[domain],
+            ).select_related("tenant")
         )
-
-        matching_connections = []
-        for conn in connections:
-            tenant_domains = getattr(conn.tenant, "domains", None)
-            domain_matches = tenant_domains and domain in tenant_domains
-            allowed_matches = conn.allowed_domains and domain in conn.allowed_domains
-            if domain_matches or allowed_matches:
-                matching_connections.append(conn)
-
-        seen_ids = set()
-        unique_connections = []
-        for conn in matching_connections:
-            if conn.id not in seen_ids:
-                seen_ids.add(conn.id)
-                unique_connections.append(conn)
 
         if not unique_connections:
             return {"sso_available": False, "require_sso": False, "connections": []}
@@ -888,6 +1014,10 @@ class TenantSSOQuery(graphene.ObjectType):
         SCIMTokenConnection,
         tenant_id=graphene.ID(required=True),
     )
+    sso_domains = graphene.List(
+        TenantDomainType,
+        tenant_id=graphene.ID(required=True),
+    )
     sso_audit_logs = graphene.relay.ConnectionField(
         SSOAuditLogConnection,
         tenant_id=graphene.ID(required=True),
@@ -920,6 +1050,14 @@ class TenantSSOQuery(graphene.ObjectType):
             pk=pk,
             tenant=tenant,
         ).first()
+
+    @staticmethod
+    @permission_classes(requires("security.view"))
+    def resolve_sso_domains(root, info, **kwargs):
+        tenant = info.context.tenant
+        if tenant is None:
+            return models.TenantDomain.objects.none()
+        return models.TenantDomain.objects.filter(tenant=tenant).order_by("domain")
 
     @staticmethod
     @permission_classes(requires("security.sso.manage"))
@@ -1024,6 +1162,11 @@ class TenantOwnerMutation(graphene.ObjectType):
         DeactivateSSOConnectionMutation.Field()
     )
     test_sso_connection = permission_classes(requires("security.sso.manage"))(TestSSOConnectionMutation.Field())
+
+    # SSO domain ownership - requires security.sso.manage
+    add_sso_domain = permission_classes(requires("security.sso.manage"))(AddSSODomainMutation.Field())
+    verify_sso_domain = permission_classes(requires("security.sso.manage"))(VerifySSODomainMutation.Field())
+    delete_sso_domain = permission_classes(requires("security.sso.manage"))(DeleteSSODomainMutation.Field())
 
     # SCIM Token management - requires security.sso.manage
     create_scim_token = permission_classes(requires("security.sso.manage"))(CreateSCIMTokenMutation.Field())

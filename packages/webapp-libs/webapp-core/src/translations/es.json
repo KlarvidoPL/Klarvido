@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "Usuario SCIM actualizado"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "Dominio SSO añadido"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "Dominio SSO eliminado"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "Dominio SSO verificado"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "Inicio de sesión omitiendo SSO"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "Sube, administra y organiza tus documentos en un solo lugar"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "No se pudo añadir el dominio."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Añadir dominio"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "Copiado al portapapeles."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Copiar nombre del registro"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Copiar valor del registro"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Añade este registro TXT a tu DNS y luego haz clic en Verificar."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "No se pudo eliminar el dominio."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Demuestra que eres propietario del dominio de correo de tu empresa antes de que SSO lo use. Solo los dominios verificados participan en el inicio de sesión, el aprovisionamiento y la aplicación de SSO."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Dominio"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "Aún no hay dominios. Añade el dominio de tu empresa para empezar la verificación."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Nombre"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Tipo"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Valor"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Eliminar dominio"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "Pendiente"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Verificado"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Verificación de dominio"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Dominio verificado. SSO ya puede usarlo."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Verificar"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "No se pudo verificar el dominio."
   },
   "Dropzone / Default label": {
     "defaultMessage": "Haz clic o arrastra un archivo a esta área para subirlo"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "Si el problema persiste, contacta a tu administrador de TI o prueba un método de inicio de sesión alternativo."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "Aún no se encontró el registro DNS. Los cambios de DNS pueden tardar hasta una hora; inténtalo de nuevo."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Quita primero este dominio de todas las conexiones SSO."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "El dominio de su correo no está autorizado para esta organización."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "Este dominio ya está verificado por otra organización. Si es tuyo, contacta con soporte."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Verifica todos los dominios permitidos de esta conexión antes de activarla."
   },
   "SSO / Error / generic": {
     "defaultMessage": "Se produjo un error al iniciar sesión. Inténtelo de nuevo o contacte con soporte."
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "Error al iniciar sesión"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Introduce un nombre de dominio, por ejemplo example.com."
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "Respuesta no válida del proveedor de identidad."
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "El proveedor de identidad no proporcionó una dirección de correo."
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Añade al menos un dominio verificado a la conexión antes de activarla."
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "La creación automática de cuentas está desactivada. Contacte con su administrador."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Los proveedores de correo públicos como gmail.com no se pueden reclamar. Usa el dominio de tu empresa."
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "Demasiados intentos. Espere antes de volver a intentarlo."

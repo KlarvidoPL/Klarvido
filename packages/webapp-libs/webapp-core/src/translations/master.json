@@ -5530,5 +5530,98 @@
   },
   "Onboarding / Clear draft failed": {
     "defaultMessage": "Could not clear this draft. Please try again."
+  },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "SSO Domain Added"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "SSO Domain Removed"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO Domain Verified"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "Failed to add the domain."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Add domain"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "Copied to clipboard."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Copy record name"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Copy record value"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Add this TXT record to your DNS, then click Verify."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "Failed to remove the domain."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Prove you own your company's email domain before SSO can use it. Only verified domains take part in sign-in, provisioning and enforcement."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Domain"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "No domains claimed yet. Add your company domain to start verification."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Name"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Type"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Value"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Remove domain"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "Pending"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Verified"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Domain verification"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Domain verified. SSO connections can now use it."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Verify"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "Failed to verify the domain."
+  },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "The DNS record was not found yet. DNS changes can take up to an hour, then try again."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Remove this domain from every SSO connection before deleting it."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "This domain is already verified by another organization. Contact support if you own it."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Verify every allowed domain of this connection before activating it."
+  },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Enter a domain name such as example.com."
+  },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Add at least one verified domain to the connection before activating it."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Public email providers such as gmail.com cannot be claimed. Use your company domain."
   }
 }

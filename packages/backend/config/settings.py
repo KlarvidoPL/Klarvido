@@ -685,6 +685,8 @@ MCP_SERVER_URL = env("MCP_SERVER_URL", default="http://mcp-server:4000")
 SSO_SP_ENTITY_ID_BASE = env("SSO_SP_ENTITY_ID_BASE", default="")  # e.g., https://api.yourdomain.com
 WEB_APP_URL = env("WEB_APP_URL", default="http://localhost:3000")
 API_URL = env("API_URL", default="http://localhost:5001")
+# SECURITY: DNS ownership check for SSO domains. The bypass only takes effect when DEBUG is on (local development).
+SSO_DOMAIN_VERIFICATION_SKIP_DNS = env.bool("SSO_DOMAIN_VERIFICATION_SKIP_DNS", default=False)
 
 # WebAuthn/Passkey Settings
 # SECURITY: Set to True to temporarily skip signature verification for backwards compatibility

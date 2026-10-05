@@ -61,6 +61,7 @@ type Query {
   ssoConnections(tenantId: ID!, before: String, after: String, first: Int, last: Int): SSOConnectionConnection
   ssoConnection(tenantId: ID!, id: ID): SSOConnectionType
   scimTokens(tenantId: ID!, before: String, after: String, first: Int, last: Int): SCIMTokenConnection
+  ssoDomains(tenantId: ID!): [TenantDomainType]
   ssoAuditLogs(tenantId: ID!, eventType: String, userEmail: String, success: Boolean, startDate: String, endDate: String, search: String, before: String, after: String, first: Int, last: Int): SSOAuditLogConnection
   myPasskeys(before: String, after: String, first: Int, last: Int): PasskeyConnection
   mySessions(before: String, after: String, first: Int, last: Int): SSOSessionConnection
@@ -463,6 +464,17 @@ type SCIMTokenType implements Node {
   requestCount: Int!
   isValid: Boolean
   isExpired: Boolean
+}
+"An email domain claimed by the tenant for SSO, with the DNS record that proves ownership."
+type TenantDomainType implements Node {
+  createdAt: DateTime!
+  "Lowercase email domain, e.g. example.com"
+  domain: String!
+  status: SsoTenantDomainStatusChoices!
+  verifiedAt: DateTime
+  id: ID!
+  verificationRecordName: String
+  verificationRecordValue: String
 }
 type SSOAuditLogConnection {
   "Pagination data for this connection."
@@ -1406,6 +1418,12 @@ type ApiMutation {
   deactivateSsoConnection(id: ID!, tenantId: ID!): DeactivateSSOConnectionMutation
   "Test an SSO connection configuration. Requires tenantId for tenant context."
   testSsoConnection(id: ID!, tenantId: ID!): TestSSOConnectionMutation
+  "Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified."
+  addSsoDomain(domain: String!, tenantId: ID!): AddSSODomainMutation
+  "Check the domain's DNS TXT record and mark the domain as verified."
+  verifySsoDomain(id: ID!, tenantId: ID!): VerifySSODomainMutation
+  "Remove a claimed domain. Refused while an SSO connection of the tenant still uses it."
+  deleteSsoDomain(id: ID!, tenantId: ID!): DeleteSSODomainMutation
   "Create a new SCIM token."
   createScimToken(input: CreateSCIMTokenMutationInput!): CreateSCIMTokenMutationPayload
   "Revoke a SCIM token. Requires tenantId for tenant context."
@@ -1725,6 +1743,18 @@ type TestSSOConnectionCheckType {
   status: String
   message: String
   details: GenericScalar
+}
+"Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified."
+type AddSSODomainMutation {
+  ssoDomain: TenantDomainType
+}
+"Check the domain's DNS TXT record and mark the domain as verified."
+type VerifySSODomainMutation {
+  ssoDomain: TenantDomainType
+}
+"Remove a claimed domain. Refused while an SSO connection of the tenant still uses it."
+type DeleteSSODomainMutation {
+  ok: Boolean
 }
 "Create a new SCIM token."
 type CreateSCIMTokenMutationPayload {
@@ -2272,6 +2302,13 @@ enum SsoTenantSSOConnectionSamlNameIdFormatChoices {
   URN_OASIS_NAMES_TC_SAML_1_1_NAMEID_FORMAT_UNSPECIFIED
 }
 "An enumeration."
+enum SsoTenantDomainStatusChoices {
+  "Pending verification"
+  PENDING
+  "Verified"
+  VERIFIED
+}
+"An enumeration."
 enum SsoSSOAuditLogEventTypeChoices {
   "IdP Configuration Created"
   IDP_CONFIG_CREATED
@@ -2311,6 +2348,12 @@ enum SsoSSOAuditLogEventTypeChoices {
   SCIM_GROUP_DELETED
   "SSO Enforce Bypass Login"
   SSO_ENFORCE_BYPASS
+  "SSO Domain Added"
+  DOMAIN_ADDED
+  "SSO Domain Verified"
+  DOMAIN_VERIFIED
+  "SSO Domain Removed"
+  DOMAIN_REMOVED
   "Session Created"
   SESSION_CREATED
   "Session Revoked"
@@ -2331,6 +2374,12 @@ enum SsoSSOAuditLogEventTypeChoices {
   PASSKEY_CLONE_DETECTED
   "Security Anomaly Detected"
   SECURITY_ANOMALY
+  "KSeF Token Saved"
+  KSEF_TOKEN_SAVED
+  "KSeF Token Tested"
+  KSEF_TOKEN_TESTED
+  "KSeF Token Deleted"
+  KSEF_TOKEN_DELETED
 }
 "An enumeration."
 enum MultitenancyActionLogActionTypeChoices {
@@ -2916,7 +2965,6 @@ input CreateSSOConnectionMutationInput {
   "Display name for this SSO connection"
   name: String!
   connectionType: connection_type
-  status: status
   "List of email domains allowed to use this SSO connection"
   allowedDomains: JSONString
   "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
@@ -2955,7 +3003,6 @@ input UpdateSSOConnectionMutationInput {
   "Display name for this SSO connection"
   name: String
   connectionType: connection_type
-  status: status
   "List of email domains allowed to use this SSO connection"
   allowedDomains: JSONString
   "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."

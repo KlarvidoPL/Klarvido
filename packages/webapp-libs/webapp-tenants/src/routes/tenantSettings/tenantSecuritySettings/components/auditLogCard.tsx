@@ -19,6 +19,7 @@ import {
   Clock,
   Filter,
   Fingerprint,
+  Globe,
   KeyRound,
   Loader2,
   LogIn,
@@ -30,6 +31,7 @@ import {
   Shield,
   ShieldCheck,
   Smartphone,
+  Trash2,
   User,
   Users,
   X,
@@ -94,6 +96,9 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
   idp_config_updated: <Settings className="h-4 w-4" />,
   idp_config_deleted: <Settings className="h-4 w-4" />,
   idp_config_activated: <Check className="h-4 w-4" />,
+  domain_added: <Globe className="h-4 w-4" />,
+  domain_verified: <ShieldCheck className="h-4 w-4" />,
+  domain_removed: <Trash2 className="h-4 w-4" />,
   idp_config_deactivated: <X className="h-4 w-4" />,
 
   // Provisioning events
@@ -142,6 +147,9 @@ const EVENT_TYPE_MESSAGES = defineMessages({
   idp_config_created: { id: 'Audit / Event / IdP Configuration Created', defaultMessage: 'IdP Configuration Created' },
   idp_config_updated: { id: 'Audit / Event / IdP Configuration Updated', defaultMessage: 'IdP Configuration Updated' },
   idp_config_deleted: { id: 'Audit / Event / IdP Configuration Deleted', defaultMessage: 'IdP Configuration Deleted' },
+  domain_added: { id: 'Audit / Event / SSO Domain Added', defaultMessage: 'SSO Domain Added' },
+  domain_verified: { id: 'Audit / Event / SSO Domain Verified', defaultMessage: 'SSO Domain Verified' },
+  domain_removed: { id: 'Audit / Event / SSO Domain Removed', defaultMessage: 'SSO Domain Removed' },
   idp_config_activated: {
     id: 'Audit / Event / IdP Configuration Activated',
     defaultMessage: 'IdP Configuration Activated',

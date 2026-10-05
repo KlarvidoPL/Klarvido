@@ -31,6 +31,18 @@ class TenantSSOConnectionFactory(DjangoModelFactory):
     saml_sso_url = factory.Sequence(lambda n: f"https://idp{n}.example.com/sso")
     saml_name_id_format = constants.SAMLNameIdFormat.EMAIL
 
+    @factory.post_generation
+    def verified_domains(obj, create, extracted, **kwargs):
+        """Every domain a connection lists is verified for its tenant, as it would be in production."""
+        if not create:
+            return
+        for domain in obj.allowed_domains:
+            models.TenantDomain.objects.update_or_create(
+                tenant=obj.tenant,
+                domain=domain,
+                defaults={"status": constants.SSODomainStatus.VERIFIED, "verified_at": timezone.now()},
+            )
+
 
 class OIDCSSOConnectionFactory(TenantSSOConnectionFactory):
     connection_type = constants.IdentityProviderType.OIDC

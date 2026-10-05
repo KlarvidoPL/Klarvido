@@ -9,6 +9,7 @@ its email. These rules are shared by JIT provisioning (SAML/OIDC login) and SCIM
 
 from apps.multitenancy.constants import TenantType
 from apps.multitenancy.models import TenantMembership
+from apps.sso.services.domain_verification import get_verified_domains
 
 # Error messages are matched by apps.sso.security.get_safe_error_code; keep the wording in sync.
 DOMAIN_NOT_ALLOWED_MESSAGE = "Email domain is not allowed for this SSO connection."
@@ -21,12 +22,18 @@ class AccountLinkingError(ValueError):
 
 
 def is_email_domain_allowed(connection, email: str) -> bool:
-    """The email's domain must be listed on the connection. An empty list allows no domain."""
+    """The email's domain must be listed on the connection and verified as owned by its tenant.
+
+    An empty list allows no domain. An unverified domain never counts, otherwise an organization could
+    pre-register accounts on a domain it does not own.
+    """
     if not email or "@" not in email:
         return False
     domain = email.rsplit("@", 1)[-1].strip().lower()
     allowed = {d.strip().lower() for d in (connection.allowed_domains or []) if d}
-    return domain in allowed
+    if domain not in allowed:
+        return False
+    return domain in get_verified_domains(connection.tenant)
 
 
 def ensure_domain_allowed(connection, email: str) -> None:

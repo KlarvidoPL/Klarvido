@@ -1,5 +1,6 @@
 export { AddSSOConnectionModal } from './addSSOConnectionModal';
 export { EditSSOConnectionModal } from './editSSOConnectionModal';
+export { DomainVerificationCard } from './domainVerificationCard';
 export { SSOConnectionCard } from './ssoConnectionCard';
 export { DirectorySyncCard } from './directorySyncCard';
 export { AuditLogCard } from './auditLogCard';

@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "已更新 SCIM 用户"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "已添加 SSO 域名"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "已删除 SSO 域名"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO 域名已验证"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "绕过 SSO 的登录"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "在一个地方上传、管理和整理您的文档"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "无法添加域名。"
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "添加域名"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "已复制到剪贴板。"
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "复制记录名称"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "复制记录值"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "将此 TXT 记录添加到您的 DNS，然后点击“验证”。"
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "无法删除域名。"
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "在 SSO 使用贵公司的邮箱域名之前，请先证明您拥有该域名。只有经过验证的域名才会参与登录、自动配置和强制 SSO。"
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "域名"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "尚未添加任何域名。添加贵公司的域名以开始验证。"
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "名称"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "类型"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "值"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "删除域名"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "待处理"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "已验证"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "域名验证"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "域名已验证。SSO 现在可以使用它。"
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "验证"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "无法验证域名。"
   },
   "Dropzone / Default label": {
     "defaultMessage": "点击或将文件拖到此处上传"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "如果问题仍然存在，请联系您的 IT 管理员或尝试其他登录方式。"
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "尚未找到 DNS 记录。DNS 更改最多可能需要一小时，请稍后重试。"
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "请先将此域名从所有 SSO 连接中移除。"
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "您的电子邮件域名未获此组织授权。"
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "该域名已被其他组织验证。如果该域名属于您，请联系支持人员。"
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "激活前，请验证此连接允许的所有域名。"
   },
   "SSO / Error / generic": {
     "defaultMessage": "登录时出错，请重试或联系支持人员。"
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "登录失败"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "请输入域名，例如 example.com。"
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "身份提供商返回了无效的响应。"
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "身份提供商未提供电子邮件地址。"
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "激活连接前，请至少为其添加一个已验证的域名。"
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "自动创建账户已禁用，请联系管理员。"
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "无法认领 gmail.com 等公共邮箱服务商的域名。请使用贵公司的域名。"
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "尝试次数过多，请稍后再试。"

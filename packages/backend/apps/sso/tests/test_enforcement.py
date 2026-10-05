@@ -16,8 +16,11 @@ apps/sso/views.py) is exempt.
 from types import SimpleNamespace
 
 import pytest
+from django.utils import timezone
 
 from apps.multitenancy import constants as multitenancy_constants
+from apps.sso import constants
+from apps.sso.models import TenantDomain
 from apps.sso.enforcement import (
     check_tenant_sso_enforcement,
     filter_tenants_for_password_session,
@@ -56,6 +59,7 @@ class TestFilterTenantsForPasswordSession:
         active_sso_connection.enforce_sso = True
         active_sso_connection.allowed_domains = [domain]
         active_sso_connection.save()
+        verify_domain_for(active_sso_connection.tenant, domain)
         tenant_membership_factory(
             user=user, tenant=active_sso_connection.tenant, role=multitenancy_constants.TenantUserRole.MEMBER
         )
@@ -76,6 +80,7 @@ class TestFilterTenantsForPasswordSession:
         active_sso_connection.enforce_sso = True
         active_sso_connection.allowed_domains = [domain]
         active_sso_connection.save()
+        verify_domain_for(active_sso_connection.tenant, domain)
         tenant_membership_factory(
             user=user, tenant=active_sso_connection.tenant, role=multitenancy_constants.TenantUserRole.MEMBER
         )
@@ -88,6 +93,14 @@ class TestFilterTenantsForPasswordSession:
         assert list(result.values_list("pk", flat=True)) == [active_sso_connection.tenant_id]
 
 
+def verify_domain_for(tenant, domain):
+    TenantDomain.objects.update_or_create(
+        tenant=tenant,
+        domain=domain,
+        defaults={"status": constants.SSODomainStatus.VERIFIED, "verified_at": timezone.now()},
+    )
+
+
 class TestCheckTenantSsoEnforcement:
     def test_blocks_oauth_session_without_break_glass_permission(
         self, user, tenant_membership_factory, active_sso_connection
@@ -96,6 +109,7 @@ class TestCheckTenantSsoEnforcement:
         active_sso_connection.enforce_sso = True
         active_sso_connection.allowed_domains = [domain]
         active_sso_connection.save()
+        verify_domain_for(active_sso_connection.tenant, domain)
         tenant_membership_factory(
             user=user, tenant=active_sso_connection.tenant, role=multitenancy_constants.TenantUserRole.MEMBER
         )
@@ -104,11 +118,29 @@ class TestCheckTenantSsoEnforcement:
 
         assert result == "sso_login_required"
 
+    def test_unverified_domain_does_not_enforce_sso(self, user, tenant_membership_factory, active_sso_connection):
+        domain = user.email.rsplit("@", 1)[-1]
+        active_sso_connection.enforce_sso = True
+        active_sso_connection.allowed_domains = [domain]
+        active_sso_connection.save()
+        # The connection factory verifies its domains by default; this test needs the claim left unverified
+        TenantDomain.objects.filter(tenant=active_sso_connection.tenant, domain=domain).update(
+            status=constants.SSODomainStatus.PENDING
+        )
+        tenant_membership_factory(
+            user=user, tenant=active_sso_connection.tenant, role=multitenancy_constants.TenantUserRole.MEMBER
+        )
+
+        result = check_tenant_sso_enforcement(_request(user, "oauth"), active_sso_connection.tenant, user)
+
+        assert result is None
+
     def test_allows_sso_session(self, user, tenant_membership_factory, active_sso_connection):
         domain = user.email.rsplit("@", 1)[-1]
         active_sso_connection.enforce_sso = True
         active_sso_connection.allowed_domains = [domain]
         active_sso_connection.save()
+        verify_domain_for(active_sso_connection.tenant, domain)
         tenant_membership_factory(
             user=user, tenant=active_sso_connection.tenant, role=multitenancy_constants.TenantUserRole.MEMBER
         )

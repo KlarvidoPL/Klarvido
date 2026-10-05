@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "SCIM उपयोगकर्ता अपडेट किया गया"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "SSO डोमेन जोड़ा गया"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "SSO डोमेन हटाया गया"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO डोमेन सत्यापित"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "SSO को छोड़कर लॉगिन"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "अपने दस्तावेज़ एक ही जगह अपलोड, प्रबंधित और व्यवस्थित करें"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "डोमेन जोड़ने में विफल।"
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "डोमेन जोड़ें"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "क्लिपबोर्ड पर कॉपी किया गया।"
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "रिकॉर्ड नाम कॉपी करें"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "रिकॉर्ड मान कॉपी करें"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "इस TXT रिकॉर्ड को अपने DNS में जोड़ें, फिर सत्यापित करें पर क्लिक करें।"
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "डोमेन हटाने में विफल।"
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "SSO इसका उपयोग करने से पहले अपनी कंपनी के ईमेल डोमेन के स्वामित्व को सिद्ध करें। केवल सत्यापित डोमेन साइन-इन, प्रावधान और एन्फोर्समेंट में भाग लेते हैं।"
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "डोमेन"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "अभी तक कोई डोमेन नहीं जोड़ा गया है। सत्यापन शुरू करने के लिए अपनी कंपनी का डोमेन जोड़ें।"
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "नाम"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "प्रकार"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "मान"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "डोमेन हटाएं"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "लंबित"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "सत्यापित"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "डोमेन सत्यापन"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "डोमेन सत्यापित। अब SSO इसका उपयोग कर सकता है।"
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "सत्यापित करें"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "डोमेन सत्यापित करने में विफल।"
   },
   "Dropzone / Default label": {
     "defaultMessage": "अपलोड करने के लिए फ़ाइल पर क्लिक करें या उसे यहाँ खींचकर छोड़ें"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "यदि यह समस्या बनी रहती है, तो कृपया अपने IT व्यवस्थापक से संपर्क करें या कोई वैकल्पिक साइन-इन तरीका आज़माएँ।"
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "DNS रिकॉर्ड अभी नहीं मिला। DNS बदलावों में एक घंटे तक लग सकता है, फिर से प्रयास करें।"
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "पहले इस डोमेन को सभी SSO कनेक्शन से हटाएं।"
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "आपका ईमेल डोमेन इस संगठन के लिए अधिकृत नहीं है।"
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "यह डोमेन पहले से किसी दूसरे संगठन द्वारा सत्यापित है। यदि यह आपका है, तो सहायता से संपर्क करें।"
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "सक्रिय करने से पहले इस कनेक्शन के सभी अनुमत डोमेन सत्यापित करें।"
   },
   "SSO / Error / generic": {
     "defaultMessage": "साइन-इन के दौरान त्रुटि हुई। कृपया फिर से प्रयास करें या सहायता से संपर्क करें।"
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "साइन-इन विफल"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "example.com जैसा डोमेन नाम दर्ज करें।"
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "पहचान प्रदाता से अमान्य प्रतिक्रिया।"
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "पहचान प्रदाता ने ईमेल पता नहीं दिया।"
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "सक्रिय करने से पहले कनेक्शन में कम से कम एक सत्यापित डोमेन जोड़ें।"
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "स्वचालित खाता निर्माण बंद है। अपने व्यवस्थापक से संपर्क करें।"
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "gmail.com जैसे सार्वजनिक ईमेल प्रदाताओं का दावा नहीं किया जा सकता। अपनी कंपनी का डोमेन उपयोग करें।"
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "बहुत अधिक प्रयास। कृपया पुनः प्रयास से पहले प्रतीक्षा करें।"

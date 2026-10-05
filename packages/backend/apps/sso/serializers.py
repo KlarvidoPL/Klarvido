@@ -4,6 +4,12 @@ from hashid_field.rest import HashidSerializerCharField
 from apps.multitenancy.constants import TenantUserRole
 from . import models
 from . import constants
+from .services.domain_verification import (
+    DOMAINS_NOT_VERIFIED_CODE,
+    DomainVerificationError,
+    ensure_connection_domains_verified,
+    get_verified_domains,
+)
 
 
 class TenantSSOConnectionSerializer(serializers.ModelSerializer):
@@ -62,6 +68,8 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
             "login_count",
             "created_at",
             "updated_at",
+            # SECURITY: status changes only through activate/deactivate, which enforce domain verification
+            "status",
         ]
 
     def validate_connection_type(self, value):
@@ -145,6 +153,13 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
                 if not attrs.get(field) and not getattr(self.instance, field, None):
                     raise serializers.ValidationError({field: f"{field} is required for OIDC connections."})
 
+        # SECURITY: an active connection may only list domains its tenant has verified
+        is_active = self.instance is not None and self.instance.status == constants.SSOConnectionStatus.ACTIVE
+        if is_active and "allowed_domains" in attrs:
+            verified = get_verified_domains(self.instance.tenant)
+            if any(domain not in verified for domain in attrs["allowed_domains"]):
+                raise serializers.ValidationError({"allowed_domains": DOMAINS_NOT_VERIFIED_CODE})
+
         return attrs
 
     def update(self, instance, validated_data):
@@ -181,6 +196,11 @@ class ActivateSSOConnectionSerializer(serializers.Serializer):
             connection = models.TenantSSOConnection.objects.get(pk=attrs["id"], tenant=tenant)
         except models.TenantSSOConnection.DoesNotExist:
             raise serializers.ValidationError({"id": "SSO connection not found."})
+
+        try:
+            ensure_connection_domains_verified(connection)
+        except DomainVerificationError as exc:
+            raise serializers.ValidationError({"allowed_domains": exc.code})
 
         attrs["tenant"] = tenant
         attrs["connection"] = connection

@@ -22,6 +22,16 @@ class SSOConnectionStatus(models.TextChoices):
     ERROR = "error", "Configuration Error"
 
 
+class SSODomainStatus(models.TextChoices):
+    """
+    Ownership state of an email domain claimed by a tenant.
+    Only verified domains take part in SSO, JIT provisioning, SCIM and enforcement.
+    """
+
+    PENDING = "pending", "Pending verification"
+    VERIFIED = "verified", "Verified"
+
+
 class SAMLNameIdFormat(models.TextChoices):
     """
     SAML NameID formats.
@@ -66,6 +76,11 @@ class SSOAuditEventType(models.TextChoices):
 
     # Enforcement events
     SSO_ENFORCE_BYPASS = "sso_enforce_bypass", "SSO Enforce Bypass Login"
+
+    # Domain ownership events
+    DOMAIN_ADDED = "domain_added", "SSO Domain Added"
+    DOMAIN_VERIFIED = "domain_verified", "SSO Domain Verified"
+    DOMAIN_REMOVED = "domain_removed", "SSO Domain Removed"
 
     # Session events
     SESSION_CREATED = "session_created", "Session Created"

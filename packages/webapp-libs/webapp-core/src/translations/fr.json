@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "Utilisateur SCIM mis à jour"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "Domaine SSO ajouté"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "Domaine SSO supprimé"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "Domaine SSO vérifié"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "Connexion contournant SSO"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "Téléversez, gérez et organisez vos documents en un seul endroit"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "Impossible d'ajouter le domaine."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Ajouter un domaine"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "Copié dans le presse-papiers."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Copier le nom de l'enregistrement"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Copier la valeur de l'enregistrement"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Ajoutez cet enregistrement TXT à votre DNS, puis cliquez sur Vérifier."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "Impossible de supprimer le domaine."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Prouvez que vous possédez le domaine e-mail de votre entreprise avant que le SSO ne l'utilise. Seuls les domaines vérifiés participent à la connexion, au provisionnement et à l'application du SSO."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Domaine"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "Aucun domaine ajouté pour le moment. Ajoutez le domaine de votre entreprise pour démarrer la vérification."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Nom"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Type"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Valeur"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Supprimer le domaine"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "En attente"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Vérifié"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Vérification du domaine"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Domaine vérifié. Le SSO peut maintenant l'utiliser."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Vérifier"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "Impossible de vérifier le domaine."
   },
   "Dropzone / Default label": {
     "defaultMessage": "Cliquez ou faites glisser un fichier ici pour le téléverser"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "Si le problème persiste, contactez votre administrateur informatique ou essayez une autre méthode de connexion."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "L'enregistrement DNS n'a pas encore été trouvé. Les modifications DNS peuvent prendre jusqu'à une heure, réessayez."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Retirez d'abord ce domaine de toutes les connexions SSO."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "Le domaine de votre adresse e-mail n'est pas autorisé pour cette organisation."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "Ce domaine est déjà vérifié par une autre organisation. Si vous en êtes le propriétaire, contactez le support."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Vérifiez tous les domaines autorisés de cette connexion avant de l'activer."
   },
   "SSO / Error / generic": {
     "defaultMessage": "Une erreur est survenue lors de la connexion. Veuillez réessayer ou contacter le support."
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "Échec de la connexion"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Saisissez un nom de domaine, par exemple example.com."
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "Réponse non valide du fournisseur d'identité."
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "L'adresse e-mail n'a pas été fournie par le fournisseur d'identité."
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Ajoutez au moins un domaine vérifié à la connexion avant de l'activer."
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "La création automatique de compte est désactivée. Contactez votre administrateur."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Les fournisseurs de messagerie publics comme gmail.com ne peuvent pas être revendiqués. Utilisez le domaine de votre entreprise."
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "Trop de tentatives. Veuillez patienter avant de réessayer."

@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "Zaktualizowano użytkownika SCIM"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "Dodano domenę SSO"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "Usunięto domenę SSO"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "Zweryfikowano domenę SSO"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "Logowanie z pominięciem SSO"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "Przesyłaj, zarządzaj i organizuj swoje dokumenty w jednym miejscu"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "Nie udało się dodać domeny."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Dodaj domenę"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "Skopiowano do schowka."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Kopiuj nazwę rekordu"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Kopiuj wartość rekordu"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Dodaj ten rekord TXT w DNS swojej domeny, a następnie kliknij Zweryfikuj."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "Nie udało się usunąć domeny."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Potwierdź, że posiadasz domenę e-mail swojej firmy, zanim SSO z niej skorzysta. Tylko zweryfikowane domeny biorą udział w logowaniu, provisioningu i wymuszaniu SSO."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Domena"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "Nie zgłoszono jeszcze żadnych domen. Dodaj domenę firmy, aby rozpocząć weryfikację."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Nazwa"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Typ"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Wartość"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Usuń domenę"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "Oczekuje"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Zweryfikowana"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Weryfikacja domeny"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Domena zweryfikowana. SSO może z niej korzystać."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Zweryfikuj"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "Nie udało się zweryfikować domeny."
   },
   "Dropzone / Default label": {
     "defaultMessage": "Kliknij lub przeciągnij plik w to miejsce, aby go przesłać"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "Jeśli problem będzie się powtarzał, skontaktuj się z administratorem IT lub spróbuj innej metody logowania."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "Rekord DNS nie został jeszcze znaleziony. Zmiany DNS mogą trwać do godziny, spróbuj ponownie."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Najpierw usuń tę domenę ze wszystkich połączeń SSO."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "Domena Twojego adresu e-mail nie jest dozwolona dla tej organizacji."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "Ta domena jest już zweryfikowana przez inną organizację. Jeśli jest Twoja, skontaktuj się z pomocą techniczną."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Zweryfikuj wszystkie dozwolone domeny tego połączenia przed aktywacją."
   },
   "SSO / Error / generic": {
     "defaultMessage": "Wystąpił błąd podczas logowania. Spróbuj ponownie lub skontaktuj się z pomocą techniczną."
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "Logowanie nie powiodło się"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Wpisz nazwę domeny, na przykład example.com."
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "Nieprawidłowa odpowiedź dostawcy tożsamości."
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "Dostawca tożsamości nie przekazał adresu e-mail."
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Przed aktywacją dodaj co najmniej jedną zweryfikowaną domenę do połączenia."
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "Automatyczne tworzenie kont jest wyłączone. Skontaktuj się z administratorem."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Publicznych dostawców poczty, takich jak gmail.com, nie można przypisać. Użyj domeny firmowej."
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "Zbyt wiele prób. Odczekaj chwilę przed ponowną próbą."

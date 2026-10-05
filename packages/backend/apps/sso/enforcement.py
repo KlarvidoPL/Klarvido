@@ -13,6 +13,7 @@ from django.db.models import QuerySet
 
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import TenantSSOConnection, SSOAuditLog
+from apps.sso.services.domain_verification import get_verified_tenant_id_for_domain
 from apps.users.jwt import get_auth_method_from_token
 
 logger = logging.getLogger(__name__)
@@ -37,9 +38,12 @@ def get_sso_enforced_tenant_ids(user) -> set:
         tenant__user_memberships__user=user,
     )
 
+    # SECURITY: enforcement applies only to the tenant that proved it owns the domain
+    verified_tenant_id = get_verified_tenant_id_for_domain(domain)
+
     enforced_ids = set()
     for conn in connections:
-        if domain in [d.lower() for d in (conn.allowed_domains or [])]:
+        if conn.tenant_id == verified_tenant_id and domain in [d.lower() for d in (conn.allowed_domains or [])]:
             enforced_ids.add(conn.tenant_id)
 
     return enforced_ids

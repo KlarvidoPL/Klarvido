@@ -51,6 +51,7 @@ import { useTenantSSO } from '../../../../hooks/useTenantSSO';
 import { useCurrentTenant } from '../../../../providers';
 import { AddSSOConnectionModal } from './addSSOConnectionModal';
 import { EditSSOConnectionModal } from './editSSOConnectionModal';
+import { getSsoDomainErrorCode, getSsoDomainErrorMessage } from './ssoDomainErrors';
 import { translateSsoDetailLabel, translateSsoTestText } from './ssoTestMessages';
 
 type SSOConnection = {
@@ -176,12 +177,16 @@ export const SSOConnectionCard = ({ canManageSSO }: SSOConnectionCardProps) => {
         });
       }
       window.dispatchEvent(new CustomEvent('sso-connections-changed', { detail: { tenantId } }));
-    } catch {
+    } catch (error) {
+      // Activation is refused until every allowed domain is verified; say so instead of a generic failure
+      const domainErrorCode = getSsoDomainErrorCode(error);
       toast({
-        description: intl.formatMessage({
-          defaultMessage: 'Failed to update SSO connection.',
-          id: 'SSO Card / Toggle Error',
-        }),
+        description: domainErrorCode
+          ? getSsoDomainErrorMessage(intl, domainErrorCode)
+          : intl.formatMessage({
+              defaultMessage: 'Failed to update SSO connection.',
+              id: 'SSO Card / Toggle Error',
+            }),
         variant: 'destructive',
       });
     } finally {

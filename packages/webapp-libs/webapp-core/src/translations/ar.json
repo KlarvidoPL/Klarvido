@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "تم تحديث مستخدم SCIM"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "تمت إضافة نطاق SSO"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "تمت إزالة نطاق SSO"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "تم التحقق من نطاق SSO"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "تسجيل دخول متجاوزًا SSO"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "قم برفع وإدارة وتنظيم مستنداتك في مكان واحد"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "تعذرت إضافة النطاق."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "إضافة نطاق"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "تم النسخ إلى الحافظة."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "نسخ اسم السجل"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "نسخ قيمة السجل"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "أضف سجل TXT هذا إلى DNS الخاص بك، ثم انقر على تحقق."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "تعذرت إزالة النطاق."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "أثبت ملكيتك لنطاق البريد الإلكتروني لشركتك قبل أن يستخدمه SSO. تشارك النطاقات المُتحقق منها فقط في تسجيل الدخول والتزويد وفرض SSO."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "النطاق"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "لم تتم إضافة أي نطاقات بعد. أضف نطاق شركتك لبدء التحقق."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "الاسم"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "النوع"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "القيمة"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "إزالة النطاق"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "قيد الانتظار"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "تم التحقق"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "التحقق من النطاق"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "تم التحقق من النطاق. يمكن لـ SSO استخدامه الآن."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "تحقق"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "تعذر التحقق من النطاق."
   },
   "Dropzone / Default label": {
     "defaultMessage": "انقر أو اسحب ملفًا إلى هذه المنطقة للرفع"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "إذا استمرت هذه المشكلة، يُرجى التواصل مع مسؤول تقنية المعلومات لديك أو تجربة طريقة أخرى لتسجيل الدخول."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "لم يتم العثور على سجل DNS بعد. قد تستغرق تغييرات DNS ما يصل إلى ساعة، فحاول مرة أخرى."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "أزل هذا النطاق من جميع اتصالات SSO أولاً."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "نطاق بريدك الإلكتروني غير مصرح به لهذه المؤسسة."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "هذا النطاق مُتحقق منه بالفعل من مؤسسة أخرى. إذا كان لك، فتواصل مع الدعم."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "تحقق من جميع النطاقات المسموح بها لهذا الاتصال قبل تفعيله."
   },
   "SSO / Error / generic": {
     "defaultMessage": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "فشل تسجيل الدخول"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "أدخل اسم نطاق مثل example.com."
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "استجابة غير صالحة من مزود الهوية."
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "لم يُقدَّم عنوان البريد الإلكتروني من مزود الهوية."
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "أضف نطاقاً مُتحقق منه واحداً على الأقل إلى الاتصال قبل تفعيله."
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "إنشاء الحسابات تلقائيًا معطل. تواصل مع المسؤول."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "لا يمكن المطالبة بمزودي البريد العامين مثل gmail.com. استخدم نطاق شركتك."
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "محاولات كثيرة جدًا. يرجى الانتظار قبل المحاولة مرة أخرى."

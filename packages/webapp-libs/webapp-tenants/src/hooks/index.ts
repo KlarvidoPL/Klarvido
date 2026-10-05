@@ -15,3 +15,4 @@ export * from './useCompanyLookup';
 // Re-export PermissionGate from components for convenience
 export { PermissionGate } from '../components/permissionGate';
 export type { PermissionGateProps } from '../components/permissionGate';
+export * from './useTenantSSODomains';

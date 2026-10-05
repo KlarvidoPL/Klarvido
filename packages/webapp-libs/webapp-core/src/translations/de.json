@@ -623,6 +623,15 @@
   "Audit / Event / SCIM User Updated": {
     "defaultMessage": "SCIM-Benutzer aktualisiert"
   },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "SSO-Domain hinzugefügt"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "SSO-Domain entfernt"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO-Domain verifiziert"
+  },
   "Audit / Event / SSO Enforce Bypass Login": {
     "defaultMessage": "Anmeldung unter Umgehung von SSO"
   },
@@ -1984,6 +1993,69 @@
   },
   "Documents / subheading": {
     "defaultMessage": "Lade deine Dokumente hoch, verwalte und organisiere sie an einem Ort"
+  },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "Die Domain konnte nicht hinzugefügt werden."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Domain hinzufügen"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "In die Zwischenablage kopiert."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Datensatznamen kopieren"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Datensatzwert kopieren"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Füge diesen TXT-Eintrag zu deinem DNS hinzu und klicke dann auf Verifizieren."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "Die Domain konnte nicht entfernt werden."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Weise nach, dass du die E-Mail-Domain deines Unternehmens besitzt, bevor SSO sie nutzen kann. Nur verifizierte Domains werden für Anmeldung, Provisioning und Erzwingung verwendet."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Domain"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "example.com"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "Noch keine Domains angemeldet. Füge die Domain deines Unternehmens hinzu, um die Verifizierung zu starten."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Name"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Typ"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Wert"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Domain entfernen"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "Ausstehend"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Verifiziert"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Domain-Verifizierung"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Domain verifiziert. SSO kann sie jetzt nutzen."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Verifizieren"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "Die Domain konnte nicht verifiziert werden."
   },
   "Dropzone / Default label": {
     "defaultMessage": "Klicke oder ziehe eine Datei in diesen Bereich, um sie hochzuladen"
@@ -4193,8 +4265,20 @@
   "SSO / Error / description": {
     "defaultMessage": "Wenn dieses Problem weiterhin besteht, wenden Sie sich an Ihre IT-Administration oder versuchen Sie eine andere Anmeldemethode."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "Der DNS-Eintrag wurde noch nicht gefunden. DNS-Änderungen können bis zu einer Stunde dauern, bitte versuche es erneut."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Entferne diese Domain zuerst aus allen SSO-Verbindungen."
+  },
   "SSO / Error / domain_not_allowed": {
     "defaultMessage": "Ihre E-Mail-Domain ist für diese Organisation nicht zugelassen."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "Diese Domain wurde bereits von einer anderen Organisation verifiziert. Gehört sie dir, kontaktiere den Support."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Verifiziere vor der Aktivierung alle erlaubten Domains dieser Verbindung."
   },
   "SSO / Error / generic": {
     "defaultMessage": "Beim Anmelden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support."
@@ -4202,14 +4286,23 @@
   "SSO / Error / heading": {
     "defaultMessage": "Anmeldung fehlgeschlagen"
   },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Gib einen Domainnamen wie example.com ein."
+  },
   "SSO / Error / invalid_response": {
     "defaultMessage": "Ungültige Antwort des Identitätsanbieters."
   },
   "SSO / Error / missing_email": {
     "defaultMessage": "Der Identitätsanbieter hat keine E-Mail-Adresse übermittelt."
   },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Füge vor der Aktivierung mindestens eine verifizierte Domain zur Verbindung hinzu."
+  },
   "SSO / Error / provisioning_disabled": {
     "defaultMessage": "Die automatische Kontoerstellung ist deaktiviert. Wenden Sie sich an Ihren Administrator."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Öffentliche E-Mail-Anbieter wie gmail.com können nicht beansprucht werden. Verwende die Domain deines Unternehmens."
   },
   "SSO / Error / rate_limited": {
     "defaultMessage": "Zu viele Versuche. Bitte warten Sie, bevor Sie es erneut versuchen."
