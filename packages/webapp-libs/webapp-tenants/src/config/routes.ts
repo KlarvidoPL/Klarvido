@@ -2,6 +2,7 @@ import { nestedPath } from '@sb/webapp-core/utils';
 
 export const RoutesConfig = {
   home: '/',
+  companies: 'companies',
   tenant: nestedPath('tenant', {
     onboarding: 'onboarding',
     settings: nestedPath('settings', {

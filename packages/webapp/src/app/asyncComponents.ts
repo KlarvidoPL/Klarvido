@@ -11,4 +11,5 @@ export const SSOCallback = asyncComponent(() => import('../routes/auth/ssoCallba
 export const OAuthCallback = asyncComponent(() => import('../routes/auth/oauthCallback'));
 export const SSOError = asyncComponent(() => import('../routes/auth/ssoError'));
 export const SSOLogin = asyncComponent(() => import('../routes/auth/ssoLogin'));
+export const CompanySelection = asyncComponent(() => import('@sb/webapp-tenants/routes/companySelection'));
 //<-- IMPORT ROUTE -->

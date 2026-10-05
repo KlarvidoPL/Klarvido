@@ -5209,5 +5209,89 @@
   },
   "Onboarding / Clear draft title": {
     "defaultMessage": "Clear this draft?"
+  },
+  "Companies / Add": {
+    "defaultMessage": "Dodaj firmę"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "Administrator"
+  },
+  "Companies / Count": {
+    "defaultMessage": "Dostępne firmy: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "Aktualnie wybrana"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "Aktywne decyzje"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "Domyślna"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "Wybierz firmę, aby przełączyć kontekst Klarvido. Ustaw domyślną, jeśli chcesz otwierać ją automatycznie po zalogowaniu."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "Usunięto domyślną firmę. Po zalogowaniu wybierzesz ją na ekranie Firmy."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "Zapisano domyślną firmę. Otworzy się automatycznie po zalogowaniu."
+  },
+  "Companies / Description": {
+    "defaultMessage": "Wybierz firmę, w której chcesz pracować"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "Nie masz jeszcze dostępu do żadnej firmy. Dodaj firmę lub zaakceptuj zaproszenie poniżej."
+  },
+  "Companies / Health": {
+    "defaultMessage": "Kondycja firmy: jeszcze niedostępna"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "Zaproszenia do firm"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "Nie udało się wczytać firm. Odśwież stronę i spróbuj ponownie."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "Wczytywanie firm…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "Członek"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "Nie znaleziono firm pasujących do wyszukiwania."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "Właściciel"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "Usuń domyślną"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "Sprzedaż"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "Nie udało się zapisać domyślnej firmy. Dotychczasowy wybór pozostaje bez zmian. Spróbuj ponownie."
+  },
+  "Companies / Search": {
+    "defaultMessage": "Szukaj po nazwie lub NIP-ie"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "Ustaw jako domyślną"
+  },
+  "Companies / Title": {
+    "defaultMessage": "Firmy"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "Jeszcze niedostępne"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "Zobacz zaproszenie"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "Wszystkie firmy"
   }
 }

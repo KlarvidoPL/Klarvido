@@ -1,6 +1,10 @@
 import { TenantType } from '@sb/webapp-api-client/constants';
 import { CommonQueryTenantItemFragmentFragment, TenantUserRole, getFragmentData } from '@sb/webapp-api-client/graphql';
-import { commonQueryCurrentUserFragment, commonQueryMembershipFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
+import {
+  commonQueryCurrentUserFragment,
+  commonQueryMembershipFragment,
+  useCommonQuery,
+} from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import {
   DropdownMenu,
@@ -47,17 +51,14 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
 
   const tenantsGrouped = groupBy(prop<string>('type'), tenants);
   const personalTenant = head(tenantsGrouped[TenantType.PERSONAL] ?? []);
-  const organizationTenants = groupBy(
-    (tenant) => {
-      const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
-      // A superuser sees every organization via an owner-equivalent access bypass that
-      // creates no real membership row - `membership` is then null, not a pending
-      // invitation, so it must not be bucketed with genuine unaccepted invitations.
-      if (!membership) return isSuperuser ? 'organizations' : 'invitations';
-      return membership.invitationAccepted ? 'organizations' : 'invitations';
-    },
-    tenantsGrouped[TenantType.ORGANIZATION] ?? []
-  );
+  const organizationTenants = groupBy((tenant) => {
+    const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+    // A superuser sees every organization via an owner-equivalent access bypass that
+    // creates no real membership row - `membership` is then null, not a pending
+    // invitation, so it must not be bucketed with genuine unaccepted invitations.
+    if (!membership) return isSuperuser ? 'organizations' : 'invitations';
+    return membership.invitationAccepted ? 'organizations' : 'invitations';
+  }, tenantsGrouped[TenantType.ORGANIZATION] ?? []);
   const filteredOrganizations = (organizationTenants?.organizations ?? []).filter((tenant) =>
     (tenant?.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -85,18 +86,14 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
   const triggerButton = collapsed ? (
     <Button variant="ghost" size="icon" className="relative h-9 w-9">
       <Building2 className="h-4 w-4" />
-      {hasPendingInvitations && (
-        <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
-      )}
+      {hasPendingInvitations && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />}
     </Button>
   ) : (
     <Button variant="outline" className="relative w-full justify-between overflow-hidden text-left font-normal">
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <div className="relative shrink-0">
           <Building2 className="h-4 w-4" />
-          {hasPendingInvitations && (
-            <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" />
-          )}
+          {hasPendingInvitations && <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" />}
         </div>
         <span className="truncate">
           {currentTenant?.name ?? (
@@ -199,6 +196,16 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            navigate(generateLocalePath(TenantRoutesConfig.companies));
+            onNavigate?.();
+          }}
+          className="gap-2"
+        >
+          <Building2 className="h-4 w-4" />
+          <FormattedMessage id="TenantSwitch / All companies" defaultMessage="Wszystkie firmy" />
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleNewTenantClick} className="gap-2">
           <Plus className="h-4 w-4" />
           <FormattedMessage defaultMessage="Create new organization" id="TenantSwitch / Create new organization" />
