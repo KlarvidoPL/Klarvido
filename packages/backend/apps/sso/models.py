@@ -11,6 +11,7 @@ from apps.multitenancy.models import Tenant
 from apps.multitenancy.constants import TenantUserRole
 from . import constants
 from . import managers
+from .crypto import decrypt_client_secret, encrypt_client_secret
 
 
 class TenantSSOConnection(TimestampedMixin, models.Model):
@@ -115,6 +116,10 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
         default=False,
         help_text="Accept OIDC logins whose email_verified claim is missing or false",
     )
+
+    # The client secret, encrypted at rest (see apps/sso/crypto.py). New secrets are only written here. The plaintext
+    # column above is legacy: it is read for rows saved before encryption and cleared by encrypt_oidc_client_secrets.
+    oidc_client_secret_encrypted = models.BinaryField(blank=True, null=True, editable=False)
 
     # Metadata caching
     idp_metadata_xml = models.TextField(blank=True, default="")
@@ -264,6 +269,16 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
                 max_priority = role_priority[mapped_role]
 
         return matched_role
+
+    def set_oidc_client_secret(self, secret: str) -> None:
+        """Encrypt the client secret for this connection. The caller saves the instance."""
+        self.oidc_client_secret_encrypted = encrypt_client_secret(self.pk, secret)
+        self.oidc_client_secret = ""
+
+    def get_oidc_client_secret(self) -> str:
+        if self.oidc_client_secret_encrypted:
+            return decrypt_client_secret(self.pk, self.oidc_client_secret_encrypted)
+        return self.oidc_client_secret or ""
 
 
 class SCIMToken(TimestampedMixin, models.Model):

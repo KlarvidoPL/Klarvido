@@ -13,6 +13,7 @@ from .services.domain_verification import (
     get_verified_domains,
 )
 from .services.outbound import UnsafeOutboundURL, validate_public_url
+from .crypto import SSOEncryptionNotConfigured, ensure_encryption_configured
 
 # SECURITY: the server calls these addresses, so they must be public (see services/outbound.py)
 OUTBOUND_URL_FIELDS = (
@@ -24,6 +25,17 @@ OUTBOUND_URL_FIELDS = (
     "saml_slo_url",
     "saml_entity_id",
 )
+
+
+def _validate_client_secret_storage(attrs):
+    """A client secret can only be saved when it can be encrypted. Refuse early, as a field error."""
+    if (attrs.get("oidc_client_secret") or "").strip():
+        try:
+            ensure_encryption_configured()
+        except SSOEncryptionNotConfigured:
+            raise serializers.ValidationError(
+                {"oidc_client_secret": "Client secret storage is not configured on the server."}
+            )
 
 
 def _validate_outbound_urls(attrs):
@@ -112,6 +124,7 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         _validate_outbound_urls(attrs)
+        _validate_client_secret_storage(attrs)
         if "tenant_id" in attrs:
             from apps.multitenancy.models import Tenant
 
@@ -136,7 +149,11 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
         user = getattr(request, "user", None)
         created_by = user if user is not None and user.is_authenticated else None
 
+        secret = validated_data.pop("oidc_client_secret", None) or ""
         connection = models.TenantSSOConnection.objects.create(tenant=tenant, created_by=created_by, **validated_data)
+        if secret.strip():
+            connection.set_oidc_client_secret(secret)
+            connection.save(update_fields=["oidc_client_secret", "oidc_client_secret_encrypted"])
         claim_domains(tenant, connection.allowed_domains)
         return connection
 
@@ -196,6 +213,7 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
     def validate(self, attrs):
         """Cross-field validation based on connection type."""
         _validate_outbound_urls(attrs)
+        _validate_client_secret_storage(attrs)
         connection_type = attrs.get("connection_type", getattr(self.instance, "connection_type", None))
 
         if connection_type == constants.IdentityProviderType.SAML:
@@ -227,10 +245,10 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        """Update instance, only setting oidc_client_secret when a non-empty value is provided."""
+        """Update instance, only replacing the client secret when a non-empty value is provided."""
         oidc_client_secret = validated_data.pop('oidc_client_secret', None)
         if oidc_client_secret is not None and oidc_client_secret.strip():
-            validated_data['oidc_client_secret'] = oidc_client_secret
+            instance.set_oidc_client_secret(oidc_client_secret)
         connection = super().update(instance, validated_data)
         # Domains the connection now lists become pending claims in the verification list
         claim_domains(connection.tenant, connection.allowed_domains)

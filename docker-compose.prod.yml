@@ -201,6 +201,9 @@ services:
       - KSEF_ENVIRONMENT=${KSEF_ENVIRONMENT:-test}
       - KSEF_ENCRYPTION_KEYS_FILE=/run/secrets/ksef_encryption_keys
 
+      # OIDC client secrets (apps.sso). Env var, not a Docker secret: a missing secret file would stop the containers.
+      - SSO_ENCRYPTION_KEYS=${SSO_ENCRYPTION_KEYS:-}
+
       # Email (SMTP)
       - EMAIL_HOST=${EMAIL_HOST:-}
       - EMAIL_PORT=${EMAIL_PORT:-587}

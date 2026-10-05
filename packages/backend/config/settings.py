@@ -568,6 +568,11 @@ KSEF_ENCRYPTION_KEYS = env("KSEF_ENCRYPTION_KEYS", default="")
 # KSEF_ENCRYPTION_KEYS.
 KSEF_ENCRYPTION_KEYS_FILE = env("KSEF_ENCRYPTION_KEYS_FILE", default="")
 
+# SSO_ENCRYPTION_KEYS: same format as KSEF_ENCRYPTION_KEYS. OIDC client secrets are encrypted with the first key before
+# they are stored. Without a key an OIDC connection cannot save a client secret (fails closed).
+SSO_ENCRYPTION_KEYS = env("SSO_ENCRYPTION_KEYS", default="")
+SSO_ENCRYPTION_KEYS_FILE = env("SSO_ENCRYPTION_KEYS_FILE", default="")
+
 LAMBDA_TASKS_BASE_HANDLER = env("LAMBDA_TASKS_BASE_HANDLER", default="common.tasks.LambdaTask")
 LAMBDA_TASKS_LOCAL_URL = env("LAMBDA_TASKS_LOCAL_URL", default=None)
 

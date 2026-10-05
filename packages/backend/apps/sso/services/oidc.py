@@ -48,9 +48,10 @@ class OIDCService:
 
     def get_client_secret(self) -> Optional[str]:
         """Retrieve the client secret."""
-        # First check if we have a direct client secret (for local development)
-        if self.connection.oidc_client_secret:
-            return self.connection.oidc_client_secret
+        # The encrypted client secret (legacy plaintext rows are read until they are migrated)
+        secret = self.connection.get_oidc_client_secret()
+        if secret:
+            return secret
         # Then check AWS Secrets Manager
         if self.connection.oidc_client_secret_arn:
             return self.secrets_service.get_secret(self.connection.oidc_client_secret_arn)
