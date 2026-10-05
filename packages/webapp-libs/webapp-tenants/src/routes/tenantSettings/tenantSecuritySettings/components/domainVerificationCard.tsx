@@ -162,6 +162,8 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
           const status = domain.status.toLowerCase();
           const verified = status === 'verified';
           const lapsed = status === 'lapsed';
+          // A verified domain whose record went missing needs the record again, so it shows the record and Verify
+          const needsRecord = !verified || Boolean(domain.firstFailedAt);
           return (
             <div key={domain.id} className="space-y-3 rounded-md border p-4">
               <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-3">
@@ -186,7 +188,7 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
                 </div>
                 {canManageSSO && (
                   <div className="flex shrink-0 items-center gap-2">
-                    {!verified && (
+                    {needsRecord && (
                       <Button variant="outline" size="sm" onClick={() => void handleVerify(domain)} disabled={isBusy}>
                         <FormattedMessage id="Domain Verification / Verify" defaultMessage="Verify" />
                       </Button>
@@ -253,7 +255,7 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
                 </p>
               )}
 
-              {!verified && domain.verificationRecordName && domain.verificationRecordValue && (
+              {needsRecord && domain.verificationRecordName && domain.verificationRecordValue && (
                 <div className="space-y-4 text-sm">
                   <p className="text-muted-foreground">
                     <FormattedMessage

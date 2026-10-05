@@ -249,12 +249,22 @@ def verify_domain(tenant_domain: TenantDomain) -> TenantDomain:
     """
     Check the TXT record and mark the domain verified. Refused if the record is missing or if another
     tenant verified the domain in the meantime. Also re-verifies a lapsed domain.
+
+    A verified domain in its grace period (record missing, warning shown) is re-checked the same way, and
+    a record found again clears the warning straight away instead of waiting for the daily check.
     """
-    if tenant_domain.is_verified:
+    if tenant_domain.is_verified and tenant_domain.first_failed_at is None:
         return tenant_domain
 
     if not dns_check_bypassed() and record_present(tenant_domain) is not True:
         raise DomainVerificationError(DNS_RECORD_NOT_FOUND_CODE)
+
+    if tenant_domain.is_verified:
+        tenant_domain.consecutive_failures = 0
+        tenant_domain.first_failed_at = None
+        tenant_domain.last_checked_at = timezone.now()
+        tenant_domain.save(update_fields=["consecutive_failures", "first_failed_at", "last_checked_at", "updated_at"])
+        return tenant_domain
 
     try:
         with transaction.atomic():

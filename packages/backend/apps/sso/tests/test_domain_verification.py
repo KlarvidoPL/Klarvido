@@ -459,6 +459,50 @@ class TestPeriodicRecheck:
         assert domain.consecutive_failures == 0
         assert domain.last_checked_at is not None
 
+    def _in_grace_period(self, org):
+        domain = self._verified(org)
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            dv.recheck_domain(domain)  # warning shown, grace period starts
+        domain.refresh_from_db()
+        return domain
+
+    def test_restoring_the_record_clears_the_warning_straight_away(self, org):
+        domain = self._in_grace_period(org)
+        assert domain.first_failed_at is not None
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[domain.verification_record_value]):
+            dv.verify_domain(domain)
+
+        domain.refresh_from_db()
+        assert domain.status == VERIFIED
+        assert domain.first_failed_at is None
+        assert domain.consecutive_failures == 0
+
+    def test_verify_during_grace_period_still_refuses_a_missing_record(self, org):
+        domain = self._in_grace_period(org)
+        first_failed_at = domain.first_failed_at
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
+            with pytest.raises(dv.DomainVerificationError) as exc:
+                dv.verify_domain(domain)
+
+        assert exc.value.code == dv.DNS_RECORD_NOT_FOUND_CODE
+        domain.refresh_from_db()
+        assert domain.first_failed_at == first_failed_at
+
+    def test_lapsed_domain_is_verified_again_through_the_normal_path(self, org):
+        domain = self._verified(org)
+        _record_missing_past_grace(domain)
+        domain.refresh_from_db()
+        assert domain.status == constants.SSODomainStatus.LAPSED
+
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[domain.verification_record_value]):
+            dv.verify_domain(domain)
+
+        domain.refresh_from_db()
+        assert domain.status == VERIFIED
+        assert domain.first_failed_at is None
+
     def test_missing_record_lapses_only_after_the_grace_period(self, org):
         domain = self._verified(org)
 
