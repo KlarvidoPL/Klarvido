@@ -16,3 +16,15 @@ Sales, active decisions and company health remain neutral unavailable placeholde
 - Local browser check: Companies cards, persisted default badge, root redirect to the default dashboard and sidebar All companies navigation.
 
 This branch starts from local master and intentionally does not include the independent KSeF invoice feature. No push, merge or deployment is required for reviewing this change.
+
+## Responsive browser review
+
+Reviewed in Brave's device emulation using the actual CompanySelection, Layout, Header and Sidebar components with isolated Apollo test data (three companies, a long company name and a pending invitation). No administrator login or changes to real company preferences were used. This verifies responsive rendering and component interactions, not native iOS behavior or live backend integration.
+
+| Viewport                             | Result                                                                                    |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Phone 375 × 667 and 667 × 375        | One column; search, invitation and default action remain usable                           |
+| iPad 768 × 1024 and 1024 × 768       | Two columns; mobile menu opens and closes; All companies closes the menu                  |
+| iPad Pro 1032 × 1376 and 1376 × 1032 | Two columns in portrait, three with desktop sidebar in landscape; long company names wrap |
+
+The review found the shared mobile sidebar close button behind the sidebar because `z-60` is not defined by the Tailwind configuration. It now uses `z-[60]` and a theme-aware background so the control is visible above the overlay. Closing the menu and returning through All companies were checked after the fix. Temporary preview files were removed after the review.
