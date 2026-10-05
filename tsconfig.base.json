@@ -77,7 +77,11 @@
         "packages/webapp-libs/webapp-ai-assistant/src/*"
       ],
       "@sb/webapp-backup": ["packages/webapp-libs/webapp-backup/src/index.ts"],
-      "@sb/webapp-backup/*": ["packages/webapp-libs/webapp-backup/src/*"]
+      "@sb/webapp-backup/*": ["packages/webapp-libs/webapp-backup/src/*"],
+      "@sb/webapp-invoices": [
+        "packages/webapp-libs/webapp-invoices/src/index.ts"
+      ],
+      "@sb/webapp-invoices/*": ["packages/webapp-libs/webapp-invoices/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

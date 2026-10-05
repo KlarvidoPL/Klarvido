@@ -2,7 +2,6 @@ import { TenantBackupSettings } from '@sb/webapp-backup';
 import { DemoItem, DemoItems, PrivacyPolicy, TermsAndConditions } from '@sb/webapp-contentful/routes';
 import { DEFAULT_LOCALE } from '@sb/webapp-core/config/i18n';
 import { DynamicIntlProvider } from '@sb/webapp-core/providers';
-import { CrudDemoItem } from '@sb/webapp-crud-demo/routes';
 import { Documents } from '@sb/webapp-documents/routes';
 import { ActiveSubscriptionContext } from '@sb/webapp-finances/components/activeSubscriptionContext';
 import {
@@ -17,6 +16,7 @@ import {
   TransactionsHistoryContent,
 } from '@sb/webapp-finances/routes';
 import { SaasIdeas } from '@sb/webapp-generative-ai/routes';
+import { Invoices, LegacyInvoiceRedirect } from '@sb/webapp-invoices';
 import { OnboardingCompletionRoute } from '@sb/webapp-tenants/components/routes/onboardingCompletionRoute';
 import { PermissionAuthRoute } from '@sb/webapp-tenants/components/routes/permissionAuthRoute';
 import {
@@ -84,7 +84,21 @@ export const App = () => {
             </Route>
             <Route index element={<Home />} />
             {/* Organization Settings - each sub-route has its own permission check */}
-            <Route element={<PermissionAuthRoute permissions={['org.settings.view', 'members.view', 'org.roles.view', 'security.view', 'security.logs.view']} mode="any" requiresOrganization />}>
+            <Route
+              element={
+                <PermissionAuthRoute
+                  permissions={[
+                    'org.settings.view',
+                    'members.view',
+                    'org.roles.view',
+                    'security.view',
+                    'security.logs.view',
+                  ]}
+                  mode="any"
+                  requiresOrganization
+                />
+              }
+            >
               <Route element={<TenantSettings />}>
                 {/* Members route - requires members.view */}
                 <Route element={<PermissionAuthRoute permissions="members.view" />}>
@@ -142,11 +156,15 @@ export const App = () => {
             {/* Content Items - protected by features.content.view */}
             <Route element={<PermissionAuthRoute permissions="features.content.view" requiresOrganization />}>
               <Route path={RoutesConfig.demoItems} element={<DemoItems />} />
-              <Route path={RoutesConfig.demoItem} element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />} />
+              <Route
+                path={RoutesConfig.demoItem}
+                element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />}
+              />
             </Route>
             {/* CRUD Demo - protected by features.crud.view */}
-            <Route element={<PermissionAuthRoute permissions="features.crud.view" requiresOrganization />}>
-              <Route path={RoutesConfig.crudDemoItem.index} element={<CrudDemoItem routesConfig={RoutesConfig} />} />
+            <Route element={<PermissionAuthRoute permissions="invoices.view" requiresOrganization />}>
+              <Route path={RoutesConfig.invoices.index} element={<Invoices />} />
+              <Route path={RoutesConfig.crudDemoItem.index} element={<LegacyInvoiceRedirect />} />
             </Route>
             {/* Documents - protected by features.documents.view */}
             <Route element={<PermissionAuthRoute permissions="features.documents.view" requiresOrganization />}>
@@ -234,8 +252,9 @@ export const App = () => {
                 />
               </Route>
               {/* CRUD Demo - protected by features.crud.view */}
-              <Route element={<PermissionAuthRoute permissions="features.crud.view" requiresOrganization />}>
-                <Route path={RoutesConfig.crudDemoItem.index} element={<CrudDemoItem routesConfig={RoutesConfig} />} />
+              <Route element={<PermissionAuthRoute permissions="invoices.view" requiresOrganization />}>
+                <Route path={RoutesConfig.invoices.index} element={<Invoices />} />
+                <Route path={RoutesConfig.crudDemoItem.index} element={<LegacyInvoiceRedirect />} />
               </Route>
               {/* Documents - protected by features.documents.view */}
               <Route element={<PermissionAuthRoute permissions="features.documents.view" requiresOrganization />}>

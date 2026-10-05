@@ -26,7 +26,8 @@
     "lucide-react": "^0.378.0",
     "qrcode": "^1.5.3",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "@sb/webapp-invoices": "workspace:*"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",

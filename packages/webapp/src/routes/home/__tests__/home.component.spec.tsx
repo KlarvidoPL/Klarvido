@@ -7,6 +7,10 @@ import { screen } from '@testing-library/react';
 import { render } from '../../../tests/utils/rendering';
 import { Home } from '../home.component';
 
+jest.mock('@sb/webapp-tenants/hooks/usePermissionCheck', () => ({
+  usePermissionCheck: () => ({ hasPermission: true }),
+}));
+
 describe('Home: Component', () => {
   const Component = () => (
     <CurrentTenantProvider>
@@ -46,8 +50,8 @@ describe('Home: Component', () => {
     expect(await screen.findByText('Content items')).toBeInTheDocument();
     const documentsElements = await screen.findAllByText('Documents');
     expect(documentsElements.length).toBeGreaterThan(0);
-    const crudElements = await screen.findAllByText(/^CRUD/);
-    expect(crudElements.length).toBeGreaterThan(0);
+    const invoiceElements = await screen.findAllByText(/^Faktury/);
+    expect(invoiceElements.length).toBeGreaterThan(0);
   });
 
   it('should display dashboard items for member', async () => {
@@ -77,7 +81,7 @@ describe('Home: Component', () => {
     // Note: "Documents" and "CRUD" text appears in both stat cards and feature cards
     const documentsElements = await screen.findAllByText('Documents');
     expect(documentsElements.length).toBeGreaterThan(0);
-    const crudElements = await screen.findAllByText(/^CRUD/);
-    expect(crudElements.length).toBeGreaterThan(0);
+    const invoiceElements = await screen.findAllByText(/^Faktury/);
+    expect(invoiceElements.length).toBeGreaterThan(0);
   });
 });

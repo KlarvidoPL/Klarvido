@@ -40,6 +40,8 @@ module.exports = [
             '@sb/webapp-api-client/**',
             '@sb/webapp-contentful/**',
             '@sb/webapp-crud-demo/**',
+            '@sb/webapp-invoices/**',
+            '@sb/webapp-ai-assistant/**',
             '@sb/webapp-documents/**',
             '@sb/webapp-finances/**',
             '@sb/webapp-generative-ai/**',

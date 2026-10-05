@@ -10,11 +10,13 @@ value as specified by
 """
 scalar DateTime
 """
-The `BigInt` scalar type represents non-fractional whole numeric values.
-`BigInt` is not constrained to 32-bit like the `Int` type and thus is a less
-compatible type.
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
 """
-scalar BigInt
+scalar Date
+"The `Decimal` scalar type represents a python Decimal."
+scalar Decimal
 """
 Allows use of a JSON String for input / output from the GraphQL schema.
 
@@ -23,19 +25,30 @@ schema (one of the key benefits of GraphQL).
 """
 scalar JSONString
 """
+The `BigInt` scalar type represents non-fractional whole numeric values.
+`BigInt` is not constrained to 32-bit like the `Int` type and thus is a less
+compatible type.
+"""
+scalar BigInt
+"""
 The `GenericScalar` scalar type represents a generic
 GraphQL scalar value that could be:
 String, Boolean, Int, Float, List or Object.
 """
 scalar GenericScalar
-"The `Decimal` scalar type represents a python Decimal."
-scalar Decimal
 """
 Create scalar that ignores normal serialization/deserialization, since
 that will be handled by the multipart request spec
 """
 scalar Upload
 type Query {
+  invoices(tenantId: ID!, filters: InvoiceFilters, page: Int = 1, pageSize: Int = 25): InvoicePage
+  invoice(tenantId: ID!, id: ID!): InvoiceType
+  invoiceCategories(tenantId: ID!): [InvoiceCategoryType]
+  invoiceSyncStatus(tenantId: ID!): InvoiceSyncStatus
+  invoiceSummary(tenantId: ID!, filters: InvoiceFilters): [InvoiceSummary]
+  invoiceXml(tenantId: ID!, id: ID!): String
+  invoiceCsv(tenantId: ID!, filters: InvoiceFilters): String
   "KSeF token status for a tenant (never the token itself)"
   ksefCredential(tenantId: ID!): KsefCredentialType
   "Get backup configuration for a tenant"
@@ -116,6 +129,68 @@ type Query {
     "The ID of the object"
     id: ID!
   ): Node
+}
+type InvoicePage {
+  items: [InvoiceType!]!
+  totalCount: Int!
+}
+type InvoiceType {
+  createdAt: DateTime!
+  id: ID!
+  ksefNumber: String!
+  number: String!
+  direction: String!
+  kind: String!
+  issueDate: Date!
+  permanentStorageDate: DateTime!
+  sellerName: String!
+  sellerNip: String!
+  buyerName: String!
+  buyerNip: String!
+  currency: String!
+  net: Decimal!
+  vat: Decimal!
+  gross: Decimal!
+  category: InvoiceCategoryType
+  correctedKsefNumbers: [String!]!
+  lines: [InvoiceLineType!]!
+}
+type InvoiceCategoryType {
+  id: ID!
+  name: String!
+}
+type InvoiceLineType {
+  position: Int!
+  description: String!
+  unit: String!
+  quantity: Decimal
+  unitPrice: Decimal
+  net: Decimal
+  vatRate: String!
+}
+type InvoiceSyncStatus {
+  startDate: DateTime
+  lastSuccessAt: DateTime
+  runs: [InvoiceSyncRunType!]!
+  connected: Boolean!
+  importErrorCount: Int!
+}
+type InvoiceSyncRunType {
+  id: ID!
+  createdAt: DateTime!
+  status: String!
+  importedCount: Int!
+  completedSubjects: JSONString!
+  errorCode: String!
+  finishedAt: DateTime
+}
+type InvoiceSummary {
+  currency: String
+  direction: String
+  count: Int
+  net: Decimal
+  vat: Decimal
+  gross: Decimal
 }
 "Metadata about the stored KSeF token. The token itself is intentionally not a field."
 type KsefCredentialType {
@@ -1383,6 +1458,8 @@ type FileFieldType {
   name: String
 }
 type ApiMutation {
+  startInvoiceSync(input: StartInvoiceSyncInput!): StartInvoiceSyncPayload
+  setInvoiceCategory(input: SetInvoiceCategoryInput!): SetInvoiceCategoryPayload
   "Verify a KSeF token with KSeF, then store it encrypted. An invalid token is never stored."
   setKsefToken(tenantId: ID!, token: String!): KsefCredentialResult
   "Check the stored KSeF token with KSeF again."
@@ -1524,7 +1601,7 @@ type ApiMutation {
   Mutation to send a message to the AI assistant.
   The response is streamed via the AiChatSubscription.
   """
-  sendAiMessage(conversationId: String!, history: [JSONString], message: String!, tenantId: String!): SendAiMessageMutation
+  sendAiMessage(context: [ComponentContextInput!], conversationId: String!, history: [JSONString], message: String!, tenantId: String!): SendAiMessageMutation
   generateSaasIdeas(input: GenerateSaasIdeasMutationInput!): GenerateSaasIdeasMutationPayload
   changeActiveSubscription(input: ChangeActiveSubscriptionMutationInput!): ChangeActiveSubscriptionMutationPayload
   cancelActiveSubscription(input: CancelActiveSubscriptionMutationInput!): CancelActiveSubscriptionMutationPayload
@@ -1555,6 +1632,14 @@ type ApiMutation {
   deleteDocumentDemoItem(input: DeleteDocumentDemoItemMutationInput!): DeleteDocumentDemoItemMutationPayload
   createFavoriteContentfulDemoItem(input: CreateFavoriteContentfulDemoItemMutationInput!): CreateFavoriteContentfulDemoItemMutationPayload
   deleteFavoriteContentfulDemoItem(input: DeleteFavoriteContentfulDemoItemMutationInput!): DeleteFavoriteContentfulDemoItemMutationPayload
+}
+type StartInvoiceSyncPayload {
+  runId: Int
+  clientMutationId: String
+}
+type SetInvoiceCategoryPayload {
+  ok: Boolean
+  clientMutationId: String
 }
 type KsefCredentialResult {
   ok: Boolean
@@ -2853,6 +2938,11 @@ enum MultitenancyActionLogExportStatusChoices {
   "Failed"
   FAILED
 }
+enum ComponentKind {
+  INVOICE_LIST
+  INVOICE_DETAILS
+  INVOICE_SELECTION
+}
 "An enumeration."
 enum DjstripeSetupIntentCancellationReasonChoices {
   "Abandoned"
@@ -2902,6 +2992,25 @@ enum UsersUserProfileLanguageChoices {
   HI
   "Arabic"
   AR
+}
+input InvoiceFilters {
+  search: String
+  direction: String
+  dateFrom: Date
+  dateTo: Date
+  category: String
+  sort: String
+}
+input StartInvoiceSyncInput {
+  tenantId: String!
+  startDate: Date
+  clientMutationId: String
+}
+input SetInvoiceCategoryInput {
+  tenantId: String!
+  invoiceId: String!
+  categoryId: Int
+  clientMutationId: String
 }
 "Input type for backup configuration."
 input BackupConfigInput {
@@ -3103,6 +3212,11 @@ input DeleteTenantMembershipMutationInput {
   id: String
   tenantId: String!
   clientMutationId: String
+}
+input ComponentContextInput {
+  kind: ComponentKind!
+  invoiceIds: [ID!]
+  filters: InvoiceFilters
 }
 input GenerateSaasIdeasMutationInput {
   keywords: [String]

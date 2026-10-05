@@ -1,17 +1,9 @@
 import { gql } from '@sb/webapp-api-client/graphql';
 
 export const dashboardStatsQuery = gql(/* GraphQL */ `
-  query dashboardStatsQuery($tenantId: ID!) {
-    allCrudDemoItems(tenantId: $tenantId, first: 100) {
-      edges {
-        node {
-          id
-          name
-          createdBy {
-            id
-          }
-        }
-      }
+  query dashboardStatsQuery($tenantId: ID!, $canViewInvoices: Boolean!) {
+    invoices(tenantId: $tenantId, pageSize: 1) @include(if: $canViewInvoices) {
+      totalCount
     }
     allDocumentDemoItems(first: 100) {
       edges {

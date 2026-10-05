@@ -12,7 +12,12 @@ import { media } from '@sb/webapp-core/theme';
 import { PermissionGate } from '@sb/webapp-tenants/components/permissionGate';
 import { TenantRoleAccess } from '@sb/webapp-tenants/components/tenantRoleAccess';
 import { TenantSwitchSidebar } from '@sb/webapp-tenants/components/tenantSwitch';
-import { useCurrentTenantRole, useGenerateTenantPath, usePermissionCheck, PermissionCode } from '@sb/webapp-tenants/hooks';
+import {
+  PermissionCode,
+  useCurrentTenantRole,
+  useGenerateTenantPath,
+  usePermissionCheck,
+} from '@sb/webapp-tenants/hooks';
 import { useCurrentTenant } from '@sb/webapp-tenants/providers';
 import {
   Building2,
@@ -38,7 +43,7 @@ import { Role } from '../../../../modules/auth/auth.types';
 import { useAuth } from '../../../hooks';
 import { RoleAccess } from '../../roleAccess';
 import { LayoutContext } from '../layout.context';
-import { SidebarExpandableItem, ExpandableMenuItem } from './sidebarExpandableItem';
+import { ExpandableMenuItem, SidebarExpandableItem } from './sidebarExpandableItem';
 import { SidebarLogo } from './sidebarLogo';
 
 type MenuItem = {
@@ -90,64 +95,87 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
   const closeSidebar = useCallback(() => setSideMenuOpen(false), [setSideMenuOpen]);
 
   // Helper to check if user has a specific permission
-  const hasPermission = useCallback((permissionCode: PermissionCode): boolean => {
-    return userPermissions.includes(permissionCode);
-  }, [userPermissions]);
+  const hasPermission = useCallback(
+    (permissionCode: PermissionCode): boolean => {
+      return userPermissions.includes(permissionCode);
+    },
+    [userPermissions]
+  );
 
   // Helper to check if user has any of the required permissions
-  const hasAnyPermission = useCallback((permissions: PermissionCode[]): boolean => {
-    if (!permissions || permissions.length === 0) return true;
-    return permissions.some((p) => userPermissions.includes(p));
-  }, [userPermissions]);
+  const hasAnyPermission = useCallback(
+    (permissions: PermissionCode[]): boolean => {
+      if (!permissions || permissions.length === 0) return true;
+      return permissions.some((p) => userPermissions.includes(p));
+    },
+    [userPermissions]
+  );
 
   // Helper to check if user has access to a menu item based on roles and permissions
-  const hasAccessToItem = useCallback((item: MenuItem): boolean => {
-    // If no roles or permissions required, allow access
-    if (item.roles.length === 0 && item.tenantRoles.length === 0 && (!item.permissions || item.permissions.length === 0)) {
-      return true;
-    }
-    // Check app-level roles
-    if (item.roles.length > 0 && item.roles.some((role) => userRoles.includes(role))) {
-      return true;
-    }
-    // Check tenant-level roles (legacy)
-    if (item.tenantRoles.length > 0 && item.tenantRoles.some((role) => role === currentTenantRole)) {
-      return true;
-    }
-    // Check permissions (new RBAC)
-    if (item.permissions && item.permissions.length > 0 && hasAnyPermission(item.permissions)) {
-      return true;
-    }
-    return false;
-  }, [userRoles, currentTenantRole, hasAnyPermission]);
+  const hasAccessToItem = useCallback(
+    (item: MenuItem): boolean => {
+      // If no roles or permissions required, allow access
+      if (
+        item.roles.length === 0 &&
+        item.tenantRoles.length === 0 &&
+        (!item.permissions || item.permissions.length === 0)
+      ) {
+        return true;
+      }
+      // Check app-level roles
+      if (item.roles.length > 0 && item.roles.some((role) => userRoles.includes(role))) {
+        return true;
+      }
+      // Check tenant-level roles (legacy)
+      if (item.tenantRoles.length > 0 && item.tenantRoles.some((role) => role === currentTenantRole)) {
+        return true;
+      }
+      // Check permissions (new RBAC)
+      if (item.permissions && item.permissions.length > 0 && hasAnyPermission(item.permissions)) {
+        return true;
+      }
+      return false;
+    },
+    [userRoles, currentTenantRole, hasAnyPermission]
+  );
 
   // Helper to check if user has access to an expandable section
-  const hasAccessToExpandableSection = useCallback((section: ExpandableMenuSection): boolean => {
-    // If no roles or permissions required, allow access
-    if (section.roles.length === 0 && section.tenantRoles.length === 0 && (!section.permissions || section.permissions.length === 0)) {
-      return true;
-    }
-    // Check app-level roles
-    if (section.roles.length > 0 && section.roles.some((role) => userRoles.includes(role))) {
-      return true;
-    }
-    // Check tenant-level roles (legacy)
-    if (section.tenantRoles.length > 0 && section.tenantRoles.some((role) => role === currentTenantRole)) {
-      return true;
-    }
-    // Check permissions (new RBAC)
-    if (section.permissions && section.permissions.length > 0 && hasAnyPermission(section.permissions)) {
-      return true;
-    }
-    return false;
-  }, [userRoles, currentTenantRole, hasAnyPermission]);
+  const hasAccessToExpandableSection = useCallback(
+    (section: ExpandableMenuSection): boolean => {
+      // If no roles or permissions required, allow access
+      if (
+        section.roles.length === 0 &&
+        section.tenantRoles.length === 0 &&
+        (!section.permissions || section.permissions.length === 0)
+      ) {
+        return true;
+      }
+      // Check app-level roles
+      if (section.roles.length > 0 && section.roles.some((role) => userRoles.includes(role))) {
+        return true;
+      }
+      // Check tenant-level roles (legacy)
+      if (section.tenantRoles.length > 0 && section.tenantRoles.some((role) => role === currentTenantRole)) {
+        return true;
+      }
+      // Check permissions (new RBAC)
+      if (section.permissions && section.permissions.length > 0 && hasAnyPermission(section.permissions)) {
+        return true;
+      }
+      return false;
+    },
+    [userRoles, currentTenantRole, hasAnyPermission]
+  );
 
   // Helper to check if user has access to any item in a section
-  const hasAccessToSection = useCallback((section: MenuSection): boolean => {
-    const hasAccessToAnyItem = section.items.some(hasAccessToItem);
-    const hasAccessToAnyExpandable = section.expandableSections?.some(hasAccessToExpandableSection) ?? false;
-    return hasAccessToAnyItem || hasAccessToAnyExpandable;
-  }, [hasAccessToItem, hasAccessToExpandableSection]);
+  const hasAccessToSection = useCallback(
+    (section: MenuSection): boolean => {
+      const hasAccessToAnyItem = section.items.some(hasAccessToItem);
+      const hasAccessToAnyExpandable = section.expandableSections?.some(hasAccessToExpandableSection) ?? false;
+      return hasAccessToAnyItem || hasAccessToAnyExpandable;
+    },
+    [hasAccessToItem, hasAccessToExpandableSection]
+  );
 
   const menuItemClassName = ({ isActive = false }: { isActive?: boolean }) =>
     cn(
@@ -239,13 +267,13 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
           generatePath: () => generateLocalePath(RoutesConfig.documents),
         },
         {
-          path: RoutesConfig.crudDemoItem.list,
-          label: intl.formatMessage({ defaultMessage: 'CRUD', id: 'Home / CRUD link' }),
+          path: RoutesConfig.invoices.list,
+          label: intl.formatMessage({ defaultMessage: 'Faktury', id: 'Home / Invoices link' }),
           icon: Database,
           roles: [],
           tenantRoles: [],
-          permissions: ['features.crud.view'],
-          generatePath: () => generateTenantPath(RoutesConfig.crudDemoItem.list),
+          permissions: ['invoices.view'],
+          generatePath: () => generateTenantPath(RoutesConfig.invoices.list),
         },
       ],
     },
@@ -369,9 +397,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
     });
 
     // If no items remain after filtering (excluding dividers), don't show the section
-    const hasVisibleItems = filteredItems.some(
-      (item) => !('type' in item && item.type === 'divider')
-    );
+    const hasVisibleItems = filteredItems.some((item) => !('type' in item && item.type === 'divider'));
     if (!hasVisibleItems) {
       return null;
     }
@@ -455,7 +481,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-[280px] top-4 z-60 xl:hidden"
+          className="z-60 fixed left-[280px] top-4 xl:hidden"
           onClick={closeSidebar}
           aria-label={intl.formatMessage({
             defaultMessage: 'Close menu',
