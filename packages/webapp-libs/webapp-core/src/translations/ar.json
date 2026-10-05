@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "فشل نسخ عنوان URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "نسخ بيانات XML الوصفية"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "جارٍ الإنشاء..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "بيانات Service Provider التعريفية"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "الصق هذا في مزود الهوية أثناء بقاء الاتصال مسودة. يصبح عنوان URL للبيانات الوصفية متاحًا بعد التفعيل."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "بيانات SP الوصفية (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "عنوان SP Metadata URL:"
@@ -578,6 +587,84 @@
   "Audit / Error": {
     "defaultMessage": "خطأ"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "تم تطبيق ربط المجموعات"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "تم تفعيل إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "تم إنشاء إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "تم إلغاء تفعيل إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "تم حذف إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "تم تحديث إعدادات IdP"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "تم حذف رمز KSeF"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "تم حفظ رمز KSeF"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "تم اختبار رمز KSeF"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "تم إنشاء مجموعة SCIM"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "تم حذف مجموعة SCIM"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "تم تحديث مجموعة SCIM"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "تم إنشاء مستخدم SCIM"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "تم حذف مستخدم SCIM"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "تم تحديث مستخدم SCIM"
+  },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "تمت إضافة نطاق SSO"
+  },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "انتهاء نطاق SSO"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "تمت إزالة نطاق SSO"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "تم التحقق من نطاق SSO"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "تسجيل دخول متجاوزًا SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "فشل تسجيل الدخول عبر SSO"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "بدأ تسجيل الدخول عبر SSO"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "نجح تسجيل الدخول عبر SSO"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "تسجيل الخروج من SSO"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "تم توفير المستخدم عبر JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "تم تحديث المستخدم عبر SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "فشل"
   },
@@ -611,6 +698,15 @@
   "Audit / IP Address": {
     "defaultMessage": "عنوان IP"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "مرفوض من KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "لم يتم التحقق بعد"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "تم التحقق"
+  },
   "Audit / Last page": {
     "defaultMessage": "الصفحة الأخيرة"
   },
@@ -638,11 +734,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "اختر تاريخ البدء"
   },
+  "Audit / Status": {
+    "defaultMessage": "الحالة"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "فشل"
   },
   "Audit / Status Success": {
     "defaultMessage": "نجاح"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "الإجراء"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "تم حفظ رمز جديد"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "تم حذف الرمز"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "تم استبدال الرمز الحالي"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "رمز ينتهي بـ"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "اسم الرمز في KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "تصفية حسب البريد الإلكتروني..."
@@ -1379,6 +1496,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "تم تحديث إعدادات النسخ الاحتياطي بنجاح"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "الانتقال إلى اليوم"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "الآن"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "اليوم"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "الخطة الحالية:"
   },
@@ -1880,6 +2006,81 @@
   "Documents / subheading": {
     "defaultMessage": "قم برفع وإدارة وتنظيم مستنداتك في مكان واحد"
   },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "تعذرت إضافة النطاق."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "إضافة نطاق"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "تم النسخ إلى الحافظة."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "نسخ اسم السجل"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "نسخ قيمة السجل"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "أضف سجل TXT هذا إلى DNS الخاص بك، ثم انقر على تحقق. أبقِ السجل في مكانه: يتحقق SSO منه يومياً، وحذفه يؤدي إلى انتهاء النطاق."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "تعذرت إزالة النطاق."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "أثبت ملكيتك لنطاق البريد الإلكتروني لشركتك قبل أن يستخدمه SSO. تشارك النطاقات المُتحقق منها فقط في تسجيل الدخول والتزويد وفرض SSO."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "النطاق"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "company.ae"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "لم تتم إضافة أي نطاقات بعد. أضف نطاق شركتك لبدء التحقق."
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "سجل التحقق مفقود منذ سبعة أيام، لذلك لم يعد هذا النطاق يعمل مع SSO وتم إلغاء تفعيل اتصالات SSO الخاصة به. أعد نشر السجل وتحقق من النطاق لاستخدامه."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "آخر فحص {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "سجل التحقق مفقود منذ {since}. سيتم إلغاء تفعيل SSO في {deadline} ما لم يتم استعادة السجل."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "الاسم"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "النوع"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "القيمة"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "إزالة النطاق"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "منتهية"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "قيد الانتظار"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "تم التحقق"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "التحقق من النطاق"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "تم التحقق من النطاق. يمكن لـ SSO استخدامه الآن."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "تحقق"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "تعذر التحقق من النطاق."
+  },
   "Dropzone / Default label": {
     "defaultMessage": "انقر أو اسحب ملفًا إلى هذه المنطقة للرفع"
   },
@@ -2233,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "أعد إضافة السجل، وتحقق من النطاق، وأعد تفعيل اتصال SSO في إعدادات الأمان."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "انتقل إلى Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "تم تعطيل SSO لـ {domain}"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "تم تعطيل SSO لـ \"{domain}\""
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "سجل التحقق لـ \"{domain}\" لدى {tenantName} مفقود منذ {graceDays} يومًا، لذلك تم تعطيل SSO لهذا النطاق. لم يعد بإمكان المستخدمين تسجيل الدخول به."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "تم تعطيل SSO لنطاقك"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "افتح إعدادات الأمان لمؤسستك لعرض السجل وإعادته."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "انتقل إلى Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "سجل التحقق من SSO لـ {domain} مفقود"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "سجل التحقق من SSO مفقود لـ \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "سجل DNS الذي يثبت ملكيتك لـ \"{domain}\" الخاص بـ {tenantName} مفقود. سيتم تعطيل SSO لهذا النطاق خلال {graceDays} يومًا ما لم يُستعد السجل."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "سجل التحقق من SSO مفقود"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "تحديث طريقة الدفع"
@@ -3074,6 +3311,21 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "تم إلغاء تفعيل اتصال SSO"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "النطاق \"{domain}\" الخاص بـ \"{tenant_name}\" لم يعد مُتحققاً لأن سجل التحقق مفقود. الاتصالات التي تم إلغاء تفعيلها: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "النطاق \"{domain}\" الخاص بـ \"{tenant_name}\" لم يعد مُتحققاً لأن سجل التحقق مفقود."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "انتهاء نطاق SSO"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "سجل التحقق الخاص بـ \"{domain}\" ({tenant_name}) مفقود. سيتم إلغاء تفعيل SSO لهذا النطاق خلال {grace_days} يوماً ما لم يتم استعادة السجل."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "سجل التحقق من نطاق SSO مفقود"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "قام \"{name}\" بحذف المؤسسة \"{tenant_name}\""
   },
@@ -3121,6 +3373,219 @@
   },
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "مثال: Google Workspace"
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "رجوع"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "مسح المسودة"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "مسح المسودة"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "سيتم حذف جميع الإجابات الخاصة بهذه المؤسسة الجديدة. لا يمكن التراجع عن ذلك."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "تعذّر مسح هذه المسودة. يرجى المحاولة مرة أخرى."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "هل تريد مسح هذه المسودة؟"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "اكتمل الإعداد"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "تأكيد الملف"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "وقت الموظفين"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "التسويق / العمولات"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "المواد / البضائع"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "المقاولون من الباطن"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "التقنية / البنية التحتية"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "النقل / الخدمات اللوجستية"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "اختر ثلاث إجابات كحد أقصى."
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "ما التكاليف التي تزداد مع مبيعاتك؟"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "معظمهم شركات (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "معظمهم مستهلكون أفراد (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "شركات ومستهلكون أفراد"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "المؤسسات العامة"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "يساعد ذلك في تقدير حجم بيانات المبيعات التي ستغطيها التكاملات المستقبلية."
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "من يدفع لك عادةً؟"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "أخبرنا كيف يعمل نشاطك. يمكنك الرجوع إلى الخطوات السابقة."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "تعديل"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "أعمل بجد، لكن النقد غير متوفر"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "أقلق من خسارة عميل رئيسي"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "التكاليف في ازدياد مستمر"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "أريد اكتشاف المشكلات مبكرًا"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "هل أستطيع تحمّل توسيع الفريق؟"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "لست متأكدًا من تسعيري"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "ما الذي تريد التحكم فيه أكثر من غيره؟"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "تعذّر تحميل ملف الشركة."
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "التالي"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "تعذّر تحديث المؤسسة. تحقق من الحقول وحاول مرة أخرى."
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "التكلفة زائد الهامش"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "سعر ثابت / عرض سعر"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "سعر فردي لكل عميل"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "كيف تحدد أسعارك عادةً؟"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "اشتراك / باقة"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "الوقت / الوحدة"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "How do you make key decisions?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "دورك في الشركة"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "هذه الإجابة وصفية فقط ولا تغيّر صلاحياتك في المؤسسة."
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "العمولة / النتيجة"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "اختر إجابتين كحد أقصى."
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "المنتج / الطلب"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "المشروع / المهمة"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "عدد الخدمات"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "اشتراك / خدمة متكررة"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "الوقت المُنجَز"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "مقابل ماذا يدفع لك عملاؤك؟"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "المحاسبة"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "مستشار"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "موظف"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "المالك / الإدارة"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "تعذّر حفظ هذه الخطوة. يرجى المحاولة مرة أخرى."
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Open business profile"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complete or update your organization onboarding answers."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "التكاليف"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "العملاء"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "التسعير والهدف"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "الإيرادات"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "الملخص"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "خطوات الإعداد"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "الهدف الرئيسي"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "هذه نقطة انطلاق للتحليلات المستقبلية."
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "التسعير"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "دورك"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "ملف نشاطك التجاري"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "إعداد مؤسستك"
   },
   "Passkeys / Add another": {
     "defaultMessage": "إضافة Passkey أخرى"
@@ -3229,24 +3694,6 @@
   },
   "Passkeys / Use count label": {
     "defaultMessage": "عدد مرات الاستخدام"
-  },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "إضافة Passkey أخرى"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "إضافة مفتاح المرور الخاص بي"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "فشل حذف Passkey. يُرجى المحاولة مرة أخرى."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "تم حذف Passkey بنجاح."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "ابحث بالاسم أو البريد الإلكتروني..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "سياق المؤسسة مطلوب لحذف مفاتيح المرور."
   },
   "Password Requirements / Min length": {
     "defaultMessage": "8 أحرف أو أكثر"
@@ -3470,6 +3917,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "لا يمكنك إعادة تعيين الأعضاء إلى دور بديل يتضمن صلاحية (صلاحيات) \"{permissions}\" لأنك لا تملكها بنفسك. اطلب من مالك المؤسسة أو المسؤول منحك إياها أولاً."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "ليس لديك صلاحية لإدارة أدوار المؤسسة."
   },
@@ -3649,12 +4099,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "عرض سجلات النشاط"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "عرض سياسات مفاتيح المرور (Passkeys) الخاصة بالمؤسسة وإدارتها"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "إدارة مفاتيح المرور"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "تهيئة اتصالات تسجيل الدخول الموحد (SSO) وتوفير SCIM"
@@ -3878,14 +4322,83 @@
   "SSO / Edit": {
     "defaultMessage": "تعديل"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "سجلت الدخول بحساب مختلف عن البريد الذي أدخلته. يرجى المحاولة مرة أخرى."
+  },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "يوجد حساب بهذا البريد الإلكتروني بالفعل. اطلب من مسؤول مؤسستك دعوتك."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "استخدم طريقة تسجيل دخول أخرى"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "فشلت المصادقة. يرجى المحاولة مرة أخرى."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "لم يتم إعداد SSO بشكل صحيح. تواصل مع المسؤول."
   },
   "SSO / Error / description": {
     "defaultMessage": "إذا استمرت هذه المشكلة، يُرجى التواصل مع مسؤول تقنية المعلومات لديك أو تجربة طريقة أخرى لتسجيل الدخول."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "لم يتم العثور على سجل DNS بعد. قد تستغرق تغييرات DNS ما يصل إلى ساعة، فحاول مرة أخرى."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "أزل هذا النطاق من جميع اتصالات SSO أولاً."
+  },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "أزل هذا النطاق من اتصالات SSO التالية أولاً: {connections}."
+  },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "نطاق بريدك الإلكتروني غير مصرح به لهذه المؤسسة."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "هذا النطاق مُتحقق منه بالفعل من مؤسسة أخرى. إذا كان لك، فتواصل مع الدعم."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "تحقق من جميع النطاقات المسموح بها لهذا الاتصال قبل تفعيله."
+  },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "لم يتحقق مزود الهوية من عنوان البريد الإلكتروني هذا. اطلب من المسؤول مراجعة الإعداد."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "فشل تسجيل الدخول"
+  },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "أدخل اسم نطاق مثل example.com."
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "استجابة غير صالحة من مزود الهوية."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "لم يُقدَّم عنوان البريد الإلكتروني من مزود الهوية."
+  },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "أضف نطاقاً مُتحقق منه واحداً على الأقل إلى الاتصال قبل تفعيله."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "إنشاء الحسابات تلقائيًا معطل. تواصل مع المسؤول."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "لا يمكن المطالبة بمزودي البريد العامين مثل gmail.com. استخدم نطاق شركتك."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "محاولات كثيرة جدًا. يرجى الانتظار قبل المحاولة مرة أخرى."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "فشل التحقق الأمني. يرجى المحاولة مرة أخرى."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "انتهت صلاحية طلب تسجيل الدخول أو بدأ في متصفح آخر. يرجى بدء تسجيل الدخول مرة أخرى."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "فشل فحص الأمان. يرجى بدء عملية تسجيل الدخول من جديد."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "المحاولة مرة أخرى"
@@ -3932,6 +4445,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "تم تفعيل اتصال SSO."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "أضف نطاقاً إلى هذا الاتصال قبل تفعيله."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "تحقق من {domains} في التحقق من النطاق قبل تفعيل هذا الاتصال. يبقى التفعيل معطلاً حتى يتم التحقق من جميع النطاقات."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "نشط"
   },
@@ -3968,6 +4487,9 @@
   "SSO Card / Delete Success": {
     "defaultMessage": "تم حذف اتصال SSO."
   },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(غير متحقق)"
+  },
   "SSO Card / Domains Label": {
     "defaultMessage": "النطاقات:"
   },
@@ -3988,6 +4510,12 @@
   },
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "مفروض"
+  },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "تم تعطيل فرض SSO. يمكن للمستخدمين الآن تسجيل الدخول بكلمة المرور."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "تم تفعيل فرض SSO. يجب على المستخدمين من النطاقات المسموح بها استخدام SSO."
   },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "فشل تحديث إعداد فرض SSO."
@@ -4070,6 +4598,12 @@
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "مثال: company.com"
   },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "غير متحقق"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "تحقق من هذا النطاق في التحقق من النطاق قبل تفعيل الاتصال."
+  },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "معرّف كيان IdP / المُصدِر"
   },
@@ -4084,6 +4618,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "عنوان SSO (عنوان تسجيل الدخول)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "فعّل هذا الخيار فقط إذا كان مزود الهوية لديك لا يرسل مطالبة email_verified، مثل Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "قبول البريد الإلكتروني غير المُتحقق منه"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "فعّل هذا الخيار فقط إذا كان مزود الهوية لديك يسمح للمستخدمين بتسجيل الدخول بعناوين البريد الإلكتروني التي يملكونها فقط. وإلا فقد يتمكن مستخدم من تسجيل الدخول باسم شخص آخر."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "العودة إلى تسجيل الدخول"
@@ -4114,6 +4657,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "تسجيل الدخول عبر SSO"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "عنوان API"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "تم إعداد عنوان API للإنتاج"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "عنوان API مضبوط على localhost - لن يعمل SSO مع مزودي الهوية الخارجيين"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "متغير البيئة API_URL غير مضبوط"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "جميع نقاط نهاية OIDC المطلوبة موجودة"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "عنوان رد الاتصال"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "قد يكون إعداد عنوان رد الاتصال غير مكتمل"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "عنوان رد الاتصال يستخدم localhost - لا يمكن لمزودي الهوية الخارجيين الوصول إليه"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "انتهت صلاحية الشهادة منذ {days} يومًا"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "ستنتهي صلاحية الشهادة خلال {days} يومًا"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "يُوصى بالشهادة للتحقق من التوقيع"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "الشهادة صالحة (تنتهي خلال {days} يومًا)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "معرّف العميل"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "السر الخاص بالعميل"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "انتهت مهلة جلب مستند الاكتشاف"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "انتهت مهلة الاتصال بنقطة نهاية SSO"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "ضع في اعتبارك تجديد الشهادة قريبًا"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "تعذّر جلب مستند الاكتشاف"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "عنوان ACS"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "نقطة نهاية التفويض"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "نقاط النهاية المكتشفة"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "معرّف الكيان"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "خطأ"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "تنتهي في"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "تلميح"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "تنسيق معرّف الطلب"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "نقطة نهاية الرمز"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "القيمة"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "أعادت نقطة الاكتشاف الاستجابة HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "أعادت نقطة الاكتشاف JSON غير صالح"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "تأكد من أن الشهادة بصيغة PEM أو base64 صالحة"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "تعذّر الاتصال بنقطة نهاية SSO"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "تعذّر إنشاء طلب SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "تعذّر تحليل الشهادة"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "شهادة IdP"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "معرّف كيان IdP"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "لم يتم إعداد شهادة IdP"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "تم إعداد معرّف كيان مزود الهوية"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "لم يتم إعداد معرّف كيان مزود الهوية"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "تم إعداد عنوان المُصدِر"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "لم يتم إعداد عنوان المُصدِر"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "قد يلزم إعداد نقاط النهاية يدويًا"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "نقاط نهاية مفقودة في مستند الاكتشاف: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "تم إعداد معرّف عميل OAuth"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "لم يتم إعداد معرّف عميل OAuth"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "تم إعداد السر الخاص بعميل OAuth"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "لم يتم إعداد السر الخاص بعميل OAuth"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "تم إعداد عنوان رد اتصال OAuth"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "اكتشاف OIDC"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "مُصدِر OIDC"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "نقطة اكتشاف OpenID Connect قابلة للوصول"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "نقاط النهاية المطلوبة"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "يمكن إنشاء طلب SAML AuthnRequest بنجاح"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "إنشاء طلب SAML"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "إعداد مزود الخدمة"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "خطأ SSL/TLS عند الاتصال بنقطة نهاية SSO"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "خطأ SSL/TLS عند الاتصال بالمُصدِر"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "تنسيق عنوان SSO"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "عنوان SSO قابل للوصول"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "نقطة نهاية SSO موجودة (أعادت 405 - متوقع لنقاط SAML)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "نقطة نهاية SSO قابلة للوصول (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "أعادت نقطة نهاية SSO الاستجابة HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "تم إعداد عناوين مزود الخدمة"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "عناوين مزود الخدمة تستخدم localhost - لا يمكن لمزودي الهوية الخارجيين الوصول إليها"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "قد يكون إعداد مزود الخدمة غير مكتمل"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "اضبط متغير البيئة API_URL على نطاق API العام الخاص بك"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "اضبط متغير البيئة API_URL على نطاق API العام الخاص بك"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "تم إعداد عنوان تسجيل الدخول الموحد"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "لم يتم إعداد عنوان تسجيل الدخول الموحد"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "قد لا تدعم بعض مزودي الهوية الاكتشاف التلقائي"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "قد يكون مزود الهوية خلف جدار حماية أو بطيئًا في الاستجابة"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "قد تظل نقطة النهاية تعمل لطلبات SAML"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "سيؤدي هذا إلى فشل عمليات إعادة توجيه SSO. اضبط API_URL على نطاق API العام الخاص بك."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - مولّد أفكار SaaS"
@@ -4526,9 +5288,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "نعم"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "إضافة Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "إضافة Token"
   },
@@ -4565,35 +5324,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "جرّب تعديل عوامل التصفية أو مسحها لعرض جميع الأحداث."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "جرّب مصطلح بحث مختلفًا"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "لا توجد مفاتيح مرور مسجّلة"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "لا توجد مفاتيح مرور تطابق بحثك"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "مزامنة الدليل تتطلب SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "لا توجد اتصالات SSO مُعدّة"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "لا يوجد أي مستخدم في مؤسستك سجّل مفاتيح مرور بعد"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "سجّل مفتاح مرور لتسجيل دخول أسرع وأكثر أمانًا"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "إدارة مفاتيح المرور لجميع مستخدمي مؤسستك"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "استخدم البيانات الحيوية أو مفاتيح الأمان لتسجيل دخول بدون كلمة مرور"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "مزودو الهوية المتوافقون"
@@ -4741,6 +5476,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "حالة ضريبة القيمة المضافة"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "لا يمكن تغيير هذه القيمة بعد حفظها."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "تحقق من هذه القيمة وحاول مرة أخرى."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "رقم NIP غير صالح"
@@ -4990,212 +5731,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "بدء سريع"
-  },
-  "Onboarding / Save failed": {
-    "defaultMessage": "تعذّر حفظ هذه الخطوة. يرجى المحاولة مرة أخرى."
-  },
-  "Onboarding / Organization save failed": {
-    "defaultMessage": "تعذّر تحديث المؤسسة. تحقق من الحقول وحاول مرة أخرى."
-  },
-  "Onboarding / Load failed": {
-    "defaultMessage": "تعذّر تحميل ملف الشركة."
-  },
-  "Onboarding / Completed": {
-    "defaultMessage": "اكتمل الإعداد"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "تحقق من هذه القيمة وحاول مرة أخرى."
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "لا يمكن تغيير هذه القيمة بعد حفظها."
-  },
-  "Onboarding / Revenue hint": {
-    "defaultMessage": "اختر إجابتين كحد أقصى."
-  },
-  "Onboarding / Costs hint": {
-    "defaultMessage": "اختر ثلاث إجابات كحد أقصى."
-  },
-  "Onboarding / Back": {
-    "defaultMessage": "رجوع"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "مسح المسودة"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "مسح المسودة"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "سيتم حذف جميع الإجابات الخاصة بهذه المؤسسة الجديدة. لا يمكن التراجع عن ذلك."
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "تعذّر مسح هذه المسودة. يرجى المحاولة مرة أخرى."
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "هل تريد مسح هذه المسودة؟"
-  },
-  "Onboarding / Confirm": {
-    "defaultMessage": "تأكيد الملف"
-  },
-  "Onboarding / Cost employees": {
-    "defaultMessage": "وقت الموظفين"
-  },
-  "Onboarding / Cost marketing": {
-    "defaultMessage": "التسويق / العمولات"
-  },
-  "Onboarding / Cost materials": {
-    "defaultMessage": "المواد / البضائع"
-  },
-  "Onboarding / Cost subcontractors": {
-    "defaultMessage": "المقاولون من الباطن"
-  },
-  "Onboarding / Cost technology": {
-    "defaultMessage": "التقنية / البنية التحتية"
-  },
-  "Onboarding / Cost transport": {
-    "defaultMessage": "النقل / الخدمات اللوجستية"
-  },
-  "Onboarding / Costs title": {
-    "defaultMessage": "ما التكاليف التي تزداد مع مبيعاتك؟"
-  },
-  "Onboarding / Customer B2B": {
-    "defaultMessage": "معظمهم شركات (B2B)"
-  },
-  "Onboarding / Customer B2C": {
-    "defaultMessage": "معظمهم مستهلكون أفراد (B2C)"
-  },
-  "Onboarding / Customer mixed": {
-    "defaultMessage": "شركات ومستهلكون أفراد"
-  },
-  "Onboarding / Customer public": {
-    "defaultMessage": "المؤسسات العامة"
-  },
-  "Onboarding / Customers hint": {
-    "defaultMessage": "يساعد ذلك في تقدير حجم بيانات المبيعات التي ستغطيها التكاملات المستقبلية."
-  },
-  "Onboarding / Customers title": {
-    "defaultMessage": "من يدفع لك عادةً؟"
-  },
-  "Onboarding / Description": {
-    "defaultMessage": "أخبرنا كيف يعمل نشاطك. يمكنك الرجوع إلى الخطوات السابقة."
-  },
-  "Onboarding / Edit": {
-    "defaultMessage": "تعديل"
-  },
-  "Onboarding / Goal cash": {
-    "defaultMessage": "أعمل بجد، لكن النقد غير متوفر"
-  },
-  "Onboarding / Goal client loss": {
-    "defaultMessage": "أقلق من خسارة عميل رئيسي"
-  },
-  "Onboarding / Goal costs": {
-    "defaultMessage": "التكاليف في ازدياد مستمر"
-  },
-  "Onboarding / Goal early warning": {
-    "defaultMessage": "أريد اكتشاف المشكلات مبكرًا"
-  },
-  "Onboarding / Goal hiring": {
-    "defaultMessage": "هل أستطيع تحمّل توسيع الفريق؟"
-  },
-  "Onboarding / Goal pricing": {
-    "defaultMessage": "لست متأكدًا من تسعيري"
-  },
-  "Onboarding / Goal question": {
-    "defaultMessage": "ما الذي تريد التحكم فيه أكثر من غيره؟"
-  },
-  "Onboarding / Next": {
-    "defaultMessage": "التالي"
-  },
-  "Onboarding / Pricing cost plus": {
-    "defaultMessage": "التكلفة زائد الهامش"
-  },
-  "Onboarding / Pricing fixed": {
-    "defaultMessage": "سعر ثابت / عرض سعر"
-  },
-  "Onboarding / Pricing individual": {
-    "defaultMessage": "سعر فردي لكل عميل"
-  },
-  "Onboarding / Pricing question": {
-    "defaultMessage": "كيف تحدد أسعارك عادةً؟"
-  },
-  "Onboarding / Pricing subscription": {
-    "defaultMessage": "اشتراك / باقة"
-  },
-  "Onboarding / Pricing time unit": {
-    "defaultMessage": "الوقت / الوحدة"
-  },
-  "Onboarding / Respondent role label": {
-    "defaultMessage": "دورك في الشركة"
-  },
-  "Onboarding / Respondent role profile hint": {
-    "defaultMessage": "هذه الإجابة وصفية فقط ولا تغيّر صلاحياتك في المؤسسة."
-  },
-  "Onboarding / Revenue commission": {
-    "defaultMessage": "العمولة / النتيجة"
-  },
-  "Onboarding / Revenue product": {
-    "defaultMessage": "المنتج / الطلب"
-  },
-  "Onboarding / Revenue project": {
-    "defaultMessage": "المشروع / المهمة"
-  },
-  "Onboarding / Revenue service": {
-    "defaultMessage": "عدد الخدمات"
-  },
-  "Onboarding / Revenue subscription": {
-    "defaultMessage": "اشتراك / خدمة متكررة"
-  },
-  "Onboarding / Revenue time": {
-    "defaultMessage": "الوقت المُنجَز"
-  },
-  "Onboarding / Revenue title": {
-    "defaultMessage": "مقابل ماذا يدفع لك عملاؤك؟"
-  },
-  "Onboarding / Role accounting": {
-    "defaultMessage": "المحاسبة"
-  },
-  "Onboarding / Role advisor": {
-    "defaultMessage": "مستشار"
-  },
-  "Onboarding / Role employee": {
-    "defaultMessage": "موظف"
-  },
-  "Onboarding / Role owner management": {
-    "defaultMessage": "المالك / الإدارة"
-  },
-  "Onboarding / Step costs": {
-    "defaultMessage": "التكاليف"
-  },
-  "Onboarding / Step customers": {
-    "defaultMessage": "العملاء"
-  },
-  "Onboarding / Step pricing goal": {
-    "defaultMessage": "التسعير والهدف"
-  },
-  "Onboarding / Step revenue": {
-    "defaultMessage": "الإيرادات"
-  },
-  "Onboarding / Step summary": {
-    "defaultMessage": "الملخص"
-  },
-  "Onboarding / Steps label": {
-    "defaultMessage": "خطوات الإعداد"
-  },
-  "Onboarding / Summary goal": {
-    "defaultMessage": "الهدف الرئيسي"
-  },
-  "Onboarding / Summary hint": {
-    "defaultMessage": "هذه نقطة انطلاق للتحليلات المستقبلية."
-  },
-  "Onboarding / Summary pricing": {
-    "defaultMessage": "التسعير"
-  },
-  "Onboarding / Summary role": {
-    "defaultMessage": "دورك"
-  },
-  "Onboarding / Summary title": {
-    "defaultMessage": "ملف نشاطك التجاري"
-  },
-  "Onboarding / Title": {
-    "defaultMessage": "إعداد مؤسستك"
   }
 }

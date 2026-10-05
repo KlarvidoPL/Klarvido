@@ -13,7 +13,7 @@ import { useToast } from '@sb/webapp-core/toast';
 import { ArrowLeft, ArrowRight, Building2, Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import {
   COMPANY_DETAILS_FIELDS,
@@ -148,6 +148,7 @@ const OnboardingForm = ({
   const errorMessages = useCompanyFormErrorMessages();
   const intl = useIntl();
   const navigate = useNavigate();
+  const location = useLocation();
   const tenantPath = useGenerateTenantPath();
   const { toast } = useToast();
   const { reload: reloadCommonQuery } = useCommonQuery();
@@ -237,7 +238,9 @@ const OnboardingForm = ({
       variant: 'success',
     });
     if (createdTenantId) trackEvent('tenant', 'add', createdTenantId);
-    navigate(tenantPath(RoutesConfig.home, createdTenantId ? { tenantId: createdTenantId } : undefined));
+    // Set by the settings page when it opens this form, so editing returns there instead of the home page.
+    const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
+    navigate(returnTo ?? tenantPath(RoutesConfig.home, createdTenantId ? { tenantId: createdTenantId } : undefined));
   };
 
   // Steps 0 and 1: organization name and company details.

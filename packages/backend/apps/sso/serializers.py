@@ -4,6 +4,50 @@ from hashid_field.rest import HashidSerializerCharField
 from apps.multitenancy.constants import TenantUserRole
 from . import models
 from . import constants
+from .services.domain_verification import (
+    DOMAINS_NOT_VERIFIED_CODE,
+    DomainVerificationError,
+    check_claimable,
+    claim_domains,
+    ensure_connection_domains_verified,
+    get_verified_domains,
+)
+from .services.outbound import UnsafeOutboundURL, validate_public_url
+from .crypto import SSOEncryptionNotConfigured, ensure_encryption_configured
+
+# SECURITY: the server calls these addresses, so they must be public (see services/outbound.py)
+OUTBOUND_URL_FIELDS = (
+    "oidc_issuer",
+    "oidc_token_endpoint",
+    "oidc_userinfo_endpoint",
+    "oidc_jwks_uri",
+    "saml_sso_url",
+    "saml_slo_url",
+    "saml_entity_id",
+)
+
+
+def _validate_client_secret_storage(attrs):
+    """A client secret can only be saved when it can be encrypted. Refuse early, as a field error."""
+    if (attrs.get("oidc_client_secret") or "").strip():
+        try:
+            ensure_encryption_configured()
+        except SSOEncryptionNotConfigured:
+            raise serializers.ValidationError(
+                {"oidc_client_secret": "Client secret storage is not configured on the server."}
+            )
+
+
+def _validate_outbound_urls(attrs):
+    for field in OUTBOUND_URL_FIELDS:
+        value = attrs.get(field)
+        # SAML entity IDs are often URNs, which are not called and are not checked here
+        if not value or not str(value).lower().startswith(("http://", "https://")):
+            continue
+        try:
+            validate_public_url(value)
+        except UnsafeOutboundURL as e:
+            raise serializers.ValidationError({field: str(e)})
 
 
 class TenantSSOConnectionSerializer(serializers.ModelSerializer):
@@ -44,6 +88,7 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
             "oidc_jwks_uri",
             "oidc_scopes",
             "oidc_claim_mapping",
+            "oidc_trust_unverified_email",
             # Metadata
             "sp_metadata_xml",
             "metadata_last_updated",
@@ -62,7 +107,30 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
             "login_count",
             "created_at",
             "updated_at",
+            # SECURITY: status changes only through activate/deactivate, which enforce domain verification
+            "status",
         ]
+
+    def validate_domain_claims(self, attrs, tenant):
+        """
+        Refuse domains the organization may not claim (public providers, or domains verified by another
+        organization) before anything is saved. New domains are added to the verification list on save.
+        """
+        for domain in attrs.get("allowed_domains") or []:
+            try:
+                check_claimable(tenant, domain)
+            except DomainVerificationError as exc:
+                raise serializers.ValidationError({"allowed_domains": exc.code})
+
+    def validate(self, attrs):
+        _validate_outbound_urls(attrs)
+        _validate_client_secret_storage(attrs)
+        if "tenant_id" in attrs:
+            from apps.multitenancy.models import Tenant
+
+            tenant = Tenant.objects.filter(pk=attrs["tenant_id"]).first()
+            self.validate_domain_claims(attrs, tenant)
+        return attrs
 
     def validate_connection_type(self, value):
         """Validate connection type is a valid choice."""
@@ -71,6 +139,23 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
                 f"Invalid connection type. Must be one of: {list(dict(constants.IdentityProviderType.choices).keys())}"
             )
         return value
+
+    def create(self, validated_data):
+        from apps.multitenancy.models import Tenant
+
+        tenant_id = validated_data.pop("tenant_id")
+        tenant = Tenant.objects.get(pk=tenant_id)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        created_by = user if user is not None and user.is_authenticated else None
+
+        secret = validated_data.pop("oidc_client_secret", None) or ""
+        connection = models.TenantSSOConnection.objects.create(tenant=tenant, created_by=created_by, **validated_data)
+        if secret.strip():
+            connection.set_oidc_client_secret(secret)
+            connection.save(update_fields=["oidc_client_secret", "oidc_client_secret_encrypted"])
+        claim_domains(tenant, connection.allowed_domains)
+        return connection
 
 
 class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
@@ -127,6 +212,8 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
 
     def validate(self, attrs):
         """Cross-field validation based on connection type."""
+        _validate_outbound_urls(attrs)
+        _validate_client_secret_storage(attrs)
         connection_type = attrs.get("connection_type", getattr(self.instance, "connection_type", None))
 
         if connection_type == constants.IdentityProviderType.SAML:
@@ -145,22 +232,27 @@ class UpdateTenantSSOConnectionSerializer(TenantSSOConnectionSerializer):
                 if not attrs.get(field) and not getattr(self.instance, field, None):
                     raise serializers.ValidationError({field: f"{field} is required for OIDC connections."})
 
+        if "allowed_domains" in attrs:
+            self.validate_domain_claims(attrs, self.instance.tenant)
+
+        # SECURITY: an active connection may only list domains its tenant has verified
+        is_active = self.instance is not None and self.instance.status == constants.SSOConnectionStatus.ACTIVE
+        if is_active and "allowed_domains" in attrs:
+            verified = get_verified_domains(self.instance.tenant)
+            if any(domain not in verified for domain in attrs["allowed_domains"]):
+                raise serializers.ValidationError({"allowed_domains": DOMAINS_NOT_VERIFIED_CODE})
+
         return attrs
 
     def update(self, instance, validated_data):
-        """Update instance, only setting oidc_client_secret when a non-empty value is provided."""
+        """Update instance, only replacing the client secret when a non-empty value is provided."""
         oidc_client_secret = validated_data.pop('oidc_client_secret', None)
         if oidc_client_secret is not None and oidc_client_secret.strip():
-            validated_data['oidc_client_secret'] = oidc_client_secret
-        return super().update(instance, validated_data)
-
-    def create(self, validated_data):
-        from apps.multitenancy.models import Tenant
-
-        tenant_id = validated_data.pop("tenant_id")
-        tenant = Tenant.objects.get(pk=tenant_id)
-
-        return models.TenantSSOConnection.objects.create(tenant=tenant, **validated_data)
+            instance.set_oidc_client_secret(oidc_client_secret)
+        connection = super().update(instance, validated_data)
+        # Domains the connection now lists become pending claims in the verification list
+        claim_domains(connection.tenant, connection.allowed_domains)
+        return connection
 
 
 class ActivateSSOConnectionSerializer(serializers.Serializer):
@@ -182,6 +274,11 @@ class ActivateSSOConnectionSerializer(serializers.Serializer):
         except models.TenantSSOConnection.DoesNotExist:
             raise serializers.ValidationError({"id": "SSO connection not found."})
 
+        try:
+            ensure_connection_domains_verified(connection)
+        except DomainVerificationError as exc:
+            raise serializers.ValidationError({"allowed_domains": exc.code})
+
         attrs["tenant"] = tenant
         attrs["connection"] = connection
 
@@ -191,10 +288,18 @@ class ActivateSSOConnectionSerializer(serializers.Serializer):
         connection = self.validated_data["connection"]
         tenant = self.validated_data["tenant"]
 
-        # Deactivate any existing active connections
-        models.TenantSSOConnection.objects.filter(tenant=tenant, status=constants.SSOConnectionStatus.ACTIVE).exclude(
-            pk=connection.pk
-        ).update(status=constants.SSOConnectionStatus.INACTIVE)
+        # Deactivate any existing active connections. The queryset update skips the save signal, so their sessions
+        # are revoked here explicitly.
+        previously_active = list(
+            models.TenantSSOConnection.objects.filter(
+                tenant=tenant, status=constants.SSOConnectionStatus.ACTIVE
+            ).exclude(pk=connection.pk)
+        )
+        models.TenantSSOConnection.objects.filter(pk__in=[c.pk for c in previously_active]).update(
+            status=constants.SSOConnectionStatus.INACTIVE
+        )
+        for previous in previously_active:
+            previous.revoke_sessions(reason="SSO connection deactivated")
 
         # Activate this connection
         connection.status = constants.SSOConnectionStatus.ACTIVE

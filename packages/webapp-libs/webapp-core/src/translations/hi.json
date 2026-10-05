@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "URL कॉपी करने में विफल"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "मेटाडेटा XML कॉपी करें"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "बना रहा है..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Service Provider Metadata"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "जब तक कनेक्शन ड्राफ़्ट में है, इसे अपने पहचान प्रदाता में चिपकाएँ। सक्रिय करने के बाद मेटाडेटा URL उपलब्ध होगा।"
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP मेटाडेटा (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP Metadata URL:"
@@ -578,6 +587,84 @@
   "Audit / Error": {
     "defaultMessage": "त्रुटि"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "समूह मैपिंग लागू की गई"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन सक्रिय की गई"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन बनाई गई"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन निष्क्रिय की गई"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन हटाई गई"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन अपडेट की गई"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "KSeF टोकन हटाया गया"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "KSeF टोकन सहेजा गया"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "KSeF टोकन की जाँच की गई"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "SCIM समूह बनाया गया"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "SCIM समूह हटाया गया"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "SCIM समूह अपडेट किया गया"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "SCIM उपयोगकर्ता बनाया गया"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "SCIM उपयोगकर्ता हटाया गया"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "SCIM उपयोगकर्ता अपडेट किया गया"
+  },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "SSO डोमेन जोड़ा गया"
+  },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO डोमेन समाप्त"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "SSO डोमेन हटाया गया"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO डोमेन सत्यापित"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "SSO को छोड़कर लॉगिन"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO लॉगिन विफल"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "SSO लॉगिन शुरू किया गया"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO लॉगिन सफल"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO लॉगआउट"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "JIT के माध्यम से उपयोगकर्ता बनाया गया"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "SSO के माध्यम से उपयोगकर्ता अपडेट किया गया"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "असफल"
   },
@@ -611,6 +698,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP Address"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "KSeF द्वारा अस्वीकृत"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "अभी सत्यापित नहीं"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "सत्यापित"
+  },
   "Audit / Last page": {
     "defaultMessage": "आखिरी पेज"
   },
@@ -638,11 +734,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "प्रारंभ तिथि चुनें"
   },
+  "Audit / Status": {
+    "defaultMessage": "स्थिति"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "असफल"
   },
   "Audit / Status Success": {
     "defaultMessage": "सफल"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "कार्रवाई"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "नया टोकन सहेजा गया"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "टोकन हटाया गया"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "मौजूदा टोकन बदला गया"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "टोकन के अंतिम अंक"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "KSeF में टोकन का नाम"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "ईमेल से फ़िल्टर करें..."
@@ -1379,6 +1496,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "बैकअप सेटिंग्स सफलतापूर्वक अपडेट की गईं"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "आज पर जाएँ"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "अभी"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "आज"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "सक्रिय प्लान:"
   },
@@ -1880,6 +2006,81 @@
   "Documents / subheading": {
     "defaultMessage": "अपने दस्तावेज़ एक ही जगह अपलोड, प्रबंधित और व्यवस्थित करें"
   },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "डोमेन जोड़ने में विफल।"
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "डोमेन जोड़ें"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "क्लिपबोर्ड पर कॉपी किया गया।"
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "रिकॉर्ड नाम कॉपी करें"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "रिकॉर्ड मान कॉपी करें"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "इस TXT रिकॉर्ड को अपने DNS में जोड़ें, फिर सत्यापित करें पर क्लिक करें। रिकॉर्ड को बनाए रखें: SSO इसे हर दिन जाँचता है, और इसे हटाने से डोमेन समाप्त हो जाएगा।"
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "डोमेन हटाने में विफल।"
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "SSO इसका उपयोग करने से पहले अपनी कंपनी के ईमेल डोमेन के स्वामित्व को सिद्ध करें। केवल सत्यापित डोमेन साइन-इन, प्रावधान और एन्फोर्समेंट में भाग लेते हैं।"
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "डोमेन"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "company.in"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "अभी तक कोई डोमेन नहीं जोड़ा गया है। सत्यापन शुरू करने के लिए अपनी कंपनी का डोमेन जोड़ें।"
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "सत्यापन रिकॉर्ड सात दिनों से गायब है, इसलिए यह डोमेन अब SSO के लिए काम नहीं करता। इसके SSO कनेक्शन निष्क्रिय कर दिए गए हैं। रिकॉर्ड फिर से प्रकाशित करें और डोमेन सत्यापित करें।"
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "अंतिम जाँच {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "सत्यापन रिकॉर्ड {since} से गायब है। रिकॉर्ड बहाल न होने पर SSO {deadline} को निष्क्रिय कर दिया जाएगा।"
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "नाम"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "प्रकार"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "मान"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "डोमेन हटाएं"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "समाप्त"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "लंबित"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "सत्यापित"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "डोमेन सत्यापन"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "डोमेन सत्यापित। अब SSO इसका उपयोग कर सकता है।"
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "सत्यापित करें"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "डोमेन सत्यापित करने में विफल।"
+  },
   "Dropzone / Default label": {
     "defaultMessage": "अपलोड करने के लिए फ़ाइल पर क्लिक करें या उसे यहाँ खींचकर छोड़ें"
   },
@@ -2233,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "अपना पासवर्ड रीसेट करें"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "रिकॉर्ड वापस जोड़ें, डोमेन सत्यापित करें और सुरक्षा सेटिंग में SSO कनेक्शन फिर से सक्रिय करें।"
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Klarvido पर जाएँ"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "{domain} के लिए SSO निष्क्रिय कर दिया गया है"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "\"{domain}\" के लिए SSO निष्क्रिय है"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "{tenantName} में \"{domain}\" का सत्यापन रिकॉर्ड {graceDays} दिनों से गायब है, इसलिए इस डोमेन का SSO निष्क्रिय कर दिया गया है। उपयोगकर्ता अब इससे साइन इन नहीं कर सकते।"
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "आपके डोमेन के लिए SSO निष्क्रिय है"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "रिकॉर्ड देखने और उसे वापस जोड़ने के लिए अपने संगठन की सुरक्षा सेटिंग खोलें।"
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Klarvido पर जाएँ"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "{domain} के लिए SSO सत्यापन रिकॉर्ड गायब है"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "\"{domain}\" के लिए SSO सत्यापन रिकॉर्ड गायब है"
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "{tenantName} के लिए \"{domain}\" का स्वामित्व साबित करने वाला DNS रिकॉर्ड गायब है। रिकॉर्ड बहाल न होने पर इस डोमेन का SSO {graceDays} दिनों में निष्क्रिय कर दिया जाएगा।"
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO सत्यापन रिकॉर्ड गायब है"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "पेमेंट विधि अपडेट करें"
@@ -3074,6 +3311,21 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO कनेक्शन निष्क्रिय किया गया"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "\"{tenant_name}\" का डोमेन \"{domain}\" अब सत्यापित नहीं है क्योंकि उसका सत्यापन रिकॉर्ड गायब है। निष्क्रिय कनेक्शन: {connections}।"
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "\"{tenant_name}\" का डोमेन \"{domain}\" अब सत्यापित नहीं है क्योंकि उसका सत्यापन रिकॉर्ड गायब है।"
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO डोमेन समाप्त"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "\"{domain}\" ({tenant_name}) का सत्यापन रिकॉर्ड गायब है। रिकॉर्ड बहाल न होने पर इस डोमेन के लिए SSO {grace_days} दिनों में निष्क्रिय कर दिया जाएगा।"
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO डोमेन सत्यापन रिकॉर्ड गायब है"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "संगठन \"{tenant_name}\" को \"{name}\" ने हटा दिया"
   },
@@ -3121,6 +3373,219 @@
   },
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "जैसे, Google Workspace"
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "वापस"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "ड्राफ़्ट हटाएँ"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "ड्राफ़्ट हटाएँ"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "इस नई संगठन के सभी उत्तर हटा दिए जाएँगे। इसे वापस नहीं किया जा सकता।"
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "यह ड्राफ़्ट हटाया नहीं जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "क्या यह ड्राफ़्ट हटाएँ?"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "ऑनबोर्डिंग पूरी हुई"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "प्रोफ़ाइल की पुष्टि करें"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "कर्मचारियों का समय"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "मार्केटिंग / कमीशन"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "सामग्री / माल"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "उप-ठेकेदार"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "तकनीक / बुनियादी ढाँचा"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "परिवहन / लॉजिस्टिक्स"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "अधिकतम तीन उत्तर चुनें।"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "आपकी बिक्री के साथ कौन-सी लागतें बढ़ती हैं?"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "मुख्यतः व्यवसाय (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "मुख्यतः उपभोक्ता (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "व्यवसाय और उपभोक्ता दोनों"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "सार्वजनिक संस्थाएँ"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "इससे अनुमान लगता है कि भविष्य के एकीकरण कितने बिक्री डेटा को कवर करेंगे।"
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "आपको सबसे ज़्यादा कौन भुगतान करता है?"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "हमें बताएँ कि आपका व्यवसाय कैसे काम करता है। आप पिछले चरणों पर वापस जा सकते हैं।"
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "संपादित करें"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "मैं कड़ी मेहनत करता हूँ, पर नकदी नहीं है"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "मुझे किसी बड़े ग्राहक को खोने की चिंता है"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "लागतें लगातार बढ़ रही हैं"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "मैं समस्याओं को जल्दी पहचानना चाहता हूँ"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "क्या मैं टीम का विस्तार करने का खर्च उठा सकता हूँ?"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "मुझे अपने मूल्य निर्धारण पर भरोसा नहीं है"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "आप सबसे ज़्यादा किस पर नियंत्रण रखना चाहते हैं?"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "कंपनी की प्रोफ़ाइल लोड नहीं हो सकी।"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "आगे"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "संगठन अपडेट नहीं हो सका। फ़ील्ड जाँचें और फिर से कोशिश करें।"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "लागत प्लस मार्जिन"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "निश्चित मूल्य / कोटेशन"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "ग्राहक के अनुसार अलग मूल्य"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "आप आमतौर पर कीमतें कैसे तय करते हैं?"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "सब्सक्रिप्शन / पैकेज"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "समय / इकाई"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "How do you make key decisions?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "कंपनी में आपकी भूमिका"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "यह उत्तर केवल विवरण के लिए है और संगठन में आपकी अनुमतियाँ नहीं बदलता।"
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "कमीशन / परिणाम"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "अधिकतम दो उत्तर चुनें।"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "उत्पाद / ऑर्डर"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "प्रोजेक्ट / असाइनमेंट"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "सेवाओं की संख्या"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "सब्सक्रिप्शन / आवर्ती सेवा"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "काम किए गए घंटे"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "ग्राहक आपको किस चीज़ के लिए भुगतान करते हैं?"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "लेखा"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "सलाहकार"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "कर्मचारी"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "मालिक / प्रबंधन"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Open business profile"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complete or update your organization onboarding answers."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "लागत"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "ग्राहक"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "मूल्य और लक्ष्य"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "राजस्व"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "सारांश"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "ऑनबोर्डिंग चरण"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "मुख्य लक्ष्य"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "यह भविष्य के विश्लेषण के लिए एक शुरुआती बिंदु है।"
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "मूल्य निर्धारण"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "आपकी भूमिका"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "आपकी व्यावसायिक प्रोफ़ाइल"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "अपना संगठन सेट करें"
   },
   "Passkeys / Add another": {
     "defaultMessage": "एक और पासकी जोड़ें"
@@ -3229,24 +3694,6 @@
   },
   "Passkeys / Use count label": {
     "defaultMessage": "उपयोग की बार"
-  },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "एक और passkey जोड़ें"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "मेरा पासकी जोड़ें"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Passkey हटाने में विफल। कृपया दोबारा प्रयास करें।"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey सफलतापूर्वक हटा दिया गया।"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "उपयोगकर्ता नाम या ईमेल से खोजें..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "पासकी हटाने के लिए संगठन संदर्भ आवश्यक है।"
   },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ अक्षर"
@@ -3470,6 +3917,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "आप सदस्यों को ऐसी प्रतिस्थापन भूमिका पर पुनः असाइन नहीं कर सकते जिसमें \"{permissions}\" अनुमति(याँ) शामिल हों, क्योंकि आपके पास स्वयं ये नहीं हैं। पहले किसी संगठन स्वामी या व्यवस्थापक से उन्हें प्राप्त करने के लिए कहें।"
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "आपके पास संगठन की भूमिकाओं को प्रबंधित करने की अनुमति नहीं है।"
   },
@@ -3649,12 +4099,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "गतिविधि लॉग देखें"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "संगठन की पासकी नीतियां देखें और प्रबंधित करें"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "पासकी प्रबंधित करें"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "सिंगल साइन-ऑन (SSO) कनेक्शन और SCIM प्रोविज़निंग कॉन्फ़िगर करें"
@@ -3878,14 +4322,83 @@
   "SSO / Edit": {
     "defaultMessage": "संपादित करें"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "आपने जिस ईमेल को दर्ज किया था उससे अलग खाते से साइन इन किया है। कृपया फिर से प्रयास करें।"
+  },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "इस ईमेल वाला खाता पहले से मौजूद है। अपने संगठन के व्यवस्थापक से आपको आमंत्रित करने के लिए कहें।"
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "कोई और साइन-इन तरीका उपयोग करें"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "प्रमाणीकरण विफल रहा। कृपया फिर से प्रयास करें।"
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO ठीक से कॉन्फ़िगर नहीं है। अपने व्यवस्थापक से संपर्क करें।"
   },
   "SSO / Error / description": {
     "defaultMessage": "यदि यह समस्या बनी रहती है, तो कृपया अपने IT व्यवस्थापक से संपर्क करें या कोई वैकल्पिक साइन-इन तरीका आज़माएँ।"
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "DNS रिकॉर्ड अभी नहीं मिला। DNS बदलावों में एक घंटे तक लग सकता है, फिर से प्रयास करें।"
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "पहले इस डोमेन को सभी SSO कनेक्शन से हटाएं।"
+  },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "पहले इस डोमेन को इन SSO कनेक्शन से हटाएं: {connections}।"
+  },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "आपका ईमेल डोमेन इस संगठन के लिए अधिकृत नहीं है।"
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "यह डोमेन पहले से किसी दूसरे संगठन द्वारा सत्यापित है। यदि यह आपका है, तो सहायता से संपर्क करें।"
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "सक्रिय करने से पहले इस कनेक्शन के सभी अनुमत डोमेन सत्यापित करें।"
+  },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "आपके पहचान प्रदाता ने इस ईमेल पते की पुष्टि नहीं की है। सेटअप जाँचने के लिए अपने व्यवस्थापक से कहें।"
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "साइन-इन के दौरान त्रुटि हुई। कृपया फिर से प्रयास करें या सहायता से संपर्क करें।"
+  },
   "SSO / Error / heading": {
     "defaultMessage": "साइन-इन विफल"
+  },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "example.com जैसा डोमेन नाम दर्ज करें।"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "पहचान प्रदाता से अमान्य प्रतिक्रिया।"
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "पहचान प्रदाता ने ईमेल पता नहीं दिया।"
+  },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "सक्रिय करने से पहले कनेक्शन में कम से कम एक सत्यापित डोमेन जोड़ें।"
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "स्वचालित खाता निर्माण बंद है। अपने व्यवस्थापक से संपर्क करें।"
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "gmail.com जैसे सार्वजनिक ईमेल प्रदाताओं का दावा नहीं किया जा सकता। अपनी कंपनी का डोमेन उपयोग करें।"
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "बहुत अधिक प्रयास। कृपया पुनः प्रयास से पहले प्रतीक्षा करें।"
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "आपका सत्र समाप्त हो गया है। कृपया फिर से साइन इन करें।"
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "सुरक्षा सत्यापन विफल रहा। कृपया फिर से प्रयास करें।"
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "आपका साइन-इन अनुरोध समाप्त हो गया है या किसी अन्य ब्राउज़र में शुरू किया गया था। कृपया साइन-इन फिर से शुरू करें।"
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "सुरक्षा जाँच विफल रही। कृपया साइन-इन प्रक्रिया फिर से शुरू करें।"
   },
   "SSO / Error / try again button": {
     "defaultMessage": "फिर से प्रयास करें"
@@ -3932,6 +4445,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO कनेक्शन सक्रिय किया गया।"
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "सक्रिय करने से पहले इस कनेक्शन में एक डोमेन जोड़ें।"
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "इस कनेक्शन को सक्रिय करने से पहले डोमेन सत्यापन में {domains} सत्यापित करें। सभी डोमेन सत्यापित होने तक सक्रियता अवरुद्ध रहेगी।"
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "सक्रिय"
   },
@@ -3968,6 +4487,9 @@
   "SSO Card / Delete Success": {
     "defaultMessage": "SSO कनेक्शन हटा दिया गया।"
   },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(सत्यापित नहीं)"
+  },
   "SSO Card / Domains Label": {
     "defaultMessage": "डोमेन:"
   },
@@ -3988,6 +4510,12 @@
   },
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "प्रवर्तित"
+  },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "SSO अनिवार्यता अक्षम है। उपयोगकर्ता अब पासवर्ड से लॉगिन कर सकते हैं।"
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "SSO अनिवार्यता सक्षम है। अनुमत डोमेन के उपयोगकर्ताओं को SSO का उपयोग करना होगा।"
   },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "SSO प्रवर्तन सेटिंग अपडेट करने में विफल।"
@@ -4070,6 +4598,12 @@
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "उदाहरण के लिए, company.com"
   },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "सत्यापित नहीं"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "कनेक्शन सक्रिय करने से पहले डोमेन सत्यापन में इस डोमेन को सत्यापित करें।"
+  },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"
   },
@@ -4084,6 +4618,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL (Login URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "इसे केवल तभी चालू करें जब आपका पहचान प्रदाता email_verified क्लेम नहीं भेजता, जैसे Microsoft Entra ID।"
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "असत्यापित ईमेल स्वीकार करें"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "इसे केवल तभी चालू करें जब आपका पहचान प्रदाता उपयोगकर्ताओं को केवल उन्हीं ईमेल पतों से साइन इन करने दे जो उनके अपने हैं। अन्यथा कोई उपयोगकर्ता किसी और के रूप में साइन इन कर सकता है।"
   },
   "SSO Login / Back to login": {
     "defaultMessage": "लॉगिन पर वापस जाएं"
@@ -4114,6 +4657,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "SSO लॉगिन"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "API URL"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "API URL उत्पादन के लिए कॉन्फ़िगर है"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "API URL localhost पर सेट है – SSO बाहरी IdP के साथ काम नहीं करेगा"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "API_URL पर्यावरण चर सेट नहीं है"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "सभी आवश्यक OIDC एंडपॉइंट मौजूद हैं"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "कॉलबैक URL"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "कॉलबैक URL कॉन्फ़िगरेशन अधूरा हो सकता है"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "कॉलबैक URL localhost का उपयोग कर रहा है – बाहरी IdP इस तक नहीं पहुँच सकते"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "प्रमाणपत्र की समय सीमा {days} दिन पहले समाप्त हो गई"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "प्रमाणपत्र {days} दिन में समाप्त हो जाएगा"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "हस्ताक्षर सत्यापन के लिए प्रमाणपत्र की सिफ़ारिश की जाती है"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "प्रमाणपत्र मान्य है ({days} दिन में समाप्त होगा)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "क्लाइंट ID"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "क्लाइंट सीक्रेट"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "डिस्कवरी दस्तावेज़ प्राप्त करते समय कनेक्शन का समय समाप्त हो गया"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "SSO एंडपॉइंट से कनेक्शन का समय समाप्त हो गया"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "जल्द ही प्रमाणपत्र नवीनीकृत करने पर विचार करें"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "डिस्कवरी दस्तावेज़ प्राप्त नहीं हो सका"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "ACS URL"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "प्राधिकरण एंडपॉइंट"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "खोजे गए एंडपॉइंट"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "एंटिटी ID"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "त्रुटि"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "समाप्ति"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "सुझाव"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "अनुरोध ID प्रारूप"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "टोकन एंडपॉइंट"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "मान"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "डिस्कवरी एंडपॉइंट ने HTTP {status} लौटाया"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "डिस्कवरी एंडपॉइंट ने अमान्य JSON लौटाया"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "सुनिश्चित करें कि प्रमाणपत्र मान्य PEM या base64 प्रारूप में है"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "SSO एंडपॉइंट से कनेक्ट नहीं हो सका"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "SAML AuthnRequest बनाने में विफल"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "प्रमाणपत्र पार्स नहीं हो सका"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "IdP प्रमाणपत्र"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "IdP एंटिटी ID"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "IdP प्रमाणपत्र कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "पहचान प्रदाता एंटिटी ID कॉन्फ़िगर है"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "पहचान प्रदाता एंटिटी ID कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "जारीकर्ता URL कॉन्फ़िगर है"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "जारीकर्ता URL कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "मैन्युअल एंडपॉइंट कॉन्फ़िगरेशन आवश्यक हो सकता है"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "डिस्कवरी दस्तावेज़ में गायब एंडपॉइंट: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "OAuth क्लाइंट ID कॉन्फ़िगर है"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "OAuth क्लाइंट ID कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "OAuth क्लाइंट सीक्रेट कॉन्फ़िगर है"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "OAuth क्लाइंट सीक्रेट कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "OAuth कॉलबैक URL कॉन्फ़िगर है"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "OIDC डिस्कवरी"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "OIDC जारीकर्ता"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "OpenID Connect डिस्कवरी एंडपॉइंट पहुँच योग्य है"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "आवश्यक एंडपॉइंट"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "SAML AuthnRequest सफलतापूर्वक बनाया जा सकता है"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "SAML अनुरोध निर्माण"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "SP कॉन्फ़िगरेशन"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "SSO एंडपॉइंट से कनेक्ट करते समय SSL/TLS त्रुटि"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "जारीकर्ता से कनेक्ट करते समय SSL/TLS त्रुटि"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "SSO URL प्रारूप"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "SSO URL पहुँच योग्य"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "SSO एंडपॉइंट मौजूद है (405 लौटाया – SAML एंडपॉइंट के लिए अपेक्षित)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "SSO एंडपॉइंट पहुँच योग्य है (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "SSO एंडपॉइंट ने HTTP {status} लौटाया"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "सेवा प्रदाता URL कॉन्फ़िगर हैं"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "सेवा प्रदाता URL localhost का उपयोग कर रहे हैं – बाहरी IdP इन तक नहीं पहुँच सकते"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "सेवा प्रदाता कॉन्फ़िगरेशन अधूरा हो सकता है"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "API_URL पर्यावरण चर को अपने सार्वजनिक API डोमेन पर सेट करें"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "API_URL पर्यावरण चर को अपने सार्वजनिक API डोमेन पर सेट करें"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "सिंगल साइन-ऑन URL कॉन्फ़िगर है"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "सिंगल साइन-ऑन URL कॉन्फ़िगर नहीं है"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "कुछ IdP स्वचालित डिस्कवरी का समर्थन नहीं कर सकते"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "IdP फ़ायरवॉल के पीछे हो सकता है या धीरे प्रतिक्रिया दे रहा है"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "यह एंडपॉइंट अब भी SAML अनुरोधों के लिए काम कर सकता है"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "इससे SSO रीडायरेक्ट विफल होंगे। API_URL को अपने सार्वजनिक API डोमेन पर सेट करें।"
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - SaaS Ideas Generator"
@@ -4526,9 +5288,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "हाँ"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Passkey जोड़ें"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Token जोड़ें"
   },
@@ -4565,35 +5324,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "सभी इवेंट देखने के लिए अपने फ़िल्टर बदलें या उन्हें साफ़ करें।"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "कोई और सर्च शब्द आज़माएँ"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "कोई पासकी रजिस्टर्ड नहीं"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "आपकी खोज से कोई पासकी मेल नहीं खा रही"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "डायरेक्टरी सिंक के लिए SSO आवश्यक है"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "कोई SSO कनेक्शन कॉन्फ़िगर नहीं है"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "आपके संगठन में अभी तक किसी यूज़र ने पासकी रजिस्टर नहीं की है"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "तेज़ और अधिक सुरक्षित साइन-इन के लिए पासकी रजिस्टर करें"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "अपने संगठन के सभी यूज़र्स के लिए पासकीज़ प्रबंधित करें"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "पासवर्ड-रहित ऑथेंटिकेशन के लिए बायोमेट्रिक्स या सिक्योरिटी कीज़ का उपयोग करें"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "संगत Identity Providers"
@@ -4741,6 +5476,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "VAT स्थिति"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "सहेजने के बाद यह मान बदला नहीं जा सकता।"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "यह मान जाँचें और फिर से कोशिश करें।"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "अमान्य NIP नंबर"
@@ -4990,212 +5731,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "त्वरित शुरुआत"
-  },
-  "Onboarding / Save failed": {
-    "defaultMessage": "यह चरण सहेजा नहीं जा सका। कृपया फिर से कोशिश करें।"
-  },
-  "Onboarding / Organization save failed": {
-    "defaultMessage": "संगठन अपडेट नहीं हो सका। फ़ील्ड जाँचें और फिर से कोशिश करें।"
-  },
-  "Onboarding / Load failed": {
-    "defaultMessage": "कंपनी की प्रोफ़ाइल लोड नहीं हो सकी।"
-  },
-  "Onboarding / Completed": {
-    "defaultMessage": "ऑनबोर्डिंग पूरी हुई"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "यह मान जाँचें और फिर से कोशिश करें।"
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "सहेजने के बाद यह मान बदला नहीं जा सकता।"
-  },
-  "Onboarding / Revenue hint": {
-    "defaultMessage": "अधिकतम दो उत्तर चुनें।"
-  },
-  "Onboarding / Costs hint": {
-    "defaultMessage": "अधिकतम तीन उत्तर चुनें।"
-  },
-  "Onboarding / Back": {
-    "defaultMessage": "वापस"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "ड्राफ़्ट हटाएँ"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "ड्राफ़्ट हटाएँ"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "इस नई संगठन के सभी उत्तर हटा दिए जाएँगे। इसे वापस नहीं किया जा सकता।"
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "यह ड्राफ़्ट हटाया नहीं जा सका। कृपया फिर से कोशिश करें।"
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "क्या यह ड्राफ़्ट हटाएँ?"
-  },
-  "Onboarding / Confirm": {
-    "defaultMessage": "प्रोफ़ाइल की पुष्टि करें"
-  },
-  "Onboarding / Cost employees": {
-    "defaultMessage": "कर्मचारियों का समय"
-  },
-  "Onboarding / Cost marketing": {
-    "defaultMessage": "मार्केटिंग / कमीशन"
-  },
-  "Onboarding / Cost materials": {
-    "defaultMessage": "सामग्री / माल"
-  },
-  "Onboarding / Cost subcontractors": {
-    "defaultMessage": "उप-ठेकेदार"
-  },
-  "Onboarding / Cost technology": {
-    "defaultMessage": "तकनीक / बुनियादी ढाँचा"
-  },
-  "Onboarding / Cost transport": {
-    "defaultMessage": "परिवहन / लॉजिस्टिक्स"
-  },
-  "Onboarding / Costs title": {
-    "defaultMessage": "आपकी बिक्री के साथ कौन-सी लागतें बढ़ती हैं?"
-  },
-  "Onboarding / Customer B2B": {
-    "defaultMessage": "मुख्यतः व्यवसाय (B2B)"
-  },
-  "Onboarding / Customer B2C": {
-    "defaultMessage": "मुख्यतः उपभोक्ता (B2C)"
-  },
-  "Onboarding / Customer mixed": {
-    "defaultMessage": "व्यवसाय और उपभोक्ता दोनों"
-  },
-  "Onboarding / Customer public": {
-    "defaultMessage": "सार्वजनिक संस्थाएँ"
-  },
-  "Onboarding / Customers hint": {
-    "defaultMessage": "इससे अनुमान लगता है कि भविष्य के एकीकरण कितने बिक्री डेटा को कवर करेंगे।"
-  },
-  "Onboarding / Customers title": {
-    "defaultMessage": "आपको सबसे ज़्यादा कौन भुगतान करता है?"
-  },
-  "Onboarding / Description": {
-    "defaultMessage": "हमें बताएँ कि आपका व्यवसाय कैसे काम करता है। आप पिछले चरणों पर वापस जा सकते हैं।"
-  },
-  "Onboarding / Edit": {
-    "defaultMessage": "संपादित करें"
-  },
-  "Onboarding / Goal cash": {
-    "defaultMessage": "मैं कड़ी मेहनत करता हूँ, पर नकदी नहीं है"
-  },
-  "Onboarding / Goal client loss": {
-    "defaultMessage": "मुझे किसी बड़े ग्राहक को खोने की चिंता है"
-  },
-  "Onboarding / Goal costs": {
-    "defaultMessage": "लागतें लगातार बढ़ रही हैं"
-  },
-  "Onboarding / Goal early warning": {
-    "defaultMessage": "मैं समस्याओं को जल्दी पहचानना चाहता हूँ"
-  },
-  "Onboarding / Goal hiring": {
-    "defaultMessage": "क्या मैं टीम का विस्तार करने का खर्च उठा सकता हूँ?"
-  },
-  "Onboarding / Goal pricing": {
-    "defaultMessage": "मुझे अपने मूल्य निर्धारण पर भरोसा नहीं है"
-  },
-  "Onboarding / Goal question": {
-    "defaultMessage": "आप सबसे ज़्यादा किस पर नियंत्रण रखना चाहते हैं?"
-  },
-  "Onboarding / Next": {
-    "defaultMessage": "आगे"
-  },
-  "Onboarding / Pricing cost plus": {
-    "defaultMessage": "लागत प्लस मार्जिन"
-  },
-  "Onboarding / Pricing fixed": {
-    "defaultMessage": "निश्चित मूल्य / कोटेशन"
-  },
-  "Onboarding / Pricing individual": {
-    "defaultMessage": "ग्राहक के अनुसार अलग मूल्य"
-  },
-  "Onboarding / Pricing question": {
-    "defaultMessage": "आप आमतौर पर कीमतें कैसे तय करते हैं?"
-  },
-  "Onboarding / Pricing subscription": {
-    "defaultMessage": "सब्सक्रिप्शन / पैकेज"
-  },
-  "Onboarding / Pricing time unit": {
-    "defaultMessage": "समय / इकाई"
-  },
-  "Onboarding / Respondent role label": {
-    "defaultMessage": "कंपनी में आपकी भूमिका"
-  },
-  "Onboarding / Respondent role profile hint": {
-    "defaultMessage": "यह उत्तर केवल विवरण के लिए है और संगठन में आपकी अनुमतियाँ नहीं बदलता।"
-  },
-  "Onboarding / Revenue commission": {
-    "defaultMessage": "कमीशन / परिणाम"
-  },
-  "Onboarding / Revenue product": {
-    "defaultMessage": "उत्पाद / ऑर्डर"
-  },
-  "Onboarding / Revenue project": {
-    "defaultMessage": "प्रोजेक्ट / असाइनमेंट"
-  },
-  "Onboarding / Revenue service": {
-    "defaultMessage": "सेवाओं की संख्या"
-  },
-  "Onboarding / Revenue subscription": {
-    "defaultMessage": "सब्सक्रिप्शन / आवर्ती सेवा"
-  },
-  "Onboarding / Revenue time": {
-    "defaultMessage": "काम किए गए घंटे"
-  },
-  "Onboarding / Revenue title": {
-    "defaultMessage": "ग्राहक आपको किस चीज़ के लिए भुगतान करते हैं?"
-  },
-  "Onboarding / Role accounting": {
-    "defaultMessage": "लेखा"
-  },
-  "Onboarding / Role advisor": {
-    "defaultMessage": "सलाहकार"
-  },
-  "Onboarding / Role employee": {
-    "defaultMessage": "कर्मचारी"
-  },
-  "Onboarding / Role owner management": {
-    "defaultMessage": "मालिक / प्रबंधन"
-  },
-  "Onboarding / Step costs": {
-    "defaultMessage": "लागत"
-  },
-  "Onboarding / Step customers": {
-    "defaultMessage": "ग्राहक"
-  },
-  "Onboarding / Step pricing goal": {
-    "defaultMessage": "मूल्य और लक्ष्य"
-  },
-  "Onboarding / Step revenue": {
-    "defaultMessage": "राजस्व"
-  },
-  "Onboarding / Step summary": {
-    "defaultMessage": "सारांश"
-  },
-  "Onboarding / Steps label": {
-    "defaultMessage": "ऑनबोर्डिंग चरण"
-  },
-  "Onboarding / Summary goal": {
-    "defaultMessage": "मुख्य लक्ष्य"
-  },
-  "Onboarding / Summary hint": {
-    "defaultMessage": "यह भविष्य के विश्लेषण के लिए एक शुरुआती बिंदु है।"
-  },
-  "Onboarding / Summary pricing": {
-    "defaultMessage": "मूल्य निर्धारण"
-  },
-  "Onboarding / Summary role": {
-    "defaultMessage": "आपकी भूमिका"
-  },
-  "Onboarding / Summary title": {
-    "defaultMessage": "आपकी व्यावसायिक प्रोफ़ाइल"
-  },
-  "Onboarding / Title": {
-    "defaultMessage": "अपना संगठन सेट करें"
   }
 }

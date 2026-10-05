@@ -152,6 +152,19 @@ describe('SSOConnectionCard: Component', () => {
         expect(screen.getByText(/Inactive/i)).toBeInTheDocument();
       });
 
+      it('should show the enforcement warning when an active connection enforces SSO', async () => {
+        renderComponent(true, [createMockConnection({ status: 'active', enforceSso: true })]);
+
+        expect(await screen.findByText('SSO enforcement is active')).toBeInTheDocument();
+      });
+
+      it('should not show the enforcement warning when only an inactive connection enforces SSO', async () => {
+        renderComponent(true, [createMockConnection({ status: 'inactive', enforceSso: true })]);
+
+        await screen.findByText('Okta Production');
+        expect(screen.queryByText('SSO enforcement is active')).not.toBeInTheDocument();
+      });
+
       it('should display multiple connections', async () => {
         renderComponent(true, [
           createMockConnection({ id: '1', name: 'Okta Production' }),
@@ -184,7 +197,7 @@ describe('SSOConnectionCard: Component', () => {
         await screen.findByText('Okta Production');
 
         const actionsButtons = screen.getAllByRole('button');
-        const actionsButton = actionsButtons.find((btn) => btn.classList.contains('opacity-0'));
+        const actionsButton = actionsButtons.find((btn) => btn.classList.contains('sm:opacity-0'));
         expect(actionsButton).toBeDefined();
       });
     });

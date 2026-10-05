@@ -152,6 +152,12 @@ export type ActivateSsoConnectionMutationPayload = {
   tenantId?: Maybe<Scalars['String']['output']>;
 };
 
+/** Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified. */
+export type AddSsoDomainMutation = {
+  __typename?: 'AddSSODomainMutation';
+  ssoDomain?: Maybe<TenantDomainType>;
+};
+
 /** Event sent during AI chat streaming. */
 export type AiChatEventType = {
   __typename?: 'AiChatEventType';
@@ -180,6 +186,8 @@ export type ApiMutation = {
   acceptTenantInvitation?: Maybe<AcceptTenantInvitationMutationPayload>;
   /** Activate an SSO connection. */
   activateSsoConnection?: Maybe<ActivateSsoConnectionMutationPayload>;
+  /** Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified. */
+  addSsoDomain?: Maybe<AddSsoDomainMutation>;
   /**
    * Assign one or more organization roles to a member.
    *
@@ -240,6 +248,8 @@ export type ApiMutation = {
   deletePaymentMethod?: Maybe<DeletePaymentMethodMutationPayload>;
   /** Delete an SSO connection. Requires tenantId in input for tenant context. */
   deleteSsoConnection?: Maybe<DeleteSsoConnectionMutationPayload>;
+  /** Remove a claimed domain. Refused while an SSO connection of the tenant still uses it. */
+  deleteSsoDomain?: Maybe<DeleteSsoDomainMutation>;
   /** Mutation to delete a tenant from the system. */
   deleteTenant?: Maybe<DeleteTenantMutationPayload>;
   /**
@@ -252,8 +262,6 @@ export type ApiMutation = {
    * - Cannot remove the last owner
    */
   deleteTenantMembership?: Maybe<DeleteTenantMembershipMutationPayload>;
-  /** Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context. */
-  deleteTenantPasskey?: Maybe<DeleteTenantPasskeyMutation>;
   disableOtp?: Maybe<DisableOtpMutationPayload>;
   /** Download a backup file with decryption applied in-memory. */
   downloadBackupDecrypted?: Maybe<DownloadBackupDecryptedMutation>;
@@ -343,6 +351,8 @@ export type ApiMutation = {
   updateTenantMembership?: Maybe<UpdateTenantMembershipMutationPayload>;
   validateOtp?: Maybe<ValidateOtpMutationPayload>;
   verifyOtp?: Maybe<VerifyOtpMutationPayload>;
+  /** Check the domain's DNS TXT record and mark the domain as verified. */
+  verifySsoDomain?: Maybe<VerifySsoDomainMutation>;
 };
 
 
@@ -353,6 +363,12 @@ export type ApiMutationAcceptTenantInvitationArgs = {
 
 export type ApiMutationActivateSsoConnectionArgs = {
   input: ActivateSsoConnectionMutationInput;
+};
+
+
+export type ApiMutationAddSsoDomainArgs = {
+  domain: Scalars['String']['input'];
+  tenantId: Scalars['ID']['input'];
 };
 
 
@@ -502,6 +518,12 @@ export type ApiMutationDeleteSsoConnectionArgs = {
 };
 
 
+export type ApiMutationDeleteSsoDomainArgs = {
+  id: Scalars['ID']['input'];
+  tenantId: Scalars['ID']['input'];
+};
+
+
 export type ApiMutationDeleteTenantArgs = {
   input: DeleteTenantMutationInput;
 };
@@ -509,12 +531,6 @@ export type ApiMutationDeleteTenantArgs = {
 
 export type ApiMutationDeleteTenantMembershipArgs = {
   input: DeleteTenantMembershipMutationInput;
-};
-
-
-export type ApiMutationDeleteTenantPasskeyArgs = {
-  id: Scalars['ID']['input'];
-  tenantId: Scalars['ID']['input'];
 };
 
 
@@ -769,6 +785,12 @@ export type ApiMutationValidateOtpArgs = {
 
 export type ApiMutationVerifyOtpArgs = {
   input: VerifyOtpMutationInput;
+};
+
+
+export type ApiMutationVerifySsoDomainArgs = {
+  id: Scalars['ID']['input'];
+  tenantId: Scalars['ID']['input'];
 };
 
 export type ApiSubscription = {
@@ -1540,6 +1562,8 @@ export type CreateSsoConnectionMutationInput = {
   /** Space-separated list of OAuth scopes */
   oidcScopes?: InputMaybe<Scalars['String']['input']>;
   oidcTokenEndpoint?: InputMaybe<Scalars['String']['input']>;
+  /** Accept OIDC logins whose email_verified claim is missing or false */
+  oidcTrustUnverifiedEmail?: InputMaybe<Scalars['Boolean']['input']>;
   oidcUserinfoEndpoint?: InputMaybe<Scalars['String']['input']>;
   /** Mapping of SAML attributes to user fields */
   samlAttributeMapping?: InputMaybe<Scalars['JSONString']['input']>;
@@ -1552,7 +1576,6 @@ export type CreateSsoConnectionMutationInput = {
   samlSsoUrl?: InputMaybe<Scalars['String']['input']>;
   samlWantAssertionsSigned?: InputMaybe<Scalars['Boolean']['input']>;
   samlWantResponseSigned?: InputMaybe<Scalars['Boolean']['input']>;
-  status?: InputMaybe<Status>;
   tenantId: Scalars['String']['input'];
 };
 
@@ -1585,6 +1608,8 @@ export type CreateSsoConnectionMutationPayload = {
   /** Space-separated list of OAuth scopes */
   oidcScopes?: Maybe<Scalars['String']['output']>;
   oidcTokenEndpoint?: Maybe<Scalars['String']['output']>;
+  /** Accept OIDC logins whose email_verified claim is missing or false */
+  oidcTrustUnverifiedEmail?: Maybe<Scalars['Boolean']['output']>;
   oidcUserinfoEndpoint?: Maybe<Scalars['String']['output']>;
   /** Mapping of SAML attributes to user fields */
   samlAttributeMapping?: Maybe<Scalars['JSONString']['output']>;
@@ -1823,6 +1848,12 @@ export type DeleteSsoConnectionMutationPayload = {
   deletedIds?: Maybe<Array<Maybe<Scalars['ID']['output']>>>;
 };
 
+/** Remove a claimed domain. Refused while an SSO connection of the tenant still uses it. */
+export type DeleteSsoDomainMutation = {
+  __typename?: 'DeleteSSODomainMutation';
+  ok?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type DeleteTenantMembershipMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
@@ -1855,12 +1886,6 @@ export type DeleteTenantMutationPayload = {
   __typename?: 'DeleteTenantMutationPayload';
   clientMutationId?: Maybe<Scalars['String']['output']>;
   deletedIds?: Maybe<Array<Maybe<Scalars['ID']['output']>>>;
-};
-
-/** Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context. */
-export type DeleteTenantPasskeyMutation = {
-  __typename?: 'DeleteTenantPasskeyMutation';
-  ok?: Maybe<Scalars['Boolean']['output']>;
 };
 
 /** [See type definition](https://app.contentful.com/spaces/m7e7pnsr61vp/content_types/demoItem) */
@@ -3123,8 +3148,8 @@ export type Query = {
   ssoConnection?: Maybe<SsoConnectionType>;
   ssoConnections?: Maybe<SsoConnectionConnection>;
   ssoDiscover?: Maybe<SsoDiscoveryResultType>;
+  ssoDomains?: Maybe<Array<Maybe<TenantDomainType>>>;
   tenant?: Maybe<TenantType>;
-  tenantPasskeys?: Maybe<Array<Maybe<TenantPasskeyType>>>;
   /** Get translation sync status (admin only) */
   translationSyncStatus?: Maybe<TranslationSyncStatusType>;
   unreadNotificationsCount?: Maybe<Scalars['Int']['output']>;
@@ -3466,14 +3491,13 @@ export type QuerySsoDiscoverArgs = {
 };
 
 
-export type QueryTenantArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
+export type QuerySsoDomainsArgs = {
+  tenantId: Scalars['ID']['input'];
 };
 
 
-export type QueryTenantPasskeysArgs = {
-  search?: InputMaybe<Scalars['String']['input']>;
-  tenantId: Scalars['ID']['input'];
+export type QueryTenantArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 /**
@@ -3756,6 +3780,8 @@ export type SsoConnectionType = Node & {
   /** Space-separated list of OAuth scopes */
   oidcScopes: Scalars['String']['output'];
   oidcTokenEndpoint: Scalars['String']['output'];
+  /** Accept OIDC logins whose email_verified claim is missing or false */
+  oidcTrustUnverifiedEmail: Scalars['Boolean']['output'];
   oidcUserinfoEndpoint: Scalars['String']['output'];
   /** Mapping of SAML attributes to user fields */
   samlAttributeMapping: Scalars['JSONString']['output'];
@@ -3769,6 +3795,7 @@ export type SsoConnectionType = Node & {
   spAcsUrl?: Maybe<Scalars['String']['output']>;
   spEntityId?: Maybe<Scalars['String']['output']>;
   spMetadataUrl?: Maybe<Scalars['String']['output']>;
+  spMetadataXml?: Maybe<Scalars['String']['output']>;
   status: SsoTenantSsoConnectionStatusChoices;
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -3778,8 +3805,6 @@ export type SsoDiscoveryConnectionType = {
   id?: Maybe<Scalars['String']['output']>;
   loginUrl?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  tenantId?: Maybe<Scalars['String']['output']>;
-  tenantName?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
 };
 
@@ -3871,6 +3896,14 @@ export enum SsoSsoAuditLogEventTypeChoices {
   DEVICE_REGISTERED = 'DEVICE_REGISTERED',
   /** Device Removed */
   DEVICE_REMOVED = 'DEVICE_REMOVED',
+  /** SSO Domain Added */
+  DOMAIN_ADDED = 'DOMAIN_ADDED',
+  /** SSO Domain Lapsed */
+  DOMAIN_LAPSED = 'DOMAIN_LAPSED',
+  /** SSO Domain Removed */
+  DOMAIN_REMOVED = 'DOMAIN_REMOVED',
+  /** SSO Domain Verified */
+  DOMAIN_VERIFIED = 'DOMAIN_VERIFIED',
   /** Group Mapping Applied */
   GROUP_MAPPING_APPLIED = 'GROUP_MAPPING_APPLIED',
   /** IdP Configuration Activated */
@@ -3883,6 +3916,12 @@ export enum SsoSsoAuditLogEventTypeChoices {
   IDP_CONFIG_DELETED = 'IDP_CONFIG_DELETED',
   /** IdP Configuration Updated */
   IDP_CONFIG_UPDATED = 'IDP_CONFIG_UPDATED',
+  /** KSeF Token Deleted */
+  KSEF_TOKEN_DELETED = 'KSEF_TOKEN_DELETED',
+  /** KSeF Token Saved */
+  KSEF_TOKEN_SAVED = 'KSEF_TOKEN_SAVED',
+  /** KSeF Token Tested */
+  KSEF_TOKEN_TESTED = 'KSEF_TOKEN_TESTED',
   /** Passkey Auth Failed */
   PASSKEY_AUTH_FAILED = 'PASSKEY_AUTH_FAILED',
   /** Passkey Auth Success */
@@ -3925,6 +3964,16 @@ export enum SsoSsoAuditLogEventTypeChoices {
   USER_PROVISIONED = 'USER_PROVISIONED',
   /** User Updated via SSO */
   USER_UPDATED = 'USER_UPDATED'
+}
+
+/** An enumeration. */
+export enum SsoTenantDomainStatusChoices {
+  /** Lapsed (record missing for several checks) */
+  LAPSED = 'LAPSED',
+  /** Pending verification */
+  PENDING = 'PENDING',
+  /** Verified */
+  VERIFIED = 'VERIFIED'
 }
 
 /** An enumeration. */
@@ -4668,6 +4717,23 @@ export type TenantConnection = {
   pageInfo: PageInfo;
 };
 
+/** An email domain claimed by the tenant for SSO, with the DNS record that proves ownership. */
+export type TenantDomainType = Node & {
+  __typename?: 'TenantDomainType';
+  consecutiveFailures: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  /** Lowercase email domain, e.g. example.com */
+  domain: Scalars['String']['output'];
+  firstFailedAt?: Maybe<Scalars['DateTime']['output']>;
+  gracePeriodEndsAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  lastCheckedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: SsoTenantDomainStatusChoices;
+  verificationRecordName?: Maybe<Scalars['String']['output']>;
+  verificationRecordValue?: Maybe<Scalars['String']['output']>;
+  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
 /** A Relay edge containing a `Tenant` and its cursor. */
 export type TenantEdge = {
   __typename?: 'TenantEdge';
@@ -4691,21 +4757,6 @@ export type TenantMembershipType = Node & {
   role?: Maybe<TenantUserRole>;
   userEmail?: Maybe<Scalars['String']['output']>;
   userId?: Maybe<Scalars['ID']['output']>;
-};
-
-export type TenantPasskeyType = {
-  __typename?: 'TenantPasskeyType';
-  authenticatorType?: Maybe<Scalars['String']['output']>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
-  deviceType?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  isActive?: Maybe<Scalars['Boolean']['output']>;
-  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  transports?: Maybe<Scalars['GenericScalar']['output']>;
-  useCount?: Maybe<Scalars['Int']['output']>;
-  userEmail?: Maybe<Scalars['String']['output']>;
-  userName?: Maybe<Scalars['String']['output']>;
 };
 
 export type TenantType = Node & {
@@ -4909,6 +4960,8 @@ export type UpdateSsoConnectionMutationInput = {
   /** Space-separated list of OAuth scopes */
   oidcScopes?: InputMaybe<Scalars['String']['input']>;
   oidcTokenEndpoint?: InputMaybe<Scalars['String']['input']>;
+  /** Accept OIDC logins whose email_verified claim is missing or false */
+  oidcTrustUnverifiedEmail?: InputMaybe<Scalars['Boolean']['input']>;
   oidcUserinfoEndpoint?: InputMaybe<Scalars['String']['input']>;
   /** Mapping of SAML attributes to user fields */
   samlAttributeMapping?: InputMaybe<Scalars['JSONString']['input']>;
@@ -4921,7 +4974,6 @@ export type UpdateSsoConnectionMutationInput = {
   samlSsoUrl?: InputMaybe<Scalars['String']['input']>;
   samlWantAssertionsSigned?: InputMaybe<Scalars['Boolean']['input']>;
   samlWantResponseSigned?: InputMaybe<Scalars['Boolean']['input']>;
-  status?: InputMaybe<Status>;
   tenantId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -4954,6 +5006,8 @@ export type UpdateSsoConnectionMutationPayload = {
   /** Space-separated list of OAuth scopes */
   oidcScopes?: Maybe<Scalars['String']['output']>;
   oidcTokenEndpoint?: Maybe<Scalars['String']['output']>;
+  /** Accept OIDC logins whose email_verified claim is missing or false */
+  oidcTrustUnverifiedEmail?: Maybe<Scalars['Boolean']['output']>;
   oidcUserinfoEndpoint?: Maybe<Scalars['String']['output']>;
   /** Mapping of SAML attributes to user fields */
   samlAttributeMapping?: Maybe<Scalars['JSONString']['output']>;
@@ -5115,6 +5169,12 @@ export type VerifyOtpMutationPayload = {
   __typename?: 'VerifyOTPMutationPayload';
   clientMutationId?: Maybe<Scalars['String']['output']>;
   otpVerified?: Maybe<Scalars['Boolean']['output']>;
+};
+
+/** Check the domain's DNS TXT record and mark the domain as verified. */
+export type VerifySsoDomainMutation = {
+  __typename?: 'VerifySSODomainMutation';
+  ssoDomain?: Maybe<TenantDomainType>;
 };
 
 export type _Node = {
@@ -5793,7 +5853,7 @@ export type SsoDiscoverQueryVariables = Exact<{
 }>;
 
 
-export type SsoDiscoverQuery = { __typename?: 'Query', ssoDiscover?: { __typename?: 'SSODiscoveryResultType', ssoAvailable?: boolean | null, requireSso?: boolean | null, connections?: Array<{ __typename?: 'SSODiscoveryConnectionType', id?: string | null, name?: string | null, type?: string | null, tenantId?: string | null, tenantName?: string | null, loginUrl?: string | null } | null> | null } | null };
+export type SsoDiscoverQuery = { __typename?: 'Query', ssoDiscover?: { __typename?: 'SSODiscoveryResultType', ssoAvailable?: boolean | null, requireSso?: boolean | null, connections?: Array<{ __typename?: 'SSODiscoveryConnectionType', id?: string | null, name?: string | null, type?: string | null, loginUrl?: string | null } | null> | null } | null };
 
 export type TenantAuditLogsQueryQueryVariables = Exact<{
   tenantId: Scalars['ID']['input'];
@@ -5838,14 +5898,6 @@ export type TenantSecurityDeleteKsefTokenMutationVariables = Exact<{
 
 export type TenantSecurityDeleteKsefTokenMutation = { __typename?: 'ApiMutation', deleteKsefToken?: { __typename?: 'DeleteKsefTokenMutation', ok?: boolean | null, errorCode?: string | null } | null };
 
-export type TenantPasskeysQueryQueryVariables = Exact<{
-  tenantId: Scalars['ID']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type TenantPasskeysQueryQuery = { __typename?: 'Query', tenantPasskeys?: Array<{ __typename?: 'TenantPasskeyType', id?: string | null, name?: string | null, authenticatorType?: string | null, createdAt?: any | null, lastUsedAt?: any | null, useCount?: number | null, userEmail?: string | null, userName?: string | null } | null> | null };
-
 export type MyPasskeysQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5857,14 +5909,6 @@ export type TenantSecurityDeletePasskeyMutationVariables = Exact<{
 
 
 export type TenantSecurityDeletePasskeyMutation = { __typename?: 'ApiMutation', deletePasskey?: { __typename?: 'DeletePasskeyMutationPayload', deletedIds?: Array<string | null> | null } | null };
-
-export type TenantSecurityDeleteTenantPasskeyMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  tenantId: Scalars['ID']['input'];
-}>;
-
-
-export type TenantSecurityDeleteTenantPasskeyMutation = { __typename?: 'ApiMutation', deleteTenantPasskey?: { __typename?: 'DeleteTenantPasskeyMutation', ok?: boolean | null } | null };
 
 export type TenantScimTokensQueryQueryVariables = Exact<{
   tenantId: Scalars['ID']['input'];
@@ -5893,14 +5937,14 @@ export type TenantSecuritySsoConnectionsQueryQueryVariables = Exact<{
 }>;
 
 
-export type TenantSecuritySsoConnectionsQueryQuery = { __typename?: 'Query', ssoConnections?: { __typename?: 'SSOConnectionConnection', edges: Array<{ __typename?: 'SSOConnectionEdge', node?: { __typename?: 'SSOConnectionType', id: string, name: string, connectionType: SsoTenantSsoConnectionConnectionTypeChoices, status: SsoTenantSsoConnectionStatusChoices, allowedDomains: any, enforceSso: boolean, jitProvisioningEnabled: boolean, samlEntityId: string, samlSsoUrl: string, oidcIssuer: string, oidcClientId: string, lastLoginAt?: any | null, loginCount: number, createdAt: any, spMetadataUrl?: string | null, spAcsUrl?: string | null, spEntityId?: string | null, oidcCallbackUrl?: string | null, oidcLoginUrl?: string | null } | null } | null> } | null };
+export type TenantSecuritySsoConnectionsQueryQuery = { __typename?: 'Query', ssoConnections?: { __typename?: 'SSOConnectionConnection', edges: Array<{ __typename?: 'SSOConnectionEdge', node?: { __typename?: 'SSOConnectionType', id: string, name: string, connectionType: SsoTenantSsoConnectionConnectionTypeChoices, status: SsoTenantSsoConnectionStatusChoices, allowedDomains: any, enforceSso: boolean, jitProvisioningEnabled: boolean, samlEntityId: string, samlSsoUrl: string, oidcIssuer: string, oidcClientId: string, oidcTrustUnverifiedEmail: boolean, lastLoginAt?: any | null, loginCount: number, createdAt: any, spMetadataUrl?: string | null, spMetadataXml?: string | null, spAcsUrl?: string | null, spEntityId?: string | null, oidcCallbackUrl?: string | null, oidcLoginUrl?: string | null } | null } | null> } | null };
 
 export type TenantSecurityCreateSsoConnectionMutationVariables = Exact<{
   input: CreateSsoConnectionMutationInput;
 }>;
 
 
-export type TenantSecurityCreateSsoConnectionMutation = { __typename?: 'ApiMutation', createSsoConnection?: { __typename?: 'CreateSSOConnectionMutationPayload', ssoConnection?: { __typename?: 'SSOConnectionType', id: string, name: string, connectionType: SsoTenantSsoConnectionConnectionTypeChoices, status: SsoTenantSsoConnectionStatusChoices, spMetadataUrl?: string | null, spAcsUrl?: string | null, spEntityId?: string | null, oidcCallbackUrl?: string | null, oidcLoginUrl?: string | null } | null } | null };
+export type TenantSecurityCreateSsoConnectionMutation = { __typename?: 'ApiMutation', createSsoConnection?: { __typename?: 'CreateSSOConnectionMutationPayload', ssoConnection?: { __typename?: 'SSOConnectionType', id: string, name: string, connectionType: SsoTenantSsoConnectionConnectionTypeChoices, status: SsoTenantSsoConnectionStatusChoices, spMetadataUrl?: string | null, spMetadataXml?: string | null, spAcsUrl?: string | null, spEntityId?: string | null, oidcCallbackUrl?: string | null, oidcLoginUrl?: string | null } | null } | null };
 
 export type TenantSecurityDeleteSsoConnectionMutationVariables = Exact<{
   input: DeleteSsoConnectionMutationInput;
@@ -5929,7 +5973,7 @@ export type TenantSecurityUpdateSsoConnectionMutationVariables = Exact<{
 }>;
 
 
-export type TenantSecurityUpdateSsoConnectionMutation = { __typename?: 'ApiMutation', updateSsoConnection?: { __typename?: 'UpdateSSOConnectionMutationPayload', ssoConnection?: { __typename?: 'SSOConnectionType', id: string, name: string, connectionType: SsoTenantSsoConnectionConnectionTypeChoices, status: SsoTenantSsoConnectionStatusChoices, enforceSso: boolean, spMetadataUrl?: string | null, spAcsUrl?: string | null, spEntityId?: string | null, oidcCallbackUrl?: string | null } | null } | null };
+export type TenantSecurityUpdateSsoConnectionMutation = { __typename?: 'ApiMutation', updateSsoConnection?: { __typename?: 'UpdateSSOConnectionMutationPayload', ssoConnection?: { __typename?: 'SSOConnectionType', id: string, name: string, connectionType: SsoTenantSsoConnectionConnectionTypeChoices, status: SsoTenantSsoConnectionStatusChoices, enforceSso: boolean, spMetadataUrl?: string | null, spMetadataXml?: string | null, spAcsUrl?: string | null, spEntityId?: string | null, oidcCallbackUrl?: string | null } | null } | null };
 
 export type TenantSecurityTestSsoConnectionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5938,6 +5982,37 @@ export type TenantSecurityTestSsoConnectionMutationVariables = Exact<{
 
 
 export type TenantSecurityTestSsoConnectionMutation = { __typename?: 'ApiMutation', testSsoConnection?: { __typename?: 'TestSSOConnectionMutation', result?: { __typename?: 'TestSSOConnectionPayload', connectionId?: string | null, connectionName?: string | null, connectionType?: string | null, overallStatus?: string | null, testedAt?: string | null, checks?: Array<{ __typename?: 'TestSSOConnectionCheckType', name?: string | null, status?: string | null, message?: string | null, details?: any | null } | null> | null } | null } | null };
+
+export type TenantSecuritySsoDomainsQueryQueryVariables = Exact<{
+  tenantId: Scalars['ID']['input'];
+}>;
+
+
+export type TenantSecuritySsoDomainsQueryQuery = { __typename?: 'Query', ssoDomains?: Array<{ __typename?: 'TenantDomainType', id: string, domain: string, status: SsoTenantDomainStatusChoices, verifiedAt?: any | null, lastCheckedAt?: any | null, consecutiveFailures: number, firstFailedAt?: any | null, gracePeriodEndsAt?: any | null, verificationRecordName?: string | null, verificationRecordValue?: string | null } | null> | null };
+
+export type TenantSecurityAddSsoDomainMutationMutationVariables = Exact<{
+  tenantId: Scalars['ID']['input'];
+  domain: Scalars['String']['input'];
+}>;
+
+
+export type TenantSecurityAddSsoDomainMutationMutation = { __typename?: 'ApiMutation', addSsoDomain?: { __typename?: 'AddSSODomainMutation', ssoDomain?: { __typename?: 'TenantDomainType', id: string, domain: string, status: SsoTenantDomainStatusChoices, verifiedAt?: any | null, verificationRecordName?: string | null, verificationRecordValue?: string | null } | null } | null };
+
+export type TenantSecurityVerifySsoDomainMutationMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  tenantId: Scalars['ID']['input'];
+}>;
+
+
+export type TenantSecurityVerifySsoDomainMutationMutation = { __typename?: 'ApiMutation', verifySsoDomain?: { __typename?: 'VerifySSODomainMutation', ssoDomain?: { __typename?: 'TenantDomainType', id: string, domain: string, status: SsoTenantDomainStatusChoices, verifiedAt?: any | null, verificationRecordName?: string | null, verificationRecordValue?: string | null } | null } | null };
+
+export type TenantSecurityDeleteSsoDomainMutationMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  tenantId: Scalars['ID']['input'];
+}>;
+
+
+export type TenantSecurityDeleteSsoDomainMutationMutation = { __typename?: 'ApiMutation', deleteSsoDomain?: { __typename?: 'DeleteSSODomainMutation', ok?: boolean | null } | null };
 
 export type TenantFragmentFragment = { __typename?: 'TenantType', id: string, name?: string | null, slug?: string | null, actionLoggingEnabled?: boolean | null, membership?: { __typename?: 'TenantMembershipType', role?: TenantUserRole | null, invitationAccepted?: boolean | null } | null } & { ' $fragmentName'?: 'TenantFragmentFragment' };
 
@@ -6380,26 +6455,28 @@ export const DeleteTenantMembershipMutationDocument = {"kind":"Document","defini
 export const ResendTenantInvitationMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"resendTenantInvitationMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ResendTenantInvitationMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resendTenantInvitation"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<ResendTenantInvitationMutationMutation, ResendTenantInvitationMutationMutationVariables>;
 export const TenantMembersListQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"tenantMembersListQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userMemberships"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"invitationAccepted"}},{"kind":"Field","name":{"kind":"Name","value":"inviteeEmailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"userEmail"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"organizationRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}},{"kind":"Field","name":{"kind":"Name","value":"isSystemRole"}},{"kind":"Field","name":{"kind":"Name","value":"isOwnerRole"}},{"kind":"Field","name":{"kind":"Name","value":"systemRoleType"}}]}}]}}]}}]}}]} as unknown as DocumentNode<TenantMembersListQueryQuery, TenantMembersListQueryQueryVariables>;
 export const CompanyLookupByNipQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"companyLookupByNipQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"nip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"country"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyLookupByNip"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"nip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"nip"}}},{"kind":"Argument","name":{"kind":"Name","value":"country"},"value":{"kind":"Variable","name":{"kind":"Name","value":"country"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"found"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"nip"}},{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"regon"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"vatStatus"}}]}}]}}]} as unknown as DocumentNode<CompanyLookupByNipQueryQuery, CompanyLookupByNipQueryQueryVariables>;
-export const SsoDiscoverDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SSODiscover"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoDiscover"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoAvailable"}},{"kind":"Field","name":{"kind":"Name","value":"requireSso"}},{"kind":"Field","name":{"kind":"Name","value":"connections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"tenantId"}},{"kind":"Field","name":{"kind":"Name","value":"tenantName"}},{"kind":"Field","name":{"kind":"Name","value":"loginUrl"}}]}}]}}]}}]} as unknown as DocumentNode<SsoDiscoverQuery, SsoDiscoverQueryVariables>;
+export const SsoDiscoverDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SSODiscover"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoDiscover"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoAvailable"}},{"kind":"Field","name":{"kind":"Name","value":"requireSso"}},{"kind":"Field","name":{"kind":"Name","value":"connections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"loginUrl"}}]}}]}}]}}]} as unknown as DocumentNode<SsoDiscoverQuery, SsoDiscoverQueryVariables>;
 export const TenantAuditLogsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantAuditLogsQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"eventType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userEmail"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"success"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoAuditLogs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"eventType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"eventType"}}},{"kind":"Argument","name":{"kind":"Name","value":"userEmail"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userEmail"}}},{"kind":"Argument","name":{"kind":"Name","value":"success"},"value":{"kind":"Variable","name":{"kind":"Name","value":"success"}}},{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"eventType"}},{"kind":"Field","name":{"kind":"Name","value":"eventDescription"}},{"kind":"Field","name":{"kind":"Name","value":"userEmail"}},{"kind":"Field","name":{"kind":"Name","value":"connectionName"}},{"kind":"Field","name":{"kind":"Name","value":"ipAddress"}},{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"errorMessage"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}}]} as unknown as DocumentNode<TenantAuditLogsQueryQuery, TenantAuditLogsQueryQueryVariables>;
 export const TenantSecurityKsefCredentialQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSecurityKsefCredentialQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ksefCredential"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"tokenName"}},{"kind":"Field","name":{"kind":"Name","value":"tokenHint"}},{"kind":"Field","name":{"kind":"Name","value":"lastVerifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastErrorCode"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityKsefCredentialQueryQuery, TenantSecurityKsefCredentialQueryQueryVariables>;
 export const TenantSecuritySetKsefTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecuritySetKsefToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setKsefToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"errorCode"}},{"kind":"Field","name":{"kind":"Name","value":"ksefCredential"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"tokenName"}},{"kind":"Field","name":{"kind":"Name","value":"tokenHint"}},{"kind":"Field","name":{"kind":"Name","value":"lastVerifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastErrorCode"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecuritySetKsefTokenMutation, TenantSecuritySetKsefTokenMutationVariables>;
 export const TenantSecurityTestKsefTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityTestKsefToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"testKsefToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"errorCode"}},{"kind":"Field","name":{"kind":"Name","value":"ksefCredential"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"tokenName"}},{"kind":"Field","name":{"kind":"Name","value":"tokenHint"}},{"kind":"Field","name":{"kind":"Name","value":"lastVerifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastErrorCode"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityTestKsefTokenMutation, TenantSecurityTestKsefTokenMutationVariables>;
 export const TenantSecurityDeleteKsefTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeleteKsefToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteKsefToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"errorCode"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeleteKsefTokenMutation, TenantSecurityDeleteKsefTokenMutationVariables>;
-export const TenantPasskeysQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantPasskeysQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantPasskeys"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatorType"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"useCount"}},{"kind":"Field","name":{"kind":"Name","value":"userEmail"}},{"kind":"Field","name":{"kind":"Name","value":"userName"}}]}}]}}]} as unknown as DocumentNode<TenantPasskeysQueryQuery, TenantPasskeysQueryQueryVariables>;
 export const MyPasskeysQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyPasskeysQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPasskeys"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatorType"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"useCount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MyPasskeysQueryQuery, MyPasskeysQueryQueryVariables>;
 export const TenantSecurityDeletePasskeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeletePasskey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeletePasskeyMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletePasskey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletedIds"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeletePasskeyMutation, TenantSecurityDeletePasskeyMutationVariables>;
-export const TenantSecurityDeleteTenantPasskeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeleteTenantPasskey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTenantPasskey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeleteTenantPasskeyMutation, TenantSecurityDeleteTenantPasskeyMutationVariables>;
 export const TenantScimTokensQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSCIMTokensQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scimTokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedIp"}},{"kind":"Field","name":{"kind":"Name","value":"requestCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<TenantScimTokensQueryQuery, TenantScimTokensQueryQueryVariables>;
 export const TenantSecurityCreateScimTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityCreateSCIMToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateSCIMTokenMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScimToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scimToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityCreateScimTokenMutation, TenantSecurityCreateScimTokenMutationVariables>;
 export const TenantSecurityRevokeScimTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityRevokeSCIMToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeScimToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityRevokeScimTokenMutation, TenantSecurityRevokeScimTokenMutationVariables>;
-export const TenantSecuritySsoConnectionsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSecuritySSOConnectionsQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnections"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"allowedDomains"}},{"kind":"Field","name":{"kind":"Name","value":"enforceSso"}},{"kind":"Field","name":{"kind":"Name","value":"jitProvisioningEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"samlEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"samlSsoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"oidcIssuer"}},{"kind":"Field","name":{"kind":"Name","value":"oidcClientId"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"loginCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spAcsUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcCallbackUrl"}},{"kind":"Field","name":{"kind":"Name","value":"oidcLoginUrl"}}]}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecuritySsoConnectionsQueryQuery, TenantSecuritySsoConnectionsQueryQueryVariables>;
-export const TenantSecurityCreateSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityCreateSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateSSOConnectionMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spAcsUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcCallbackUrl"}},{"kind":"Field","name":{"kind":"Name","value":"oidcLoginUrl"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityCreateSsoConnectionMutation, TenantSecurityCreateSsoConnectionMutationVariables>;
+export const TenantSecuritySsoConnectionsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSecuritySSOConnectionsQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnections"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"allowedDomains"}},{"kind":"Field","name":{"kind":"Name","value":"enforceSso"}},{"kind":"Field","name":{"kind":"Name","value":"jitProvisioningEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"samlEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"samlSsoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"oidcIssuer"}},{"kind":"Field","name":{"kind":"Name","value":"oidcClientId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcTrustUnverifiedEmail"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"loginCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataXml"}},{"kind":"Field","name":{"kind":"Name","value":"spAcsUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcCallbackUrl"}},{"kind":"Field","name":{"kind":"Name","value":"oidcLoginUrl"}}]}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecuritySsoConnectionsQueryQuery, TenantSecuritySsoConnectionsQueryQueryVariables>;
+export const TenantSecurityCreateSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityCreateSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateSSOConnectionMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataXml"}},{"kind":"Field","name":{"kind":"Name","value":"spAcsUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcCallbackUrl"}},{"kind":"Field","name":{"kind":"Name","value":"oidcLoginUrl"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityCreateSsoConnectionMutation, TenantSecurityCreateSsoConnectionMutationVariables>;
 export const TenantSecurityDeleteSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeleteSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteSSOConnectionMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletedIds"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeleteSsoConnectionMutation, TenantSecurityDeleteSsoConnectionMutationVariables>;
 export const TenantSecurityActivateSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityActivateSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ActivateSSOConnectionMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activateSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityActivateSsoConnectionMutation, TenantSecurityActivateSsoConnectionMutationVariables>;
 export const TenantSecurityDeactivateSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeactivateSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deactivateSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeactivateSsoConnectionMutation, TenantSecurityDeactivateSsoConnectionMutationVariables>;
-export const TenantSecurityUpdateSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityUpdateSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSSOConnectionMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"enforceSso"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spAcsUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcCallbackUrl"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityUpdateSsoConnectionMutation, TenantSecurityUpdateSsoConnectionMutationVariables>;
+export const TenantSecurityUpdateSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityUpdateSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSSOConnectionMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"enforceSso"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spMetadataXml"}},{"kind":"Field","name":{"kind":"Name","value":"spAcsUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spEntityId"}},{"kind":"Field","name":{"kind":"Name","value":"oidcCallbackUrl"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityUpdateSsoConnectionMutation, TenantSecurityUpdateSsoConnectionMutationVariables>;
 export const TenantSecurityTestSsoConnectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityTestSSOConnection"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"testSsoConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"result"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"connectionId"}},{"kind":"Field","name":{"kind":"Name","value":"connectionName"}},{"kind":"Field","name":{"kind":"Name","value":"connectionType"}},{"kind":"Field","name":{"kind":"Name","value":"overallStatus"}},{"kind":"Field","name":{"kind":"Name","value":"testedAt"}},{"kind":"Field","name":{"kind":"Name","value":"checks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"details"}}]}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityTestSsoConnectionMutation, TenantSecurityTestSsoConnectionMutationVariables>;
+export const TenantSecuritySsoDomainsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSecuritySSODomainsQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoDomains"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"verifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastCheckedAt"}},{"kind":"Field","name":{"kind":"Name","value":"consecutiveFailures"}},{"kind":"Field","name":{"kind":"Name","value":"firstFailedAt"}},{"kind":"Field","name":{"kind":"Name","value":"gracePeriodEndsAt"}},{"kind":"Field","name":{"kind":"Name","value":"verificationRecordName"}},{"kind":"Field","name":{"kind":"Name","value":"verificationRecordValue"}}]}}]}}]} as unknown as DocumentNode<TenantSecuritySsoDomainsQueryQuery, TenantSecuritySsoDomainsQueryQueryVariables>;
+export const TenantSecurityAddSsoDomainMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityAddSSODomainMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"domain"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addSsoDomain"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"domain"},"value":{"kind":"Variable","name":{"kind":"Name","value":"domain"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoDomain"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"verifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"verificationRecordName"}},{"kind":"Field","name":{"kind":"Name","value":"verificationRecordValue"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityAddSsoDomainMutationMutation, TenantSecurityAddSsoDomainMutationMutationVariables>;
+export const TenantSecurityVerifySsoDomainMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityVerifySSODomainMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"verifySsoDomain"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ssoDomain"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"verifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"verificationRecordName"}},{"kind":"Field","name":{"kind":"Name","value":"verificationRecordValue"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityVerifySsoDomainMutationMutation, TenantSecurityVerifySsoDomainMutationMutationVariables>;
+export const TenantSecurityDeleteSsoDomainMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeleteSSODomainMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteSsoDomain"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeleteSsoDomainMutationMutation, TenantSecurityDeleteSsoDomainMutationMutationVariables>;
 export const CurrentTenantQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"currentTenantQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"tenantFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"tenantFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TenantType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"actionLoggingEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"membership"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"invitationAccepted"}}]}}]}}]} as unknown as DocumentNode<CurrentTenantQueryQuery, CurrentTenantQueryQueryVariables>;
 export const AddTenantMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addTenantMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTenantMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTenant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantEdge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddTenantMutationMutation, AddTenantMutationMutationVariables>;
 export const OrganizationOnboardingProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"organizationOnboardingProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organizationOnboardingProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"respondentRole"}},{"kind":"Field","name":{"kind":"Name","value":"customerType"}},{"kind":"Field","name":{"kind":"Name","value":"revenueModels"}},{"kind":"Field","name":{"kind":"Name","value":"costDrivers"}},{"kind":"Field","name":{"kind":"Name","value":"pricing"}},{"kind":"Field","name":{"kind":"Name","value":"mainGoal"}},{"kind":"Field","name":{"kind":"Name","value":"currentStep"}},{"kind":"Field","name":{"kind":"Name","value":"isRequired"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}}]}}]}}]} as unknown as DocumentNode<OrganizationOnboardingProfileQuery, OrganizationOnboardingProfileQueryVariables>;

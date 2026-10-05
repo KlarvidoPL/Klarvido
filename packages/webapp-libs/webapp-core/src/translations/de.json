@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "Fehler beim Kopieren der URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Metadaten-XML kopieren"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Wird erstellt..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Service-Provider-Metadaten"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Fügen Sie dies in Ihren Identitätsanbieter ein, solange die Verbindung noch ein Entwurf ist. Die Metadaten-URL steht nach der Aktivierung zur Verfügung."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP-Metadaten (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP-Metadaten-URL:"
@@ -578,6 +587,84 @@
   "Audit / Error": {
     "defaultMessage": "Fehler"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Gruppenzuordnung angewendet"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "IdP-Konfiguration aktiviert"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "IdP-Konfiguration erstellt"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "IdP-Konfiguration deaktiviert"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "IdP-Konfiguration gelöscht"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "IdP-Konfiguration aktualisiert"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "KSeF-Token entfernt"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "KSeF-Token gespeichert"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "KSeF-Token geprüft"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "SCIM-Gruppe erstellt"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "SCIM-Gruppe gelöscht"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "SCIM-Gruppe aktualisiert"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "SCIM-Benutzer erstellt"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "SCIM-Benutzer gelöscht"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "SCIM-Benutzer aktualisiert"
+  },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "SSO-Domain hinzugefügt"
+  },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO-Domain abgelaufen"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "SSO-Domain entfernt"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO-Domain verifiziert"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "Anmeldung unter Umgehung von SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO-Anmeldung fehlgeschlagen"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "SSO-Anmeldung gestartet"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO-Anmeldung erfolgreich"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO-Abmeldung"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "Benutzer per JIT bereitgestellt"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "Benutzer per SSO aktualisiert"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Fehlgeschlagen"
   },
@@ -611,6 +698,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP-Adresse"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Von KSeF abgelehnt"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Noch nicht verifiziert"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Verifiziert"
+  },
   "Audit / Last page": {
     "defaultMessage": "Letzte Seite"
   },
@@ -638,11 +734,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Startdatum auswählen"
   },
+  "Audit / Status": {
+    "defaultMessage": "Status"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Fehlgeschlagen"
   },
   "Audit / Status Success": {
     "defaultMessage": "Erfolgreich"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Aktion"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "Neues Token gespeichert"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Token entfernt"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Vorhandenes Token ersetzt"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token endet auf"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Token-Name in KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Nach E-Mail filtern..."
@@ -1379,6 +1496,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Sicherungseinstellungen erfolgreich aktualisiert"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Zu heute springen"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Jetzt"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Heute"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Aktiver Tarif:"
   },
@@ -1880,6 +2006,81 @@
   "Documents / subheading": {
     "defaultMessage": "Lade deine Dokumente hoch, verwalte und organisiere sie an einem Ort"
   },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "Die Domain konnte nicht hinzugefügt werden."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Domain hinzufügen"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "In die Zwischenablage kopiert."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Datensatznamen kopieren"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Datensatzwert kopieren"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Füge diesen TXT-Eintrag in deinem DNS hinzu und klicke dann auf Verifizieren. Lass den Eintrag bestehen: SSO prüft ihn täglich, und ein Entfernen lässt die Domain auslaufen."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "Die Domain konnte nicht entfernt werden."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Weise nach, dass du die E-Mail-Domain deines Unternehmens besitzt, bevor SSO sie nutzen kann. Nur verifizierte Domains werden für Anmeldung, Provisioning und Erzwingung verwendet."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Domain"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "firma.de"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "Noch keine Domains angemeldet. Füge die Domain deines Unternehmens hinzu, um die Verifizierung zu starten."
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "Der Verifizierungseintrag fehlte sieben Tage lang, daher funktioniert diese Domain nicht mehr für SSO. Die SSO-Verbindungen wurden deaktiviert. Veröffentliche den Eintrag erneut und verifiziere die Domain, um sie zu nutzen."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "Zuletzt geprüft {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Verifizierungseintrag fehlt seit {since}. SSO wird am {deadline} deaktiviert, sofern der Eintrag nicht wiederhergestellt wird."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Name"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Typ"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Wert"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Domain entfernen"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "Abgelaufen"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "Ausstehend"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Verifiziert"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Domain-Verifizierung"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Domain verifiziert. SSO kann sie jetzt nutzen."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Verifizieren"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "Die Domain konnte nicht verifiziert werden."
+  },
   "Dropzone / Default label": {
     "defaultMessage": "Klicke oder ziehe eine Datei in diesen Bereich, um sie hochzuladen"
   },
@@ -2233,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Passwort zurücksetzen"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Stellen Sie den Eintrag wieder her, verifizieren Sie die Domain und aktivieren Sie die SSO-Verbindung in den Sicherheitseinstellungen erneut."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Zu Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "SSO für {domain} wurde deaktiviert"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO für \"{domain}\" deaktiviert"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "Der Verifizierungseintrag für \"{domain}\" bei {tenantName} fehlt seit {graceDays} Tagen, daher wurde SSO für diese Domain deaktiviert. Benutzer können sich damit nicht mehr anmelden."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO für Ihre Domain deaktiviert"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Öffnen Sie die Sicherheitseinstellungen Ihrer Organisation, um den Eintrag einzusehen und wiederherzustellen."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Zu Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "Der SSO-Verifizierungseintrag für {domain} fehlt"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "SSO-Verifizierungseintrag fehlt für \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "Der DNS-Eintrag, der belegt, dass Ihnen die Domain \"{domain}\" für {tenantName} gehört, fehlt. SSO für diese Domain wird in {graceDays} Tagen deaktiviert, wenn der Eintrag nicht wiederhergestellt wird."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO-Verifizierungseintrag fehlt"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Zahlungsmethode aktualisieren"
@@ -3074,6 +3311,21 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO-Verbindung deaktiviert"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "Die Domain \"{domain}\" für \"{tenant_name}\" ist nicht mehr verifiziert, weil ihr Verifizierungseintrag fehlt. Deaktivierte Verbindungen: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "Die Domain \"{domain}\" für \"{tenant_name}\" ist nicht mehr verifiziert, weil ihr Verifizierungseintrag fehlt."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO-Domain abgelaufen"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "Der Verifizierungseintrag für \"{domain}\" ({tenant_name}) fehlt. SSO für diese Domain wird in {grace_days} Tagen deaktiviert, sofern der Eintrag nicht wiederhergestellt wird."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO-Domain-Verifizierungseintrag fehlt"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Die Organisation „{tenant_name}“ wurde von „{name}“ gelöscht"
   },
@@ -3121,6 +3373,219 @@
   },
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "z. B. Google Workspace"
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "Zurück"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Entwurf verwerfen"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Entwurf verwerfen"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Alle Antworten für diese neue Organisation werden gelöscht. Dies kann nicht rückgängig gemacht werden."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Der Entwurf konnte nicht verworfen werden. Bitte versuchen Sie es erneut."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Entwurf verwerfen?"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "Onboarding abgeschlossen"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "Profil bestätigen"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "Zeit der Mitarbeiter"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "Marketing / Provisionen"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "Material / Waren"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "Subunternehmer"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "Technologie / Infrastruktur"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "Transport / Logistik"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "Wählen Sie bis zu drei Antworten."
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "Welche Kosten steigen mit Ihrem Umsatz?"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "Hauptsächlich Unternehmen (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "Hauptsächlich Endkunden (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "Unternehmen und Endkunden"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "Öffentliche Einrichtungen"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "So lässt sich abschätzen, wie viele Verkaufsdaten künftige Integrationen abdecken."
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "Wer zahlt Ihnen meist?"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "Erzählen Sie uns, wie Ihr Geschäft funktioniert. Sie können zu früheren Schritten zurückkehren."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Bearbeiten"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "Ich arbeite hart, aber das Geld reicht nicht"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "Ich mache mir Sorgen, einen wichtigen Kunden zu verlieren"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "Die Kosten steigen weiter"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "Ich möchte Probleme frühzeitig erkennen"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "Kann ich mir ein größeres Team leisten?"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "Ich bin mir bei meiner Preisgestaltung unsicher"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "Was möchten Sie vor allem unter Kontrolle halten?"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "Das Unternehmensprofil konnte nicht geladen werden."
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "Weiter"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "Die Organisation konnte nicht aktualisiert werden. Bitte überprüfen Sie die Felder und versuchen Sie es erneut."
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "Kosten plus Aufschlag"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "Festpreis / Angebot"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "Individueller Kundenpreis"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "Wie legen Sie Ihre Preise in der Regel fest?"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "Abo / Paket"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "Zeit / Einheit"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "How do you make key decisions?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "Ihre Rolle im Unternehmen"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "Diese Angabe ist beschreibend und ändert Ihre Berechtigungen in der Organisation nicht."
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "Provision / Ergebnis"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "Wählen Sie bis zu zwei Antworten."
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "Produkt / Bestellung"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "Projekt / Auftrag"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "Anzahl der Dienstleistungen"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "Abo / wiederkehrende Leistung"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "Abgerechnete Arbeitszeit"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "Wofür zahlen Ihre Kunden?"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "Buchhaltung"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "Berater"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "Mitarbeiter"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "Inhaber / Geschäftsführung"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "Dieser Schritt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Open business profile"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complete or update your organization onboarding answers."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "Kosten"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "Kunden"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "Preise & Ziel"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "Umsatz"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "Zusammenfassung"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "Onboarding-Schritte"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "Hauptziel"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "Dies ist ein Ausgangspunkt für künftige Analysen."
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "Preisgestaltung"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "Ihre Rolle"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "Ihr Unternehmensprofil"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "Organisation einrichten"
   },
   "Passkeys / Add another": {
     "defaultMessage": "Weiteren Passkey hinzufügen"
@@ -3229,24 +3694,6 @@
   },
   "Passkeys / Use count label": {
     "defaultMessage": "Verwendet"
-  },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Weiteren Passkey hinzufügen"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Meinen Passkey hinzufügen"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Passkey konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey erfolgreich gelöscht."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Nach Benutzername oder E-Mail suchen..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Für das Löschen von Passkeys ist ein Organisationskontext erforderlich."
   },
   "Password Requirements / Min length": {
     "defaultMessage": "Mindestens 8 Zeichen"
@@ -3470,6 +3917,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "Sie können Mitglieder nicht einer Ersatzrolle zuweisen, die die Berechtigung(en) \"{permissions}\" enthält, da Sie diese selbst nicht besitzen. Bitten Sie einen Organisationsinhaber oder Administrator, sie Ihnen zuerst zu erteilen."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "Sie haben keine Berechtigung, Organisationsrollen zu verwalten."
   },
@@ -3649,12 +4099,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "Aktivitätsprotokolle anzeigen"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "Passkey-Richtlinien der Organisation anzeigen und verwalten"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Passkeys verwalten"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Single-Sign-On-Verbindungen und SCIM-Bereitstellung konfigurieren"
@@ -3878,14 +4322,83 @@
   "SSO / Edit": {
     "defaultMessage": "Bearbeiten"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "Sie haben sich mit einem anderen Konto angemeldet als dem eingegebenen. Bitte versuchen Sie es erneut."
+  },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "Ein Konto mit dieser E-Mail-Adresse existiert bereits. Bitten Sie den Administrator Ihrer Organisation um eine Einladung."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Andere Anmeldemethode verwenden"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO ist nicht richtig konfiguriert. Wenden Sie sich an Ihren Administrator."
   },
   "SSO / Error / description": {
     "defaultMessage": "Wenn dieses Problem weiterhin besteht, wenden Sie sich an Ihre IT-Administration oder versuchen Sie eine andere Anmeldemethode."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "Der DNS-Eintrag wurde noch nicht gefunden. DNS-Änderungen können bis zu einer Stunde dauern, bitte versuche es erneut."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Entferne diese Domain zuerst aus allen SSO-Verbindungen."
+  },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "Entferne diese Domain zuerst aus diesen SSO-Verbindungen: {connections}."
+  },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "Ihre E-Mail-Domain ist für diese Organisation nicht zugelassen."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "Diese Domain wurde bereits von einer anderen Organisation verifiziert. Gehört sie dir, kontaktiere den Support."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Verifiziere vor der Aktivierung alle erlaubten Domains dieser Verbindung."
+  },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Ihr Identitätsanbieter hat diese E-Mail-Adresse nicht bestätigt. Bitten Sie Ihren Administrator, die Einrichtung zu prüfen."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "Beim Anmelden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Anmeldung fehlgeschlagen"
+  },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Gib einen Domainnamen wie example.com ein."
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Ungültige Antwort des Identitätsanbieters."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "Der Identitätsanbieter hat keine E-Mail-Adresse übermittelt."
+  },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Füge vor der Aktivierung mindestens eine verifizierte Domain zur Verbindung hinzu."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "Die automatische Kontoerstellung ist deaktiviert. Wenden Sie sich an Ihren Administrator."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Öffentliche E-Mail-Anbieter wie gmail.com können nicht beansprucht werden. Verwende die Domain deines Unternehmens."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Zu viele Versuche. Bitte warten Sie, bevor Sie es erneut versuchen."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "Sicherheitsprüfung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Ihre Anmeldeanfrage ist abgelaufen oder wurde in einem anderen Browser gestartet. Bitte starten Sie die Anmeldung erneut."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "Sicherheitsprüfung fehlgeschlagen. Bitte starten Sie die Anmeldung erneut."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Erneut versuchen"
@@ -3932,6 +4445,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO-Verbindung aktiviert."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "Füge vor der Aktivierung eine Domain zu dieser Verbindung hinzu."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "Verifiziere {domains} unter Domain-Verifizierung, bevor du diese Verbindung aktivierst. Die Aktivierung bleibt gesperrt, bis alle Domains verifiziert sind."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "Aktiv"
   },
@@ -3968,6 +4487,9 @@
   "SSO Card / Delete Success": {
     "defaultMessage": "SSO-Verbindung gelöscht."
   },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(nicht verifiziert)"
+  },
   "SSO Card / Domains Label": {
     "defaultMessage": "Domains:"
   },
@@ -3988,6 +4510,12 @@
   },
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "Erzwungen"
+  },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "SSO-Erzwingung deaktiviert. Benutzer können sich jetzt mit Passwort anmelden."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "SSO-Erzwingung aktiviert. Benutzer aus erlaubten Domains müssen SSO verwenden."
   },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "Einstellung zur SSO-Erzwingung konnte nicht aktualisiert werden."
@@ -4070,6 +4598,12 @@
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "z. B. firma.de"
   },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "Nicht verifiziert"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "Verifiziere diese Domain unter Domain-Verifizierung, bevor die Verbindung aktiviert werden kann."
+  },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"
   },
@@ -4084,6 +4618,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO-URL (Login-URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "Aktivieren Sie dies nur, wenn Ihr Identitätsanbieter den Anspruch email_verified nicht sendet, zum Beispiel Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Nicht bestätigte E-Mails akzeptieren"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "Aktivieren Sie dies nur, wenn Ihr Identitätsanbieter nur Anmeldungen mit E-Mail-Adressen erlaubt, die den Benutzern gehören. Andernfalls könnte sich ein Benutzer als jemand anderes anmelden."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "Zurück zur Anmeldung"
@@ -4114,6 +4657,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "SSO-Anmeldung"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "API-URL"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "Die API-URL ist für die Produktion konfiguriert"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "Die API-URL verweist auf localhost – SSO funktioniert nicht mit externen IdPs"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "Die Umgebungsvariable API_URL ist nicht gesetzt"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "Alle erforderlichen OIDC-Endpunkte sind vorhanden"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "Callback-URL"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "Die Callback-URL-Konfiguration ist möglicherweise unvollständig"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "Die Callback-URL verwendet localhost – externe IdPs können diese URL nicht erreichen"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "Zertifikat ist seit {days} Tagen abgelaufen"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "Zertifikat läuft in {days} Tagen ab"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "Ein Zertifikat wird für die Signaturprüfung empfohlen"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "Zertifikat ist gültig (läuft in {days} Tagen ab)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "Client-ID"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "Client-Secret"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "Zeitüberschreitung beim Abrufen des Discovery-Dokuments"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "Zeitüberschreitung beim Verbindungsaufbau zum SSO-Endpunkt"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "Erneuern Sie das Zertifikat bald"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "Das Discovery-Dokument konnte nicht abgerufen werden"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "ACS-URL"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "Autorisierungsendpunkt"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "Erkannte Endpunkte"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "Entity-ID"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "Fehler"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "Läuft ab"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "Hinweis"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "Format der Anfrage-ID"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "Token-Endpunkt"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "Wert"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "Der Discovery-Endpunkt hat HTTP {status} zurückgegeben"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "Der Discovery-Endpunkt hat ungültiges JSON zurückgegeben"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "Stellen Sie sicher, dass das Zertifikat im gültigen PEM- oder Base64-Format vorliegt"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "Verbindung zum SSO-Endpunkt fehlgeschlagen"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "SAML-AuthnRequest konnte nicht erstellt werden"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "Zertifikat konnte nicht gelesen werden"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "IdP-Zertifikat"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "IdP-Entity-ID"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "IdP-Zertifikat ist nicht konfiguriert"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "Entity-ID des Identitätsanbieters ist konfiguriert"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "Entity-ID des Identitätsanbieters ist nicht konfiguriert"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "Aussteller-URL ist konfiguriert"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "Aussteller-URL ist nicht konfiguriert"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "Möglicherweise ist eine manuelle Endpunktkonfiguration erforderlich"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "Fehlende Endpunkte im Discovery-Dokument: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "OAuth-Client-ID ist konfiguriert"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "OAuth-Client-ID ist nicht konfiguriert"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "OAuth-Client-Secret ist konfiguriert"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "OAuth-Client-Secret ist nicht konfiguriert"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "OAuth-Callback-URL ist konfiguriert"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "OIDC-Discovery"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "OIDC-Aussteller"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "Der OpenID-Connect-Discovery-Endpunkt ist erreichbar"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "Erforderliche Endpunkte"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "Das SAML-AuthnRequest kann erfolgreich erstellt werden"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "SAML-Anfrageerstellung"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "SP-Konfiguration"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "SSL/TLS-Fehler beim Verbinden mit dem SSO-Endpunkt"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "SSL/TLS-Fehler beim Verbinden mit dem Aussteller"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "Format der SSO-URL"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "SSO-URL erreichbar"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "SSO-Endpunkt existiert (405 zurückgegeben – erwartet für SAML-Endpunkte)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "SSO-Endpunkt ist erreichbar (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "SSO-Endpunkt hat HTTP {status} zurückgegeben"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "Service-Provider-URLs sind konfiguriert"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "Die Service-Provider-URLs verwenden localhost – externe IdPs können diese URLs nicht erreichen"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "Die Service-Provider-Konfiguration ist möglicherweise unvollständig"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "Setzen Sie die Umgebungsvariable API_URL auf Ihre öffentliche API-Domain"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "Setzen Sie die Umgebungsvariable API_URL auf Ihre öffentliche API-Domain"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "Single-Sign-On-URL ist konfiguriert"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "Single-Sign-On-URL ist nicht konfiguriert"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "Manche IdPs unterstützen die automatische Erkennung möglicherweise nicht"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "Der IdP befindet sich möglicherweise hinter einer Firewall oder antwortet langsam"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "Der Endpunkt funktioniert für SAML-Anfragen möglicherweise trotzdem"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "Dadurch schlagen SSO-Weiterleitungen fehl. Setzen Sie API_URL auf Ihre öffentliche API-Domain."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat – SaaS-Ideen-Generator"
@@ -4526,9 +5288,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Ja"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Passkey hinzufügen"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Token hinzufügen"
   },
@@ -4565,35 +5324,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Passe deine Filter an oder lösche sie, um alle Ereignisse zu sehen."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Versuche einen anderen Suchbegriff"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "Keine Passkeys registriert"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "Keine Passkeys entsprechen deiner Suche"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "Verzeichnis-Sync erfordert SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "Keine SSO-Verbindungen konfiguriert"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "Noch keine Benutzer in deiner Organisation haben Passkeys registriert"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Registriere einen Passkey für schnelleres und sichereres Anmelden"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Verwalte Passkeys für alle Benutzer in deiner Organisation"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Nutze Biometrie oder Sicherheitsschlüssel für passwortlose Authentifizierung"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Kompatible Identity Provider"
@@ -4741,6 +5476,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "Umsatzsteuerstatus"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Dieser Wert kann nach dem Speichern nicht geändert werden."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Überprüfen Sie diesen Wert und versuchen Sie es erneut."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Ungültige NIP-Nummer"
@@ -4990,212 +5731,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Schnellstart"
-  },
-  "Onboarding / Save failed": {
-    "defaultMessage": "Dieser Schritt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
-  },
-  "Onboarding / Organization save failed": {
-    "defaultMessage": "Die Organisation konnte nicht aktualisiert werden. Bitte überprüfen Sie die Felder und versuchen Sie es erneut."
-  },
-  "Onboarding / Load failed": {
-    "defaultMessage": "Das Unternehmensprofil konnte nicht geladen werden."
-  },
-  "Onboarding / Completed": {
-    "defaultMessage": "Onboarding abgeschlossen"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "Überprüfen Sie diesen Wert und versuchen Sie es erneut."
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "Dieser Wert kann nach dem Speichern nicht geändert werden."
-  },
-  "Onboarding / Revenue hint": {
-    "defaultMessage": "Wählen Sie bis zu zwei Antworten."
-  },
-  "Onboarding / Costs hint": {
-    "defaultMessage": "Wählen Sie bis zu drei Antworten."
-  },
-  "Onboarding / Back": {
-    "defaultMessage": "Zurück"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "Entwurf verwerfen"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "Entwurf verwerfen"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "Alle Antworten für diese neue Organisation werden gelöscht. Dies kann nicht rückgängig gemacht werden."
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "Der Entwurf konnte nicht verworfen werden. Bitte versuchen Sie es erneut."
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "Entwurf verwerfen?"
-  },
-  "Onboarding / Confirm": {
-    "defaultMessage": "Profil bestätigen"
-  },
-  "Onboarding / Cost employees": {
-    "defaultMessage": "Zeit der Mitarbeiter"
-  },
-  "Onboarding / Cost marketing": {
-    "defaultMessage": "Marketing / Provisionen"
-  },
-  "Onboarding / Cost materials": {
-    "defaultMessage": "Material / Waren"
-  },
-  "Onboarding / Cost subcontractors": {
-    "defaultMessage": "Subunternehmer"
-  },
-  "Onboarding / Cost technology": {
-    "defaultMessage": "Technologie / Infrastruktur"
-  },
-  "Onboarding / Cost transport": {
-    "defaultMessage": "Transport / Logistik"
-  },
-  "Onboarding / Costs title": {
-    "defaultMessage": "Welche Kosten steigen mit Ihrem Umsatz?"
-  },
-  "Onboarding / Customer B2B": {
-    "defaultMessage": "Hauptsächlich Unternehmen (B2B)"
-  },
-  "Onboarding / Customer B2C": {
-    "defaultMessage": "Hauptsächlich Endkunden (B2C)"
-  },
-  "Onboarding / Customer mixed": {
-    "defaultMessage": "Unternehmen und Endkunden"
-  },
-  "Onboarding / Customer public": {
-    "defaultMessage": "Öffentliche Einrichtungen"
-  },
-  "Onboarding / Customers hint": {
-    "defaultMessage": "So lässt sich abschätzen, wie viele Verkaufsdaten künftige Integrationen abdecken."
-  },
-  "Onboarding / Customers title": {
-    "defaultMessage": "Wer zahlt Ihnen meist?"
-  },
-  "Onboarding / Description": {
-    "defaultMessage": "Erzählen Sie uns, wie Ihr Geschäft funktioniert. Sie können zu früheren Schritten zurückkehren."
-  },
-  "Onboarding / Edit": {
-    "defaultMessage": "Bearbeiten"
-  },
-  "Onboarding / Goal cash": {
-    "defaultMessage": "Ich arbeite hart, aber das Geld reicht nicht"
-  },
-  "Onboarding / Goal client loss": {
-    "defaultMessage": "Ich mache mir Sorgen, einen wichtigen Kunden zu verlieren"
-  },
-  "Onboarding / Goal costs": {
-    "defaultMessage": "Die Kosten steigen weiter"
-  },
-  "Onboarding / Goal early warning": {
-    "defaultMessage": "Ich möchte Probleme frühzeitig erkennen"
-  },
-  "Onboarding / Goal hiring": {
-    "defaultMessage": "Kann ich mir ein größeres Team leisten?"
-  },
-  "Onboarding / Goal pricing": {
-    "defaultMessage": "Ich bin mir bei meiner Preisgestaltung unsicher"
-  },
-  "Onboarding / Goal question": {
-    "defaultMessage": "Was möchten Sie vor allem unter Kontrolle halten?"
-  },
-  "Onboarding / Next": {
-    "defaultMessage": "Weiter"
-  },
-  "Onboarding / Pricing cost plus": {
-    "defaultMessage": "Kosten plus Aufschlag"
-  },
-  "Onboarding / Pricing fixed": {
-    "defaultMessage": "Festpreis / Angebot"
-  },
-  "Onboarding / Pricing individual": {
-    "defaultMessage": "Individueller Kundenpreis"
-  },
-  "Onboarding / Pricing question": {
-    "defaultMessage": "Wie legen Sie Ihre Preise in der Regel fest?"
-  },
-  "Onboarding / Pricing subscription": {
-    "defaultMessage": "Abo / Paket"
-  },
-  "Onboarding / Pricing time unit": {
-    "defaultMessage": "Zeit / Einheit"
-  },
-  "Onboarding / Respondent role label": {
-    "defaultMessage": "Ihre Rolle im Unternehmen"
-  },
-  "Onboarding / Respondent role profile hint": {
-    "defaultMessage": "Diese Angabe ist beschreibend und ändert Ihre Berechtigungen in der Organisation nicht."
-  },
-  "Onboarding / Revenue commission": {
-    "defaultMessage": "Provision / Ergebnis"
-  },
-  "Onboarding / Revenue product": {
-    "defaultMessage": "Produkt / Bestellung"
-  },
-  "Onboarding / Revenue project": {
-    "defaultMessage": "Projekt / Auftrag"
-  },
-  "Onboarding / Revenue service": {
-    "defaultMessage": "Anzahl der Dienstleistungen"
-  },
-  "Onboarding / Revenue subscription": {
-    "defaultMessage": "Abo / wiederkehrende Leistung"
-  },
-  "Onboarding / Revenue time": {
-    "defaultMessage": "Abgerechnete Arbeitszeit"
-  },
-  "Onboarding / Revenue title": {
-    "defaultMessage": "Wofür zahlen Ihre Kunden?"
-  },
-  "Onboarding / Role accounting": {
-    "defaultMessage": "Buchhaltung"
-  },
-  "Onboarding / Role advisor": {
-    "defaultMessage": "Berater"
-  },
-  "Onboarding / Role employee": {
-    "defaultMessage": "Mitarbeiter"
-  },
-  "Onboarding / Role owner management": {
-    "defaultMessage": "Inhaber / Geschäftsführung"
-  },
-  "Onboarding / Step costs": {
-    "defaultMessage": "Kosten"
-  },
-  "Onboarding / Step customers": {
-    "defaultMessage": "Kunden"
-  },
-  "Onboarding / Step pricing goal": {
-    "defaultMessage": "Preise & Ziel"
-  },
-  "Onboarding / Step revenue": {
-    "defaultMessage": "Umsatz"
-  },
-  "Onboarding / Step summary": {
-    "defaultMessage": "Zusammenfassung"
-  },
-  "Onboarding / Steps label": {
-    "defaultMessage": "Onboarding-Schritte"
-  },
-  "Onboarding / Summary goal": {
-    "defaultMessage": "Hauptziel"
-  },
-  "Onboarding / Summary hint": {
-    "defaultMessage": "Dies ist ein Ausgangspunkt für künftige Analysen."
-  },
-  "Onboarding / Summary pricing": {
-    "defaultMessage": "Preisgestaltung"
-  },
-  "Onboarding / Summary role": {
-    "defaultMessage": "Ihre Rolle"
-  },
-  "Onboarding / Summary title": {
-    "defaultMessage": "Ihr Unternehmensprofil"
-  },
-  "Onboarding / Title": {
-    "defaultMessage": "Organisation einrichten"
   }
 }

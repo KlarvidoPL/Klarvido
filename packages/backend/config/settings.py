@@ -4,6 +4,7 @@ import os
 import warnings
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 # Suppress pkg_resources deprecation warnings from third-party packages
 # (docutils, etc.) until they release fixes
@@ -567,6 +568,14 @@ KSEF_ENCRYPTION_KEYS = env("KSEF_ENCRYPTION_KEYS", default="")
 # KSEF_ENCRYPTION_KEYS.
 KSEF_ENCRYPTION_KEYS_FILE = env("KSEF_ENCRYPTION_KEYS_FILE", default="")
 
+# SSO_ENCRYPTION_KEYS: same format as KSEF_ENCRYPTION_KEYS. OIDC client secrets are encrypted with the first key before
+# they are stored. Without a key an OIDC connection cannot save a client secret (fails closed).
+SSO_ENCRYPTION_KEYS = env("SSO_ENCRYPTION_KEYS", default="")
+SSO_ENCRYPTION_KEYS_FILE = env("SSO_ENCRYPTION_KEYS_FILE", default="")
+# SSO is switched off until it is ready: no configuration, no sign-in through SSO, no enforcement, no SCIM.
+# Existing SSO data is kept. Set SSO_CONFIGURATION_ENABLED=true to turn it back on.
+SSO_CONFIGURATION_ENABLED = env.bool("SSO_CONFIGURATION_ENABLED", default=False)
+
 LAMBDA_TASKS_BASE_HANDLER = env("LAMBDA_TASKS_BASE_HANDLER", default="common.tasks.LambdaTask")
 LAMBDA_TASKS_LOCAL_URL = env("LAMBDA_TASKS_LOCAL_URL", default=None)
 
@@ -685,6 +694,11 @@ MCP_SERVER_URL = env("MCP_SERVER_URL", default="http://mcp-server:4000")
 SSO_SP_ENTITY_ID_BASE = env("SSO_SP_ENTITY_ID_BASE", default="")  # e.g., https://api.yourdomain.com
 WEB_APP_URL = env("WEB_APP_URL", default="http://localhost:3000")
 API_URL = env("API_URL", default="http://localhost:5001")
+# SECURITY: DNS ownership check for SSO domains. The bypass only takes effect when DEBUG is on (local development).
+SSO_DOMAIN_VERIFICATION_SKIP_DNS = env.bool("SSO_DOMAIN_VERIFICATION_SKIP_DNS", default=False)
+if SSO_DOMAIN_VERIFICATION_SKIP_DNS and not DEBUG:
+    # Fail at startup rather than run a production instance that accepts unverified domains
+    raise ImproperlyConfigured("SSO_DOMAIN_VERIFICATION_SKIP_DNS may only be enabled when DJANGO_DEBUG is on")
 
 # WebAuthn/Passkey Settings
 # SECURITY: Set to True to temporarily skip signature verification for backwards compatibility
@@ -736,6 +750,10 @@ CELERY_BEAT_SCHEDULE = {
     'cleanup-expired-sessions-daily': {
         'task': 'apps.sso.tasks.cleanup_expired_sessions',
         'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
+    },
+    'recheck-sso-domains-daily': {
+        'task': 'apps.sso.tasks.recheck_verified_domains',
+        'schedule': 60 * 60 * 24,  # Every 24 hours: a lapsed domain deactivates its SSO connections
     },
 }
 

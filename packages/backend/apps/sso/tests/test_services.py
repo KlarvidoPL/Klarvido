@@ -17,6 +17,8 @@ from apps.sso import models
 from apps.multitenancy.constants import TenantUserRole
 from apps.multitenancy.models import TenantMembership
 
+from apps.multitenancy.tests.factories import TenantMembershipFactory
+
 from . import factories
 
 
@@ -52,12 +54,13 @@ class TestJITProvisioningService:
         connection.status = constants.SSOConnectionStatus.ACTIVE
         connection.save()
 
-        # Create existing SSO link
-        link = factories.SSOUserLinkFactory(
+        # Create existing SSO link (links always come with a membership in the connection's organization)
+        factories.SSOUserLinkFactory(
             user=user,
             sso_connection=connection,
             idp_user_id='existing_user_123',
         )
+        TenantMembershipFactory(user=user, tenant=connection.tenant, is_accepted=True)
 
         provisioning_service = JITProvisioningService(connection)
 
@@ -88,7 +91,7 @@ class TestJITProvisioningService:
 
         user, link, created = provisioning_service.provision_or_update_user(
             idp_user_id="admin_user_123",
-            email="admin@example.com",
+            email="team.lead@example.com",
             groups=["Engineering", "Admins"],
         )
 

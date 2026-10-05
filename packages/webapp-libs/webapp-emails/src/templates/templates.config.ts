@@ -1,19 +1,21 @@
 import { EmailTemplateDefinition, EmailTemplateType } from '../types';
 import * as AccountActivation from './accountActivation';
+import * as BackupReady from './backupReady';
+import * as InvoiceCreated from './invoiceCreated';
+import * as InvoiceFileAdded from './invoiceFileAdded';
+import * as InvoiceRequestAssigned from './invoiceRequestAssigned';
+import * as InvoiceRequestComment from './invoiceRequestComment';
+import * as InvoiceRequestMention from './invoiceRequestMention';
 import * as PasswordReset from './passwordReset';
+import * as ProjectNoteMention from './projectNoteMention';
+import * as SSODomainLapsed from './ssoDomainLapsed';
+import * as SSODomainRecordMissing from './ssoDomainRecordMissing';
 import * as SubscriptionError from './subscriptionError';
+import * as TenantDeleted from './tenantDeleted';
 import * as TenantInvitation from './tenantInvitation';
 import * as TrialExpiresSoon from './trialExpiresSoon';
 import * as UserExport from './userExport';
 import * as UserExportAdmin from './userExportAdmin';
-import * as InvoiceRequestAssigned from './invoiceRequestAssigned';
-import * as InvoiceRequestComment from './invoiceRequestComment';
-import * as InvoiceRequestMention from './invoiceRequestMention';
-import * as InvoiceCreated from './invoiceCreated';
-import * as InvoiceFileAdded from './invoiceFileAdded';
-import * as ProjectNoteMention from './projectNoteMention';
-import * as BackupReady from './backupReady';
-import * as TenantDeleted from './tenantDeleted';
 
 //<-- INJECT EMAIL TEMPLATE IMPORT -->
 
@@ -33,5 +35,7 @@ export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
   [EmailTemplateType.PROJECT_NOTE_MENTION]: ProjectNoteMention,
   [EmailTemplateType.BACKUP_READY]: BackupReady,
   [EmailTemplateType.TENANT_DELETED]: TenantDeleted,
+  [EmailTemplateType.SSO_DOMAIN_RECORD_MISSING]: SSODomainRecordMissing,
+  [EmailTemplateType.SSO_DOMAIN_LAPSED]: SSODomainLapsed,
   //<-- INJECT EMAIL TEMPLATE -->
 };

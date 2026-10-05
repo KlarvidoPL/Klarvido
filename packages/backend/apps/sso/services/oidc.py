@@ -14,6 +14,7 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 
+from apps.sso.services.outbound import safe_request
 from common.secrets.service import get_secrets_service
 
 logger = logging.getLogger(__name__)
@@ -47,9 +48,10 @@ class OIDCService:
 
     def get_client_secret(self) -> Optional[str]:
         """Retrieve the client secret."""
-        # First check if we have a direct client secret (for local development)
-        if self.connection.oidc_client_secret:
-            return self.connection.oidc_client_secret
+        # The encrypted client secret (legacy plaintext rows are read until they are migrated)
+        secret = self.connection.get_oidc_client_secret()
+        if secret:
+            return secret
         # Then check AWS Secrets Manager
         if self.connection.oidc_client_secret_arn:
             return self.secrets_service.get_secret(self.connection.oidc_client_secret_arn)
@@ -71,7 +73,7 @@ class OIDCService:
         discovery_url = f"{self.connection.oidc_issuer.rstrip('/')}/.well-known/openid-configuration"
 
         try:
-            response = requests.get(discovery_url, timeout=10)
+            response = safe_request("GET", discovery_url)
             response.raise_for_status()
             config = response.json()
 
@@ -80,6 +82,20 @@ class OIDCService:
         except requests.RequestException as e:
             logger.error(f"OIDC discovery failed: {e}")
             raise ValueError(f"Failed to fetch OIDC configuration: {e}")
+
+    def get_end_session_endpoint(self) -> str:
+        """The identity provider's logout endpoint, from its discovery document (empty if not advertised)."""
+        return self.discover_configuration().get("end_session_endpoint", "")
+
+    def build_logout_url(self, post_logout_redirect_uri: str, id_token_hint: str = None) -> str:
+        """URL that ends the identity provider session and returns the user to post_logout_redirect_uri."""
+        endpoint = self.get_end_session_endpoint()
+        if not endpoint:
+            return ""
+        params = {"client_id": self.connection.oidc_client_id, "post_logout_redirect_uri": post_logout_redirect_uri}
+        if id_token_hint:
+            params["id_token_hint"] = id_token_hint
+        return f"{endpoint}?{urlencode(params)}"
 
     def get_authorization_endpoint(self) -> str:
         """Get the authorization endpoint URL."""
@@ -226,11 +242,7 @@ class OIDCService:
             data["code_verifier"] = code_verifier
 
         try:
-            response = requests.post(
-                token_endpoint,
-                data=data,
-                timeout=30,
-            )
+            response = safe_request("POST", token_endpoint, data=data, timeout=30)
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:
@@ -248,6 +260,19 @@ class OIDCService:
         if not issuer:
             return issuer
         return issuer.rstrip('/')
+
+    def _fetch_jwks(self) -> Dict[str, Any]:
+        """The identity provider's public key set, cached like the discovery document."""
+        cache_key = f"oidc_jwks_{self.connection.id}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+
+        response = safe_request("GET", self.get_jwks_uri())
+        response.raise_for_status()
+        keys = response.json()
+        cache.set(cache_key, keys, self.JWKS_CACHE_TTL)
+        return keys
 
     def validate_id_token(
         self,
@@ -269,15 +294,18 @@ class OIDCService:
         """
         try:
             import jwt
-            from jwt import PyJWKClient
         except ImportError:
             raise ImportError("PyJWT with jwcrypto support is required for OIDC")
 
         try:
-            # Get JWKS
-            jwks_uri = self.get_jwks_uri()
-            jwks_client = PyJWKClient(jwks_uri)
-            signing_key = jwks_client.get_signing_key_from_jwt(id_token)
+            # Select the signing key by kid. PyJWKClient would fetch the JWKS itself, bypassing the outbound checks.
+            key_id = jwt.get_unverified_header(id_token).get("kid")
+            signing_key = next(
+                (key for key in jwt.PyJWKSet.from_dict(self._fetch_jwks()).keys if key.key_id == key_id),
+                None,
+            )
+            if signing_key is None:
+                raise ValueError("Signing key for this ID token was not found at the identity provider")
 
             # Decode with issuer check disabled - we'll validate issuer ourselves
             # to handle trailing slash differences (e.g. Okta, Auth0)
@@ -325,7 +353,8 @@ class OIDCService:
         userinfo_endpoint = self.get_userinfo_endpoint()
 
         try:
-            response = requests.get(
+            response = safe_request(
+                "GET",
                 userinfo_endpoint,
                 headers={"Authorization": f"Bearer {access_token}"},
                 timeout=30,
@@ -391,6 +420,13 @@ class OIDCService:
         if not claims:
             raise ValueError("ID token validation returned empty claims")
 
+        # SECURITY: the email is used to find or create the account. Refuse it unless the IdP vouches for it,
+        # unless the tenant admin has explicitly accepted unverified emails for this connection.
+        email_verified = claims.get("email_verified")
+        if not self.connection.oidc_trust_unverified_email and email_verified not in (True, "true"):
+            logger.error(f"OIDC email is not verified by the IdP (connection {self.connection.id})")
+            raise ValueError("Email address is not verified by the identity provider")
+
         # Get additional user info if needed (supplementary, not for auth)
         access_token = tokens.get("access_token")
         if access_token:
@@ -405,7 +441,10 @@ class OIDCService:
                 logger.warning(f"Failed to fetch userinfo (non-critical): {e}")
 
         # Map claims to user attributes
-        return self._map_claims(claims)
+        user_attrs = self._map_claims(claims)
+        # Kept for sign-out: the IdP needs it as id_token_hint to end the session without a confirmation page
+        user_attrs["id_token"] = id_token
+        return user_attrs
 
     def _map_claims(self, claims: Dict[str, Any]) -> Dict[str, Any]:
         """Map OIDC claims to user fields using connection configuration."""

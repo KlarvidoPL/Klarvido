@@ -20,6 +20,13 @@ from apps.multitenancy.constants import TenantUserRole, SystemRoleType
 from apps.sso.models import SCIMToken, SSOUserLink, SSOAuditLog, TenantSSOConnection
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.security import sanitize_scim_filter
+from apps.sso.services.account_linking import (
+    AccountLinkingError,
+    ensure_can_link_existing_user,
+    ensure_can_use_linked_user,
+    ensure_domain_allowed,
+    is_user_managed_only_by,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -111,34 +118,15 @@ class SCIMService:
                 defaults={'assigned_by': membership.user},
             )
 
-    def _reactivate_user(
-        self,
-        link: SSOUserLink,
-        scim_user: Dict[str, Any],
-        external_id: str,
-        ip_address: str = None,
-    ) -> Dict[str, Any]:
+    def _activate_membership(self, user: User) -> TenantMembership:
+        """Give the user an accepted membership in this organization (SCIM active=true).
+
+        SECURITY: an account used by another organization can only be (re)added if it is still a member
+        here. Otherwise a link made before membership was required could be revived to take it over.
         """
-        Reactivate a user who was previously deactivated (removed from IdP).
-        Called when IdP sends create for a user that already has an SSOUserLink.
-        """
-        user = link.user
-        email = user.email
-
-        # Reactivate user
-        user.is_active = True
-        user.save(update_fields=['is_active'])
-
-        # Update profile from payload
-        name = scim_user.get('name', {})
-        if name and hasattr(user, 'profile'):
-            if name.get('givenName') is not None:
-                user.profile.first_name = name.get('givenName', '')
-            if name.get('familyName') is not None:
-                user.profile.last_name = name.get('familyName', '')
-            user.profile.save()
-
-        # Ensure tenant membership exists (may have been removed by deactivation)
+        is_member = TenantMembership.objects.filter(user=user, tenant=self.tenant).exists()
+        if user.is_superuser or (not is_member and not is_user_managed_only_by(user, self.tenant)):
+            raise SCIMError("User cannot be provisioned via SCIM", status=409, scim_type="uniqueness")
         membership, created = TenantMembership.objects.get_or_create(
             user=user,
             tenant=self.tenant,
@@ -153,6 +141,51 @@ class SCIMService:
             membership.invitation_accepted_at = timezone.now()
             membership.save(update_fields=['is_accepted', 'invitation_accepted_at'])
         self._ensure_rbac_member_role(membership)
+        return membership
+
+    def _deactivate_membership(self, user: User) -> None:
+        """SCIM active=false: remove the user from this organization only.
+
+        SECURITY: the account itself (user.is_active) is shared with other organizations, so an
+        organization's identity provider must never disable it.
+        """
+        TenantMembership.objects.filter(user=user, tenant=self.tenant).delete()
+
+    def _update_profile_if_owned(self, user: User, first_name=None, last_name=None) -> None:
+        """Profile names are account-wide: only change them if no other organization uses this account."""
+        if not hasattr(user, 'profile') or not is_user_managed_only_by(user, self.tenant):
+            return
+        if first_name is not None:
+            user.profile.first_name = first_name
+        if last_name is not None:
+            user.profile.last_name = last_name
+        user.profile.save()
+
+    def _reactivate_user(
+        self,
+        link: SSOUserLink,
+        scim_user: Dict[str, Any],
+        external_id: str,
+        ip_address: str = None,
+    ) -> Dict[str, Any]:
+        """
+        Reactivate a user who was previously deactivated (removed from IdP).
+        Called when IdP sends create for a user that already has an SSOUserLink.
+        """
+        user = link.user
+        email = user.email
+        try:
+            ensure_can_use_linked_user(user)
+        except AccountLinkingError:
+            raise SCIMError("User cannot be provisioned via SCIM", status=409, scim_type="uniqueness")
+
+        # Update profile from payload (only for accounts this organization owns)
+        name = scim_user.get('name', {})
+        if name:
+            self._update_profile_if_owned(user, name.get('givenName'), name.get('familyName'))
+
+        # Restore the membership removed by deactivation
+        self._activate_membership(user)
 
         # Update link
         link.provisioned_via_scim = True
@@ -195,11 +228,17 @@ class SCIMService:
         """
         # Get all active users that are members of this tenant via SSO.
         # Exclude deactivated users (active=false) so removed users don't appear in the list.
-        queryset = SSOUserLink.objects.filter(
-            sso_connection__tenant=self.tenant,
-            provisioned_via_scim=True,
-            user__is_active=True,
-        ).select_related("user", "user__profile")
+        queryset = (
+            SSOUserLink.objects.filter(
+                sso_connection__tenant=self.tenant,
+                provisioned_via_scim=True,
+                user__is_active=True,
+                # Deactivated via SCIM = removed from this organization
+                user__tenant_memberships__tenant=self.tenant,
+            )
+            .distinct()
+            .select_related("user", "user__profile")
+        )
 
         # Apply filter if provided
         if filter_expr:
@@ -297,41 +336,37 @@ class SCIMService:
             elif isinstance(e, str):
                 email = e
 
-        # Check if user with this email exists
+        sso_connection = self.sso_connection or self._get_default_connection()
+        if sso_connection is None:
+            raise SCIMError("An active SSO connection is required for SCIM provisioning", status=400)
+
+        # SECURITY: the email's domain must be allowed on this organization's connection
+        try:
+            ensure_domain_allowed(sso_connection, email)
+        except AccountLinkingError:
+            raise SCIMError("Email domain is not allowed for this organization", status=400)
+
+        # SECURITY: never take over an account that does not already belong to this organization
         existing_user = User.objects.filter(email__iexact=email).first()
-
-        # Link existing user or create new one
-        user = existing_user or User.objects.create_user(email=email)
-        if not user.is_active:
-            user.is_active = True
-            user.save(update_fields=['is_active'])
-
-        # Update profile
-        if hasattr(user, "profile"):
-            user.profile.first_name = first_name
-            user.profile.last_name = last_name
-            user.profile.save()
+        if existing_user:
+            try:
+                ensure_can_link_existing_user(existing_user, self.tenant)
+            except AccountLinkingError:
+                raise SCIMError(
+                    "A user with this email already exists outside this organization",
+                    status=409,
+                    scim_type="uniqueness",
+                )
+            user = existing_user
+            self._update_profile_if_owned(user, first_name, last_name)
+        else:
+            user = User.objects.create_user(email=email)
+            self._update_profile_if_owned(user, first_name, last_name)
 
         # Create tenant membership if not exists (consistent with JIT provisioning)
-        membership, membership_created = TenantMembership.objects.get_or_create(
-            user=user,
-            tenant=self.tenant,
-            defaults={
-                "role": TenantUserRole.MEMBER,
-                "is_accepted": True,
-                'invitation_accepted_at': timezone.now(),
-            },
-        )
-        if not membership_created and not membership.is_accepted:
-            membership.is_accepted = True
-            membership.invitation_accepted_at = timezone.now()
-            membership.save(update_fields=['is_accepted', 'invitation_accepted_at'])
-
-        # Assign RBAC Member role so user appears in members list and has proper permissions
-        self._ensure_rbac_member_role(membership)
+        self._activate_membership(user)
 
         # Create SSO link
-        sso_connection = self.sso_connection or self._get_default_connection()
         link = SSOUserLink.objects.create(
             user=user,
             sso_connection=sso_connection,
@@ -381,27 +416,19 @@ class SCIMService:
         if name:
             first_name = name.get("givenName")
             last_name = name.get("familyName")
+            if first_name is not None:
+                link.idp_first_name = first_name
+            if last_name is not None:
+                link.idp_last_name = last_name
+            self._update_profile_if_owned(user, first_name, last_name)
 
-            if hasattr(user, "profile"):
-                if first_name is not None:
-                    user.profile.first_name = first_name
-                    link.idp_first_name = first_name
-                if last_name is not None:
-                    user.profile.last_name = last_name
-                    link.idp_last_name = last_name
-                user.profile.save()
-
-        # Update active status
+        # Update active status: affects only the membership in this organization
         active = scim_user.get("active")
         if active is not None:
-            user.is_active = active
-            user.save(update_fields=['is_active'])
-            if not active:
-                # Remove from org when deactivated (user removed from IdP SCIM app)
-                TenantMembership.objects.filter(
-                    user=user,
-                    tenant=self.tenant,
-                ).delete()
+            if active:
+                self._activate_membership(user)
+            else:
+                self._deactivate_membership(user)
 
         link.save()
 
@@ -484,25 +511,24 @@ class SCIMService:
             value = op.get("value")
 
             if op_type == "replace":
-                if path == "active" or path == "" and "active" in value:
+                if path == "active" or (path == "" and isinstance(value, dict) and "active" in value):
                     active_value = value if path == "active" else value.get("active")
-                    user.is_active = active_value
-                    user.save(update_fields=['is_active'])
-                    if not active_value:
-                        # Remove from org when deactivated (user removed from IdP SCIM app)
-                        TenantMembership.objects.filter(
-                            user=user,
-                            tenant=self.tenant,
-                        ).delete()
+                    # Affects only the membership in this organization, never the account itself
+                    if active_value:
+                        self._activate_membership(user)
+                    else:
+                        self._deactivate_membership(user)
 
-                elif path.startswith("name.") or (path == "" and "name" in value):
-                    name_data = value if path.startswith("name.") else value.get("name", {})
-                    if hasattr(user, "profile"):
-                        if "givenName" in str(path) or "givenName" in name_data:
-                            user.profile.first_name = name_data.get("givenName", value)
-                        if "familyName" in str(path) or "familyName" in name_data:
-                            user.profile.last_name = name_data.get("familyName", value)
-                        user.profile.save()
+                elif path.startswith("name.") or (path == "" and isinstance(value, dict) and "name" in value):
+                    if path == "name.givenName":
+                        self._update_profile_if_owned(user, first_name=value)
+                    elif path == "name.familyName":
+                        self._update_profile_if_owned(user, last_name=value)
+                    else:
+                        name_data = (
+                            value if path.startswith("name") and isinstance(value, dict) else value.get("name", {})
+                        )
+                        self._update_profile_if_owned(user, name_data.get("givenName"), name_data.get("familyName"))
 
             elif op_type == "add":
                 # Handle add operations similarly
@@ -660,7 +686,8 @@ class SCIMService:
                     "type": "work",
                 }
             ],
-            "active": user.is_active,
+            # SCIM manages membership in this organization, not the account itself
+            "active": user.is_active and TenantMembership.objects.filter(user=user, tenant=self.tenant).exists(),
             "meta": {
                 "resourceType": "User",
                 "created": user.created.isoformat() if hasattr(user, "created") else None,

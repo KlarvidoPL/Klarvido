@@ -372,6 +372,14 @@ arn = secrets.store_saml_certificate(
 )
 ```
 
+### Domain Verification
+
+An organization proves it owns an email domain by publishing a TXT record at `_klarvido-challenge.<domain>` (the apex record is accepted for older claims). Only verified domains take part in sign-in, provisioning and enforcement. The record is checked every day. If it is missing for seven days, the domain lapses and its SSO connections are deactivated, and the owners are warned by email and in the app from the first failed check.
+
+The lookups use the server's DNS resolver and **do not validate DNSSEC**. Treat the resolver as part of the trust boundary: run the backend on infrastructure whose DNS resolution you control or trust.
+
+The development bypass `SSO_DOMAIN_VERIFICATION_SKIP_DNS` only works with `DJANGO_DEBUG` on. The backend refuses to start with the bypass enabled and debug off, so it cannot reach production.
+
 ### Audit Logging
 
 All security events are automatically logged for compliance. The audit log captures:

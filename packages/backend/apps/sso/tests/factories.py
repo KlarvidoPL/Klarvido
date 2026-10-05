@@ -21,7 +21,8 @@ class TenantSSOConnectionFactory(DjangoModelFactory):
     name = factory.Sequence(lambda n: f"SSO Connection {n}")
     connection_type = constants.IdentityProviderType.SAML
     status = constants.SSOConnectionStatus.DRAFT
-    allowed_domains = factory.LazyFunction(list)
+    # A connection must list its email domains: an empty list allows no one to sign in
+    allowed_domains = factory.LazyFunction(lambda: ["example.com"])
     jit_provisioning_enabled = True
     group_role_mapping = factory.LazyFunction(dict)
 
@@ -29,6 +30,18 @@ class TenantSSOConnectionFactory(DjangoModelFactory):
     saml_entity_id = factory.Sequence(lambda n: f"https://idp{n}.example.com")
     saml_sso_url = factory.Sequence(lambda n: f"https://idp{n}.example.com/sso")
     saml_name_id_format = constants.SAMLNameIdFormat.EMAIL
+
+    @factory.post_generation
+    def verified_domains(obj, create, extracted, **kwargs):
+        """Every domain a connection lists is verified for its tenant, as it would be in production."""
+        if not create:
+            return
+        for domain in obj.allowed_domains:
+            models.TenantDomain.objects.update_or_create(
+                tenant=obj.tenant,
+                domain=domain,
+                defaults={"status": constants.SSODomainStatus.VERIFIED, "verified_at": timezone.now()},
+            )
 
 
 class OIDCSSOConnectionFactory(TenantSSOConnectionFactory):

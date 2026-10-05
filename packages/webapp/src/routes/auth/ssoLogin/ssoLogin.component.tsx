@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { Alert, AlertDescription } from '@sb/webapp-core/components/ui/alert';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
@@ -8,6 +7,7 @@ import { ENV } from '@sb/webapp-core/config/env';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { useSSODiscover } from '@sb/webapp-tenants/hooks';
 import { ArrowLeft, Building2, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 
@@ -19,14 +19,15 @@ interface SSOConnection {
   id: string;
   name: string;
   type: 'saml' | 'oidc';
-  tenant_id: string;
-  tenant_name: string;
   login_url: string;
 }
 
 function handleSSOLoginRedirect(connection: SSOConnection, email: string) {
   const urlParams = new URLSearchParams(window.location.search);
-  const intendedDestination = urlParams.get('next') || '/';
+  // Keep the language the user chose: return to the home page of the current locale (e.g. /pl/)
+  const localeMatch = window.location.pathname.match(/^\/([a-z]{2})\//);
+  const locale = localeMatch ? localeMatch[1] : 'en';
+  const intendedDestination = urlParams.get('next') || `/${locale}/`;
   const next = encodeURIComponent(intendedDestination);
 
   const loginUrl = connection.login_url.startsWith('http')
@@ -69,7 +70,7 @@ export const SSOLogin = () => {
   const discoveryResult = result;
   const hasResults = submitted && !loading && discoveryResult;
   const noConnections = hasResults && !discoveryResult.sso_available;
-  const connections = discoveryResult?.connections ?? [];
+  const connections = useMemo(() => discoveryResult?.connections ?? [], [discoveryResult]);
   const domain = email.includes('@') ? email.split('@')[1] : '';
 
   useEffect(() => {
@@ -156,7 +157,7 @@ export const SSOLogin = () => {
                         onClick={() => handleSSOLoginRedirect(connection as SSOConnection, email.trim())}
                       >
                         <Building2 className="mr-2 h-4 w-4" />
-                        {connection.tenant_name} ({connection.name})
+                        {connection.name}
                       </Button>
                     ))}
                   </div>

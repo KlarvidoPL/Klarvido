@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "Nie udało się skopiować adresu URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Skopiuj metadane XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Tworzenie..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Metadane Service Provider"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Wklej to w swoim dostawcy tożsamości, dopóki połączenie jest szkicem. Adres URL metadanych będzie dostępny po aktywacji."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "Metadane SP (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "Adres URL metadanych SP:"
@@ -578,6 +587,84 @@
   "Audit / Error": {
     "defaultMessage": "Błąd"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Zastosowano mapowanie grup"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "Aktywowano konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "Utworzono konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "Dezaktywowano konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "Usunięto konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "Zaktualizowano konfigurację IdP"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "Usunięto token KSeF"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "Zapisano token KSeF"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "Sprawdzono token KSeF"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "Utworzono grupę SCIM"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "Usunięto grupę SCIM"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "Zaktualizowano grupę SCIM"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "Utworzono użytkownika SCIM"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "Usunięto użytkownika SCIM"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "Zaktualizowano użytkownika SCIM"
+  },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "Dodano domenę SSO"
+  },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "Wygasła domena SSO"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "Usunięto domenę SSO"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "Zweryfikowano domenę SSO"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "Logowanie z pominięciem SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "Nieudane logowanie SSO"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "Rozpoczęto logowanie SSO"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "Zalogowano przez SSO"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "Wylogowano z SSO"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "Utworzono użytkownika przez JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "Zaktualizowano użytkownika przez SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Niepowodzenie"
   },
@@ -611,6 +698,15 @@
   "Audit / IP Address": {
     "defaultMessage": "Adres IP"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Odrzucony przez KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Jeszcze niezweryfikowany"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Zweryfikowany"
+  },
   "Audit / Last page": {
     "defaultMessage": "Ostatnia strona"
   },
@@ -638,11 +734,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Wybierz datę początkową"
   },
+  "Audit / Status": {
+    "defaultMessage": "Status"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Niepowodzenie"
   },
   "Audit / Status Success": {
     "defaultMessage": "Sukces"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Działanie"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "Zapisano nowy token"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Usunięto token"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Zastąpiono istniejący token"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token zakończony na"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Nazwa tokenu w KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Filtruj po e-mailu..."
@@ -1379,6 +1496,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Ustawienia kopii zapasowej zostały zaktualizowane"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Przejdź do dzisiaj"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Teraz"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Dziś"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Aktywny plan:"
   },
@@ -1880,6 +2006,81 @@
   "Documents / subheading": {
     "defaultMessage": "Przesyłaj, zarządzaj i organizuj swoje dokumenty w jednym miejscu"
   },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "Nie udało się dodać domeny."
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "Dodaj domenę"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "Skopiowano do schowka."
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "Kopiuj nazwę rekordu"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "Kopiuj wartość rekordu"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "Dodaj ten rekord TXT w DNS, a następnie kliknij Zweryfikuj. Zostaw rekord na miejscu: SSO sprawdza go codziennie, a jego usunięcie spowoduje wygaszenie domeny."
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "Nie udało się usunąć domeny."
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "Potwierdź, że posiadasz domenę e-mail swojej firmy, zanim SSO z niej skorzysta. Tylko zweryfikowane domeny biorą udział w logowaniu, provisioningu i wymuszaniu SSO."
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "Domena"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "firma.pl"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "Nie zgłoszono jeszcze żadnych domen. Dodaj domenę firmy, aby rozpocząć weryfikację."
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "Rekord weryfikacyjny był nieobecny przez siedem dni, więc domena przestała działać w SSO. Połączenia SSO tej domeny zostały dezaktywowane. Opublikuj rekord ponownie i zweryfikuj domenę, aby ponownie z niej korzystać."
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "Ostatnio sprawdzono {date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "Brakuje rekordu weryfikacyjnego od {since}. Jeśli nie zostanie przywrócony, SSO dla tej domeny zostanie dezaktywowane dnia {deadline}."
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "Nazwa"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "Typ"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "Wartość"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "Usuń domenę"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "Wygasła"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "Oczekuje"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "Zweryfikowana"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "Weryfikacja domeny"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "Domena zweryfikowana. SSO może z niej korzystać."
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "Zweryfikuj"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "Nie udało się zweryfikować domeny."
+  },
   "Dropzone / Default label": {
     "defaultMessage": "Kliknij lub przeciągnij plik w to miejsce, aby go przesłać"
   },
@@ -2233,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Zresetuj swoje hasło"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Przywróć rekord, zweryfikuj domenę i ponownie aktywuj połączenie SSO w ustawieniach bezpieczeństwa."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Przejdź do Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "SSO dla {domain} zostało dezaktywowane"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO dla \"{domain}\" zostało dezaktywowane"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "Rekord weryfikacyjny dla \"{domain}\" w {tenantName} zniknął na {graceDays} dni, dlatego SSO dla tej domeny zostało dezaktywowane. Użytkownicy nie mogą już się nim logować."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO dla domeny zostało dezaktywowane"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Otwórz ustawienia bezpieczeństwa swojej organizacji, aby zobaczyć rekord i go przywrócić."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Przejdź do Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "Brakuje rekordu weryfikacji SSO dla {domain}"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "Brak rekordu weryfikacji SSO dla \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "Rekord DNS potwierdzający, że posiadasz domenę \"{domain}\" dla {tenantName}, zniknął. SSO dla tej domeny zostanie dezaktywowane za {graceDays} dni, jeśli rekord nie zostanie przywrócony."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "Brak rekordu weryfikacji SSO"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Zaktualizuj metodę płatności"
@@ -3074,6 +3311,21 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "Połączenie SSO dezaktywowane"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "Domena \"{domain}\" dla \"{tenant_name}\" nie jest już zweryfikowana, ponieważ brakuje jej rekordu weryfikacyjnego. Dezaktywowane połączenia: {connections}."
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "Domena \"{domain}\" dla \"{tenant_name}\" nie jest już zweryfikowana, ponieważ brakuje jej rekordu weryfikacyjnego."
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "Wygasła domena SSO"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "Rekord weryfikacyjny dla \"{domain}\" ({tenant_name}) jest niedostępny. SSO dla tej domeny zostanie dezaktywowane za {grace_days} dni, chyba że rekord zostanie przywrócony."
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "Brak rekordu weryfikacyjnego domeny SSO"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "Organizacja „{tenant_name}” została usunięta przez „{name}”"
   },
@@ -3125,6 +3377,21 @@
   "Onboarding / Back": {
     "defaultMessage": "Wstecz"
   },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Wyczyść szkic"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "Wszystkie odpowiedzi dla tej nowej organizacji zostaną usunięte. Tej operacji nie można cofnąć."
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Wyczyścić ten szkic?"
+  },
   "Onboarding / Completed": {
     "defaultMessage": "Onboarding ukończony"
   },
@@ -3173,11 +3440,11 @@
   "Onboarding / Customers title": {
     "defaultMessage": "Kto najczęściej Ci płaci?"
   },
-  "Onboarding / Edit": {
-    "defaultMessage": "Edytuj"
-  },
   "Onboarding / Description": {
     "defaultMessage": "Opowiedz nam, jak działa Twoja firma. Możesz wracać do wcześniejszych kroków."
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "Edytuj"
   },
   "Onboarding / Goal cash": {
     "defaultMessage": "Dużo pracuję, ale nie widać tego na koncie"
@@ -3428,24 +3695,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Liczba użyć"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Dodaj kolejną passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Dodaj mój passkey"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Nie udało się usunąć passkey. Spróbuj ponownie."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey została pomyślnie usunięta."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Szukaj po nazwisku lub e‑mailu..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Do usunięcia kluczy dostępu wymagany jest kontekst organizacji."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "Co najmniej 8 znaków"
   },
@@ -3668,6 +3917,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "Nie możesz przypisać członków do roli zastępczej, która zawiera uprawnienie(a) \"{permissions}\", ponieważ sam(a) ich nie posiadasz. Poproś właściciela lub administratora organizacji o ich nadanie."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Ten kolor jest zarezerwowany dla roli właściciela. Wybierz inny kolor."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "Nie masz uprawnień do zarządzania rolami organizacji."
   },
@@ -3847,12 +4099,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "Wyświetlanie dzienników aktywności"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "Wyświetlaj i zarządzaj politykami kluczy dostępu (passkey) organizacji"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Zarządzanie kluczami dostępu"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Konfiguruj połączenia Single Sign-On (SSO) i obsługę SCIM"
@@ -4076,14 +4322,83 @@
   "SSO / Edit": {
     "defaultMessage": "Edytuj"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "Zalogowano innym kontem niż podany adres e-mail. Spróbuj ponownie."
+  },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "Konto z tym adresem e-mail już istnieje. Poproś administratora organizacji o zaproszenie."
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "Użyj innej metody logowania"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "Uwierzytelnienie nie powiodło się. Spróbuj ponownie."
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO nie jest poprawnie skonfigurowane. Skontaktuj się z administratorem."
   },
   "SSO / Error / description": {
     "defaultMessage": "Jeśli problem będzie się powtarzał, skontaktuj się z administratorem IT lub spróbuj innej metody logowania."
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "Rekord DNS nie został jeszcze znaleziony. Zmiany DNS mogą trwać do godziny, spróbuj ponownie."
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "Najpierw usuń tę domenę ze wszystkich połączeń SSO."
+  },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "Najpierw usuń tę domenę z tych połączeń SSO: {connections}."
+  },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "Domena Twojego adresu e-mail nie jest dozwolona dla tej organizacji."
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "Ta domena jest już zweryfikowana przez inną organizację. Jeśli jest Twoja, skontaktuj się z pomocą techniczną."
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "Zweryfikuj wszystkie dozwolone domeny tego połączenia przed aktywacją."
+  },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Dostawca tożsamości nie potwierdził tego adresu e-mail. Poproś administratora o sprawdzenie konfiguracji."
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "Wystąpił błąd podczas logowania. Spróbuj ponownie lub skontaktuj się z pomocą techniczną."
+  },
   "SSO / Error / heading": {
     "defaultMessage": "Logowanie nie powiodło się"
+  },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "Wpisz nazwę domeny, na przykład example.com."
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "Nieprawidłowa odpowiedź dostawcy tożsamości."
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "Dostawca tożsamości nie przekazał adresu e-mail."
+  },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "Przed aktywacją dodaj co najmniej jedną zweryfikowaną domenę do połączenia."
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "Automatyczne tworzenie kont jest wyłączone. Skontaktuj się z administratorem."
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "Publicznych dostawców poczty, takich jak gmail.com, nie można przypisać. Użyj domeny firmowej."
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "Zbyt wiele prób. Odczekaj chwilę przed ponowną próbą."
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "Twoja sesja wygasła. Zaloguj się ponownie."
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "Weryfikacja bezpieczeństwa nie powiodła się. Spróbuj ponownie."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Żądanie logowania wygasło lub zostało rozpoczęte w innej przeglądarce. Zacznij logowanie ponownie."
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "Kontrola bezpieczeństwa nie powiodła się. Rozpocznij logowanie ponownie."
   },
   "SSO / Error / try again button": {
     "defaultMessage": "Spróbuj ponownie"
@@ -4130,6 +4445,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "Połączenie SSO zostało aktywowane."
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "Przed aktywacją dodaj domenę do tego połączenia."
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "Zweryfikuj {domains} w sekcji Weryfikacja domeny przed aktywacją tego połączenia. Aktywacja pozostaje zablokowana, dopóki wszystkie domeny nie zostaną zweryfikowane."
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "Aktywne"
   },
@@ -4166,6 +4487,9 @@
   "SSO Card / Delete Success": {
     "defaultMessage": "Połączenie SSO zostało usunięte."
   },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(niezweryfikowana)"
+  },
   "SSO Card / Domains Label": {
     "defaultMessage": "Domeny:"
   },
@@ -4186,6 +4510,12 @@
   },
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "Wymuszone"
+  },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "Wymuszanie SSO wyłączone. Użytkownicy mogą teraz logować się hasłem."
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "Wymuszanie SSO włączone. Użytkownicy z dozwolonych domen muszą logować się przez SSO."
   },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "Nie udało się zaktualizować ustawienia wymuszania SSO."
@@ -4268,6 +4598,12 @@
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "np. firma.pl"
   },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "Niezweryfikowana"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "Zweryfikuj tę domenę w sekcji Weryfikacja domeny, zanim będzie można aktywować połączenie."
+  },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"
   },
@@ -4282,6 +4618,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL (Login URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "Włącz tylko wtedy, gdy dostawca tożsamości nie wysyła roszczenia email_verified, na przykład Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Akceptuj niepotwierdzone adresy e-mail"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "Włącz tylko wtedy, gdy dostawca tożsamości pozwala logować się wyłącznie adresami e-mail należącymi do użytkownika. W przeciwnym razie użytkownik mógłby zalogować się jako ktoś inny."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "Powrót do logowania"
@@ -4312,6 +4657,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "Logowanie SSO"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "Adres API"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "Adres API jest skonfigurowany dla środowiska produkcyjnego"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "Adres API wskazuje na localhost – SSO nie będzie działać z zewnętrznymi dostawcami tożsamości"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "Zmienna środowiskowa API_URL nie jest ustawiona"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "Wszystkie wymagane punkty końcowe OIDC są obecne"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "Adres callback"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "Konfiguracja adresu callback może być niepełna"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "Adres callback używa localhost – zewnętrzni dostawcy tożsamości nie mogą go osiągnąć"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "Certyfikat wygasł {days} dni temu"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "Certyfikat wygasa za {days} dni"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "Certyfikat jest zalecany do weryfikacji podpisu"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "Certyfikat jest ważny (wygasa za {days} dni)"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "Identyfikator klienta"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "Sekret klienta"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "Przekroczono limit czasu pobierania dokumentu wykrywania"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "Przekroczono limit czasu połączenia z punktem SSO"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "Rozważ wkrótce odnowienie certyfikatu"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "Nie udało się pobrać dokumentu wykrywania"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "Adres ACS"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "Punkt autoryzacji"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "Wykryte punkty końcowe"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "Identyfikator encji"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "Błąd"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "Wygasa"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "Wskazówka"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "Format identyfikatora żądania"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "Punkt tokenów"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "Wartość"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "Punkt wykrywania zwrócił HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "Punkt wykrywania zwrócił nieprawidłowy JSON"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "Upewnij się, że certyfikat ma poprawny format PEM lub base64"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "Nie udało się połączyć z punktem SSO"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "Nie udało się wygenerować żądania SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "Nie udało się przetworzyć certyfikatu"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "Certyfikat IdP"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "Identyfikator IdP"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "Certyfikat IdP nie jest skonfigurowany"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "Identyfikator dostawcy tożsamości jest skonfigurowany"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "Identyfikator dostawcy tożsamości nie jest skonfigurowany"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "Adres wystawcy jest skonfigurowany"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "Adres wystawcy nie jest skonfigurowany"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "Może być wymagana ręczna konfiguracja punktów końcowych"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "Brakujące punkty końcowe w dokumencie wykrywania: {endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "Identyfikator klienta OAuth jest skonfigurowany"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "Identyfikator klienta OAuth nie jest skonfigurowany"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "Sekret klienta OAuth jest skonfigurowany"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "Sekret klienta OAuth nie jest skonfigurowany"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "Adres callback OAuth jest skonfigurowany"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "Wykrywanie OIDC"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "Wystawca OIDC"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "Punkt wykrywania OpenID Connect jest osiągalny"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "Wymagane punkty końcowe"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "Żądanie SAML AuthnRequest można wygenerować"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "Generowanie żądania SAML"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "Konfiguracja SP"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "Błąd SSL/TLS podczas łączenia z punktem SSO"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "Błąd SSL/TLS podczas łączenia z wystawcą"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "Format adresu SSO"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "Adres SSO osiągalny"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "Punkt SSO istnieje (zwrócono 405 – oczekiwane dla punktów SAML)"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "Punkt SSO jest osiągalny (HTTP {status})"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "Punkt SSO zwrócił HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "Adresy Service Provider są skonfigurowane"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "Adresy Service Provider używają localhost – zewnętrzni dostawcy tożsamości nie mogą ich osiągnąć"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "Konfiguracja Service Provider może być niepełna"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "Ustaw zmienną środowiskową API_URL na publiczną domenę API"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "Ustaw zmienną środowiskową API_URL na publiczną domenę API"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "Adres Single Sign-On jest skonfigurowany"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "Adres Single Sign-On nie jest skonfigurowany"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "Niektórzy dostawcy mogą nie obsługiwać automatycznego wykrywania"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "Dostawca tożsamości może być za zaporą lub odpowiadać wolno"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "Punkt może nadal działać dla żądań SAML"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "Spowoduje to błąd przekierowań SSO. Ustaw API_URL na publiczną domenę API."
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - Generator pomysłów na SaaS"
@@ -4724,9 +5288,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Tak"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Dodaj Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Dodaj token"
   },
@@ -4737,7 +5298,7 @@
     "defaultMessage": "Skonfiguruj SSO"
   },
   "Tenant Security Settings / Audit Description": {
-    "defaultMessage": "Przeglądaj ostatnie zdarzenia bezpieczeństwa w swojej organizacji"
+    "defaultMessage": "Przeglądaj ostatnie zdarzenia SSO, SCIM i KSeF w swojej organizacji"
   },
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Dziennik zdarzeń bezpieczeństwa"
@@ -4755,7 +5316,7 @@
     "defaultMessage": "Brak zdarzeń zabezpieczeń"
   },
   "Tenant Security Settings / No Audit Events Hint": {
-    "defaultMessage": "Zdarzenia zabezpieczeń, takie jak logowania SSO, tworzenie użytkowników i zmiany konfiguracji, pojawią się tutaj."
+    "defaultMessage": "Zdarzenia SSO i SCIM, takie jak logowania przez SSO, tworzenie użytkowników i zmiany konfiguracji, oraz zmiany tokenu KSeF, pojawią się tutaj."
   },
   "Tenant Security Settings / No Filtered Audit Events": {
     "defaultMessage": "Brak zdarzeń spełniających kryteria filtrów"
@@ -4763,35 +5324,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Spróbuj zmienić filtry lub wyczyść je, aby zobaczyć wszystkie zdarzenia."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Spróbuj innego hasła wyszukiwania"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "Brak zarejestrowanych passkeyów"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "Brak passkeyów spełniających kryteria wyszukiwania"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "Synchronizacja katalogu wymaga SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "Brak skonfigurowanych połączeń SSO"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "Żaden użytkownik w Twojej organizacji nie zarejestrował jeszcze passkeya"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Zarejestruj passkey, aby logować się szybciej i bezpieczniej"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Zarządzaj passkeyami wszystkich użytkowników w organizacji"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Używaj biometrii lub kluczy bezpieczeństwa do logowania bez hasła"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Kompatybilni dostawcy tożsamości"
@@ -4939,6 +5476,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "statusu VAT"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "Sprawdź tę wartość i spróbuj ponownie."
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "Nieprawidłowy numer NIP"
@@ -5188,26 +5731,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "Szybki start"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "Sprawdź tę wartość i spróbuj ponownie."
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "Tej wartości nie można zmienić po zapisaniu."
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "Wyczyścić ten szkic?"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "Wszystkie odpowiedzi dla tej nowej organizacji zostaną usunięte. Tej operacji nie można cofnąć."
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "Wyczyść szkic"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "Wyczyść szkic"
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
   }
 }

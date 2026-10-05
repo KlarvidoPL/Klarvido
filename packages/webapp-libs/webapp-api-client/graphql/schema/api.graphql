@@ -61,8 +61,8 @@ type Query {
   ssoConnections(tenantId: ID!, before: String, after: String, first: Int, last: Int): SSOConnectionConnection
   ssoConnection(tenantId: ID!, id: ID): SSOConnectionType
   scimTokens(tenantId: ID!, before: String, after: String, first: Int, last: Int): SCIMTokenConnection
+  ssoDomains(tenantId: ID!): [TenantDomainType]
   ssoAuditLogs(tenantId: ID!, eventType: String, userEmail: String, success: Boolean, startDate: String, endDate: String, search: String, before: String, after: String, first: Int, last: Int): SSOAuditLogConnection
-  tenantPasskeys(tenantId: ID!, search: String): [TenantPasskeyType]
   myPasskeys(before: String, after: String, first: Int, last: Int): PasskeyConnection
   mySessions(before: String, after: String, first: Int, last: Int): SSOSessionConnection
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
@@ -424,12 +424,15 @@ type SSOConnectionType implements Node {
   oidcScopes: String!
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString!
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean!
   lastLoginAt: DateTime
   loginCount: Int!
   isActive: Boolean
   isSaml: Boolean
   isOidc: Boolean
   spMetadataUrl: String
+  spMetadataXml: String
   spAcsUrl: String
   spEntityId: String
   oidcCallbackUrl: String
@@ -465,6 +468,21 @@ type SCIMTokenType implements Node {
   isValid: Boolean
   isExpired: Boolean
 }
+"An email domain claimed by the tenant for SSO, with the DNS record that proves ownership."
+type TenantDomainType implements Node {
+  createdAt: DateTime!
+  "Lowercase email domain, e.g. example.com"
+  domain: String!
+  status: SsoTenantDomainStatusChoices!
+  verifiedAt: DateTime
+  lastCheckedAt: DateTime
+  consecutiveFailures: Int!
+  firstFailedAt: DateTime
+  id: ID!
+  verificationRecordName: String
+  verificationRecordValue: String
+  gracePeriodEndsAt: DateTime
+}
 type SSOAuditLogConnection {
   "Pagination data for this connection."
   pageInfo: PageInfo!
@@ -490,19 +508,6 @@ type SSOAuditLogType implements Node {
   errorMessage: String!
   userEmail: String
   connectionName: String
-}
-type TenantPasskeyType {
-  id: ID
-  name: String
-  authenticatorType: String
-  transports: GenericScalar
-  isActive: Boolean
-  lastUsedAt: DateTime
-  useCount: Int
-  deviceType: String
-  createdAt: DateTime
-  userEmail: String
-  userName: String
 }
 type PasskeyConnection {
   "Pagination data for this connection."
@@ -598,8 +603,6 @@ type SSODiscoveryConnectionType {
   id: String
   name: String
   type: String
-  tenantId: String
-  tenantName: String
   loginUrl: String
 }
 type OrganizationOnboardingProfileType {
@@ -1420,12 +1423,16 @@ type ApiMutation {
   deactivateSsoConnection(id: ID!, tenantId: ID!): DeactivateSSOConnectionMutation
   "Test an SSO connection configuration. Requires tenantId for tenant context."
   testSsoConnection(id: ID!, tenantId: ID!): TestSSOConnectionMutation
+  "Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified."
+  addSsoDomain(domain: String!, tenantId: ID!): AddSSODomainMutation
+  "Check the domain's DNS TXT record and mark the domain as verified."
+  verifySsoDomain(id: ID!, tenantId: ID!): VerifySSODomainMutation
+  "Remove a claimed domain. Refused while an SSO connection of the tenant still uses it."
+  deleteSsoDomain(id: ID!, tenantId: ID!): DeleteSSODomainMutation
   "Create a new SCIM token."
   createScimToken(input: CreateSCIMTokenMutationInput!): CreateSCIMTokenMutationPayload
   "Revoke a SCIM token. Requires tenantId for tenant context."
   revokeScimToken(id: ID!, tenantId: ID!): RevokeSCIMTokenMutation
-  "Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context."
-  deleteTenantPasskey(id: ID!, tenantId: ID!): DeleteTenantPasskeyMutation
   "Revoke an SSO session."
   revokeSession(reason: String, sessionId: String!): RevokeSessionMutation
   "Revoke all SSO sessions for the current user except the current session."
@@ -1654,6 +1661,8 @@ type CreateSSOConnectionMutationPayload {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   spMetadataXml: String
   metadataLastUpdated: DateTime
   lastLoginAt: DateTime
@@ -1699,6 +1708,8 @@ type UpdateSSOConnectionMutationPayload {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   spMetadataXml: String
   metadataLastUpdated: DateTime
   lastLoginAt: DateTime
@@ -1742,6 +1753,18 @@ type TestSSOConnectionCheckType {
   message: String
   details: GenericScalar
 }
+"Claim an email domain for SSO. The claim is pending until its DNS TXT record is verified."
+type AddSSODomainMutation {
+  ssoDomain: TenantDomainType
+}
+"Check the domain's DNS TXT record and mark the domain as verified."
+type VerifySSODomainMutation {
+  ssoDomain: TenantDomainType
+}
+"Remove a claimed domain. Refused while an SSO connection of the tenant still uses it."
+type DeleteSSODomainMutation {
+  ok: Boolean
+}
 "Create a new SCIM token."
 type CreateSCIMTokenMutationPayload {
   tenantId: String
@@ -1754,10 +1777,6 @@ type CreateSCIMTokenMutationPayload {
 }
 "Revoke a SCIM token. Requires tenantId for tenant context."
 type RevokeSCIMTokenMutation {
-  ok: Boolean
-}
-"Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context."
-type DeleteTenantPasskeyMutation {
   ok: Boolean
 }
 "Revoke an SSO session."
@@ -2292,6 +2311,15 @@ enum SsoTenantSSOConnectionSamlNameIdFormatChoices {
   URN_OASIS_NAMES_TC_SAML_1_1_NAMEID_FORMAT_UNSPECIFIED
 }
 "An enumeration."
+enum SsoTenantDomainStatusChoices {
+  "Pending verification"
+  PENDING
+  "Verified"
+  VERIFIED
+  "Lapsed (record missing for several checks)"
+  LAPSED
+}
+"An enumeration."
 enum SsoSSOAuditLogEventTypeChoices {
   "IdP Configuration Created"
   IDP_CONFIG_CREATED
@@ -2331,6 +2359,14 @@ enum SsoSSOAuditLogEventTypeChoices {
   SCIM_GROUP_DELETED
   "SSO Enforce Bypass Login"
   SSO_ENFORCE_BYPASS
+  "SSO Domain Added"
+  DOMAIN_ADDED
+  "SSO Domain Verified"
+  DOMAIN_VERIFIED
+  "SSO Domain Removed"
+  DOMAIN_REMOVED
+  "SSO Domain Lapsed"
+  DOMAIN_LAPSED
   "Session Created"
   SESSION_CREATED
   "Session Revoked"
@@ -2351,6 +2387,12 @@ enum SsoSSOAuditLogEventTypeChoices {
   PASSKEY_CLONE_DETECTED
   "Security Anomaly Detected"
   SECURITY_ANOMALY
+  "KSeF Token Saved"
+  KSEF_TOKEN_SAVED
+  "KSeF Token Tested"
+  KSEF_TOKEN_TESTED
+  "KSeF Token Deleted"
+  KSEF_TOKEN_DELETED
 }
 "An enumeration."
 enum MultitenancyActionLogActionTypeChoices {
@@ -2936,7 +2978,6 @@ input CreateSSOConnectionMutationInput {
   "Display name for this SSO connection"
   name: String!
   connectionType: connection_type
-  status: status
   "List of email domains allowed to use this SSO connection"
   allowedDomains: JSONString
   "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
@@ -2967,6 +3008,8 @@ input CreateSSOConnectionMutationInput {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   clientMutationId: String
 }
 input UpdateSSOConnectionMutationInput {
@@ -2975,7 +3018,6 @@ input UpdateSSOConnectionMutationInput {
   "Display name for this SSO connection"
   name: String
   connectionType: connection_type
-  status: status
   "List of email domains allowed to use this SSO connection"
   allowedDomains: JSONString
   "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
@@ -3007,6 +3049,8 @@ input UpdateSSOConnectionMutationInput {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   clientMutationId: String
 }
 input DeleteSSOConnectionMutationInput {

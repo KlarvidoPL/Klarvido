@@ -9,6 +9,9 @@ Security Features:
 """
 
 import logging
+import re
+import secrets
+from urllib.parse import urlencode
 from functools import wraps
 
 from django.conf import settings
@@ -35,6 +38,7 @@ from apps.multitenancy.constants import TenantUserRole
 
 from .models import TenantSSOConnection, SCIMToken, SSOAuditLog
 from .renderers import SCIMRenderer, SCIMParser
+from .availability import SSO_UNAVAILABLE_MESSAGE, sso_enabled
 from .constants import SSOConnectionStatus, SSOAuditEventType
 from .services import SAMLService, OIDCService, SCIMService, WebAuthnService
 from .services.scim import SCIMError
@@ -96,11 +100,12 @@ class SAMLMetadataView(View):
 
     def get(self, request, connection_id):
         try:
-            # SECURITY: Only expose metadata for active or testing connections
+            # SECURITY: Only expose metadata for active connections. Admins copy the SP metadata from the
+            # connection screen while the connection is still a draft.
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
                 connection_type="saml",
-                status__in=[SSOConnectionStatus.ACTIVE, SSOConnectionStatus.DRAFT],
+                status=SSOConnectionStatus.ACTIVE,
             )
         except TenantSSOConnection.DoesNotExist:
             return HttpResponse("Not found", status=404)
@@ -119,11 +124,134 @@ class SAMLMetadataView(View):
         )
 
 
+def _normalize_login_hint(login_hint: str | None) -> str | None:
+    """The email the user typed on the SSO login page, normalized for comparison."""
+    return (login_hint or "").strip().lower() or None
+
+
+def _ensure_matches_login_hint(login_hint: str | None, email: str | None) -> None:
+    """The account signed in at the identity provider must be the one the user asked for.
+
+    Without this, an existing identity-provider session (for example another user signed in
+    to the IdP) would silently log the user into a different account.
+    """
+    if login_hint and (not email or email.strip().lower() != login_hint):
+        raise ValueError("Signed-in account does not match the email entered for SSO login")
+
+
+def _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, login_hint):
+    """The IdP signed in a different account than the one requested.
+
+    Ends that identity-provider session and returns the user to the SSO login page, where the
+    requested email is pre-filled. Nothing is provisioned or logged in for the other account.
+    """
+    SSOAuditLog.log_event(
+        event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
+        tenant=connection.tenant,
+        sso_connection=connection,
+        description="OIDC login with a different account than requested - restarting SSO login",
+        error_message="account_mismatch",
+        success=False,
+        ip_address=get_client_ip(request),
+    )
+
+    # After the identity provider session is ended, start this login again with the requested email,
+    # so the identity provider's login page opens with that email already filled in
+    restart_query = urlencode({"next": stored_data.get("next", "/"), "login_hint": login_hint})
+    post_logout_redirect = f"{settings.API_URL.rstrip('/')}/api/sso/oidc/{connection.id}/login?{restart_query}"
+    logout_url = OIDCService(connection).build_logout_url(
+        post_logout_redirect, id_token_hint=user_attrs.get("id_token")
+    )
+    if logout_url:
+        return HttpResponseRedirect(logout_url)
+    return _sso_error_redirect("account_mismatch", next_url=stored_data.get("next"))
+
+
+def _restart_saml_login_for_hint(request, connection, saml_service, login_hint, stored_request):
+    """SAML counterpart of _restart_sso_login_for_hint: end the other identity-provider session, then sign in again."""
+    SSOAuditLog.log_event(
+        event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
+        tenant=connection.tenant,
+        sso_connection=connection,
+        description="SAML login with a different account than requested - restarting SSO login",
+        error_message="account_mismatch",
+        success=False,
+        ip_address=get_client_ip(request),
+    )
+
+    restart_query = urlencode({"next": (stored_request or {}).get("relay_state", "/"), "login_hint": login_hint})
+    post_logout_redirect = f"{settings.API_URL.rstrip('/')}/api/sso/saml/{connection.id}/login?{restart_query}"
+    try:
+        logout_url = saml_service.build_logout_url(post_logout_redirect)
+    except Exception as e:
+        logger.warning(f"Could not build identity provider logout URL for SAML connection {connection.id}: {e}")
+        logout_url = ""
+    if logout_url:
+        return HttpResponseRedirect(logout_url)
+    return _sso_error_redirect("account_mismatch", next_url=(stored_request or {}).get("relay_state"))
+
+
+def _locale_from_next(next_url) -> str:
+    """The language the user was using when they started sign-in, from their return path (e.g. /pl/ -> pl)."""
+    match = re.match(r"^/([a-z]{2})(?:/|$)", next_url or "")
+    return match.group(1) if match else "en"
+
+
+def _sso_unavailable():
+    """Sign-in through SSO is switched off (apps/sso/availability.py)."""
+    return HttpResponse(SSO_UNAVAILABLE_MESSAGE, status=503)
+
+
+def _sso_error_redirect(error_code: str, next_url=None):
+    """Send the user to the sign-in error page in the language they were using, with a translated message."""
+    web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000").rstrip("/")
+    locale = _locale_from_next(next_url)
+    return HttpResponseRedirect(f"{web_app_url}/{locale}/auth/sso/error?code={error_code}")
+
+
+SSO_BINDING_COOKIE_MAX_AGE = 600  # same lifetime as the stored login request (10 minutes)
+SAML_REQUEST_COOKIE = "saml_request_id"
+OIDC_STATE_COOKIE = "oidc_state"
+
+
+def _saml_acs_path(connection_id) -> str:
+    return f"/api/sso/saml/{connection_id}/acs"
+
+
+def _oidc_callback_path(connection_id) -> str:
+    return f"/api/sso/oidc/{connection_id}/callback"
+
+
+def _bind_login_to_browser(response, name: str, value: str, path: str, samesite: str):
+    """Tie a login request to the browser that started it.
+
+    SECURITY: the stored request is looked up by a value only this browser holds. Without this, an attacker can
+    start a login in their own browser and make a victim's browser complete it (login CSRF).
+    """
+    response.set_cookie(
+        name,
+        value,
+        max_age=SSO_BINDING_COOKIE_MAX_AGE,
+        path=path,
+        httponly=True,
+        secure=True,
+        samesite=samesite,
+    )
+    return response
+
+
+def _unbind_login_from_browser(response, name: str, path: str, samesite: str):
+    response.delete_cookie(name, path=path, samesite=samesite)
+    return response
+
+
 @method_decorator(ratelimit(key="ip", rate="20/m", method="GET", block=True), name="get")
 class SAMLLoginView(View):
     """Initiate SAML SSO login with rate limiting."""
 
     def get(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -141,6 +269,8 @@ class SAMLLoginView(View):
         # Store relay state (return URL)
         relay_state = request.GET.get("next", "/")
 
+        login_hint = _normalize_login_hint(request.GET.get("login_hint"))
+
         try:
             saml_service = SAMLService(connection)
             redirect_url, request_id = saml_service.create_authn_request(
@@ -150,7 +280,7 @@ class SAMLLoginView(View):
             # SECURITY: Log detailed error server-side, return generic message to client
             logger.error(f"Failed to create SAML AuthnRequest for connection {connection_id}: {e}", exc_info=True)
             error_code = get_safe_error_code(e)
-            return HttpResponse(f"Failed to initiate SSO login. Error code: {error_code}", status=500)
+            return _sso_error_redirect(error_code, next_url=relay_state)
 
         # Store request ID for validation
         cache.set(
@@ -158,6 +288,7 @@ class SAMLLoginView(View):
             {
                 "connection_id": str(connection_id),
                 "relay_state": relay_state,
+                "login_hint": login_hint,
             },
             timeout=600,
         )  # 10 minutes
@@ -170,7 +301,14 @@ class SAMLLoginView(View):
             ip_address=get_client_ip(request),
         )
 
-        return HttpResponseRedirect(redirect_url)
+        # SameSite=None: the IdP posts the response to the ACS cross-site, and browsers do not send Lax cookies there
+        return _bind_login_to_browser(
+            HttpResponseRedirect(redirect_url),
+            SAML_REQUEST_COOKIE,
+            request_id,
+            path=_saml_acs_path(connection_id),
+            samesite="None",
+        )
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -178,6 +316,12 @@ class SAMLACSView(View):
     """SAML Assertion Consumer Service - handles SAML responses."""
 
     def post(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
+        response = self._process_response(request, connection_id)
+        return _unbind_login_from_browser(response, SAML_REQUEST_COOKIE, _saml_acs_path(connection_id), "None")
+
+    def _process_response(self, request, connection_id):
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -192,12 +336,31 @@ class SAMLACSView(View):
         if not saml_response:
             return HttpResponse("Missing SAMLResponse", status=400)
 
+        # SECURITY: the login request is identified by the cookie this browser received when it started the login.
+        # The posted response is not trusted to name it, because nothing in it is verified until the signature check.
+        request_id = request.COOKIES.get(SAML_REQUEST_COOKIE)
+        stored_request = cache.get(f"saml_request_{request_id}") if request_id else None
+        if not stored_request or stored_request.get("connection_id") != str(connection_id):
+            SSOAuditLog.log_event(
+                event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
+                tenant=connection.tenant,
+                sso_connection=connection,
+                description="SAML response without a login request started in this browser",
+                error_message="sso_request_expired",
+                success=False,
+                ip_address=get_client_ip(request),
+            )
+            return _sso_error_redirect("sso_request_expired", next_url=(stored_request or {}).get("relay_state"))
+        login_hint = stored_request.get("login_hint")
+
         saml_service = SAMLService(connection)
 
         try:
-            # Parse and validate SAML response
+            # Parse and validate SAML response; the response must answer exactly this request
             logger.info(f"Processing SAML response for connection {connection_id}")
-            user_attrs = saml_service.parse_saml_response(saml_response)
+            user_attrs = saml_service.parse_saml_response(saml_response, request_id=request_id)
+            # The response is verified and consumed, so the stored request is single-use
+            cache.delete(f"saml_request_{request_id}")
 
             # Validate we have required attributes
             email = user_attrs.get("email")
@@ -207,6 +370,9 @@ class SAMLACSView(View):
                     f"raw_attrs: {list(user_attrs.get('raw_attributes', {}).keys())}"
                 )
                 raise ValueError("No email found in SAML response. Check attribute mapping in your IdP.")
+            if login_hint and email.strip().lower() != login_hint:
+                return _restart_saml_login_for_hint(request, connection, saml_service, login_hint, stored_request)
+            _ensure_matches_login_hint(login_hint, email)
 
             # Provision or update user
             logger.info(f"Provisioning user with email: {email}")
@@ -226,7 +392,7 @@ class SAMLACSView(View):
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            tokens = create_jwt_tokens(user, auth_method='sso')
+            tokens = create_jwt_tokens(user, auth_method='sso', sso_tenant_id=connection.tenant_id)
 
             # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
@@ -266,20 +432,19 @@ class SAMLACSView(View):
             # Log detailed error server-side only (not exposed to client)
             logger.error(f"SAML authentication failed for connection {connection_id}: {e}", exc_info=True)
 
+            error_code = get_safe_error_code(e)
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
                 tenant=connection.tenant,
                 sso_connection=connection,
                 description="SAML login failed",
-                error_message=str(e)[:500],  # Store for admin review
+                error_message=error_code,  # Stable code; the detailed message stays in the server log
                 ip_address=get_client_ip(request),
                 success=False,
             )
 
-            # SECURITY: Return safe error code instead of raw exception message
-            web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-            error_code = get_safe_error_code(e)
-            return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
+            # SECURITY: Return the safe error code, never the raw exception message
+            return _sso_error_redirect(error_code, next_url=(stored_request or {}).get("relay_state"))
 
 
 # ==================
@@ -292,6 +457,8 @@ class OIDCLoginView(View):
     """Initiate OIDC SSO login with rate limiting."""
 
     def get(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -323,7 +490,7 @@ class OIDCLoginView(View):
             # SECURITY: Log detailed error server-side, return generic message to client
             logger.error(f"Failed to create OIDC authorization URL for connection {connection_id}: {e}", exc_info=True)
             error_code = get_safe_error_code(e)
-            return HttpResponse(f"Failed to initiate SSO login. Error code: {error_code}", status=500)
+            return _sso_error_redirect(error_code, next_url=request.GET.get("next"))
 
         # Store state for callback validation
         cache.set(
@@ -333,6 +500,7 @@ class OIDCLoginView(View):
                 "nonce": auth_params["nonce"],
                 "code_verifier": code_verifier,
                 "next": request.GET.get("next", "/"),
+                "login_hint": _normalize_login_hint(request.GET.get("login_hint")),
             },
             timeout=600,
         )  # 10 minutes
@@ -345,13 +513,25 @@ class OIDCLoginView(View):
             ip_address=get_client_ip(request),
         )
 
-        return HttpResponseRedirect(auth_url)
+        return _bind_login_to_browser(
+            HttpResponseRedirect(auth_url),
+            OIDC_STATE_COOKIE,
+            auth_params["state"],
+            path=_oidc_callback_path(connection_id),
+            samesite="Lax",
+        )
 
 
 class OIDCCallbackView(View):
     """Handle OIDC callback after authentication."""
 
     def get(self, request, connection_id):
+        if not sso_enabled():
+            return _sso_unavailable()
+        response = self._process_callback(request, connection_id)
+        return _unbind_login_from_browser(response, OIDC_STATE_COOKIE, _oidc_callback_path(connection_id), "Lax")
+
+    def _process_callback(self, request, connection_id):
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -376,14 +556,21 @@ class OIDCCallbackView(View):
                 ip_address=get_client_ip(request),
             )
             # SECURITY: Return safe error code, not raw IdP error
-            web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-            return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code=auth_failed")
+            pending_state = request.GET.get("state")
+            pending = cache.get(f"oidc_state_{pending_state}") if pending_state else None
+            return _sso_error_redirect("auth_failed", next_url=(pending or {}).get("next"))
 
         code = request.GET.get("code")
         state = request.GET.get("state")
 
         if not code or not state:
             return HttpResponse("Missing code or state", status=400)
+
+        # SECURITY: the state must be the one this browser received when it started the login (login CSRF)
+        bound_state = request.COOKIES.get(OIDC_STATE_COOKIE)
+        if not bound_state or not secrets.compare_digest(bound_state, state):
+            logger.warning(f"OIDC callback without a login started in this browser (connection {connection_id})")
+            return HttpResponse("Invalid or expired state", status=400)
 
         # Retrieve stored state
         stored_data = cache.get(f"oidc_state_{state}")
@@ -403,6 +590,9 @@ class OIDCCallbackView(View):
                 stored_nonce=stored_data["nonce"],
                 code_verifier=stored_data["code_verifier"],
             )
+            login_hint = stored_data.get("login_hint")
+            if login_hint and (user_attrs.get("email") or "").strip().lower() != login_hint:
+                return _restart_sso_login_for_hint(request, connection, user_attrs, stored_data, login_hint)
 
             # Provision or update user
             provisioning_service = JITProvisioningService(connection)
@@ -421,8 +611,7 @@ class OIDCCallbackView(View):
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            tokens = create_jwt_tokens(user, auth_method='sso')
-
+            tokens = create_jwt_tokens(user, auth_method='sso', sso_tenant_id=connection.tenant_id)
             # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
             try:
@@ -462,20 +651,19 @@ class OIDCCallbackView(View):
             # Log detailed error server-side only
             logger.error(f"OIDC authentication failed for connection {connection_id}: {e}", exc_info=True)
 
+            error_code = get_safe_error_code(e)
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
                 tenant=connection.tenant,
                 sso_connection=connection,
                 description="OIDC login failed",
-                error_message=str(e)[:500],  # Store for admin review
+                error_message=error_code,  # Stable code; the detailed message stays in the server log
                 success=False,
                 ip_address=get_client_ip(request),
             )
 
-            # SECURITY: Return safe error code instead of raw exception
-            web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-            error_code = get_safe_error_code(e)
-            return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
+            # SECURITY: Return the safe error code, never the raw exception message
+            return _sso_error_redirect(error_code, next_url=stored_data.get("next"))
 
 
 # ==================
@@ -488,6 +676,8 @@ def scim_auth_required(view_func):
 
     @wraps(view_func)
     def wrapper(self, request, *args, **kwargs):
+        if not sso_enabled():
+            return JsonResponse(SCIMError(SSO_UNAVAILABLE_MESSAGE, 503).to_response(), status=503)
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
 
         if not auth_header.startswith("Bearer "):
@@ -1096,184 +1286,3 @@ class AuditLogListView(APIView):
                 **filter_options,
             }
         )
-
-
-# ==================
-# SCIM Token Views
-# ==================
-
-
-class SCIMTokenListView(APIView):
-    """
-    List and create SCIM tokens for a tenant.
-    Only accessible to tenant owners and admins.
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, tenant_id):
-        from graphql_relay import from_global_id
-
-        # Decode tenant ID if it's a GraphQL global ID
-        try:
-            type_name, pk = from_global_id(tenant_id)
-            if type_name and type_name != "":
-                tenant_id = pk
-        except Exception:
-            pass
-
-        try:
-            tenant = Tenant.objects.get(pk=tenant_id)
-        except Tenant.DoesNotExist:
-            return Response({"error": "Tenant not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # Check permissions
-        try:
-            membership = TenantMembership.objects.get(user=request.user, tenant=tenant)
-            if not is_owner_or_admin(membership):
-                return Response({"error": "Insufficient permissions"}, status=status.HTTP_403_FORBIDDEN)
-        except TenantMembership.DoesNotExist:
-            return Response({"error": "Not a member of this tenant"}, status=status.HTTP_403_FORBIDDEN)
-
-        # Get SCIM tokens (only active by default)
-        include_revoked = request.GET.get("include_revoked", "false").lower() == "true"
-        tokens = SCIMToken.objects.filter(tenant=tenant).order_by("-created_at")
-
-        if not include_revoked:
-            tokens = tokens.filter(is_active=True)
-
-        return Response(
-            [
-                {
-                    "id": str(t.id),
-                    "name": t.name,
-                    "tokenPrefix": t.token_prefix,
-                    "isActive": t.is_active,
-                    "createdAt": t.created_at.isoformat(),
-                    "lastUsedAt": t.last_used_at.isoformat() if t.last_used_at else None,
-                    "requestCount": t.request_count,
-                }
-                for t in tokens
-            ]
-        )
-
-    def post(self, request, tenant_id):
-        import secrets
-        import hashlib
-        from graphql_relay import from_global_id
-
-        # Decode tenant ID if it's a GraphQL global ID
-        try:
-            type_name, pk = from_global_id(tenant_id)
-            if type_name and type_name != "":
-                tenant_id = pk
-        except Exception:
-            pass
-
-        try:
-            tenant = Tenant.objects.get(pk=tenant_id)
-        except Tenant.DoesNotExist:
-            return Response({"error": "Tenant not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # Check permissions
-        try:
-            membership = TenantMembership.objects.get(user=request.user, tenant=tenant)
-            if not is_owner_or_admin(membership):
-                return Response({"error": "Insufficient permissions"}, status=status.HTTP_403_FORBIDDEN)
-        except TenantMembership.DoesNotExist:
-            return Response({"error": "Not a member of this tenant"}, status=status.HTTP_403_FORBIDDEN)
-
-        # Check if there's an active SSO connection
-        active_connections = TenantSSOConnection.objects.filter(tenant=tenant, status=SSOConnectionStatus.ACTIVE)
-        if not active_connections.exists():
-            return Response(
-                {"error": "An active SSO connection is required to create SCIM tokens"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        name = request.data.get("name", "SCIM Token")
-
-        # Generate token
-        raw_token = secrets.token_urlsafe(48)
-        token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
-        token_prefix = raw_token[:8]
-
-        # Create token
-        token = SCIMToken.objects.create(
-            tenant=tenant,
-            sso_connection=active_connections.first(),
-            name=name,
-            token_hash=token_hash,
-            token_prefix=token_prefix,
-        )
-
-        # Log the creation
-        SSOAuditLog.log_event(
-            event_type=SSOAuditEventType.IDP_CONFIG_UPDATED,
-            tenant=tenant,
-            user=request.user,
-            description=f'SCIM token "{name}" created',
-            ip_address=get_client_ip(request),
-        )
-
-        return Response(
-            {
-                "id": str(token.id),
-                "name": token.name,
-                "token": raw_token,  # Only returned once!
-                "tokenPrefix": token_prefix,
-                "createdAt": token.created_at.isoformat(),
-                "endpointUrl": "/api/sso/scim/v2",
-            },
-            status=status.HTTP_201_CREATED,
-        )
-
-
-class SCIMTokenDetailView(APIView):
-    """Delete a SCIM token."""
-
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request, tenant_id, token_id):
-        from graphql_relay import from_global_id
-
-        # Decode tenant ID if it's a GraphQL global ID
-        try:
-            type_name, pk = from_global_id(tenant_id)
-            if type_name and type_name != "":
-                tenant_id = pk
-        except Exception:
-            pass
-
-        try:
-            tenant = Tenant.objects.get(pk=tenant_id)
-        except Tenant.DoesNotExist:
-            return Response({"error": "Tenant not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # Check permissions
-        try:
-            membership = TenantMembership.objects.get(user=request.user, tenant=tenant)
-            if not is_owner_or_admin(membership):
-                return Response({"error": "Insufficient permissions"}, status=status.HTTP_403_FORBIDDEN)
-        except TenantMembership.DoesNotExist:
-            return Response({"error": "Not a member of this tenant"}, status=status.HTTP_403_FORBIDDEN)
-
-        try:
-            token = SCIMToken.objects.get(pk=token_id, tenant=tenant)
-        except SCIMToken.DoesNotExist:
-            return Response({"error": "Token not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        token_name = token.name
-        token.is_active = False
-        token.save(update_fields=["is_active"])
-
-        # Log the revocation
-        SSOAuditLog.log_event(
-            event_type=SSOAuditEventType.IDP_CONFIG_UPDATED,
-            tenant=tenant,
-            user=request.user,
-            description=f'SCIM token "{token_name}" revoked',
-            ip_address=get_client_ip(request),
-        )
-
-        return Response(status=status.HTTP_204_NO_CONTENT)

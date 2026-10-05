@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { Emitter } from '../utils/eventEmitter';
 import { AUTH_URL, coordinatedRefreshToken } from './auth';
+import { CSRF_HEADER_NAME, ensureCsrfToken } from './csrf';
 import { ApiClientEvents, PendingRequest } from './types';
 
 let pendingRequests: PendingRequest[] = [];
@@ -45,7 +46,15 @@ export const createRefreshTokenInterceptor = (props?: CreateRefreshTokenIntercep
         await Promise.all(
           pendingRequests.map(async ({ request, resolve, reject }: PendingRequest) => {
             try {
-              resolve(axios.request({ ...request, baseURL: '/' }));
+              // Retried requests skip the shared client's interceptors, so the CSRF token is added here
+              const csrfToken = await ensureCsrfToken();
+              resolve(
+                axios.request({
+                  ...request,
+                  baseURL: '/',
+                  headers: { ...request?.headers, ...(csrfToken ? { [CSRF_HEADER_NAME]: csrfToken } : {}) },
+                })
+              );
             } catch (e) {
               reject(e);
             }

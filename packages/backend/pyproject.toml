@@ -126,6 +126,7 @@ dependencies = [
     # WebAuthn/Passkey support
     "cbor2>=5.4.0",
     # SAML XML signature verification (proper C14N canonicalization)
+    "dnspython>=2.6",
     "signxml>=4.3.1",
     # Multi-platform deployment support
     "django-sendgrid-v5>=1.2.3",

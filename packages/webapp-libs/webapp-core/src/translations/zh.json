@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "复制链接失败"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "复制元数据 XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "正在创建..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "服务提供商元数据"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "在连接仍为草稿时，将其粘贴到您的身份提供商中。激活后将提供元数据 URL。"
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP 元数据 (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP 元数据 URL："
@@ -578,6 +587,84 @@
   "Audit / Error": {
     "defaultMessage": "错误"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "已应用组映射"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "已启用 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "已创建 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "已停用 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "已删除 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "已更新 IdP 配置"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "已删除 KSeF 令牌"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "已保存 KSeF 令牌"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "已测试 KSeF 令牌"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "已创建 SCIM 组"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "已删除 SCIM 组"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "已更新 SCIM 组"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "已创建 SCIM 用户"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "已删除 SCIM 用户"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "已更新 SCIM 用户"
+  },
+  "Audit / Event / SSO Domain Added": {
+    "defaultMessage": "已添加 SSO 域名"
+  },
+  "Audit / Event / SSO Domain Lapsed": {
+    "defaultMessage": "SSO 域名已失效"
+  },
+  "Audit / Event / SSO Domain Removed": {
+    "defaultMessage": "已删除 SSO 域名"
+  },
+  "Audit / Event / SSO Domain Verified": {
+    "defaultMessage": "SSO 域名已验证"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "绕过 SSO 的登录"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO 登录失败"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "已发起 SSO 登录"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO 登录成功"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO 退出登录"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "通过 JIT 创建用户"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "通过 SSO 更新用户"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "失败"
   },
@@ -611,6 +698,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP 地址"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "被 KSeF 拒绝"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "尚未验证"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "已验证"
+  },
   "Audit / Last page": {
     "defaultMessage": "最后一页"
   },
@@ -638,11 +734,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "选择开始日期"
   },
+  "Audit / Status": {
+    "defaultMessage": "状态"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "失败"
   },
   "Audit / Status Success": {
     "defaultMessage": "成功"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "操作"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "已保存新令牌"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "已删除令牌"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "已替换现有令牌"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "令牌末四位"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "KSeF 中的令牌名称"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "按邮箱筛选..."
@@ -1379,6 +1496,15 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "备份设置更新成功"
   },
+  "Calendar / Jump to today": {
+    "defaultMessage": "跳到今天"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "现在"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "今天"
+  },
   "Cancel subscription / Active plan": {
     "defaultMessage": "当前套餐："
   },
@@ -1880,6 +2006,81 @@
   "Documents / subheading": {
     "defaultMessage": "在一个地方上传、管理和整理您的文档"
   },
+  "Domain Verification / Add Error": {
+    "defaultMessage": "无法添加域名。"
+  },
+  "Domain Verification / Add domain": {
+    "defaultMessage": "添加域名"
+  },
+  "Domain Verification / Copied": {
+    "defaultMessage": "已复制到剪贴板。"
+  },
+  "Domain Verification / Copy name": {
+    "defaultMessage": "复制记录名称"
+  },
+  "Domain Verification / Copy value": {
+    "defaultMessage": "复制记录值"
+  },
+  "Domain Verification / DNS instructions": {
+    "defaultMessage": "将此 TXT 记录添加到您的 DNS，然后点击“验证”。请保留该记录：SSO 每天都会检查它，删除后域名将失效。"
+  },
+  "Domain Verification / Delete Error": {
+    "defaultMessage": "无法删除域名。"
+  },
+  "Domain Verification / Description": {
+    "defaultMessage": "在 SSO 使用贵公司的邮箱域名之前，请先证明您拥有该域名。只有经过验证的域名才会参与登录、自动配置和强制 SSO。"
+  },
+  "Domain Verification / Domain input": {
+    "defaultMessage": "域名"
+  },
+  "Domain Verification / Domain placeholder": {
+    "defaultMessage": "company.cn"
+  },
+  "Domain Verification / Empty": {
+    "defaultMessage": "尚未添加任何域名。添加贵公司的域名以开始验证。"
+  },
+  "Domain Verification / Lapsed explanation": {
+    "defaultMessage": "验证记录已缺失七天，因此该域名不再可用于 SSO。其 SSO 连接已被停用。请重新发布该记录并验证域名以继续使用。"
+  },
+  "Domain Verification / Last checked": {
+    "defaultMessage": "上次检查：{date}"
+  },
+  "Domain Verification / Record missing": {
+    "defaultMessage": "验证记录自 {since} 起缺失。除非恢复该记录，否则 SSO 将于 {deadline} 停用。"
+  },
+  "Domain Verification / Record name": {
+    "defaultMessage": "名称"
+  },
+  "Domain Verification / Record type": {
+    "defaultMessage": "类型"
+  },
+  "Domain Verification / Record value": {
+    "defaultMessage": "值"
+  },
+  "Domain Verification / Remove domain": {
+    "defaultMessage": "删除域名"
+  },
+  "Domain Verification / Status lapsed": {
+    "defaultMessage": "已失效"
+  },
+  "Domain Verification / Status pending": {
+    "defaultMessage": "待处理"
+  },
+  "Domain Verification / Status verified": {
+    "defaultMessage": "已验证"
+  },
+  "Domain Verification / Title": {
+    "defaultMessage": "域名验证"
+  },
+  "Domain Verification / Verified": {
+    "defaultMessage": "域名已验证。SSO 现在可以使用它。"
+  },
+  "Domain Verification / Verify": {
+    "defaultMessage": "验证"
+  },
+  "Domain Verification / Verify Error": {
+    "defaultMessage": "无法验证域名。"
+  },
   "Dropzone / Default label": {
     "defaultMessage": "点击或将文件拖到此处上传"
   },
@@ -2233,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "重置你的密码"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "恢复该记录，验证域名，并在安全设置中重新启用 SSO 连接。"
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "前往 Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "{domain} 的 SSO 已停用"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "\"{domain}\" 的 SSO 已停用"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "{tenantName} 中 \"{domain}\" 的验证记录已缺失 {graceDays} 天，因此该域名的 SSO 已停用。用户无法再通过它登录。"
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "您域名的 SSO 已停用"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "打开组织的安全设置，查看并恢复该记录。"
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "前往 Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "{domain} 的 SSO 验证记录缺失"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "\"{domain}\" 的 SSO 验证记录缺失"
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "证明您拥有 {tenantName} 的域名 \"{domain}\" 的 DNS 记录缺失。如果不恢复该记录，此域名的 SSO 将在 {graceDays} 天后停用。"
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO 验证记录缺失"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "更新付款方式"
@@ -3074,6 +3311,21 @@
   "Notifications / SSO Connection Deactivated / Title": {
     "defaultMessage": "SSO 连接已停用"
   },
+  "Notifications / SSO Domain Lapsed / Content": {
+    "defaultMessage": "\"{tenant_name}\" 的域名 \"{domain}\" 因缺少验证记录而不再验证。已停用的连接：{connections}。"
+  },
+  "Notifications / SSO Domain Lapsed / Content without connections": {
+    "defaultMessage": "\"{tenant_name}\" 的域名 \"{domain}\" 因缺少验证记录而不再验证。"
+  },
+  "Notifications / SSO Domain Lapsed / Title": {
+    "defaultMessage": "SSO 域名已失效"
+  },
+  "Notifications / SSO Domain Record Missing / Content": {
+    "defaultMessage": "\"{domain}\"（{tenant_name}）的验证记录缺失。如果不恢复该记录，此域名的 SSO 将在 {grace_days} 天后停用。"
+  },
+  "Notifications / SSO Domain Record Missing / Title": {
+    "defaultMessage": "SSO 域名验证记录缺失"
+  },
   "Notifications / Tenant / Deleted": {
     "defaultMessage": "组织“{tenant_name}”已被“{name}”删除"
   },
@@ -3121,6 +3373,219 @@
   },
   "OIDC Form / Name Placeholder": {
     "defaultMessage": "例如：Google Workspace"
+  },
+  "Onboarding / Back": {
+    "defaultMessage": "返回"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "清除草稿"
+  },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "清除草稿"
+  },
+  "Onboarding / Clear draft description": {
+    "defaultMessage": "此新组织的所有答案都将被删除，此操作无法撤销。"
+  },
+  "Onboarding / Clear draft failed": {
+    "defaultMessage": "无法清除此草稿，请重试。"
+  },
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "清除此草稿？"
+  },
+  "Onboarding / Completed": {
+    "defaultMessage": "引导流程已完成"
+  },
+  "Onboarding / Confirm": {
+    "defaultMessage": "确认档案"
+  },
+  "Onboarding / Cost employees": {
+    "defaultMessage": "员工工时"
+  },
+  "Onboarding / Cost marketing": {
+    "defaultMessage": "营销 / 佣金"
+  },
+  "Onboarding / Cost materials": {
+    "defaultMessage": "材料 / 商品"
+  },
+  "Onboarding / Cost subcontractors": {
+    "defaultMessage": "分包商"
+  },
+  "Onboarding / Cost technology": {
+    "defaultMessage": "技术 / 基础设施"
+  },
+  "Onboarding / Cost transport": {
+    "defaultMessage": "运输 / 物流"
+  },
+  "Onboarding / Costs hint": {
+    "defaultMessage": "最多选择三个答案。"
+  },
+  "Onboarding / Costs title": {
+    "defaultMessage": "哪些成本会随销售增长？"
+  },
+  "Onboarding / Customer B2B": {
+    "defaultMessage": "主要是企业客户 (B2B)"
+  },
+  "Onboarding / Customer B2C": {
+    "defaultMessage": "主要是个人消费者 (B2C)"
+  },
+  "Onboarding / Customer mixed": {
+    "defaultMessage": "企业和个人消费者"
+  },
+  "Onboarding / Customer public": {
+    "defaultMessage": "公共机构"
+  },
+  "Onboarding / Customers hint": {
+    "defaultMessage": "这有助于估算未来集成能覆盖多少销售数据。"
+  },
+  "Onboarding / Customers title": {
+    "defaultMessage": "通常是谁向您付款？"
+  },
+  "Onboarding / Description": {
+    "defaultMessage": "请告诉我们您的业务如何运作。您可以返回之前的步骤。"
+  },
+  "Onboarding / Edit": {
+    "defaultMessage": "编辑"
+  },
+  "Onboarding / Goal cash": {
+    "defaultMessage": "我很努力，但现金不足"
+  },
+  "Onboarding / Goal client loss": {
+    "defaultMessage": "我担心失去一个重要客户"
+  },
+  "Onboarding / Goal costs": {
+    "defaultMessage": "成本持续上涨"
+  },
+  "Onboarding / Goal early warning": {
+    "defaultMessage": "我希望尽早发现问题"
+  },
+  "Onboarding / Goal hiring": {
+    "defaultMessage": "我能负担扩大团队的费用吗？"
+  },
+  "Onboarding / Goal pricing": {
+    "defaultMessage": "我对自己的定价没有把握"
+  },
+  "Onboarding / Goal question": {
+    "defaultMessage": "您最希望掌控的是什么？"
+  },
+  "Onboarding / Load failed": {
+    "defaultMessage": "无法加载公司资料。"
+  },
+  "Onboarding / Next": {
+    "defaultMessage": "下一步"
+  },
+  "Onboarding / Organization save failed": {
+    "defaultMessage": "无法更新组织，请检查字段后重试。"
+  },
+  "Onboarding / Pricing cost plus": {
+    "defaultMessage": "成本加利润"
+  },
+  "Onboarding / Pricing fixed": {
+    "defaultMessage": "固定价格 / 报价"
+  },
+  "Onboarding / Pricing individual": {
+    "defaultMessage": "按客户单独定价"
+  },
+  "Onboarding / Pricing question": {
+    "defaultMessage": "您通常如何定价？"
+  },
+  "Onboarding / Pricing subscription": {
+    "defaultMessage": "订阅 / 套餐"
+  },
+  "Onboarding / Pricing time unit": {
+    "defaultMessage": "按时间 / 单位计价"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "How do you make key decisions?"
+  },
+  "Onboarding / Respondent role label": {
+    "defaultMessage": "您在公司中的角色"
+  },
+  "Onboarding / Respondent role profile hint": {
+    "defaultMessage": "此回答仅作描述，不会改变您在组织中的权限。"
+  },
+  "Onboarding / Revenue commission": {
+    "defaultMessage": "佣金 / 业绩"
+  },
+  "Onboarding / Revenue hint": {
+    "defaultMessage": "最多选择两个答案。"
+  },
+  "Onboarding / Revenue product": {
+    "defaultMessage": "产品 / 订单"
+  },
+  "Onboarding / Revenue project": {
+    "defaultMessage": "项目 / 委托"
+  },
+  "Onboarding / Revenue service": {
+    "defaultMessage": "服务次数"
+  },
+  "Onboarding / Revenue subscription": {
+    "defaultMessage": "订阅 / 定期服务"
+  },
+  "Onboarding / Revenue time": {
+    "defaultMessage": "工时"
+  },
+  "Onboarding / Revenue title": {
+    "defaultMessage": "客户为什么向您付费？"
+  },
+  "Onboarding / Role accounting": {
+    "defaultMessage": "会计"
+  },
+  "Onboarding / Role advisor": {
+    "defaultMessage": "顾问"
+  },
+  "Onboarding / Role employee": {
+    "defaultMessage": "员工"
+  },
+  "Onboarding / Role owner management": {
+    "defaultMessage": "所有者 / 管理层"
+  },
+  "Onboarding / Save failed": {
+    "defaultMessage": "无法保存此步骤，请重试。"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Open business profile"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complete or update your organization onboarding answers."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step costs": {
+    "defaultMessage": "成本"
+  },
+  "Onboarding / Step customers": {
+    "defaultMessage": "客户"
+  },
+  "Onboarding / Step pricing goal": {
+    "defaultMessage": "定价与目标"
+  },
+  "Onboarding / Step revenue": {
+    "defaultMessage": "收入"
+  },
+  "Onboarding / Step summary": {
+    "defaultMessage": "摘要"
+  },
+  "Onboarding / Steps label": {
+    "defaultMessage": "设置步骤"
+  },
+  "Onboarding / Summary goal": {
+    "defaultMessage": "主要目标"
+  },
+  "Onboarding / Summary hint": {
+    "defaultMessage": "这是未来分析的起点。"
+  },
+  "Onboarding / Summary pricing": {
+    "defaultMessage": "定价"
+  },
+  "Onboarding / Summary role": {
+    "defaultMessage": "您的角色"
+  },
+  "Onboarding / Summary title": {
+    "defaultMessage": "您的企业档案"
+  },
+  "Onboarding / Title": {
+    "defaultMessage": "设置您的组织"
   },
   "Passkeys / Add another": {
     "defaultMessage": "添加另一把通行密钥"
@@ -3229,24 +3694,6 @@
   },
   "Passkeys / Use count label": {
     "defaultMessage": "使用次数"
-  },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "添加另一个 Passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "添加我的通行密钥"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "删除 Passkey 失败。请重试。"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey 删除成功。"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "按用户名或邮箱搜索…"
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "删除通行密钥需要组织上下文。"
   },
   "Password Requirements / Min length": {
     "defaultMessage": "至少 8 个字符"
@@ -3470,6 +3917,9 @@
   "Roles / Error / Cannot reassign to replacement role with permissions not owned": {
     "defaultMessage": "您无法将成员重新分配到包含“{permissions}”权限的替代角色，因为您自己没有这些权限。请先让组织所有者或管理员授予您这些权限。"
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / No manage roles permission": {
     "defaultMessage": "您没有管理组织角色的权限。"
   },
@@ -3649,12 +4099,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "查看活动日志"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "查看和管理组织的通行密钥（Passkey）策略"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "管理通行密钥"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "配置单点登录（SSO）连接和 SCIM 预配置"
@@ -3878,14 +4322,83 @@
   "SSO / Edit": {
     "defaultMessage": "编辑"
   },
+  "SSO / Error / account_mismatch": {
+    "defaultMessage": "您登录的账户与输入的邮箱不一致，请重试。"
+  },
+  "SSO / Error / account_not_member": {
+    "defaultMessage": "使用此电子邮件的账户已存在。请联系组织管理员邀请您。"
+  },
   "SSO / Error / alternative login": {
     "defaultMessage": "使用其他登录方式"
+  },
+  "SSO / Error / auth_failed": {
+    "defaultMessage": "身份验证失败，请重试。"
+  },
+  "SSO / Error / config_error": {
+    "defaultMessage": "SSO 配置不正确，请联系管理员。"
   },
   "SSO / Error / description": {
     "defaultMessage": "如果问题仍然存在，请联系您的 IT 管理员或尝试其他登录方式。"
   },
+  "SSO / Error / dns_record_not_found": {
+    "defaultMessage": "尚未找到 DNS 记录。DNS 更改最多可能需要一小时，请稍后重试。"
+  },
+  "SSO / Error / domain_in_use": {
+    "defaultMessage": "请先将此域名从所有 SSO 连接中移除。"
+  },
+  "SSO / Error / domain_in_use with connections": {
+    "defaultMessage": "请先将此域名从以下 SSO 连接中移除：{connections}。"
+  },
+  "SSO / Error / domain_not_allowed": {
+    "defaultMessage": "您的电子邮件域名未获此组织授权。"
+  },
+  "SSO / Error / domain_taken": {
+    "defaultMessage": "该域名已被其他组织验证。如果该域名属于您，请联系支持人员。"
+  },
+  "SSO / Error / domains_not_verified": {
+    "defaultMessage": "激活前，请验证此连接允许的所有域名。"
+  },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "您的身份提供商尚未验证此电子邮件地址。请让管理员检查配置。"
+  },
+  "SSO / Error / generic": {
+    "defaultMessage": "登录时出错，请重试或联系支持人员。"
+  },
   "SSO / Error / heading": {
     "defaultMessage": "登录失败"
+  },
+  "SSO / Error / invalid_domain": {
+    "defaultMessage": "请输入域名，例如 example.com。"
+  },
+  "SSO / Error / invalid_response": {
+    "defaultMessage": "身份提供商返回了无效的响应。"
+  },
+  "SSO / Error / missing_email": {
+    "defaultMessage": "身份提供商未提供电子邮件地址。"
+  },
+  "SSO / Error / no_domains": {
+    "defaultMessage": "激活连接前，请至少为其添加一个已验证的域名。"
+  },
+  "SSO / Error / provisioning_disabled": {
+    "defaultMessage": "自动创建账户已禁用，请联系管理员。"
+  },
+  "SSO / Error / public_domain": {
+    "defaultMessage": "无法认领 gmail.com 等公共邮箱服务商的域名。请使用贵公司的域名。"
+  },
+  "SSO / Error / rate_limited": {
+    "defaultMessage": "尝试次数过多，请稍后再试。"
+  },
+  "SSO / Error / session_expired": {
+    "defaultMessage": "您的会话已过期，请重新登录。"
+  },
+  "SSO / Error / signature_invalid": {
+    "defaultMessage": "安全验证失败，请重试。"
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "登录请求已过期，或是在其他浏览器中发起的。请重新开始登录。"
+  },
+  "SSO / Error / state_mismatch": {
+    "defaultMessage": "安全检查失败，请重新开始登录。"
   },
   "SSO / Error / try again button": {
     "defaultMessage": "重试"
@@ -3932,6 +4445,12 @@
   "SSO Card / Activate Success": {
     "defaultMessage": "SSO 连接已启用。"
   },
+  "SSO Card / Activate blocked no domains": {
+    "defaultMessage": "激活前，请为此连接添加域名。"
+  },
+  "SSO Card / Activate blocked unverified domains": {
+    "defaultMessage": "激活此连接前，请在“域名验证”中验证 {domains}。在所有域名验证通过之前，激活将保持禁用。"
+  },
   "SSO Card / Active Badge": {
     "defaultMessage": "启用"
   },
@@ -3968,6 +4487,9 @@
   "SSO Card / Delete Success": {
     "defaultMessage": "已删除 SSO 连接。"
   },
+  "SSO Card / Domain not verified": {
+    "defaultMessage": "(未验证)"
+  },
   "SSO Card / Domains Label": {
     "defaultMessage": "域:"
   },
@@ -3988,6 +4510,12 @@
   },
   "SSO Card / Enforce SSO Badge": {
     "defaultMessage": "已强制"
+  },
+  "SSO Card / Enforce SSO Disabled": {
+    "defaultMessage": "已停用 SSO 强制登录。用户现在可以使用密码登录。"
+  },
+  "SSO Card / Enforce SSO Enabled": {
+    "defaultMessage": "已启用 SSO 强制登录。允许域名中的用户必须使用 SSO。"
   },
   "SSO Card / Enforce SSO Error": {
     "defaultMessage": "更新 SSO 强制执行设置失败。"
@@ -4070,6 +4598,12 @@
   "SSO Form / Domain Placeholder": {
     "defaultMessage": "例如 company.com"
   },
+  "SSO Form / Domain not verified": {
+    "defaultMessage": "未验证"
+  },
+  "SSO Form / Domain not verified tooltip": {
+    "defaultMessage": "请先在“域名验证”中验证此域名，然后才能激活连接。"
+  },
   "SSO Form / Entity ID Label": {
     "defaultMessage": "IdP Entity ID / Issuer"
   },
@@ -4084,6 +4618,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL（登录 URL）"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "仅当您的身份提供商未发送 email_verified 声明时（例如 Microsoft Entra ID）才开启此项。"
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "接受未验证的电子邮件"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "仅当您的身份提供商只允许用户使用其本人拥有的电子邮件地址登录时才开启此项。否则，用户可能以他人身份登录。"
   },
   "SSO Login / Back to login": {
     "defaultMessage": "返回登录"
@@ -4114,6 +4657,225 @@
   },
   "SSO Login / heading": {
     "defaultMessage": "SSO 登录"
+  },
+  "SSO Test / API URL": {
+    "defaultMessage": "API URL"
+  },
+  "SSO Test / API URL is configured for production": {
+    "defaultMessage": "API URL 已为生产环境配置"
+  },
+  "SSO Test / API URL is set to localhost - SSO will not work with external identity providers": {
+    "defaultMessage": "API URL 设置为 localhost，SSO 无法与外部身份提供商配合使用"
+  },
+  "SSO Test / API_URL environment variable is not set": {
+    "defaultMessage": "未设置环境变量 API_URL"
+  },
+  "SSO Test / All required OIDC endpoints are present": {
+    "defaultMessage": "所有必需的 OIDC 端点均已存在"
+  },
+  "SSO Test / Callback URL": {
+    "defaultMessage": "回调 URL"
+  },
+  "SSO Test / Callback URL configuration may be incomplete": {
+    "defaultMessage": "回调 URL 配置可能不完整"
+  },
+  "SSO Test / Callback URL is using localhost - external IdPs cannot reach this URL": {
+    "defaultMessage": "回调 URL 使用 localhost，外部身份提供商无法访问"
+  },
+  "SSO Test / Certificate expired days days ago": {
+    "defaultMessage": "证书已于 {days} 天前过期"
+  },
+  "SSO Test / Certificate expires in days days": {
+    "defaultMessage": "证书将在 {days} 天后过期"
+  },
+  "SSO Test / Certificate is recommended for signature validation": {
+    "defaultMessage": "建议提供证书以验证签名"
+  },
+  "SSO Test / Certificate is valid (expires in days days)": {
+    "defaultMessage": "证书有效（将在 {days} 天后过期）"
+  },
+  "SSO Test / Client ID": {
+    "defaultMessage": "客户端 ID"
+  },
+  "SSO Test / Client Secret": {
+    "defaultMessage": "客户端密钥"
+  },
+  "SSO Test / Connection timed out when fetching discovery document": {
+    "defaultMessage": "获取发现文档超时"
+  },
+  "SSO Test / Connection timed out when reaching SSO endpoint": {
+    "defaultMessage": "连接 SSO 端点超时"
+  },
+  "SSO Test / Consider renewing the certificate soon": {
+    "defaultMessage": "建议尽快更新证书"
+  },
+  "SSO Test / Could not fetch discovery document": {
+    "defaultMessage": "无法获取发现文档"
+  },
+  "SSO Test / Detail / acsUrl": {
+    "defaultMessage": "ACS URL"
+  },
+  "SSO Test / Detail / authorization": {
+    "defaultMessage": "授权端点"
+  },
+  "SSO Test / Detail / discoveredEndpoints": {
+    "defaultMessage": "已发现的端点"
+  },
+  "SSO Test / Detail / entityId": {
+    "defaultMessage": "实体 ID"
+  },
+  "SSO Test / Detail / error": {
+    "defaultMessage": "错误"
+  },
+  "SSO Test / Detail / expires": {
+    "defaultMessage": "过期时间"
+  },
+  "SSO Test / Detail / hint": {
+    "defaultMessage": "提示"
+  },
+  "SSO Test / Detail / requestIdFormat": {
+    "defaultMessage": "请求 ID 格式"
+  },
+  "SSO Test / Detail / token": {
+    "defaultMessage": "令牌端点"
+  },
+  "SSO Test / Detail / value": {
+    "defaultMessage": "值"
+  },
+  "SSO Test / Discovery endpoint returned HTTP status": {
+    "defaultMessage": "发现端点返回 HTTP {status}"
+  },
+  "SSO Test / Discovery endpoint returned invalid JSON": {
+    "defaultMessage": "发现端点返回了无效的 JSON"
+  },
+  "SSO Test / Ensure the certificate is in valid PEM or base64 format": {
+    "defaultMessage": "请确保证书为有效的 PEM 或 base64 格式"
+  },
+  "SSO Test / Failed to connect to SSO endpoint": {
+    "defaultMessage": "无法连接到 SSO 端点"
+  },
+  "SSO Test / Failed to generate SAML AuthnRequest": {
+    "defaultMessage": "无法生成 SAML AuthnRequest"
+  },
+  "SSO Test / Failed to parse certificate": {
+    "defaultMessage": "无法解析证书"
+  },
+  "SSO Test / IdP Certificate": {
+    "defaultMessage": "IdP 证书"
+  },
+  "SSO Test / IdP Entity ID": {
+    "defaultMessage": "IdP 实体 ID"
+  },
+  "SSO Test / IdP certificate is not configured": {
+    "defaultMessage": "未配置 IdP 证书"
+  },
+  "SSO Test / Identity Provider Entity ID is configured": {
+    "defaultMessage": "身份提供商实体 ID 已配置"
+  },
+  "SSO Test / Identity Provider Entity ID is not configured": {
+    "defaultMessage": "未配置身份提供商实体 ID"
+  },
+  "SSO Test / Issuer URL is configured": {
+    "defaultMessage": "颁发者 URL 已配置"
+  },
+  "SSO Test / Issuer URL is not configured": {
+    "defaultMessage": "未配置颁发者 URL"
+  },
+  "SSO Test / Manual endpoint configuration may be required": {
+    "defaultMessage": "可能需要手动配置端点"
+  },
+  "SSO Test / Missing endpoints in discovery: endpoints": {
+    "defaultMessage": "发现文档中缺少端点：{endpoints}"
+  },
+  "SSO Test / OAuth Client ID is configured": {
+    "defaultMessage": "OAuth 客户端 ID 已配置"
+  },
+  "SSO Test / OAuth Client ID is not configured": {
+    "defaultMessage": "未配置 OAuth 客户端 ID"
+  },
+  "SSO Test / OAuth Client Secret is configured": {
+    "defaultMessage": "OAuth 客户端密钥已配置"
+  },
+  "SSO Test / OAuth Client Secret is not configured": {
+    "defaultMessage": "未配置 OAuth 客户端密钥"
+  },
+  "SSO Test / OAuth callback URL is configured": {
+    "defaultMessage": "OAuth 回调 URL 已配置"
+  },
+  "SSO Test / OIDC Discovery": {
+    "defaultMessage": "OIDC 发现"
+  },
+  "SSO Test / OIDC Issuer": {
+    "defaultMessage": "OIDC 颁发者"
+  },
+  "SSO Test / OpenID Connect discovery endpoint is accessible": {
+    "defaultMessage": "OpenID Connect 发现端点可访问"
+  },
+  "SSO Test / Required Endpoints": {
+    "defaultMessage": "必需的端点"
+  },
+  "SSO Test / SAML AuthnRequest can be generated successfully": {
+    "defaultMessage": "可以成功生成 SAML AuthnRequest"
+  },
+  "SSO Test / SAML Request Generation": {
+    "defaultMessage": "SAML 请求生成"
+  },
+  "SSO Test / SP Configuration": {
+    "defaultMessage": "SP 配置"
+  },
+  "SSO Test / SSL/TLS error when connecting to SSO endpoint": {
+    "defaultMessage": "连接 SSO 端点时出现 SSL/TLS 错误"
+  },
+  "SSO Test / SSL/TLS error when connecting to issuer": {
+    "defaultMessage": "连接颁发者时出现 SSL/TLS 错误"
+  },
+  "SSO Test / SSO URL Format": {
+    "defaultMessage": "SSO URL 格式"
+  },
+  "SSO Test / SSO URL Reachable": {
+    "defaultMessage": "SSO URL 可访问"
+  },
+  "SSO Test / SSO endpoint exists (returned 405 - expected for SAML endpoints)": {
+    "defaultMessage": "SSO 端点存在（返回 405，属于 SAML 端点的预期结果）"
+  },
+  "SSO Test / SSO endpoint is reachable (HTTP status)": {
+    "defaultMessage": "SSO 端点可访问（HTTP {status}）"
+  },
+  "SSO Test / SSO endpoint returned HTTP status": {
+    "defaultMessage": "SSO 端点返回 HTTP {status}"
+  },
+  "SSO Test / Service Provider URLs are configured": {
+    "defaultMessage": "服务提供商 URL 已配置"
+  },
+  "SSO Test / Service Provider URLs are using localhost - external IdPs cannot reach these URLs": {
+    "defaultMessage": "服务提供商 URL 使用 localhost，外部身份提供商无法访问这些 URL"
+  },
+  "SSO Test / Service Provider configuration may be incomplete": {
+    "defaultMessage": "服务提供商配置可能不完整"
+  },
+  "SSO Test / Set API_URL environment variable to your public API domain": {
+    "defaultMessage": "将环境变量 API_URL 设置为您的公共 API 域名"
+  },
+  "SSO Test / Set the API_URL environment variable to your public API domain": {
+    "defaultMessage": "将环境变量 API_URL 设置为您的公共 API 域名"
+  },
+  "SSO Test / Single Sign-On URL is configured": {
+    "defaultMessage": "单点登录 URL 已配置"
+  },
+  "SSO Test / Single Sign-On URL is not configured": {
+    "defaultMessage": "未配置单点登录 URL"
+  },
+  "SSO Test / Some IdPs may not support automatic discovery": {
+    "defaultMessage": "部分身份提供商可能不支持自动发现"
+  },
+  "SSO Test / The IdP might be behind a firewall or slow to respond": {
+    "defaultMessage": "身份提供商可能位于防火墙之后或响应较慢"
+  },
+  "SSO Test / The endpoint might still work for SAML requests": {
+    "defaultMessage": "该端点可能仍可用于 SAML 请求"
+  },
+  "SSO Test / This will cause SSO redirects to fail. Set API_URL to your public API domain.": {
+    "defaultMessage": "这会导致 SSO 重定向失败。请将 API_URL 设置为您的公共 API 域名。"
   },
   "SaaS Ideas / page title": {
     "defaultMessage": "AI Chat - SaaS 创意生成器"
@@ -4526,9 +5288,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "是"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "添加 Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "添加 Token"
   },
@@ -4565,35 +5324,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "尝试调整或清除筛选条件以查看所有事件。"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "尝试使用其他搜索词"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "尚未注册任何 Passkey"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "没有与搜索条件匹配的 Passkey"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "目录同步需要先启用 SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "尚未配置任何 SSO 连接"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "您组织中的用户尚未注册任何 Passkey"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "注册 Passkey，享受更快捷、更安全的登录体验"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "为组织内所有用户管理 Passkey"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "使用生物识别或安全密钥实现无密码认证"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys（WebAuthn）"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "兼容的身份提供商"
@@ -4741,6 +5476,12 @@
   },
   "Tenant form / Field name / VAT status": {
     "defaultMessage": "增值税状态"
+  },
+  "Tenant form / Immutable value": {
+    "defaultMessage": "此值保存后无法更改。"
+  },
+  "Tenant form / Invalid value": {
+    "defaultMessage": "请检查此值后重试。"
   },
   "Tenant form / NIP invalid": {
     "defaultMessage": "NIP 号码无效"
@@ -4990,212 +5731,5 @@
   },
   "Welcome Modal / tips title": {
     "defaultMessage": "快速开始"
-  },
-  "Onboarding / Save failed": {
-    "defaultMessage": "无法保存此步骤，请重试。"
-  },
-  "Onboarding / Organization save failed": {
-    "defaultMessage": "无法更新组织，请检查字段后重试。"
-  },
-  "Onboarding / Load failed": {
-    "defaultMessage": "无法加载公司资料。"
-  },
-  "Onboarding / Completed": {
-    "defaultMessage": "引导流程已完成"
-  },
-  "Tenant form / Invalid value": {
-    "defaultMessage": "请检查此值后重试。"
-  },
-  "Tenant form / Immutable value": {
-    "defaultMessage": "此值保存后无法更改。"
-  },
-  "Onboarding / Revenue hint": {
-    "defaultMessage": "最多选择两个答案。"
-  },
-  "Onboarding / Costs hint": {
-    "defaultMessage": "最多选择三个答案。"
-  },
-  "Onboarding / Back": {
-    "defaultMessage": "返回"
-  },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "清除草稿"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "清除草稿"
-  },
-  "Onboarding / Clear draft description": {
-    "defaultMessage": "此新组织的所有答案都将被删除，此操作无法撤销。"
-  },
-  "Onboarding / Clear draft failed": {
-    "defaultMessage": "无法清除此草稿，请重试。"
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "清除此草稿？"
-  },
-  "Onboarding / Confirm": {
-    "defaultMessage": "确认档案"
-  },
-  "Onboarding / Cost employees": {
-    "defaultMessage": "员工工时"
-  },
-  "Onboarding / Cost marketing": {
-    "defaultMessage": "营销 / 佣金"
-  },
-  "Onboarding / Cost materials": {
-    "defaultMessage": "材料 / 商品"
-  },
-  "Onboarding / Cost subcontractors": {
-    "defaultMessage": "分包商"
-  },
-  "Onboarding / Cost technology": {
-    "defaultMessage": "技术 / 基础设施"
-  },
-  "Onboarding / Cost transport": {
-    "defaultMessage": "运输 / 物流"
-  },
-  "Onboarding / Costs title": {
-    "defaultMessage": "哪些成本会随销售增长？"
-  },
-  "Onboarding / Customer B2B": {
-    "defaultMessage": "主要是企业客户 (B2B)"
-  },
-  "Onboarding / Customer B2C": {
-    "defaultMessage": "主要是个人消费者 (B2C)"
-  },
-  "Onboarding / Customer mixed": {
-    "defaultMessage": "企业和个人消费者"
-  },
-  "Onboarding / Customer public": {
-    "defaultMessage": "公共机构"
-  },
-  "Onboarding / Customers hint": {
-    "defaultMessage": "这有助于估算未来集成能覆盖多少销售数据。"
-  },
-  "Onboarding / Customers title": {
-    "defaultMessage": "通常是谁向您付款？"
-  },
-  "Onboarding / Description": {
-    "defaultMessage": "请告诉我们您的业务如何运作。您可以返回之前的步骤。"
-  },
-  "Onboarding / Edit": {
-    "defaultMessage": "编辑"
-  },
-  "Onboarding / Goal cash": {
-    "defaultMessage": "我很努力，但现金不足"
-  },
-  "Onboarding / Goal client loss": {
-    "defaultMessage": "我担心失去一个重要客户"
-  },
-  "Onboarding / Goal costs": {
-    "defaultMessage": "成本持续上涨"
-  },
-  "Onboarding / Goal early warning": {
-    "defaultMessage": "我希望尽早发现问题"
-  },
-  "Onboarding / Goal hiring": {
-    "defaultMessage": "我能负担扩大团队的费用吗？"
-  },
-  "Onboarding / Goal pricing": {
-    "defaultMessage": "我对自己的定价没有把握"
-  },
-  "Onboarding / Goal question": {
-    "defaultMessage": "您最希望掌控的是什么？"
-  },
-  "Onboarding / Next": {
-    "defaultMessage": "下一步"
-  },
-  "Onboarding / Pricing cost plus": {
-    "defaultMessage": "成本加利润"
-  },
-  "Onboarding / Pricing fixed": {
-    "defaultMessage": "固定价格 / 报价"
-  },
-  "Onboarding / Pricing individual": {
-    "defaultMessage": "按客户单独定价"
-  },
-  "Onboarding / Pricing question": {
-    "defaultMessage": "您通常如何定价？"
-  },
-  "Onboarding / Pricing subscription": {
-    "defaultMessage": "订阅 / 套餐"
-  },
-  "Onboarding / Pricing time unit": {
-    "defaultMessage": "按时间 / 单位计价"
-  },
-  "Onboarding / Respondent role label": {
-    "defaultMessage": "您在公司中的角色"
-  },
-  "Onboarding / Respondent role profile hint": {
-    "defaultMessage": "此回答仅作描述，不会改变您在组织中的权限。"
-  },
-  "Onboarding / Revenue commission": {
-    "defaultMessage": "佣金 / 业绩"
-  },
-  "Onboarding / Revenue product": {
-    "defaultMessage": "产品 / 订单"
-  },
-  "Onboarding / Revenue project": {
-    "defaultMessage": "项目 / 委托"
-  },
-  "Onboarding / Revenue service": {
-    "defaultMessage": "服务次数"
-  },
-  "Onboarding / Revenue subscription": {
-    "defaultMessage": "订阅 / 定期服务"
-  },
-  "Onboarding / Revenue time": {
-    "defaultMessage": "工时"
-  },
-  "Onboarding / Revenue title": {
-    "defaultMessage": "客户为什么向您付费？"
-  },
-  "Onboarding / Role accounting": {
-    "defaultMessage": "会计"
-  },
-  "Onboarding / Role advisor": {
-    "defaultMessage": "顾问"
-  },
-  "Onboarding / Role employee": {
-    "defaultMessage": "员工"
-  },
-  "Onboarding / Role owner management": {
-    "defaultMessage": "所有者 / 管理层"
-  },
-  "Onboarding / Step costs": {
-    "defaultMessage": "成本"
-  },
-  "Onboarding / Step customers": {
-    "defaultMessage": "客户"
-  },
-  "Onboarding / Step pricing goal": {
-    "defaultMessage": "定价与目标"
-  },
-  "Onboarding / Step revenue": {
-    "defaultMessage": "收入"
-  },
-  "Onboarding / Step summary": {
-    "defaultMessage": "摘要"
-  },
-  "Onboarding / Steps label": {
-    "defaultMessage": "设置步骤"
-  },
-  "Onboarding / Summary goal": {
-    "defaultMessage": "主要目标"
-  },
-  "Onboarding / Summary hint": {
-    "defaultMessage": "这是未来分析的起点。"
-  },
-  "Onboarding / Summary pricing": {
-    "defaultMessage": "定价"
-  },
-  "Onboarding / Summary role": {
-    "defaultMessage": "您的角色"
-  },
-  "Onboarding / Summary title": {
-    "defaultMessage": "您的企业档案"
-  },
-  "Onboarding / Title": {
-    "defaultMessage": "设置您的组织"
   }
 }

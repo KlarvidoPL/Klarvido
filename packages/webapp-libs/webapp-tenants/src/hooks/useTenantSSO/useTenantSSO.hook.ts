@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { gql } from '@sb/webapp-api-client/graphql';
 
 const SSO_CONNECTIONS_QUERY = gql(`
@@ -17,10 +17,12 @@ const SSO_CONNECTIONS_QUERY = gql(`
           samlSsoUrl
           oidcIssuer
           oidcClientId
+          oidcTrustUnverifiedEmail
           lastLoginAt
           loginCount
           createdAt
           spMetadataUrl
+          spMetadataXml
           spAcsUrl
           spEntityId
           oidcCallbackUrl
@@ -40,6 +42,7 @@ const CREATE_SSO_CONNECTION = gql(`
         connectionType
         status
         spMetadataUrl
+        spMetadataXml
         spAcsUrl
         spEntityId
         oidcCallbackUrl
@@ -89,6 +92,7 @@ const UPDATE_SSO_CONNECTION = gql(`
         status
         enforceSso
         spMetadataUrl
+        spMetadataXml
         spAcsUrl
         spEntityId
         oidcCallbackUrl
@@ -123,25 +127,40 @@ export function useTenantSSO(tenantId: string | undefined) {
     skip: !tenantId,
   });
 
-  const [createConnection, { loading: creating }] = useMutation(CREATE_SSO_CONNECTION, {
-    onCompleted: () => refetch(),
-  });
+  const [createConnectionMutation, { loading: creating }] = useMutation(CREATE_SSO_CONNECTION);
+  const createConnection: typeof createConnectionMutation = async (options) => {
+    const result = await createConnectionMutation(options);
+    await refetch();
+    return result;
+  };
 
-  const [updateConnection, { loading: updating }] = useMutation(UPDATE_SSO_CONNECTION, {
-    onCompleted: () => refetch(),
-  });
+  const [updateConnectionMutation, { loading: updating }] = useMutation(UPDATE_SSO_CONNECTION);
+  const updateConnection: typeof updateConnectionMutation = async (options) => {
+    const result = await updateConnectionMutation(options);
+    await refetch();
+    return result;
+  };
 
-  const [deleteConnection] = useMutation(DELETE_SSO_CONNECTION, {
-    onCompleted: () => refetch(),
-  });
+  const [deleteConnectionMutation] = useMutation(DELETE_SSO_CONNECTION);
+  const deleteConnection: typeof deleteConnectionMutation = async (options) => {
+    const result = await deleteConnectionMutation(options);
+    await refetch();
+    return result;
+  };
 
-  const [activateConnection] = useMutation(ACTIVATE_SSO_CONNECTION, {
-    onCompleted: () => refetch(),
-  });
+  const [activateConnectionMutation] = useMutation(ACTIVATE_SSO_CONNECTION);
+  const activateConnection: typeof activateConnectionMutation = async (options) => {
+    const result = await activateConnectionMutation(options);
+    await refetch();
+    return result;
+  };
 
-  const [deactivateConnection] = useMutation(DEACTIVATE_SSO_CONNECTION, {
-    onCompleted: () => refetch(),
-  });
+  const [deactivateConnectionMutation] = useMutation(DEACTIVATE_SSO_CONNECTION);
+  const deactivateConnection: typeof deactivateConnectionMutation = async (options) => {
+    const result = await deactivateConnectionMutation(options);
+    await refetch();
+    return result;
+  };
 
   const [testConnection, { loading: testing }] = useMutation(TEST_SSO_CONNECTION);
 

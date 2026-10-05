@@ -1,13 +1,14 @@
-import { CrudItemCreated, CrudItemUpdated } from '@sb/webapp-crud-demo/notifications';
-
-import { NotificationTypes } from '@sb/webapp-notifications';
 import { backupNotificationTemplates } from '@sb/webapp-backup';
+import { CrudItemCreated, CrudItemUpdated } from '@sb/webapp-crud-demo/notifications';
+import { NotificationTypes } from '@sb/webapp-notifications';
 import {
   ActionLogExportFailed,
   ActionLogExportReady,
   PasskeyRegistered,
   SSOConnectionActivated,
   SSOConnectionDeactivated,
+  SSODomainLapsed,
+  SSODomainRecordMissing,
   TenantDeleted,
   TenantInvitationAccepted,
   TenantInvitationCreated,
@@ -25,6 +26,8 @@ const templates: Record<NotificationTypes, ElementType> = {
   [NotificationTypes.ACTION_LOG_EXPORT_FAILED]: ActionLogExportFailed,
   [NotificationTypes.SSO_CONNECTION_ACTIVATED]: SSOConnectionActivated,
   [NotificationTypes.SSO_CONNECTION_DEACTIVATED]: SSOConnectionDeactivated,
+  [NotificationTypes.SSO_DOMAIN_LAPSED]: SSODomainLapsed,
+  [NotificationTypes.SSO_DOMAIN_RECORD_MISSING]: SSODomainRecordMissing,
   [NotificationTypes.PASSKEY_REGISTERED]: PasskeyRegistered,
   [NotificationTypes.TENANT_DELETED]: TenantDeleted,
   // Backup notifications

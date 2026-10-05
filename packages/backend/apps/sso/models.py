@@ -11,6 +11,7 @@ from apps.multitenancy.models import Tenant
 from apps.multitenancy.constants import TenantUserRole
 from . import constants
 from . import managers
+from .crypto import decrypt_client_secret, encrypt_client_secret
 
 
 class TenantSSOConnection(TimestampedMixin, models.Model):
@@ -25,6 +26,14 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
 
     id = hashid_field.HashidAutoField(primary_key=True)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="sso_connections")
+    # Who configured the connection: they are notified when it is deactivated because a domain lapsed
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_sso_connections",
+    )
 
     # Basic configuration
     name = models.CharField(max_length=255, help_text="Display name for this SSO connection")
@@ -100,6 +109,17 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
 
     # OIDC claim mapping
     oidc_claim_mapping = models.JSONField(default=dict, blank=True, help_text="Mapping of OIDC claims to user fields")
+
+    # Some IdPs (e.g. Microsoft Entra ID) do not send email_verified. Logins are refused without it unless
+    # the tenant admin explicitly opts in for this connection.
+    oidc_trust_unverified_email = models.BooleanField(
+        default=False,
+        help_text="Accept OIDC logins whose email_verified claim is missing or false",
+    )
+
+    # The client secret, encrypted at rest (see apps/sso/crypto.py). New secrets are only written here. The plaintext
+    # column above is legacy: it is read for rows saved before encryption and cleared by encrypt_oidc_client_secrets.
+    oidc_client_secret_encrypted = models.BinaryField(blank=True, null=True, editable=False)
 
     # Metadata caching
     idp_metadata_xml = models.TextField(blank=True, default="")
@@ -224,6 +244,18 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
         self.status = constants.SSOConnectionStatus.INACTIVE
         self.save(update_fields=["status", "updated_at"])
 
+    def revoke_sessions(self, reason: str) -> int:
+        """
+        Revoke the active sessions created through this connection, so a deactivated or lapsed connection stops
+        granting access. Sessions from other sign-in methods are left alone. Returns how many were revoked.
+        """
+        sessions = SSOSession.objects.filter(sso_link__sso_connection=self, is_active=True)
+        revoked = 0
+        for session in sessions:
+            session.revoke(reason=reason)
+            revoked += 1
+        return revoked
+
     def get_default_role(self) -> str:
         """Get the default role for users provisioned via this SSO connection."""
         return self.group_role_mapping.get("_default", TenantUserRole.MEMBER)
@@ -249,6 +281,16 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
                 max_priority = role_priority[mapped_role]
 
         return matched_role
+
+    def set_oidc_client_secret(self, secret: str) -> None:
+        """Encrypt the client secret for this connection. The caller saves the instance."""
+        self.oidc_client_secret_encrypted = encrypt_client_secret(self.pk, secret)
+        self.oidc_client_secret = ""
+
+    def get_oidc_client_secret(self) -> str:
+        if self.oidc_client_secret_encrypted:
+            return decrypt_client_secret(self.pk, self.oidc_client_secret_encrypted)
+        return self.oidc_client_secret or ""
 
 
 class SCIMToken(TimestampedMixin, models.Model):
@@ -719,3 +761,58 @@ class SSOAuditLog(TimestampedMixin, models.Model):
             success=success,
             error_message=error_message,
         )
+
+
+def _generate_domain_verification_token():
+    return secrets.token_urlsafe(32)
+
+
+class TenantDomain(TimestampedMixin, models.Model):
+    """
+    An email domain claimed by a tenant for SSO.
+
+    A claim does nothing until the tenant proves ownership by publishing the verification TXT record
+    on the domain. A verified domain belongs to exactly one tenant at a time.
+    """
+
+    TXT_RECORD_PREFIX = "klarvido-domain-verification"
+    CHALLENGE_LABEL = "_klarvido-challenge"
+
+    id = hashid_field.HashidAutoField(primary_key=True)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="sso_domains")
+    domain = models.CharField(max_length=253, help_text="Lowercase email domain, e.g. example.com")
+    status = models.CharField(
+        choices=constants.SSODomainStatus.choices, max_length=20, default=constants.SSODomainStatus.PENDING
+    )
+    verification_token = models.CharField(max_length=64, default=_generate_domain_verification_token, editable=False)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+    consecutive_failures = models.PositiveSmallIntegerField(default=0)
+    # When the record was first found missing in the current run of failures; the grace period counts from here
+    first_failed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["tenant", "domain"], name="sso_tenant_domain_unique"),
+            models.UniqueConstraint(
+                fields=["domain"],
+                condition=models.Q(status="verified"),
+                name="sso_verified_domain_unique",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.domain} ({self.status})"
+
+    @property
+    def is_verified(self) -> bool:
+        return self.status == constants.SSODomainStatus.VERIFIED
+
+    @property
+    def verification_record_name(self) -> str:
+        # A dedicated subdomain, so the apex record is not needed after the claim
+        return f"{self.CHALLENGE_LABEL}.{self.domain}"
+
+    @property
+    def verification_record_value(self) -> str:
+        return f"{self.TXT_RECORD_PREFIX}={self.verification_token}"

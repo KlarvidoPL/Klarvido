@@ -1,16 +1,33 @@
-import { useState } from 'react';
 import { apiURL, extractGraphQLErrors } from '@sb/webapp-api-client/api';
+import { Connection_Type } from '@sb/webapp-api-client/graphql';
 import { Button } from '@sb/webapp-core/components/buttons';
-import { cn } from '@sb/webapp-core/lib/utils';
-import { camelCaseKeys } from '@sb/webapp-core/utils';
 import { Input } from '@sb/webapp-core/components/forms';
 import { Label } from '@sb/webapp-core/components/ui/label';
+import { Switch } from '@sb/webapp-core/components/ui/switch';
+import { cn } from '@sb/webapp-core/lib/utils';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { Shield, Key, Building2, ArrowLeft, Link2, CheckCircle2, Loader2, Copy, Check, Globe, X } from 'lucide-react';
+import { camelCaseKeys } from '@sb/webapp-core/utils';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Building2,
+  Check,
+  CheckCircle2,
+  Copy,
+  Globe,
+  Key,
+  Link2,
+  Loader2,
+  Shield,
+  X,
+} from 'lucide-react';
+import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Connection_Type } from '@sb/webapp-api-client/graphql';
 import { useTenantSSO } from '../../../../hooks/useTenantSSO';
+import { useTenantSSODomains } from '../../../../hooks/useTenantSSODomains';
+import { DomainChip, getDomainVerification } from './domainChip';
+import { translateSsoDomainFieldError } from './ssoDomainErrors';
 
 type SSOType = 'saml' | 'oidc' | null;
 type Step = 'select' | 'configure' | 'success';
@@ -23,6 +40,7 @@ export type AddSSOConnectionModalProps = {
 
 export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSSOConnectionModalProps) => {
   const intl = useIntl();
+  const { domains: tenantDomains, loading: domainsLoading } = useTenantSSODomains(tenantId);
   const { toast } = useToast();
   const { createConnection } = useTenantSSO(tenantId);
 
@@ -30,6 +48,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
   const [ssoType, setSsoType] = useState<SSOType>(null);
   const [loading, setLoading] = useState(false);
   const [spMetadataUrl, setSpMetadataUrl] = useState<string | null>(null);
+  const [spMetadataXml, setSpMetadataXml] = useState<string | null>(null);
   const [spAcsUrl, setSpAcsUrl] = useState<string | null>(null);
   const [spEntityId, setSpEntityId] = useState<string | null>(null);
   const [connectionId, setConnectionId] = useState<string | null>(null);
@@ -47,6 +66,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
     issuer: '',
     clientId: '',
     clientSecret: '',
+    trustUnverifiedEmail: false,
   });
   const [domainInput, setDomainInput] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -105,25 +125,27 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
     setLoading(true);
     setFieldErrors({});
 
-    const input = ssoType === 'saml'
-      ? {
-          tenantId,
-          name: formData.name,
-          connectionType: Connection_Type.SAML,
-          allowedDomains: JSON.stringify(formData.allowedDomains),
-          samlEntityId: formData.entityId,
-          samlSsoUrl: formData.ssoUrl,
-          samlCertificate: formData.certificate || undefined,
-        }
-      : {
-          tenantId,
-          name: formData.name,
-          connectionType: Connection_Type.OIDC,
-          allowedDomains: JSON.stringify(formData.allowedDomains),
-          oidcIssuer: formData.issuer,
-          oidcClientId: formData.clientId,
-          ...(formData.clientSecret.trim() ? { oidcClientSecret: formData.clientSecret } : {}),
-        };
+    const input =
+      ssoType === 'saml'
+        ? {
+            tenantId,
+            name: formData.name,
+            connectionType: Connection_Type.SAML,
+            allowedDomains: JSON.stringify(formData.allowedDomains),
+            samlEntityId: formData.entityId,
+            samlSsoUrl: formData.ssoUrl,
+            samlCertificate: formData.certificate || undefined,
+          }
+        : {
+            tenantId,
+            name: formData.name,
+            connectionType: Connection_Type.OIDC,
+            allowedDomains: JSON.stringify(formData.allowedDomains),
+            oidcIssuer: formData.issuer,
+            oidcClientId: formData.clientId,
+            oidcTrustUnverifiedEmail: formData.trustUnverifiedEmail,
+            ...(formData.clientSecret.trim() ? { oidcClientSecret: formData.clientSecret } : {}),
+          };
 
     try {
       const result = await createConnection({ variables: { input } });
@@ -134,6 +156,9 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
       }
       if (conn?.spMetadataUrl) {
         setSpMetadataUrl(conn.spMetadataUrl);
+      }
+      if (conn?.spMetadataXml) {
+        setSpMetadataXml(conn.spMetadataXml);
       }
       if (conn?.spAcsUrl) {
         setSpAcsUrl(conn.spAcsUrl);
@@ -158,7 +183,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
       });
       onSuccess?.();
     } catch (error) {
-            const graphQLErrors = extractGraphQLErrors(error);
+      const graphQLErrors = extractGraphQLErrors(error);
       const validationError = graphQLErrors?.find((e) => e.message === 'GraphQlValidationError');
 
       let extractedErrors: Record<string, string> = {};
@@ -250,8 +275,11 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
   };
 
   return (
-    <form 
-      onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} 
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
       className="-m-6 flex h-[85vh] max-h-[700px] flex-col overflow-hidden sm:rounded-lg"
     >
       {/* Fixed Header */}
@@ -262,10 +290,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
         <div className="mr-8">
           <h2 className="text-lg font-semibold">
             {step === 'success' ? (
-              <FormattedMessage
-                defaultMessage="Connection Created"
-                id="Add SSO Modal / Title Success"
-              />
+              <FormattedMessage defaultMessage="Connection Created" id="Add SSO Modal / Title Success" />
             ) : ssoType ? (
               <FormattedMessage
                 defaultMessage="Configure {type} Connection"
@@ -273,10 +298,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                 values={{ type: ssoType.toUpperCase() }}
               />
             ) : (
-              <FormattedMessage
-                defaultMessage="Add SSO Connection"
-                id="Add SSO Modal / Title"
-              />
+              <FormattedMessage defaultMessage="Add SSO Connection" id="Add SSO Modal / Title" />
             )}
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -361,10 +383,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                 <Link2 className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium text-foreground mb-1">
-                    <FormattedMessage
-                      defaultMessage="Not sure which to choose?"
-                      id="Add SSO Modal / Help Title"
-                    />
+                    <FormattedMessage defaultMessage="Not sure which to choose?" id="Add SSO Modal / Help Title" />
                   </p>
                   <FormattedMessage
                     defaultMessage="SAML 2.0 is recommended for enterprise IdPs like Okta and Azure AD. OIDC is simpler and works well with Google Workspace and modern identity providers."
@@ -449,24 +468,19 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                   {formData.allowedDomains.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {formData.allowedDomains.map((domain) => (
-                        <span
+                        <DomainChip
                           key={domain}
-                          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                        >
-                          {domain}
-                          <button
-                            type="button"
-                            onClick={() => removeDomain(domain)}
-                            className="ml-1 rounded-full p-0.5 hover:bg-primary/20 transition-colors"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </span>
+                          domain={domain}
+                          verified={getDomainVerification(tenantDomains, domainsLoading, domain)}
+                          onRemove={() => removeDomain(domain)}
+                        />
                       ))}
                     </div>
                   )}
                   {fieldErrors['allowedDomains'] && (
-                    <p className="text-destructive text-sm">{fieldErrors['allowedDomains']}</p>
+                    <p className="text-destructive dark:text-red-400 text-sm">
+                      {translateSsoDomainFieldError(intl, fieldErrors['allowedDomains'])}
+                    </p>
                   )}
                   <p className="text-xs text-muted-foreground">
                     <FormattedMessage
@@ -548,10 +562,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                 <Link2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-blue-800 dark:text-blue-200 mb-1">
-                    <FormattedMessage
-                      defaultMessage="Redirect URI"
-                      id="Add SSO Modal / Redirect URI Title"
-                    />
+                    <FormattedMessage defaultMessage="Redirect URI" id="Add SSO Modal / Redirect URI Title" />
                   </p>
                   <p className="text-blue-700 dark:text-blue-300">
                     <FormattedMessage
@@ -619,24 +630,19 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                   {formData.allowedDomains.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {formData.allowedDomains.map((domain) => (
-                        <span
+                        <DomainChip
                           key={domain}
-                          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                        >
-                          {domain}
-                          <button
-                            type="button"
-                            onClick={() => removeDomain(domain)}
-                            className="ml-1 rounded-full p-0.5 hover:bg-primary/20 transition-colors"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </span>
+                          domain={domain}
+                          verified={getDomainVerification(tenantDomains, domainsLoading, domain)}
+                          onRemove={() => removeDomain(domain)}
+                        />
                       ))}
                     </div>
                   )}
                   {fieldErrors['allowedDomains'] && (
-                    <p className="text-destructive text-sm">{fieldErrors['allowedDomains']}</p>
+                    <p className="text-destructive dark:text-red-400 text-sm">
+                      {translateSsoDomainFieldError(intl, fieldErrors['allowedDomains'])}
+                    </p>
                   )}
                   <p className="text-xs text-muted-foreground">
                     <FormattedMessage
@@ -695,6 +701,43 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                       error={fieldErrors['clientSecret']}
                     />
                   </div>
+                  <div className="space-y-2 rounded-md border p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 space-y-1">
+                        <Label htmlFor="trust-unverified-email">
+                          <FormattedMessage
+                            defaultMessage="Accept unverified emails"
+                            id="SSO Form / Trust unverified email Label"
+                          />
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          <FormattedMessage
+                            defaultMessage="Turn this on only if your identity provider does not send the email_verified claim, for example Microsoft Entra ID."
+                            id="SSO Form / Trust unverified email Help"
+                          />
+                        </p>
+                      </div>
+                      <Switch
+                        id="trust-unverified-email"
+                        className="shrink-0"
+                        checked={formData.trustUnverifiedEmail}
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({ ...prev, trustUnverifiedEmail: checked }))
+                        }
+                      />
+                    </div>
+                    {formData.trustUnverifiedEmail && (
+                      <p className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400">
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          <FormattedMessage
+                            defaultMessage="Only enable this if your identity provider lets users sign in only with email addresses they own. Otherwise a user could sign in as someone else."
+                            id="SSO Form / Trust unverified email Warning"
+                          />
+                        </span>
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -709,10 +752,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
               </div>
               <div className="text-center space-y-2">
                 <h3 className="text-lg font-semibold text-green-700 dark:text-green-300">
-                  <FormattedMessage
-                    defaultMessage="SSO Connection Created!"
-                    id="Add SSO Modal / Success Title"
-                  />
+                  <FormattedMessage defaultMessage="SSO Connection Created!" id="Add SSO Modal / Success Title" />
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-[350px]">
                   <FormattedMessage
@@ -724,7 +764,6 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
 
               {ssoType === 'saml' && (
                 <div className="w-full space-y-4 p-4">
-
                   {/* Instructions */}
                   <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-4">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
@@ -738,7 +777,10 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                   {spAcsUrl && (
                     <div className="rounded-lg border bg-muted/30 p-4">
                       <p className="text-sm font-medium mb-2">
-                        <FormattedMessage defaultMessage="ACS URL (Assertion Consumer Service):" id="Add SSO Modal / ACS URL Label" />
+                        <FormattedMessage
+                          defaultMessage="ACS URL (Assertion Consumer Service):"
+                          id="Add SSO Modal / ACS URL Label"
+                        />
                       </p>
                       <div className="flex items-center gap-2">
                         <code className="flex-1 bg-background px-3 py-2 rounded text-xs break-all border">
@@ -749,9 +791,9 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                           variant="outline"
                           size="icon"
                           className="h-9 w-9 shrink-0"
-onClick={() => handleCopyUrl(spAcsUrl, 'acs')}
-                      >
-                        {copiedField === 'acs' ? (
+                          onClick={() => handleCopyUrl(spAcsUrl, 'acs')}
+                        >
+                          {copiedField === 'acs' ? (
                             <Check className="h-4 w-4 text-green-600" />
                           ) : (
                             <Copy className="h-4 w-4" />
@@ -765,7 +807,10 @@ onClick={() => handleCopyUrl(spAcsUrl, 'acs')}
                   {spEntityId && (
                     <div className="rounded-lg border bg-muted/30 p-4">
                       <p className="text-sm font-medium mb-2">
-                        <FormattedMessage defaultMessage="Entity ID (SP Identifier):" id="Add SSO Modal / Entity ID Label" />
+                        <FormattedMessage
+                          defaultMessage="Entity ID (SP Identifier):"
+                          id="Add SSO Modal / Entity ID Label"
+                        />
                       </p>
                       <div className="flex items-center gap-2">
                         <code className="flex-1 bg-background px-3 py-2 rounded text-xs break-all border">
@@ -776,9 +821,9 @@ onClick={() => handleCopyUrl(spAcsUrl, 'acs')}
                           variant="outline"
                           size="icon"
                           className="h-9 w-9 shrink-0"
-onClick={() => handleCopyUrl(spEntityId, 'entityId')}
-                      >
-                        {copiedField === 'entityId' ? (
+                          onClick={() => handleCopyUrl(spEntityId, 'entityId')}
+                        >
+                          {copiedField === 'entityId' ? (
                             <Check className="h-4 w-4 text-green-600" />
                           ) : (
                             <Copy className="h-4 w-4" />
@@ -788,11 +833,45 @@ onClick={() => handleCopyUrl(spEntityId, 'entityId')}
                     </div>
                   )}
 
+                  {/* Draft connections have no metadata URL yet, so the metadata XML is copied instead */}
+                  {!spMetadataUrl && spMetadataXml && (
+                    <div className="rounded-lg border bg-muted/30 p-4">
+                      <p className="text-sm font-medium mb-2">
+                        <FormattedMessage defaultMessage="SP metadata XML" id="Add SSO Modal / SP Metadata XML Label" />
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCopyUrl(spMetadataXml, 'metadata-xml')}
+                      >
+                        {copiedField === 'metadata-xml' ? (
+                          <Check className="mr-2 h-4 w-4 text-green-600" />
+                        ) : (
+                          <Copy className="mr-2 h-4 w-4" />
+                        )}
+                        <FormattedMessage
+                          defaultMessage="Copy metadata XML"
+                          id="Add SSO Modal / Copy SP Metadata XML"
+                        />
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        <FormattedMessage
+                          defaultMessage="Paste this into your identity provider while the connection is still a draft. The metadata URL becomes available after activation."
+                          id="Add SSO Modal / SP Metadata XML Hint"
+                        />
+                      </p>
+                    </div>
+                  )}
+
                   {/* SP Metadata URL */}
                   {spMetadataUrl && (
                     <div className="rounded-lg border bg-muted/30 p-4">
                       <p className="text-sm font-medium mb-2">
-                        <FormattedMessage defaultMessage="SP Metadata URL (optional):" id="Add SSO Modal / SP URL Label" />
+                        <FormattedMessage
+                          defaultMessage="SP Metadata URL (optional):"
+                          id="Add SSO Modal / SP URL Label"
+                        />
                       </p>
                       <div className="flex items-center gap-2">
                         <code className="flex-1 bg-background px-3 py-2 rounded text-xs break-all border">
@@ -803,9 +882,9 @@ onClick={() => handleCopyUrl(spEntityId, 'entityId')}
                           variant="outline"
                           size="icon"
                           className="h-9 w-9 shrink-0"
-onClick={() => handleCopyUrl(spMetadataUrl, 'metadata')}
-                      >
-                        {copiedField === 'metadata' ? (
+                          onClick={() => handleCopyUrl(spMetadataUrl, 'metadata')}
+                        >
+                          {copiedField === 'metadata' ? (
                             <Check className="h-4 w-4 text-green-600" />
                           ) : (
                             <Copy className="h-4 w-4" />
@@ -820,7 +899,6 @@ onClick={() => handleCopyUrl(spMetadataUrl, 'metadata')}
                       </p>
                     </div>
                   )}
-
                 </div>
               )}
 
@@ -836,7 +914,10 @@ onClick={() => handleCopyUrl(spMetadataUrl, 'metadata')}
                   </div>
                   <div className="rounded-lg border bg-muted/30 p-4">
                     <p className="text-sm font-medium mb-2">
-                      <FormattedMessage defaultMessage="Redirect URI (update in your IdP):" id="Add SSO Modal / Redirect Label" />
+                      <FormattedMessage
+                        defaultMessage="Redirect URI (update in your IdP):"
+                        id="Add SSO Modal / Redirect Label"
+                      />
                     </p>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 bg-background px-3 py-2 rounded text-xs break-all border">
@@ -847,7 +928,9 @@ onClick={() => handleCopyUrl(spMetadataUrl, 'metadata')}
                         variant="outline"
                         size="icon"
                         className="h-9 w-9 shrink-0"
-                        onClick={() => handleCopyUrl(oidcCallbackUrl || apiURL(`/sso/oidc/${connectionId}/callback`), 'oidc')}
+                        onClick={() =>
+                          handleCopyUrl(oidcCallbackUrl || apiURL(`/sso/oidc/${connectionId}/callback`), 'oidc')
+                        }
                       >
                         {copiedField === 'oidc' ? (
                           <Check className="h-4 w-4 text-green-600" />

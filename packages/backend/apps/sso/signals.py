@@ -53,6 +53,7 @@ def on_sso_connection_saved(sender, instance, created, **kwargs):
                 sso_connection=instance,
                 description=f'SSO connection "{instance.name}" deactivated',
             )
+            instance.revoke_sessions(reason="SSO connection deactivated")
             _notify_sso_status_change(instance, activated=False)
 
 

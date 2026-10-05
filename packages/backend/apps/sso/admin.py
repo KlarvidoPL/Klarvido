@@ -109,10 +109,27 @@ class UserDeviceAdmin(admin.ModelAdmin):
 
 @admin.register(UserPasskey)
 class UserPasskeyAdmin(admin.ModelAdmin):
+    """Passkeys are personal credentials, so only superusers may see them in the admin."""
+
     list_display = ["user", "name", "authenticator_type", "is_active", "last_used_at", "use_count"]
     list_filter = ["is_active", "authenticator_type"]
     search_fields = ["user__email", "name"]
     readonly_fields = ["credential_id", "public_key", "sign_count", "created_at", "updated_at"]
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 @admin.register(WebAuthnChallenge)

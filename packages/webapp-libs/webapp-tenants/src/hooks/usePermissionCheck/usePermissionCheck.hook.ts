@@ -116,7 +116,6 @@ export type PermissionCode =
   // Security
   | 'security.view'
   | 'security.sso.manage'
-  | 'security.passkeys.manage'
   | 'security.ksef.view'
   | 'security.ksef.manage'
   | 'security.logs.view'

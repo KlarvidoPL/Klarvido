@@ -151,6 +151,16 @@ SSO_ERROR_CODES = {
     "signature_invalid": "Security validation failed. Please try again.",
     "state_mismatch": "Security check failed. Please start the sign-in process again.",
     "rate_limited": "Too many attempts. Please wait before trying again.",
+    "account_mismatch": "You signed in with a different account than the one you entered. Please try again.",
+    "account_not_member": (
+        "An account with this email already exists. Ask your organization administrator to invite you."
+    ),
+    "sso_request_expired": (
+        "Your sign-in request has expired or was started in another browser. Please start the sign-in again."
+    ),
+    "email_not_verified": (
+        "Your identity provider has not verified this email address. Ask your administrator to check the setup."
+    ),
     "generic": "An error occurred during sign-in. Please try again or contact support.",
 }
 
@@ -172,6 +182,18 @@ def get_safe_error_code(exception: Exception) -> str:
 
     # Log the actual error for debugging (server-side only)
     logger.error(f"SSO error mapped to safe code: {exception}")
+
+    if "account" in error_msg and "does not match" in error_msg:
+        return "account_mismatch"
+
+    if "not a member of this organization" in error_msg:
+        return "account_not_member"
+
+    if "email" in error_msg and "not verified" in error_msg:
+        return "email_not_verified"
+
+    if "request id" in error_msg or "replay" in error_msg:
+        return "sso_request_expired"
 
     # Map common error patterns to safe codes
     if "email" in error_msg and ("missing" in error_msg or "not found" in error_msg or "no email" in error_msg):

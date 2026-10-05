@@ -19,4 +19,6 @@ export const ENV = {
   ENABLE_PASSKEYS: process.env.VITE_ENABLE_PASSKEYS !== 'false', // Default: enabled  
   ENABLE_SOCIAL_LOGIN: process.env.VITE_ENABLE_SOCIAL_LOGIN !== 'false', // Default: enabled
   ENABLE_PASSWORD_LOGIN: process.env.VITE_ENABLE_PASSWORD_LOGIN !== 'false', // Default: enabled
+  // SSO is not available yet: its settings are greyed out and sign-in through SSO is hidden. Set to 'true' to enable.
+  SSO_CONFIGURATION_ENABLED: process.env.VITE_SSO_CONFIGURATION_ENABLED === 'true', // Default: disabled
 };

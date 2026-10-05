@@ -3,13 +3,17 @@ import { Connection_Type } from '@sb/webapp-api-client/graphql';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Input } from '@sb/webapp-core/components/forms';
 import { Label } from '@sb/webapp-core/components/ui/label';
+import { Switch } from '@sb/webapp-core/components/ui/switch';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { camelCaseKeys } from '@sb/webapp-core/utils';
-import { Check, Copy, Globe, Loader2, Shield, X } from 'lucide-react';
+import { AlertTriangle, Check, Copy, Globe, Loader2, Shield, X } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useTenantSSO } from '../../../../hooks/useTenantSSO';
+import { useTenantSSODomains } from '../../../../hooks/useTenantSSODomains';
+import { DomainChip, getDomainVerification } from './domainChip';
+import { translateSsoDomainFieldError } from './ssoDomainErrors';
 
 export type EditSSOConnectionModalProps = {
   connection: {
@@ -26,6 +30,7 @@ export type EditSSOConnectionModalProps = {
     spEntityId?: string | null;
     oidcCallbackUrl?: string | null;
     oidcLoginUrl?: string | null;
+    oidcTrustUnverifiedEmail?: boolean | null;
   };
   closeModal: () => void;
   onSuccess?: () => void;
@@ -39,6 +44,7 @@ export const EditSSOConnectionModal = ({
   tenantId,
 }: EditSSOConnectionModalProps) => {
   const intl = useIntl();
+  const { domains: tenantDomains, loading: domainsLoading } = useTenantSSODomains(tenantId);
   const { toast } = useToast();
   const { updateConnection } = useTenantSSO(tenantId);
 
@@ -53,6 +59,7 @@ export const EditSSOConnectionModal = ({
     issuer: connection.oidcIssuer ?? '',
     clientId: connection.oidcClientId ?? '',
     clientSecret: '',
+    trustUnverifiedEmail: connection.oidcTrustUnverifiedEmail ?? false,
   });
   const [domainInput, setDomainInput] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -131,6 +138,7 @@ export const EditSSOConnectionModal = ({
           allowedDomains: JSON.stringify(formData.allowedDomains),
           oidcIssuer: formData.issuer,
           oidcClientId: formData.clientId,
+          oidcTrustUnverifiedEmail: formData.trustUnverifiedEmail,
           ...(formData.clientSecret.trim() ? { oidcClientSecret: formData.clientSecret } : {}),
         };
 
@@ -426,24 +434,19 @@ export const EditSSOConnectionModal = ({
             {formData.allowedDomains.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.allowedDomains.map((domain) => (
-                  <span
+                  <DomainChip
                     key={domain}
-                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                  >
-                    {domain}
-                    <button
-                      type="button"
-                      onClick={() => removeDomain(domain)}
-                      className="ml-1 rounded-full p-0.5 hover:bg-primary/20 transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
+                    domain={domain}
+                    verified={getDomainVerification(tenantDomains, domainsLoading, domain)}
+                    onRemove={() => removeDomain(domain)}
+                  />
                 ))}
               </div>
             )}
             {fieldErrors['allowedDomains'] && (
-              <p className="text-destructive text-sm">{fieldErrors['allowedDomains']}</p>
+              <p className="text-destructive dark:text-red-400 text-sm">
+                {translateSsoDomainFieldError(intl, fieldErrors['allowedDomains'])}
+              </p>
             )}
             <p className="text-xs text-muted-foreground">
               <FormattedMessage
@@ -491,7 +494,9 @@ export const EditSSOConnectionModal = ({
                   value={formData.certificate}
                   onChange={(e) => updateFormData('certificate', e.target.value)}
                 />
-                {fieldErrors['certificate'] && <p className="text-destructive text-sm">{fieldErrors['certificate']}</p>}
+                {fieldErrors['certificate'] && (
+                  <p className="text-destructive dark:text-red-400 text-sm">{fieldErrors['certificate']}</p>
+                )}
               </div>
             </>
           )}
@@ -539,6 +544,41 @@ export const EditSSOConnectionModal = ({
                   onChange={(e) => updateFormData('clientSecret', e.target.value)}
                   error={fieldErrors['clientSecret']}
                 />
+              </div>
+              <div className="space-y-2 rounded-md border p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1">
+                    <Label htmlFor="edit-trust-unverified-email">
+                      <FormattedMessage
+                        defaultMessage="Accept unverified emails"
+                        id="SSO Form / Trust unverified email Label"
+                      />
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      <FormattedMessage
+                        defaultMessage="Turn this on only if your identity provider does not send the email_verified claim, for example Microsoft Entra ID."
+                        id="SSO Form / Trust unverified email Help"
+                      />
+                    </p>
+                  </div>
+                  <Switch
+                    id="edit-trust-unverified-email"
+                    className="shrink-0"
+                    checked={formData.trustUnverifiedEmail}
+                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, trustUnverifiedEmail: checked }))}
+                  />
+                </div>
+                {formData.trustUnverifiedEmail && (
+                  <p className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span>
+                      <FormattedMessage
+                        defaultMessage="Only enable this if your identity provider lets users sign in only with email addresses they own. Otherwise a user could sign in as someone else."
+                        id="SSO Form / Trust unverified email Warning"
+                      />
+                    </span>
+                  </p>
+                )}
               </div>
             </>
           )}

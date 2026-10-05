@@ -1,5 +1,6 @@
 import { apiURL } from '@sb/webapp-api-client/api';
 import { Button } from '@sb/webapp-core/components/buttons';
+import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { Input } from '@sb/webapp-core/components/forms';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
@@ -12,16 +13,16 @@ import {
 } from '@sb/webapp-core/components/ui/dropdown-menu';
 import { Label } from '@sb/webapp-core/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sb/webapp-core/components/ui/tooltip';
-import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import {
+  Activity,
   AlertTriangle,
   Calendar,
   CheckCircle2,
   Copy,
-  Activity,
+  Hash,
   Key,
   Link2,
   Loader2,
@@ -30,14 +31,13 @@ import {
   RefreshCw,
   Shield,
   Trash2,
-  Hash,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { useCurrentTenant } from '../../../../providers';
 import { useTenantSCIM } from '../../../../hooks/useTenantSCIM';
 import { useTenantSSO } from '../../../../hooks/useTenantSSO';
+import { useCurrentTenant } from '../../../../providers';
 
 export type DirectorySyncCardProps = {
   canManageSSO: boolean;
@@ -158,23 +158,22 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-    }).format(new Date(dateStr));
+    return intl.formatDate(dateStr, { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
-  const scimEndpointUrl = apiURL('/sso/scim/v2');
+  // Identity providers need the full address; resolve a relative API base against this site
+  const scimEndpointUrl = new URL(apiURL('/sso/scim/v2'), window.location.origin).toString();
 
   return (
     <TooltipProvider>
       <Card>
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                 <RefreshCw className="h-5 w-5 text-primary" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <CardTitle className="text-lg">
                   <FormattedMessage
                     defaultMessage="Directory Sync (SCIM)"
@@ -192,10 +191,7 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
             {canManageSSO && hasActiveConnection && activeTokens.length > 0 && (
               <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                <FormattedMessage
-                  defaultMessage="Add Token"
-                  id="Tenant Security Settings / Add SCIM Token Button"
-                />
+                <FormattedMessage defaultMessage="Add Token" id="Tenant Security Settings / Add SCIM Token Button" />
               </Button>
             )}
           </div>
@@ -316,32 +312,32 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                 <div
                   key={token.id}
                   className={cn(
-                    'group relative flex items-center justify-between rounded-lg border p-4 transition-all',
+                    'group relative flex items-start gap-4 rounded-lg border p-4 pr-12 transition-all',
                     'hover:shadow-sm hover:border-primary/20',
                     'border-l-2 border-l-emerald-500'
                   )}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex min-w-0 flex-1 items-start gap-4">
                     {/* Token Icon */}
-                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                       <Key className="h-5 w-5" />
                     </div>
 
                     {/* Token Info */}
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{token.name}</span>
-                        <Badge variant="outline" className="font-mono text-xs">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="min-w-0 break-all font-medium">{token.name}</span>
+                        <Badge variant="outline" className="shrink-0 font-mono text-xs">
                           {token.tokenPrefix}...
                         </Badge>
                       </div>
 
                       {/* Stats Row */}
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="flex items-center gap-1 cursor-default">
-                              <Calendar className="h-3.5 w-3.5" />
+                            <span className="flex items-center gap-1 whitespace-nowrap cursor-default">
+                              <Calendar className="h-3.5 w-3.5 shrink-0" />
                               <FormattedMessage
                                 defaultMessage="Created {date}"
                                 id="SCIM / Created Date"
@@ -350,10 +346,7 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <FormattedMessage
-                              defaultMessage="Token creation date"
-                              id="SCIM / Created Tooltip"
-                            />
+                            <FormattedMessage defaultMessage="Token creation date" id="SCIM / Created Tooltip" />
                           </TooltipContent>
                         </Tooltip>
 
@@ -362,8 +355,8 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                             <span className="text-muted-foreground/50">•</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="flex items-center gap-1 cursor-default">
-                                  <Activity className="h-3.5 w-3.5" />
+                                <span className="flex items-center gap-1 whitespace-nowrap cursor-default">
+                                  <Activity className="h-3.5 w-3.5 shrink-0" />
                                   <FormattedMessage
                                     defaultMessage="Last: {date}"
                                     id="SCIM / Last Used"
@@ -386,8 +379,8 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                             <span className="text-muted-foreground/50">•</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="flex items-center gap-1 cursor-default">
-                                  <Hash className="h-3.5 w-3.5" />
+                                <span className="flex items-center gap-1 whitespace-nowrap cursor-default">
+                                  <Hash className="h-3.5 w-3.5 shrink-0" />
                                   <FormattedMessage
                                     defaultMessage="{count, plural, one {# request} other {# requests}}"
                                     id="SCIM / Request Count"
@@ -408,52 +401,51 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                     </div>
                   </div>
 
-                  {/* Actions Dropdown */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">
-                          <FormattedMessage defaultMessage="Actions" id="SCIM Card / Actions" />
-                        </span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <ConfirmDialog
-                        onContinue={() => handleRevokeToken(token.id)}
-                        variant="destructive"
-                        title={
-                          <FormattedMessage
-                            defaultMessage="Revoke SCIM Token?"
-                            id="SCIM / Revoke Dialog Title"
-                          />
-                        }
-                        description={
-                          <FormattedMessage
-                            defaultMessage="This will permanently disable this token. Your identity provider will no longer be able to sync users using this token. This action cannot be undone."
-                            id="SCIM / Revoke Dialog Description"
-                          />
-                        }
-                      >
-                        <DropdownMenuItem
-                          onSelect={(e) => e.preventDefault()}
-                          disabled={revokingId === token.id}
-                          className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                  {/* Actions Dropdown - pinned to the tile corner, visible without hover on touch screens */}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
                         >
-                          {revokingId === token.id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="mr-2 h-4 w-4" />
-                          )}
-                          <FormattedMessage defaultMessage="Revoke token" id="SCIM / Revoke Button" />
-                        </DropdownMenuItem>
-                      </ConfirmDialog>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">
+                            <FormattedMessage defaultMessage="Actions" id="SCIM Card / Actions" />
+                          </span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <ConfirmDialog
+                          onContinue={() => handleRevokeToken(token.id)}
+                          variant="destructive"
+                          title={
+                            <FormattedMessage defaultMessage="Revoke SCIM Token?" id="SCIM / Revoke Dialog Title" />
+                          }
+                          description={
+                            <FormattedMessage
+                              defaultMessage="This will permanently disable this token. Your identity provider will no longer be able to sync users using this token. This action cannot be undone."
+                              id="SCIM / Revoke Dialog Description"
+                            />
+                          }
+                        >
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            disabled={revokingId === token.id}
+                            className="text-destructive dark:text-red-400 focus:text-destructive dark:focus:text-red-400 focus:bg-destructive/10 dark:focus:bg-red-400/10"
+                          >
+                            {revokingId === token.id ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="mr-2 h-4 w-4" />
+                            )}
+                            <FormattedMessage defaultMessage="Revoke token" id="SCIM / Revoke Button" />
+                          </DropdownMenuItem>
+                        </ConfirmDialog>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               ))}
 
@@ -475,7 +467,13 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
       </Card>
 
       {/* Generate Token Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(open) => { setIsModalOpen(open); if (!open) closeModal(); }}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) closeModal();
+        }}
+      >
         <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -509,9 +507,9 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
               </div>
 
               {/* Warning */}
-              <div className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-900/20">
+              <div className="flex gap-3 rounded-lg border border-amber-500/30 bg-card p-3">
                 <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
-                <p className="text-sm text-amber-700 dark:text-amber-300">
+                <p className="text-sm text-muted-foreground">
                   <FormattedMessage
                     defaultMessage="The token will only be shown once. Make sure to copy it before closing this dialog."
                     id="SCIM Modal / Warning"
@@ -523,11 +521,7 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                 <Button variant="outline" onClick={closeModal} className="flex-1">
                   <FormattedMessage defaultMessage="Cancel" id="SCIM Modal / Cancel" />
                 </Button>
-                <Button
-                  onClick={handleGenerateToken}
-                  disabled={!tokenName.trim() || creating}
-                  className="flex-1"
-                >
+                <Button onClick={handleGenerateToken} disabled={!tokenName.trim() || creating} className="flex-1">
                   {creating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -563,11 +557,7 @@ export const DirectorySyncCard = ({ canManageSSO }: DirectorySyncCardProps) => {
                 <div className="flex gap-2">
                   <Input value={generatedToken} readOnly className="font-mono text-xs" />
                   <Button variant="outline" size="icon" onClick={handleCopyToken}>
-                    {copied ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
+                    {copied ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>

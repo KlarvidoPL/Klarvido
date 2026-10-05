@@ -91,7 +91,11 @@ const PaymentMethodContent = () => {
             {paymentMethods.length === 0 && renderEmptyList()}
             {canManageBilling && (
               <div>
-                <Link to={generateTenantPath(RoutesConfig.subscriptions.paymentMethods.edit)} variant="default">
+                <Link
+                  to={generateTenantPath(RoutesConfig.subscriptions.paymentMethods.edit)}
+                  variant="default"
+                  className="w-full sm:w-auto"
+                >
                   {paymentMethods.length ? (
                     <FormattedMessage
                       defaultMessage="Edit payment methods"

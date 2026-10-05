@@ -17,6 +17,7 @@ interface ImportMetaEnv {
   readonly VITE_ENABLE_PASSKEYS: string;
   readonly VITE_ENABLE_SOCIAL_LOGIN: string;
   readonly VITE_ENABLE_PASSWORD_LOGIN: string;
+  readonly VITE_SSO_CONFIGURATION_ENABLED: string;
 }
 
 interface ImportMeta {

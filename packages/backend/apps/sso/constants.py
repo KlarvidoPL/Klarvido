@@ -22,6 +22,17 @@ class SSOConnectionStatus(models.TextChoices):
     ERROR = "error", "Configuration Error"
 
 
+class SSODomainStatus(models.TextChoices):
+    """
+    Ownership state of an email domain claimed by a tenant.
+    Only verified domains take part in SSO, JIT provisioning, SCIM and enforcement.
+    """
+
+    PENDING = "pending", "Pending verification"
+    VERIFIED = "verified", "Verified"
+    LAPSED = "lapsed", "Lapsed (record missing for several checks)"
+
+
 class SAMLNameIdFormat(models.TextChoices):
     """
     SAML NameID formats.
@@ -67,6 +78,12 @@ class SSOAuditEventType(models.TextChoices):
     # Enforcement events
     SSO_ENFORCE_BYPASS = "sso_enforce_bypass", "SSO Enforce Bypass Login"
 
+    # Domain ownership events
+    DOMAIN_ADDED = "domain_added", "SSO Domain Added"
+    DOMAIN_VERIFIED = "domain_verified", "SSO Domain Verified"
+    DOMAIN_REMOVED = "domain_removed", "SSO Domain Removed"
+    DOMAIN_LAPSED = "domain_lapsed", "SSO Domain Lapsed"
+
     # Session events
     SESSION_CREATED = "session_created", "Session Created"
     SESSION_REVOKED = "session_revoked", "Session Revoked"
@@ -83,6 +100,11 @@ class SSOAuditEventType(models.TextChoices):
     # Security events
     SECURITY_ANOMALY = "security_anomaly", "Security Anomaly Detected"
 
+    # KSeF events (organization token for invoice import)
+    KSEF_TOKEN_SAVED = "ksef_token_saved", "KSeF Token Saved"
+    KSEF_TOKEN_TESTED = "ksef_token_tested", "KSeF Token Tested"
+    KSEF_TOKEN_DELETED = "ksef_token_deleted", "KSeF Token Deleted"
+
 
 class Notification(Enum):
     """
@@ -92,5 +114,7 @@ class Notification(Enum):
     SSO_CONNECTION_ACTIVATED = "SSO_CONNECTION_ACTIVATED"
     SSO_CONNECTION_DEACTIVATED = "SSO_CONNECTION_DEACTIVATED"
     SSO_LOGIN_FROM_NEW_DEVICE = "SSO_LOGIN_FROM_NEW_DEVICE"
+    SSO_DOMAIN_LAPSED = "SSO_DOMAIN_LAPSED"
+    SSO_DOMAIN_RECORD_MISSING = "SSO_DOMAIN_RECORD_MISSING"
     PASSKEY_REGISTERED = "PASSKEY_REGISTERED"
     SESSION_REVOKED_REMOTELY = "SESSION_REVOKED_REMOTELY"

@@ -5,5 +5,7 @@ export * from './actionLogExportReady';
 export * from './actionLogExportFailed';
 export * from './ssoConnectionActivated';
 export * from './ssoConnectionDeactivated';
+export * from './ssoDomainLapsed';
+export * from './ssoDomainRecordMissing';
 export * from './passkeyRegistered';
 export * from './tenantDeleted';

@@ -4,8 +4,9 @@ import * as React from 'react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { DayPicker, type DayPickerProps, useDayPicker, type DayButtonProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { addYears, subYears, format, isToday } from 'date-fns';
+import { addYears, subYears } from 'date-fns';
 import { cn } from '../../../lib/utils';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 import { buttonVariants } from '../button';
 
 export type CalendarProps = DayPickerProps & {
@@ -202,48 +203,6 @@ const calendarAnimationStyles = `
     position: relative;
   }
   
-  /* Elevate the week row when any day is hovered */
-  .calendar-week-row:has(.calendar-day-wrapper:hover) {
-    z-index: 100;
-  }
-  
-  .calendar-day-wrapper:hover {
-    z-index: 100;
-  }
-  
-  .calendar-day-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 4px 8px;
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
-    font-size: 11px;
-    font-weight: 500;
-    border-radius: 4px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    z-index: 9999;
-    margin-bottom: 4px;
-  }
-  
-  .calendar-day-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 4px solid transparent;
-    border-top-color: rgba(0, 0, 0, 0.9);
-  }
-  
-  .calendar-day-wrapper:hover .calendar-day-tooltip {
-    opacity: 1;
-  }
-  
   /* Navigation button tooltip styles */
   .nav-button-wrapper {
     position: relative;
@@ -287,7 +246,6 @@ const calendarAnimationStyles = `
   
   /* Hide tooltips on touch devices */
   @media (hover: none) and (pointer: coarse) {
-    .calendar-day-tooltip,
     .nav-button-tooltip {
       display: none;
     }
@@ -312,24 +270,12 @@ const calendarAnimationStyles = `
   }
 `;
 
-// Custom DayButton component with tooltip
+// Custom DayButton (no hover label on individual days)
 function CustomDayButton({ day, modifiers, className, children, ...props }: DayButtonProps) {
-  // day.date is the actual Date object in react-day-picker v9
-  const dateObj = day.date;
-  const today = isToday(dateObj);
-  const tooltipText = format(dateObj, 'EEEE, MMMM d, yyyy') + (today ? ' (Today)' : '');
-  
   return (
-    <div className="calendar-day-wrapper">
-      <button
-        type="button"
-        className={className}
-        {...props}
-      >
-        {children}
-      </button>
-      <div className="calendar-day-tooltip">{tooltipText}</div>
-    </div>
+    <button type="button" className={className} {...props}>
+      {children}
+    </button>
   );
 }
 
@@ -343,6 +289,7 @@ function Calendar({
   onMonthChange,
   ...props
 }: CalendarProps) {
+  const dateLocale = useDateFnsLocale();
   const [internalMonth, setInternalMonth] = useState<Date>(
     controlledMonth ?? props.defaultMonth ?? new Date()
   );
@@ -384,6 +331,7 @@ function Calendar({
         weekStartsOn={weekStartsOn}
         month={currentMonth}
         onMonthChange={handleMonthChange}
+        locale={dateLocale}
       className={cn('p-3', className)}
         modifiers={{
           weekend: { dayOfWeek: [0, 6] }, // Sunday (0) and Saturday (6)

@@ -43,6 +43,31 @@ describe('SSOError: Component', () => {
     expect(screen.getByText(/your email domain is not authorized/i)).toBeInTheDocument();
   });
 
+  it('should explain the account mismatch when code is account_mismatch', async () => {
+    const { waitForApolloMocks } = render(<SSOError />, {
+      routerProps: {
+        initialEntries: ['/en/auth/sso/error?code=account_mismatch'],
+      },
+    });
+
+    await waitForApolloMocks();
+
+    expect(screen.getByText(/you signed in with a different account than the one you entered/i)).toBeInTheDocument();
+    expect(screen.queryByText(/an error occurred during sign-in/i)).not.toBeInTheDocument();
+  });
+
+  it('should ask for an invitation when code is account_not_member', async () => {
+    const { waitForApolloMocks } = render(<SSOError />, {
+      routerProps: {
+        initialEntries: ['/en/auth/sso/error?code=account_not_member'],
+      },
+    });
+
+    await waitForApolloMocks();
+
+    expect(screen.getByText(/ask your organization administrator to invite you/i)).toBeInTheDocument();
+  });
+
   it('should use legacy message param when provided', async () => {
     const { waitForApolloMocks } = render(<SSOError />, {
       routerProps: {

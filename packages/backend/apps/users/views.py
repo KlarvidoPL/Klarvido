@@ -1,7 +1,9 @@
 from config import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt import views as jwt_views, tokens as jwt_tokens
@@ -10,6 +12,7 @@ from social_core.actions import do_complete
 from social_django.utils import psa
 
 from . import serializers, utils
+from .authentication import enforce_csrf
 
 
 class CookieTokenRefreshView(jwt_views.TokenRefreshView):
@@ -21,9 +24,14 @@ class CookieTokenRefreshView(jwt_views.TokenRefreshView):
     endpoint, thus preventing us from adding it to a blacklist.
     """
 
+    # Authenticates with the refresh token, not the access token. An expired Authorization header must not stop it.
+    authentication_classes = ()
     serializer_class = serializers.CookieTokenRefreshSerializer
 
     def post(self, request, *args, **kwargs):
+        # The refresh cookie is sent cross-site too (SameSite=None), so its use must carry the CSRF token
+        if request.COOKIES.get(settings.REFRESH_TOKEN_COOKIE):
+            enforce_csrf(request)
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid(raise_exception=False):
             response = Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
@@ -55,10 +63,15 @@ class LogoutView(TokenViewBase):
     users can always log out regardless of their token state.
     """
 
+    # Uses the refresh token only. An expired Authorization header must not stop logout.
+    authentication_classes = ()
     permission_classes = ()
     serializer_class = serializers.LogoutSerializer
 
     def post(self, request, *args, **kwargs):
+        # A cross-site request must not be able to log the user out, so the refresh cookie's use needs the CSRF token
+        if request.COOKIES.get(settings.REFRESH_TOKEN_COOKIE):
+            enforce_csrf(request)
         serializer = self.get_serializer(data=request.data)
         # Always try to process logout - serializer is designed to be graceful
         if serializer.is_valid(raise_exception=False):
@@ -127,3 +140,14 @@ def complete(request, backend, *args, **kwargs):
         *args,  # noqa: B026
         **kwargs,
     )
+
+
+@ensure_csrf_cookie
+def csrf_token(request):
+    """Set the csrftoken cookie and return the token the web app sends back in X-CSRFToken.
+
+    The token is returned in the body, not read from the cookie: the web app and the API can be on different sites
+    (Render), where the app cannot read the API's cookies. The browser still sends the cookie, so Django checks the
+    header against it, and a page on another site cannot read this response to learn the token.
+    """
+    return JsonResponse({"csrfToken": get_token(request)})
