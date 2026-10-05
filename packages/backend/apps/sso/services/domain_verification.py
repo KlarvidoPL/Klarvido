@@ -267,9 +267,17 @@ def verify_domain(tenant_domain: TenantDomain) -> TenantDomain:
             tenant_domain.status = constants.SSODomainStatus.VERIFIED
             tenant_domain.verified_at = timezone.now()
             tenant_domain.consecutive_failures = 0
+            tenant_domain.first_failed_at = None
             tenant_domain.last_checked_at = tenant_domain.verified_at
             tenant_domain.save(
-                update_fields=["status", "verified_at", "consecutive_failures", "last_checked_at", "updated_at"]
+                update_fields=[
+                    "status",
+                    "verified_at",
+                    "consecutive_failures",
+                    "first_failed_at",
+                    "last_checked_at",
+                    "updated_at",
+                ]
             )
     except IntegrityError:
         # The partial unique index on verified domains caught a concurrent verification

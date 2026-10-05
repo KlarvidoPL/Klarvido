@@ -925,7 +925,12 @@ export const AuditLogCard = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className={cn('flex items-center justify-between border-t pt-4', isFetching && 'opacity-60')}>
+                <div
+                  className={cn(
+                    'flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between',
+                    isFetching && 'opacity-60'
+                  )}
+                >
                   <p className="text-sm text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="Showing {start}-{end} of {total} events"
@@ -937,14 +942,14 @@ export const AuditLogCard = () => {
                       }}
                     />
                   </p>
-                  <div className="flex items-center gap-1">
+                  <div className="flex w-full max-w-full flex-wrap items-center justify-between gap-1 sm:w-[22rem]">
                     {/* First page */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="hidden h-8 w-8 sm:inline-flex"
                           onClick={() => handlePageChange(1)}
                           disabled={currentPage === 1 || isFetching}
                         >
@@ -978,7 +983,7 @@ export const AuditLogCard = () => {
                     <div className="flex items-center gap-1">
                       {getPageNumbers().map((page, index) =>
                         page === 'ellipsis' ? (
-                          <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
+                          <span key={`ellipsis-${index}`} className="hidden px-2 text-muted-foreground sm:inline">
                             ...
                           </span>
                         ) : (
@@ -986,7 +991,7 @@ export const AuditLogCard = () => {
                             key={page}
                             variant={currentPage === page ? 'default' : 'ghost'}
                             size="icon"
-                            className="h-8 w-8"
+                            className={cn('h-8 w-8', Math.abs(page - currentPage) > 1 && 'hidden sm:inline-flex')}
                             onClick={() => handlePageChange(page)}
                             disabled={isFetching}
                           >
@@ -1020,7 +1025,7 @@ export const AuditLogCard = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="hidden h-8 w-8 sm:inline-flex"
                           onClick={() => handlePageChange(totalPages)}
                           disabled={currentPage === totalPages || isFetching}
                         >

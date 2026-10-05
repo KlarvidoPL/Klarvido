@@ -164,9 +164,9 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
           const lapsed = status === 'lapsed';
           return (
             <div key={domain.id} className="space-y-3 rounded-md border p-4">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="truncate font-mono text-sm">{domain.domain}</span>
+              <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-3">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <span className="min-w-0 break-all font-mono text-sm">{domain.domain}</span>
                   {verified && (
                     <Badge variant="default" className="shrink-0">
                       <Check className="mr-1 h-3 w-3" />
@@ -242,11 +242,14 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
               )}
 
               {lapsed && (
-                <p className="text-sm text-destructive dark:text-red-400">
-                  <FormattedMessage
-                    id="Domain Verification / Lapsed explanation"
-                    defaultMessage="The verification record has been missing for seven days, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
-                  />
+                <p className="flex items-start gap-2 text-sm text-destructive dark:text-red-400">
+                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    <FormattedMessage
+                      id="Domain Verification / Lapsed explanation"
+                      defaultMessage="The verification record has been missing for seven days, so this domain no longer works for SSO. Its SSO connections were deactivated. Publish the record again and verify the domain to use it."
+                    />
+                  </span>
                 </p>
               )}
 
@@ -258,7 +261,7 @@ export const DomainVerificationCard = ({ canManageSSO }: DomainVerificationCardP
                       defaultMessage="Add this TXT record to your DNS, then click Verify. Keep the record in place: SSO checks it every day, and removing it lapses the domain."
                     />
                   </p>
-                  <div className="grid gap-1 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-2">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
                     <span className="text-muted-foreground">
                       <FormattedMessage id="Domain Verification / Record type" defaultMessage="Type" />
                     </span>
