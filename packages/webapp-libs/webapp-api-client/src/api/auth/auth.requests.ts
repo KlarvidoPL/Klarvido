@@ -1,4 +1,5 @@
 import { client } from '../client';
+import { CSRF_HEADER_NAME, ensureCsrfToken, resetCsrfToken } from '../csrf';
 import { apiURLs } from '../helpers';
 import { LogoutApiResponseData } from './auth.types';
 import { storeAuthTokens } from './auth.utils';
@@ -16,6 +17,19 @@ export interface RefreshTokenResponse {
   refresh?: string;
 }
 
+/**
+ * CSRF header for the auth calls that use the auth cookie (refresh, logout). They send it explicitly rather than
+ * relying only on the client's request interceptor: if the cached token came back empty, fetch a new one once.
+ */
+const getCsrfHeaders = async (): Promise<Record<string, string>> => {
+  let token = await ensureCsrfToken();
+  if (!token) {
+    resetCsrfToken();
+    token = await ensureCsrfToken();
+  }
+  return token ? { [CSRF_HEADER_NAME]: token } : {};
+};
+
 export const refreshToken = async () => {
   // For Safari/mobile: pass refresh token from localStorage in request body
   // because Safari blocks third-party cookies (ITP)
@@ -29,7 +43,8 @@ export const refreshToken = async () => {
 
   const res = await client.post<RefreshTokenResponse>(
     AUTH_URL.REFRESH_TOKEN,
-    refreshTokenValue ? { refresh: refreshTokenValue } : undefined
+    refreshTokenValue ? { refresh: refreshTokenValue } : undefined,
+    { headers: await getCsrfHeaders() }
   );
 
   if (res.data?.access) {
@@ -149,7 +164,8 @@ export const logout = async () => {
   
   const res = await client.post<LogoutApiResponseData>(
     AUTH_URL.LOGOUT,
-    refreshTokenValue ? { refresh: refreshTokenValue } : undefined
+    refreshTokenValue ? { refresh: refreshTokenValue } : undefined,
+    { headers: await getCsrfHeaders() }
   );
   return res.data;
 };

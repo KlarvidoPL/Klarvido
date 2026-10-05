@@ -24,6 +24,8 @@ class CookieTokenRefreshView(jwt_views.TokenRefreshView):
     endpoint, thus preventing us from adding it to a blacklist.
     """
 
+    # Authenticates with the refresh token, not the access token. An expired Authorization header must not stop it.
+    authentication_classes = ()
     serializer_class = serializers.CookieTokenRefreshSerializer
 
     def post(self, request, *args, **kwargs):
@@ -61,6 +63,8 @@ class LogoutView(TokenViewBase):
     users can always log out regardless of their token state.
     """
 
+    # Uses the refresh token only. An expired Authorization header must not stop logout.
+    authentication_classes = ()
     permission_classes = ()
     serializer_class = serializers.LogoutSerializer
 

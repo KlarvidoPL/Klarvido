@@ -196,3 +196,40 @@ class TestRefreshAndLogoutCookies:
         response = client.post("/api/auth/logout/", {}, format="json", HTTP_X_CSRFTOKEN=csrf_secret)
 
         assert response.status_code == 200
+
+
+class TestExpiredAuthorizationHeaderDoesNotBlockRefresh:
+    """The web app sends the stored access token on every request. After it expires,
+    refresh and logout still work."""
+
+    def test_refresh_with_an_expired_authorization_header_succeeds(self, user, csrf_secret):
+        refresh_token = create_jwt_tokens(user)["refresh"]
+        client = APIClient(enforce_csrf_checks=True)
+        client.cookies[settings.REFRESH_TOKEN_COOKIE] = refresh_token
+        client.cookies["csrftoken"] = csrf_secret
+
+        response = client.post(
+            "/api/auth/token-refresh/",
+            {},
+            format="json",
+            HTTP_X_CSRFTOKEN=csrf_secret,
+            HTTP_AUTHORIZATION="Bearer expired.access.token",
+        )
+
+        assert response.status_code == 200
+
+    def test_logout_with_an_expired_authorization_header_succeeds(self, user, csrf_secret):
+        refresh_token = create_jwt_tokens(user)["refresh"]
+        client = APIClient(enforce_csrf_checks=True)
+        client.cookies[settings.REFRESH_TOKEN_COOKIE] = refresh_token
+        client.cookies["csrftoken"] = csrf_secret
+
+        response = client.post(
+            "/api/auth/logout/",
+            {},
+            format="json",
+            HTTP_X_CSRFTOKEN=csrf_secret,
+            HTTP_AUTHORIZATION="Bearer expired.access.token",
+        )
+
+        assert response.status_code == 200
