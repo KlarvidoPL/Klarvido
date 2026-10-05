@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "复制链接失败"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "复制元数据 XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "正在创建..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "服务提供商元数据"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "在连接仍为草稿时，将其粘贴到您的身份提供商中。激活后将提供元数据 URL。"
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP 元数据 (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP 元数据 URL："
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "重置你的密码"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "恢复该记录，验证域名，并在安全设置中重新启用 SSO 连接。"
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "前往 Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "{domain} 的 SSO 已停用"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "\"{domain}\" 的 SSO 已停用"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "{tenantName} 中 \"{domain}\" 的验证记录已缺失 {graceDays} 天，因此该域名的 SSO 已停用。用户无法再通过它登录。"
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "您域名的 SSO 已停用"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "打开组织的安全设置，查看并恢复该记录。"
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "前往 Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "{domain} 的 SSO 验证记录缺失"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "\"{domain}\" 的 SSO 验证记录缺失"
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "证明您拥有 {tenantName} 的域名 \"{domain}\" 的 DNS 记录缺失。如果不恢复该记录，此域名的 SSO 将在 {graceDays} 天后停用。"
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO 验证记录缺失"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "更新付款方式"

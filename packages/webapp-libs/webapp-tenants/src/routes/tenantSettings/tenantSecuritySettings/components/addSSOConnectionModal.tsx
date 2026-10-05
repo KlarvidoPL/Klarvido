@@ -48,6 +48,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
   const [ssoType, setSsoType] = useState<SSOType>(null);
   const [loading, setLoading] = useState(false);
   const [spMetadataUrl, setSpMetadataUrl] = useState<string | null>(null);
+  const [spMetadataXml, setSpMetadataXml] = useState<string | null>(null);
   const [spAcsUrl, setSpAcsUrl] = useState<string | null>(null);
   const [spEntityId, setSpEntityId] = useState<string | null>(null);
   const [connectionId, setConnectionId] = useState<string | null>(null);
@@ -155,6 +156,9 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
       }
       if (conn?.spMetadataUrl) {
         setSpMetadataUrl(conn.spMetadataUrl);
+      }
+      if (conn?.spMetadataXml) {
+        setSpMetadataXml(conn.spMetadataXml);
       }
       if (conn?.spAcsUrl) {
         setSpAcsUrl(conn.spAcsUrl);
@@ -826,6 +830,37 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                           )}
                         </Button>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Draft connections have no metadata URL yet, so the metadata XML is copied instead */}
+                  {!spMetadataUrl && spMetadataXml && (
+                    <div className="rounded-lg border bg-muted/30 p-4">
+                      <p className="text-sm font-medium mb-2">
+                        <FormattedMessage defaultMessage="SP metadata XML" id="Add SSO Modal / SP Metadata XML Label" />
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCopyUrl(spMetadataXml, 'metadata-xml')}
+                      >
+                        {copiedField === 'metadata-xml' ? (
+                          <Check className="mr-2 h-4 w-4 text-green-600" />
+                        ) : (
+                          <Copy className="mr-2 h-4 w-4" />
+                        )}
+                        <FormattedMessage
+                          defaultMessage="Copy metadata XML"
+                          id="Add SSO Modal / Copy SP Metadata XML"
+                        />
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        <FormattedMessage
+                          defaultMessage="Paste this into your identity provider while the connection is still a draft. The metadata URL becomes available after activation."
+                          id="Add SSO Modal / SP Metadata XML Hint"
+                        />
+                      </p>
                     </div>
                   )}
 

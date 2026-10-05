@@ -22,6 +22,7 @@ const SSO_CONNECTIONS_QUERY = gql(`
           loginCount
           createdAt
           spMetadataUrl
+          spMetadataXml
           spAcsUrl
           spEntityId
           oidcCallbackUrl
@@ -41,6 +42,7 @@ const CREATE_SSO_CONNECTION = gql(`
         connectionType
         status
         spMetadataUrl
+        spMetadataXml
         spAcsUrl
         spEntityId
         oidcCallbackUrl
@@ -90,6 +92,7 @@ const UPDATE_SSO_CONNECTION = gql(`
         status
         enforceSso
         spMetadataUrl
+        spMetadataXml
         spAcsUrl
         spEntityId
         oidcCallbackUrl

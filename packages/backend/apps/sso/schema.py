@@ -23,6 +23,16 @@ from . import serializers
 from . import constants
 from .services import domain_verification
 from .services.domain_verification import DomainVerificationError, get_verified_tenant_id_for_domain
+from .services.saml import SAMLService
+from apps.multitenancy.models import get_user_permissions_for_tenant
+
+
+def _can_manage_sso(info, tenant) -> bool:
+    """Whether the requesting user holds security.sso.manage on the tenant."""
+    user = info.context.user
+    if user is None or not user.is_authenticated or tenant is None:
+        return False
+    return "security.sso.manage" in get_user_permissions_for_tenant(user, tenant)
 
 
 def _resolve_tenant(info, tenant_id=None):
@@ -60,6 +70,8 @@ class SSOConnectionType(DjangoObjectType):
     is_saml = graphene.Boolean()
     is_oidc = graphene.Boolean()
     sp_metadata_url = graphene.String()
+    # The metadata XML itself, so an admin can paste it into the IdP while the connection is still a draft
+    sp_metadata_xml = graphene.String()
     sp_acs_url = graphene.String()
     sp_entity_id = graphene.String()
     oidc_callback_url = graphene.String()
@@ -108,10 +120,20 @@ class SSOConnectionType(DjangoObjectType):
     def resolve_sp_metadata_url(self, info):
         from django.conf import settings
 
-        if self.is_saml:
+        # The endpoint only serves active connections, so a draft has no URL yet (see sp_metadata_xml)
+        if self.is_saml and self.status == constants.SSOConnectionStatus.ACTIVE:
             api_url = getattr(settings, "API_URL", "http://localhost:5001")
             return f"{api_url}/api/sso/saml/{self.id}/metadata"
         return None
+
+    def resolve_sp_metadata_xml(self, info):
+        if not self.is_saml:
+            return None
+        try:
+            return SAMLService(self).generate_sp_metadata()
+        except Exception:
+            # An incomplete draft cannot produce metadata yet; the rest of the connection still loads
+            return None
 
     def resolve_sp_acs_url(self, info):
         return self.sp_acs_url if self.is_saml else None
@@ -154,6 +176,13 @@ class TenantDomainType(DjangoObjectType):
 
     def resolve_id(self, info):
         return to_global_id("TenantDomainType", self.id)
+
+    def resolve_verification_record_name(self, info):
+        return self.verification_record_name if _can_manage_sso(info, self.tenant) else None
+
+    def resolve_verification_record_value(self, info):
+        # SECURITY: the token only proves ownership, so members who cannot manage SSO never see it
+        return self.verification_record_value if _can_manage_sso(info, self.tenant) else None
 
     def resolve_grace_period_ends_at(self, info):
         # When a missing record turns into a lapse; None while the record is present

@@ -18,6 +18,7 @@ from django.utils import timezone
 from apps.notifications import sender
 from apps.sso import constants
 from apps.sso.constants import Notification as SSONotification
+from apps.sso.emails import SSODomainLapsedEmail, SSODomainRecordMissingEmail
 from apps.multitenancy.constants import ActionActorType, ActionType
 from apps.sso.models import SSOAuditLog, TenantDomain, TenantSSOConnection
 from common.action_logging.service import log_action
@@ -386,9 +387,10 @@ def _notify_domain_lapsed(tenant_domain: TenantDomain, deactivated_connections) 
     data = {
         "domain": tenant_domain.domain,
         "tenant_name": tenant_domain.tenant.name,
+        "grace_days": LAPSE_AFTER_FAILURES.days,
         "connection_names": [connection.name for connection in deactivated_connections],
     }
-    _send_to(recipients.values(), SSONotification.SSO_DOMAIN_LAPSED, data)
+    _send_to(recipients.values(), SSONotification.SSO_DOMAIN_LAPSED, data, SSODomainLapsedEmail)
 
 
 def _notify_record_missing(tenant_domain: TenantDomain) -> None:
@@ -398,16 +400,21 @@ def _notify_record_missing(tenant_domain: TenantDomain) -> None:
         "tenant_name": tenant_domain.tenant.name,
         "grace_days": LAPSE_AFTER_FAILURES.days,
     }
-    _send_to(tenant_domain.tenant.owners, SSONotification.SSO_DOMAIN_RECORD_MISSING, data)
+    _send_to(tenant_domain.tenant.owners, SSONotification.SSO_DOMAIN_RECORD_MISSING, data, SSODomainRecordMissingEmail)
 
 
-def _send_to(users, notification, data) -> None:
+def _send_to(users, notification, data, email_class) -> None:
+    """Send the in-app notification and the email to each user. Each channel is best-effort: a failure in
+    one never undoes a lapse, skips the other channel, or stops the other recipients."""
     for user in users:
         try:
             sender.send_notification(user=user, type=notification.value, data=data, issuer=None)
         except Exception:
-            # A notification failure must not undo a lapse or stop the other recipients
             logger.warning("Failed to send SSO domain notification %s", notification.value, exc_info=True)
+        try:
+            email_class(user, data=data).send()
+        except Exception:
+            logger.warning("Failed to email SSO domain notification %s", notification.value, exc_info=True)
 
 
 def remove_domain(tenant_domain: TenantDomain) -> None:

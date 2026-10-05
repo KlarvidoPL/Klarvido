@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "فشل نسخ عنوان URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "نسخ بيانات XML الوصفية"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "جارٍ الإنشاء..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "بيانات Service Provider التعريفية"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "الصق هذا في مزود الهوية أثناء بقاء الاتصال مسودة. يصبح عنوان URL للبيانات الوصفية متاحًا بعد التفعيل."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "بيانات SP الوصفية (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "عنوان SP Metadata URL:"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "أعد إضافة السجل، وتحقق من النطاق، وأعد تفعيل اتصال SSO في إعدادات الأمان."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "انتقل إلى Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "تم تعطيل SSO لـ {domain}"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "تم تعطيل SSO لـ \"{domain}\""
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "سجل التحقق لـ \"{domain}\" لدى {tenantName} مفقود منذ {graceDays} يومًا، لذلك تم تعطيل SSO لهذا النطاق. لم يعد بإمكان المستخدمين تسجيل الدخول به."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "تم تعطيل SSO لنطاقك"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "افتح إعدادات الأمان لمؤسستك لعرض السجل وإعادته."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "انتقل إلى Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "سجل التحقق من SSO لـ {domain} مفقود"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "سجل التحقق من SSO مفقود لـ \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "سجل DNS الذي يثبت ملكيتك لـ \"{domain}\" الخاص بـ {tenantName} مفقود. سيتم تعطيل SSO لهذا النطاق خلال {graceDays} يومًا ما لم يُستعد السجل."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "سجل التحقق من SSO مفقود"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "تحديث طريقة الدفع"

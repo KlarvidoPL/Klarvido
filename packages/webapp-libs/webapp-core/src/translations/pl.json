@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "Nie udało się skopiować adresu URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Skopiuj metadane XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Tworzenie..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Metadane Service Provider"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Wklej to w swoim dostawcy tożsamości, dopóki połączenie jest szkicem. Adres URL metadanych będzie dostępny po aktywacji."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "Metadane SP (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "Adres URL metadanych SP:"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Zresetuj swoje hasło"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Przywróć rekord, zweryfikuj domenę i ponownie aktywuj połączenie SSO w ustawieniach bezpieczeństwa."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Przejdź do Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "SSO dla {domain} zostało dezaktywowane"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO dla \"{domain}\" zostało dezaktywowane"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "Rekord weryfikacyjny dla \"{domain}\" w {tenantName} zniknął na {graceDays} dni, dlatego SSO dla tej domeny zostało dezaktywowane. Użytkownicy nie mogą już się nim logować."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO dla domeny zostało dezaktywowane"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Otwórz ustawienia bezpieczeństwa swojej organizacji, aby zobaczyć rekord i go przywrócić."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Przejdź do Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "Brakuje rekordu weryfikacji SSO dla {domain}"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "Brak rekordu weryfikacji SSO dla \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "Rekord DNS potwierdzający, że posiadasz domenę \"{domain}\" dla {tenantName}, zniknął. SSO dla tej domeny zostanie dezaktywowane za {graceDays} dni, jeśli rekord nie zostanie przywrócony."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "Brak rekordu weryfikacji SSO"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Zaktualizuj metodę płatności"

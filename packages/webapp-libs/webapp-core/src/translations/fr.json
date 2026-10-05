@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "Échec de la copie de l'URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Copier les métadonnées XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Création…"
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Métadonnées du fournisseur de services"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Collez ceci dans votre fournisseur d’identité tant que la connexion est un brouillon. L’URL des métadonnées sera disponible après l’activation."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "Métadonnées SP (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "URL des métadonnées SP :"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Réinitialisez votre mot de passe"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Rétablissez l’enregistrement, vérifiez le domaine et réactivez la connexion SSO dans les paramètres de sécurité."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Aller sur Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "Le SSO pour {domain} a été désactivé"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO désactivé pour \"{domain}\""
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "L’enregistrement de vérification de \"{domain}\" chez {tenantName} est absent depuis {graceDays} jours, le SSO de ce domaine a donc été désactivé. Les utilisateurs ne peuvent plus se connecter avec."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO désactivé pour votre domaine"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Ouvrez les paramètres de sécurité de votre organisation pour voir l’enregistrement et le rétablir."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Aller sur Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "L’enregistrement de vérification SSO pour {domain} est absent"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "Enregistrement de vérification SSO absent pour \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "L’enregistrement DNS qui prouve que vous possédez \"{domain}\" pour {tenantName} est absent. Le SSO de ce domaine sera désactivé dans {graceDays} jours si l’enregistrement n’est pas rétabli."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "Enregistrement de vérification SSO absent"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Mettre à jour le mode de paiement"

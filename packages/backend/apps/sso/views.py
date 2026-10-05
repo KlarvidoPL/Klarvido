@@ -98,11 +98,12 @@ class SAMLMetadataView(View):
 
     def get(self, request, connection_id):
         try:
-            # SECURITY: Only expose metadata for active or testing connections
+            # SECURITY: Only expose metadata for active connections. Admins copy the SP metadata from the
+            # connection screen while the connection is still a draft.
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
                 connection_type="saml",
-                status__in=[SSOConnectionStatus.ACTIVE, SSOConnectionStatus.DRAFT],
+                status=SSOConnectionStatus.ACTIVE,
             )
         except TenantSSOConnection.DoesNotExist:
             return HttpResponse("Not found", status=404)
@@ -1355,6 +1356,20 @@ class SCIMTokenListView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # SECURITY: the token is bound to one connection. Pick it explicitly rather than taking whichever is first.
+        requested_connection_id = request.data.get("connection_id")
+        if requested_connection_id:
+            connection = active_connections.filter(pk=requested_connection_id).first()
+            if connection is None:
+                return Response({"error": "Active connection not found"}, status=status.HTTP_404_NOT_FOUND)
+        elif active_connections.count() > 1:
+            return Response(
+                {"error": "ambiguous_connection", "detail": "Several connections are active; pass connection_id"},
+                status=status.HTTP_409_CONFLICT,
+            )
+        else:
+            connection = active_connections.get()
+
         name = request.data.get("name", "SCIM Token")
 
         # Generate token
@@ -1365,7 +1380,7 @@ class SCIMTokenListView(APIView):
         # Create token
         token = SCIMToken.objects.create(
             tenant=tenant,
-            sso_connection=active_connections.first(),
+            sso_connection=connection,
             name=name,
             token_hash=token_hash,
             token_prefix=token_prefix,

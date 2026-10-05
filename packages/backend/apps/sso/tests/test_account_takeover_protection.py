@@ -205,12 +205,31 @@ A = "urn:oasis:names:tc:SAML:2.0:assertion"
 SUCCESS = '<samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>'
 
 
+ACS_URL = "https://sp.example.com/api/sso/saml/c1/acs"
+SP_ENTITY_ID = "https://sp.example.com"
+
+
 def _assertion(assertion_id, email):
     return (
         f'<saml:Assertion xmlns:saml="{A}" ID="{assertion_id}" Version="2.0" IssueInstant="2026-01-01T00:00:00Z">'
-        f"<saml:Issuer>idp</saml:Issuer><saml:Subject><saml:NameID>{email}</saml:NameID></saml:Subject>"
+        "<saml:Issuer>idp</saml:Issuer>"
+        "<saml:Subject><saml:NameID>" + email + "</saml:NameID>"
+        f'<saml:SubjectConfirmation><saml:SubjectConfirmationData Recipient="{ACS_URL}"/></saml:SubjectConfirmation>'
+        "</saml:Subject>"
+        "<saml:Conditions><saml:AudienceRestriction>"
+        f"<saml:Audience>{SP_ENTITY_ID}</saml:Audience>"
+        "</saml:AudienceRestriction></saml:Conditions>"
         "</saml:Assertion>"
     )
+
+
+@pytest.fixture(autouse=True)
+def fixed_sp_identity():
+    """The SP values every response in this module is addressed to."""
+    with mock.patch.object(SAMLService, "get_acs_url", return_value=ACS_URL), mock.patch.object(
+        SAMLService, "get_sp_entity_id", return_value=SP_ENTITY_ID
+    ):
+        yield
 
 
 @pytest.fixture(scope="module")
@@ -247,6 +266,7 @@ def _sign(element, key_pem, cert_pem, reference_uri):
 def _saml_service(cert_pem):
     connection = mock.Mock(
         id="c1",
+        saml_entity_id="idp",
         saml_certificate=cert_pem,
         saml_certificate_arn="",
         saml_want_response_signed=True,
@@ -266,7 +286,7 @@ class TestSAMLSignatureWrapping:
     def test_signed_response_is_accepted(self, idp_keys):
         key_pem, cert_pem = idp_keys
         response = etree.fromstring(
-            f'<samlp:Response xmlns:samlp="{P}" ID="R1">{SUCCESS}{_assertion("A1", "user@example.com")}</samlp:Response>'
+            f'<samlp:Response xmlns:samlp="{P}" xmlns:saml="{A}" ID="R1" Destination="{ACS_URL}"><saml:Issuer>idp</saml:Issuer>{SUCCESS}{_assertion("A1", "user@example.com")}</samlp:Response>'
         )
 
         attrs = _parse(_saml_service(cert_pem), _sign(response, key_pem, cert_pem, "R1"))
@@ -276,7 +296,9 @@ class TestSAMLSignatureWrapping:
     def test_signed_assertion_is_accepted(self, idp_keys):
         key_pem, cert_pem = idp_keys
         signed_assertion = _sign(etree.fromstring(_assertion("A2", "user@example.com")), key_pem, cert_pem, "A2")
-        response = etree.fromstring(f'<samlp:Response xmlns:samlp="{P}" ID="R2">{SUCCESS}</samlp:Response>')
+        response = etree.fromstring(
+            f'<samlp:Response xmlns:samlp="{P}" xmlns:saml="{A}" ID="R2" Destination="{ACS_URL}"><saml:Issuer>idp</saml:Issuer>{SUCCESS}</samlp:Response>'
+        )
         response.append(signed_assertion)
 
         attrs = _parse(_saml_service(cert_pem), response)
@@ -287,7 +309,7 @@ class TestSAMLSignatureWrapping:
         key_pem, cert_pem = idp_keys
         genuine = _sign(
             etree.fromstring(
-                f'<samlp:Response xmlns:samlp="{P}" ID="R3">{SUCCESS}{_assertion("A3", "attacker@example.com")}'
+                f'<samlp:Response xmlns:samlp="{P}" xmlns:saml="{A}" ID="R3" Destination="{ACS_URL}"><saml:Issuer>idp</saml:Issuer>{SUCCESS}{_assertion("A3", "attacker@example.com")}'
                 "</samlp:Response>"
             ),
             key_pem,
@@ -295,7 +317,7 @@ class TestSAMLSignatureWrapping:
             "R3",
         )
         forged = etree.fromstring(
-            f'<samlp:Response xmlns:samlp="{P}" ID="EVIL">{SUCCESS}{_assertion("F1", "victim@example.com")}'
+            f'<samlp:Response xmlns:samlp="{P}" xmlns:saml="{A}" ID="EVIL" Destination="{ACS_URL}"><saml:Issuer>idp</saml:Issuer>{SUCCESS}{_assertion("F1", "victim@example.com")}'
             "<samlp:Extensions/></samlp:Response>"
         )
         forged.find(f"{{{P}}}Extensions").append(genuine)
@@ -307,7 +329,7 @@ class TestSAMLSignatureWrapping:
         key_pem, cert_pem = idp_keys
         signed_assertion = _sign(etree.fromstring(_assertion("A4", "attacker@example.com")), key_pem, cert_pem, "A4")
         response = etree.fromstring(
-            f'<samlp:Response xmlns:samlp="{P}" ID="R4">{SUCCESS}{_assertion("F2", "victim@example.com")}'
+            f'<samlp:Response xmlns:samlp="{P}" xmlns:saml="{A}" ID="R4" Destination="{ACS_URL}"><saml:Issuer>idp</saml:Issuer>{SUCCESS}{_assertion("F2", "victim@example.com")}'
             "</samlp:Response>"
         )
         response.append(signed_assertion)

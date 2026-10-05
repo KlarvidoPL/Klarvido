@@ -4,6 +4,7 @@ import os
 import warnings
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 # Suppress pkg_resources deprecation warnings from third-party packages
 # (docutils, etc.) until they release fixes
@@ -687,6 +688,9 @@ WEB_APP_URL = env("WEB_APP_URL", default="http://localhost:3000")
 API_URL = env("API_URL", default="http://localhost:5001")
 # SECURITY: DNS ownership check for SSO domains. The bypass only takes effect when DEBUG is on (local development).
 SSO_DOMAIN_VERIFICATION_SKIP_DNS = env.bool("SSO_DOMAIN_VERIFICATION_SKIP_DNS", default=False)
+if SSO_DOMAIN_VERIFICATION_SKIP_DNS and not DEBUG:
+    # Fail at startup rather than run a production instance that accepts unverified domains
+    raise ImproperlyConfigured("SSO_DOMAIN_VERIFICATION_SKIP_DNS may only be enabled when DJANGO_DEBUG is on")
 
 # WebAuthn/Passkey Settings
 # SECURITY: Set to True to temporarily skip signature verification for backwards compatibility

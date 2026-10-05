@@ -7,7 +7,7 @@ import { ENV } from '@sb/webapp-core/config/env';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { useSSODiscover } from '@sb/webapp-tenants/hooks';
 import { ArrowLeft, Building2, Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 
@@ -70,7 +70,7 @@ export const SSOLogin = () => {
   const discoveryResult = result;
   const hasResults = submitted && !loading && discoveryResult;
   const noConnections = hasResults && !discoveryResult.sso_available;
-  const connections = discoveryResult?.connections ?? [];
+  const connections = useMemo(() => discoveryResult?.connections ?? [], [discoveryResult]);
   const domain = email.includes('@') ? email.split('@')[1] : '';
 
   useEffect(() => {

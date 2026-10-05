@@ -432,6 +432,7 @@ type SSOConnectionType implements Node {
   isSaml: Boolean
   isOidc: Boolean
   spMetadataUrl: String
+  spMetadataXml: String
   spAcsUrl: String
   spEntityId: String
   oidcCallbackUrl: String

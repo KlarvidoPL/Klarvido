@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "No se pudo copiar la URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Copiar metadatos XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Creando..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Metadatos del Service Provider"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Pegue esto en su proveedor de identidad mientras la conexión sea un borrador. La URL de metadatos estará disponible después de activarla."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "Metadatos SP (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "URL de metadatos del SP:"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Restablece tu contraseña"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Restablezca el registro, verifique el dominio y vuelva a activar la conexión SSO en la configuración de seguridad."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Ir a Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "El SSO de {domain} se ha desactivado"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO desactivado para \"{domain}\""
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "El registro de verificación de \"{domain}\" en {tenantName} lleva {graceDays} días ausente, por lo que el SSO de este dominio se ha desactivado. Los usuarios ya no pueden iniciar sesión con él."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO desactivado para su dominio"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Abra la configuración de seguridad de su organización para ver el registro y restablecerlo."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Ir a Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "Falta el registro de verificación SSO de {domain}"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "Falta el registro de verificación SSO de \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "Falta el registro DNS que demuestra que es dueño de \"{domain}\" para {tenantName}. El SSO de este dominio se desactivará en {graceDays} días si el registro no se restablece."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "Falta el registro de verificación SSO"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Actualizar método de pago"

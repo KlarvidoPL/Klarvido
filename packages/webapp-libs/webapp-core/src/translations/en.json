@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "Failed to copy URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Copy metadata XML"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Creating..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Service Provider Metadata"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Paste this into your identity provider while the connection is still a draft. The metadata URL becomes available after activation."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP metadata XML"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP Metadata URL (optional):"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Reset your password"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Put the record back, verify the domain and reactivate the SSO connection in the security settings."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Go to Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "SSO for {domain} has been deactivated"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO deactivated for \"{domain}\""
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "The verification record for \"{domain}\" at {tenantName} has been missing for {graceDays} days, so SSO for this domain has been deactivated. Users can no longer sign in with it."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO deactivated for your domain"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Open the security settings of your organization to see the record and put it back."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Go to Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "The SSO verification record for {domain} is missing"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "SSO verification record missing for \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "The DNS record that proves you own \"{domain}\" for {tenantName} is missing. SSO for this domain will be deactivated in {graceDays} days unless the record is restored."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO verification record missing"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Update payment method"

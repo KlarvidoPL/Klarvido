@@ -46,15 +46,19 @@ def validate_public_url(url: str) -> str:
     if parsed.scheme != "https":
         raise UnsafeOutboundURL("Identity provider URL must use https")
 
-    try:
-        addresses = socket.getaddrinfo(host, parsed.port or 443, proto=socket.IPPROTO_TCP)
-    except socket.gaierror:
-        raise UnsafeOutboundURL("Identity provider host cannot be resolved")
-
-    for info in addresses:
-        if not _is_public_address(info[4][0]):
+    for address in _resolve_addresses(host, parsed.port or 443):
+        if not _is_public_address(address):
             raise UnsafeOutboundURL("Identity provider URL points at a private or internal address")
     return url
+
+
+def _resolve_addresses(host: str, port: int) -> list:
+    """Every address the host resolves to. Kept as one function so tests can stub DNS."""
+    try:
+        infos = socket.getaddrinfo(host, port, proto=socket.IPPROTO_TCP)
+    except socket.gaierror:
+        raise UnsafeOutboundURL("Identity provider host cannot be resolved")
+    return [info[4][0] for info in infos]
 
 
 def safe_request(method: str, url: str, timeout: int = REQUEST_TIMEOUT_SECONDS, **kwargs) -> requests.Response:

@@ -30,6 +30,7 @@ from apps.sso.serializers import (
     UpdateTenantSSOConnectionSerializer,
 )
 from apps.sso.services import domain_verification as dv
+from apps.sso.services import outbound
 from apps.sso.services.account_linking import AccountLinkingError, is_email_domain_allowed
 from apps.sso.services.provisioning import JITProvisioningService
 from apps.users.tests.factories import UserFactory
@@ -415,6 +416,13 @@ class TestDomainMutations:
         assert str(exc.value) == dv.DOMAIN_IN_USE_CODE
 
 
+@pytest.fixture(autouse=True)
+def public_idp_hosts():
+    """The example IdP hosts used in these tests do not resolve in the sandbox. Treat them as public addresses."""
+    with mock.patch.object(outbound, "_resolve_addresses", return_value=["93.184.216.34"]):
+        yield
+
+
 def _record_missing_past_grace(tenant_domain):
     """Simulate a record that has been missing for longer than the grace period, then re-check."""
     with mock.patch.object(dv, "lookup_txt_records", return_value=[]):
@@ -660,6 +668,54 @@ class TestLapseNotifications:
         assert lapsed.filter(user=creator).count() == 1
         assert not lapsed.filter(user=outsider).exists()
         assert lapsed.first().data["domain"] == "client.pl"
+
+    def test_lapse_emails_each_recipient_once(self, org):
+        claim = dv.add_domain(org, "client.pl")
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            dv.verify_domain(claim)
+        owner = UserFactory(email="lapse-mail-owner@sso-test.invalid")
+        TenantMembershipFactory(user=owner, tenant=org, role=TenantUserRole.OWNER, is_accepted=True)
+        factories.TenantSSOConnectionFactory(
+            tenant=org,
+            allowed_domains=["client.pl"],
+            status=constants.SSOConnectionStatus.ACTIVE,
+            created_by=owner,
+        )
+
+        with mock.patch.object(dv, "SSODomainLapsedEmail") as email_class:
+            self._lapse(claim)
+
+        recipients = [call.args[0] for call in email_class.call_args_list]
+        assert recipients.count(owner) == 1
+        assert email_class.call_args.kwargs["data"]["grace_days"] == dv.LAPSE_AFTER_FAILURES.days
+
+    def test_missing_record_warning_is_emailed_to_owners(self, org):
+        claim = dv.add_domain(org, "client.pl")
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            dv.verify_domain(claim)
+        owner = UserFactory(email="warn-mail-owner@sso-test.invalid")
+        TenantMembershipFactory(user=owner, tenant=org, role=TenantUserRole.OWNER, is_accepted=True)
+
+        with mock.patch.object(dv, "SSODomainRecordMissingEmail") as email_class, mock.patch.object(
+            dv, "lookup_txt_records", return_value=[]
+        ):
+            dv.recheck_domain(claim)
+
+        recipients = [call.args[0] for call in email_class.call_args_list]
+        assert recipients.count(owner) == 1
+        assert email_class.call_args.kwargs["data"]["domain"] == "client.pl"
+
+    def test_email_failure_does_not_stop_the_lapse(self, org):
+        claim = dv.add_domain(org, "client.pl")
+        with mock.patch.object(dv, "lookup_txt_records", return_value=[claim.verification_record_value]):
+            dv.verify_domain(claim)
+
+        with mock.patch.object(dv, "SSODomainLapsedEmail") as email_class:
+            email_class.return_value.send.side_effect = RuntimeError("mail server down")
+            self._lapse(claim)
+
+        claim.refresh_from_db()
+        assert claim.status == constants.SSODomainStatus.LAPSED
 
     def test_lapse_still_happens_when_notifications_fail(self, org):
         claim = dv.add_domain(org, "client.pl")

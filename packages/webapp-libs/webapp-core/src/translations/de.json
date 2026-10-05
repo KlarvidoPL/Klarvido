@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "Fehler beim Kopieren der URL"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "Metadaten-XML kopieren"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "Wird erstellt..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Service-Provider-Metadaten"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "Fügen Sie dies in Ihren Identitätsanbieter ein, solange die Verbindung noch ein Entwurf ist. Die Metadaten-URL steht nach der Aktivierung zur Verfügung."
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP-Metadaten (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP-Metadaten-URL:"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "Passwort zurücksetzen"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "Stellen Sie den Eintrag wieder her, verifizieren Sie die Domain und aktivieren Sie die SSO-Verbindung in den Sicherheitseinstellungen erneut."
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Zu Klarvido"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "SSO für {domain} wurde deaktiviert"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "SSO für \"{domain}\" deaktiviert"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "Der Verifizierungseintrag für \"{domain}\" bei {tenantName} fehlt seit {graceDays} Tagen, daher wurde SSO für diese Domain deaktiviert. Benutzer können sich damit nicht mehr anmelden."
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "SSO für Ihre Domain deaktiviert"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "Öffnen Sie die Sicherheitseinstellungen Ihrer Organisation, um den Eintrag einzusehen und wiederherzustellen."
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Zu Klarvido"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "Der SSO-Verifizierungseintrag für {domain} fehlt"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "SSO-Verifizierungseintrag fehlt für \"{domain}\""
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "Der DNS-Eintrag, der belegt, dass Ihnen die Domain \"{domain}\" für {tenantName} gehört, fehlt. SSO für diese Domain wird in {graceDays} Tagen deaktiviert, wenn der Eintrag nicht wiederhergestellt wird."
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO-Verifizierungseintrag fehlt"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "Zahlungsmethode aktualisieren"

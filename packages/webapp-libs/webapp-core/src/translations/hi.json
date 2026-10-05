@@ -305,6 +305,9 @@
   "Add SSO Modal / Copy Failed": {
     "defaultMessage": "URL कॉपी करने में विफल"
   },
+  "Add SSO Modal / Copy SP Metadata XML": {
+    "defaultMessage": "मेटाडेटा XML कॉपी करें"
+  },
   "Add SSO Modal / Creating Button": {
     "defaultMessage": "बना रहा है..."
   },
@@ -364,6 +367,12 @@
   },
   "Add SSO Modal / SP Metadata Title": {
     "defaultMessage": "Service Provider Metadata"
+  },
+  "Add SSO Modal / SP Metadata XML Hint": {
+    "defaultMessage": "जब तक कनेक्शन ड्राफ़्ट में है, इसे अपने पहचान प्रदाता में चिपकाएँ। सक्रिय करने के बाद मेटाडेटा URL उपलब्ध होगा।"
+  },
+  "Add SSO Modal / SP Metadata XML Label": {
+    "defaultMessage": "SP मेटाडेटा (XML)"
   },
   "Add SSO Modal / SP URL Label": {
     "defaultMessage": "SP Metadata URL:"
@@ -2425,6 +2434,42 @@
   },
   "Email / Reset Password / Title": {
     "defaultMessage": "अपना पासवर्ड रीसेट करें"
+  },
+  "Email / SSODomainLapsed / Action": {
+    "defaultMessage": "रिकॉर्ड वापस जोड़ें, डोमेन सत्यापित करें और सुरक्षा सेटिंग में SSO कनेक्शन फिर से सक्रिय करें।"
+  },
+  "Email / SSODomainLapsed / Button": {
+    "defaultMessage": "Klarvido पर जाएँ"
+  },
+  "Email / SSODomainLapsed / Preheader": {
+    "defaultMessage": "{domain} के लिए SSO निष्क्रिय कर दिया गया है"
+  },
+  "Email / SSODomainLapsed / Subject": {
+    "defaultMessage": "\"{domain}\" के लिए SSO निष्क्रिय है"
+  },
+  "Email / SSODomainLapsed / Text": {
+    "defaultMessage": "{tenantName} में \"{domain}\" का सत्यापन रिकॉर्ड {graceDays} दिनों से गायब है, इसलिए इस डोमेन का SSO निष्क्रिय कर दिया गया है। उपयोगकर्ता अब इससे साइन इन नहीं कर सकते।"
+  },
+  "Email / SSODomainLapsed / Title": {
+    "defaultMessage": "आपके डोमेन के लिए SSO निष्क्रिय है"
+  },
+  "Email / SSODomainRecordMissing / Action": {
+    "defaultMessage": "रिकॉर्ड देखने और उसे वापस जोड़ने के लिए अपने संगठन की सुरक्षा सेटिंग खोलें।"
+  },
+  "Email / SSODomainRecordMissing / Button": {
+    "defaultMessage": "Klarvido पर जाएँ"
+  },
+  "Email / SSODomainRecordMissing / Preheader": {
+    "defaultMessage": "{domain} के लिए SSO सत्यापन रिकॉर्ड गायब है"
+  },
+  "Email / SSODomainRecordMissing / Subject": {
+    "defaultMessage": "\"{domain}\" के लिए SSO सत्यापन रिकॉर्ड गायब है"
+  },
+  "Email / SSODomainRecordMissing / Text": {
+    "defaultMessage": "{tenantName} के लिए \"{domain}\" का स्वामित्व साबित करने वाला DNS रिकॉर्ड गायब है। रिकॉर्ड बहाल न होने पर इस डोमेन का SSO {graceDays} दिनों में निष्क्रिय कर दिया जाएगा।"
+  },
+  "Email / SSODomainRecordMissing / Title": {
+    "defaultMessage": "SSO सत्यापन रिकॉर्ड गायब है"
   },
   "Email / Subscription Error / Link label": {
     "defaultMessage": "पेमेंट विधि अपडेट करें"

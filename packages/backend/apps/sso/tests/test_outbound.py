@@ -13,12 +13,13 @@ from apps.sso.serializers import TenantSSOConnectionSerializer, _validate_outbou
 from apps.sso.services import outbound
 from apps.sso.services.outbound import UnsafeOutboundURL, safe_request, validate_public_url
 
+pytestmark = pytest.mark.django_db
+
 PUBLIC_ADDRESS = "93.184.216.34"
 
 
 def _resolves_to(*addresses):
-    results = [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (address, 443)) for address in addresses]
-    return mock.patch.object(outbound.socket, "getaddrinfo", return_value=results)
+    return mock.patch.object(outbound, "_resolve_addresses", return_value=list(addresses))
 
 
 @pytest.fixture(autouse=True)
@@ -112,7 +113,7 @@ class TestSerializerRejectsInternalUrls:
         assert "oidc_issuer" in exc.value.detail
 
     def test_urn_entity_id_is_not_resolved(self):
-        with mock.patch.object(outbound.socket, "getaddrinfo") as resolve:
+        with mock.patch.object(outbound, "_resolve_addresses") as resolve:
             _validate_outbound_urls({"saml_entity_id": "urn:example:idp"})
 
         resolve.assert_not_called()
