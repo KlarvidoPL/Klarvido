@@ -1,6 +1,6 @@
 import { usePermissionCheck } from '../../../hooks';
 import { useCurrentTenant } from '../../../providers';
-import { AuditLogCard, DirectorySyncCard, KsefTokenCard, PasskeysCard, SSOConnectionCard } from './components';
+import { AuditLogCard, DirectorySyncCard, KsefTokenCard, SSOConnectionCard } from './components';
 
 export const TenantSecuritySettings = () => {
   const { data: currentTenant } = useCurrentTenant();
@@ -9,7 +9,6 @@ export const TenantSecuritySettings = () => {
   // Permission checks
   const { hasPermission: canViewSecurity } = usePermissionCheck('security.view');
   const { hasPermission: canManageSSO } = usePermissionCheck('security.sso.manage');
-  const { hasPermission: canManagePasskeys } = usePermissionCheck('security.passkeys.manage');
   const { hasPermission: canViewLogs } = usePermissionCheck('security.logs.view');
 
   return (
@@ -19,7 +18,6 @@ export const TenantSecuritySettings = () => {
         <>
           <SSOConnectionCard canManageSSO={canManageSSO} />
           <DirectorySyncCard canManageSSO={canManageSSO} />
-          <PasskeysCard canManagePasskeys={canManagePasskeys} />
         </>
       )}
       {canViewLogs && <AuditLogCard />}

@@ -264,33 +264,6 @@ class PasskeyConnection(graphene.Connection):
         node = PasskeyType
 
 
-class TenantPasskeyType(graphene.ObjectType):
-    id = graphene.ID()
-    name = graphene.String()
-    authenticator_type = graphene.String()
-    transports = GenericScalar()
-    is_active = graphene.Boolean()
-    last_used_at = graphene.DateTime()
-    use_count = graphene.Int()
-    device_type = graphene.String()
-    created_at = graphene.DateTime()
-    user_email = graphene.String()
-    user_name = graphene.String()
-
-    def resolve_id(self, info):
-        return to_global_id("PasskeyType", self.id)
-
-    def resolve_user_email(self, info):
-        return self.user.email if hasattr(self, "user") and self.user else None
-
-    def resolve_user_name(self, info):
-        if not hasattr(self, "user") or not self.user:
-            return None
-        first = getattr(self.user.profile, "first_name", "") or ""
-        last = getattr(self.user.profile, "last_name", "") or ""
-        return f"{first} {last}".strip() or self.user.email
-
-
 class SSOAuditLogType(DjangoObjectType):
     """GraphQL type for SSO audit logs."""
 
@@ -797,49 +770,6 @@ class DeletePasskeyMutation(mutations.DeleteModelMutation):
         return cls(deleted_ids=[id])
 
 
-class DeleteTenantPasskeyMutation(graphene.Mutation):
-    """Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context."""
-
-    class Arguments:
-        id = graphene.ID(required=True)
-        tenant_id = graphene.ID(required=True)
-
-    ok = graphene.Boolean()
-
-    @classmethod
-    def mutate(cls, root, info, id, tenant_id=None):
-        tenant = _resolve_tenant(info, tenant_id)
-        if tenant is None:
-            raise PermissionDenied("Tenant context is required for this operation")
-
-        from apps.multitenancy.models import TenantMembership
-
-        _, pk = from_global_id(id)
-        passkey = get_object_or_404(models.UserPasskey, pk=pk, is_active=True)
-
-        if not TenantMembership.objects.filter(tenant=tenant, user=passkey.user).exists():
-            raise ValueError("Passkey does not belong to a tenant member")
-
-        passkey.is_active = False
-        passkey.save(update_fields=["is_active"])
-
-        from .services import get_client_ip
-
-        request = info.context._request if hasattr(info.context, "_request") else info.context
-        ip_address = get_client_ip(request) if hasattr(request, "META") else None
-
-        models.SSOAuditLog.log_event(
-            event_type=constants.SSOAuditEventType.PASSKEY_REMOVED,
-            tenant=tenant,
-            user=passkey.user,
-            description=f'Passkey "{passkey.name}" removed by admin {info.context.user.email}',
-            ip_address=ip_address,
-            metadata={"removed_by": info.context.user.email, "passkey_owner": passkey.user.email},
-        )
-
-        return cls(ok=True)
-
-
 # ==================
 # Queries
 # ==================
@@ -968,11 +898,6 @@ class TenantSSOQuery(graphene.ObjectType):
         end_date=graphene.String(),
         search=graphene.String(),
     )
-    tenant_passkeys = graphene.List(
-        TenantPasskeyType,
-        tenant_id=graphene.ID(required=True),
-        search=graphene.String(),
-    )
 
     @staticmethod
     @permission_classes(requires("security.view"))
@@ -1059,32 +984,6 @@ class TenantSSOQuery(graphene.ObjectType):
 
         return logs.order_by("-created_at")
 
-    @staticmethod
-    @permission_classes(requires("security.passkeys.manage"))
-    def resolve_tenant_passkeys(root, info, tenant_id=None, search=None, **kwargs):
-        from apps.multitenancy.models import TenantMembership
-        from django.db.models import Q
-
-        # Tenant is set by middleware from tenantId argument; without it we get HashidField errors
-        tenant = info.context.tenant
-        if tenant is None:
-            return []
-        tenant_members = TenantMembership.objects.filter(tenant=tenant).values_list("user_id", flat=True)
-        passkeys = (
-            models.UserPasskey.objects.filter(user_id__in=tenant_members, is_active=True)
-            .select_related("user", "user__profile")
-            .order_by("-created_at")
-        )
-        if search:
-            search_lower = search.strip().lower()
-            passkeys = passkeys.filter(
-                Q(user__email__icontains=search_lower)
-                | Q(user__profile__first_name__icontains=search_lower)
-                | Q(user__profile__last_name__icontains=search_lower)
-                | Q(name__icontains=search_lower)
-            )
-        return list(passkeys)
-
 
 # ==================
 # Mutation Groups
@@ -1129,8 +1028,3 @@ class TenantOwnerMutation(graphene.ObjectType):
     # SCIM Token management - requires security.sso.manage
     create_scim_token = permission_classes(requires("security.sso.manage"))(CreateSCIMTokenMutation.Field())
     revoke_scim_token = permission_classes(requires("security.sso.manage"))(RevokeSCIMTokenMutation.Field())
-
-    # Passkey management (tenant admin) - requires security.passkeys.manage
-    delete_tenant_passkey = permission_classes(requires("security.passkeys.manage"))(
-        DeleteTenantPasskeyMutation.Field()
-    )

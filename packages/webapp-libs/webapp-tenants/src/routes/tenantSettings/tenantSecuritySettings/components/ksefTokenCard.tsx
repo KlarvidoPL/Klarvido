@@ -158,23 +158,24 @@ export const KsefTokenCard = ({ canManageKsef = false }: KsefTokenCardProps) => 
             )}
 
             {canManageKsef && (
-              <div className="flex flex-nowrap gap-2">
-                <Button variant={ButtonVariant.SECONDARY} onClick={handleTest} disabled={busy} className="px-3 sm:px-4">
-                  {testing ? <Loader2 className="h-4 w-4 animate-spin sm:mr-2" /> : <RefreshCw className="h-4 w-4 sm:mr-2" />}
-                  <span className="sr-only sm:not-sr-only">
-                    <FormattedMessage id="KSeF / Test connection button" defaultMessage="Test connection" />
-                  </span>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  variant={ButtonVariant.SECONDARY}
+                  onClick={handleTest}
+                  disabled={busy}
+                  className="w-full sm:w-auto"
+                >
+                  {testing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                  <FormattedMessage id="KSeF / Test connection button" defaultMessage="Test connection" />
                 </Button>
                 <Button
                   variant={ButtonVariant.SECONDARY}
                   onClick={() => setIsModalOpen(true)}
                   disabled={busy}
-                  className="px-3 sm:px-4"
+                  className="w-full sm:w-auto"
                 >
-                  <KeyRound className="h-4 w-4 sm:mr-2" />
-                  <span className="sr-only sm:not-sr-only">
-                    <FormattedMessage id="KSeF / Replace token button" defaultMessage="Replace token" />
-                  </span>
+                  <KeyRound className="mr-2 h-4 w-4" />
+                  <FormattedMessage id="KSeF / Replace token button" defaultMessage="Replace token" />
                 </Button>
                 <ConfirmDialog
                   onContinue={handleDelete}
@@ -187,11 +188,9 @@ export const KsefTokenCard = ({ canManageKsef = false }: KsefTokenCardProps) => 
                     />
                   }
                 >
-                  <ShadcnButton variant="destructive" disabled={busy} className="px-3 sm:px-4">
-                    <Trash2 className="h-4 w-4 sm:mr-2" />
-                    <span className="sr-only sm:not-sr-only">
-                      <FormattedMessage id="KSeF / Remove token button" defaultMessage="Remove" />
-                    </span>
+                  <ShadcnButton variant="destructive" disabled={busy} className="w-full sm:w-auto">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <FormattedMessage id="KSeF / Remove token button" defaultMessage="Remove" />
                   </ShadcnButton>
                 </ConfirmDialog>
               </div>

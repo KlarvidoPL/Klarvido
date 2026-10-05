@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "خطأ"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "تم تطبيق ربط المجموعات"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "تم تفعيل إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "تم إنشاء إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "تم إلغاء تفعيل إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "تم حذف إعدادات IdP"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "تم تحديث إعدادات IdP"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "تم حذف رمز KSeF"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "تم حفظ رمز KSeF"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "تم اختبار رمز KSeF"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "تم إنشاء مجموعة SCIM"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "تم حذف مجموعة SCIM"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "تم تحديث مجموعة SCIM"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "تم إنشاء مستخدم SCIM"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "تم حذف مستخدم SCIM"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "تم تحديث مستخدم SCIM"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "تسجيل دخول متجاوزًا SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "فشل تسجيل الدخول عبر SSO"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "بدأ تسجيل الدخول عبر SSO"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "نجح تسجيل الدخول عبر SSO"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "تسجيل الخروج من SSO"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "تم توفير المستخدم عبر JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "تم تحديث المستخدم عبر SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "فشل"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "عنوان IP"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "مرفوض من KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "لم يتم التحقق بعد"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "تم التحقق"
+  },
   "Audit / Last page": {
     "defaultMessage": "الصفحة الأخيرة"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "اختر تاريخ البدء"
   },
+  "Audit / Status": {
+    "defaultMessage": "الحالة"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "فشل"
   },
   "Audit / Status Success": {
     "defaultMessage": "نجاح"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "الإجراء"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "تم حفظ رمز جديد"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "تم حذف الرمز"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "تم استبدال الرمز الحالي"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "رمز ينتهي بـ"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "اسم الرمز في KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "تصفية حسب البريد الإلكتروني..."
@@ -1378,6 +1474,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "تم تحديث إعدادات النسخ الاحتياطي بنجاح"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "الانتقال إلى اليوم"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "الآن"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "اليوم"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "الخطة الحالية:"

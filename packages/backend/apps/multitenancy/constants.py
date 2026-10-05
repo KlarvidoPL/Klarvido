@@ -130,6 +130,10 @@ class RoleColor(models.TextChoices):
     GRAY = "gray", "Gray"
 
 
+# Colour of the Owner system role. Custom roles must not use it, so it stays recognisable as the owner.
+OWNER_ROLE_COLOR = RoleColor.PURPLE
+
+
 class SystemRoleType(models.TextChoices):
     """System role types that serve as templates."""
 

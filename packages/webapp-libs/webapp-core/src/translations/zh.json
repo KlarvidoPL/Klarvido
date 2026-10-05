@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "错误"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "已应用组映射"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "已启用 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "已创建 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "已停用 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "已删除 IdP 配置"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "已更新 IdP 配置"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "已删除 KSeF 令牌"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "已保存 KSeF 令牌"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "已测试 KSeF 令牌"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "已创建 SCIM 组"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "已删除 SCIM 组"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "已更新 SCIM 组"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "已创建 SCIM 用户"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "已删除 SCIM 用户"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "已更新 SCIM 用户"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "绕过 SSO 的登录"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO 登录失败"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "已发起 SSO 登录"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO 登录成功"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO 退出登录"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "通过 JIT 创建用户"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "通过 SSO 更新用户"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "失败"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP 地址"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "被 KSeF 拒绝"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "尚未验证"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "已验证"
+  },
   "Audit / Last page": {
     "defaultMessage": "最后一页"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "选择开始日期"
   },
+  "Audit / Status": {
+    "defaultMessage": "状态"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "失败"
   },
   "Audit / Status Success": {
     "defaultMessage": "成功"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "操作"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "已保存新令牌"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "已删除令牌"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "已替换现有令牌"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "令牌末四位"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "KSeF 中的令牌名称"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "按邮箱筛选..."
@@ -1378,6 +1474,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "备份设置更新成功"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "跳到今天"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "现在"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "今天"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "当前套餐："

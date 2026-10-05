@@ -1,6 +1,6 @@
 import { TenantUserRole, apiClient } from '@sb/webapp-api-client';
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { RoutesConfig } from '../../../../../config/routes';
@@ -71,7 +71,7 @@ describe('AuditLogCard: Component', () => {
     renderComponent();
 
     expect(await screen.findByText(/security audit log/i)).toBeInTheDocument();
-    expect(await screen.findByText(/view recent security events/i)).toBeInTheDocument();
+    expect(await screen.findByText(/view recent sso, scim and ksef events/i)).toBeInTheDocument();
   });
 
   it('should show empty state when no logs', async () => {
@@ -97,6 +97,43 @@ describe('AuditLogCard: Component', () => {
 
     expect(await screen.findByText(/SSO login success/i)).toBeInTheDocument();
     expect(await screen.findByText('user@example.com')).toBeInTheDocument();
+  });
+
+  it('should show translated titles for KSeF token events', async () => {
+    mockedApiClient.get.mockResolvedValue({
+      data: {
+        logs: [
+          createMockAuditLog({
+            eventType: 'ksef_token_saved',
+            eventTypeLabel: 'KSeF Token Saved',
+            eventDescription: 'KSeF token saved',
+          }),
+        ],
+        totalCount: 1,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 20,
+        hasMore: false,
+        hasPrevious: false,
+      },
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('KSeF token saved', { selector: 'span' })).toBeInTheDocument();
+  });
+
+  it('should refresh the list once after typing in the search, not on every keystroke', async () => {
+    renderComponent();
+
+    await userEvent.click(await screen.findByRole('button', { name: /filters/i }));
+    const search = await screen.findByPlaceholderText(/search logs/i);
+    await waitFor(() => expect(mockedApiClient.get).toHaveBeenCalledTimes(1));
+
+    await userEvent.type(search, 'abc');
+
+    await waitFor(() => expect(mockedApiClient.get).toHaveBeenCalledTimes(2));
+    expect(mockedApiClient.get).toHaveBeenLastCalledWith(expect.stringContaining('search=abc'));
   });
 
   it('should toggle filters panel', async () => {
@@ -126,7 +163,84 @@ describe('AuditLogCard: Component', () => {
     const logEntry = await screen.findByText(/SSO login success/i);
     await userEvent.click(logEntry);
 
-    expect(await screen.findByText('Test description')).toBeInTheDocument();
+    expect(await screen.findByText('Okta Prod')).toBeInTheDocument();
+    expect(screen.queryByText('Test description')).not.toBeInTheDocument();
+  });
+
+  it('should show curated KSeF details instead of raw metadata', async () => {
+    mockedApiClient.get.mockResolvedValue({
+      data: {
+        logs: [
+          createMockAuditLog({
+            eventType: 'ksef_token_saved',
+            eventTypeLabel: 'KSeF Token Saved',
+            eventDescription: 'KSeF token saved',
+            metadata: { tokenHint: 'c4f6', status: 'VALID', created: true },
+          }),
+        ],
+        totalCount: 1,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 20,
+        hasMore: false,
+        hasPrevious: false,
+      },
+    });
+
+    renderComponent();
+
+    await userEvent.click(await screen.findByText('KSeF token saved', { selector: 'span' }));
+
+    expect(await screen.findByText('••••c4f6')).toBeInTheDocument();
+    expect(screen.getByText('Verified')).toBeInTheDocument();
+    expect(screen.queryByText(/"tokenHint"/)).not.toBeInTheDocument();
+  });
+
+  it('should show the token ending and removal action for deleted KSeF tokens', async () => {
+    mockedApiClient.get.mockResolvedValue({
+      data: {
+        logs: [
+          createMockAuditLog({
+            eventType: 'ksef_token_deleted',
+            eventTypeLabel: 'KSeF Token Deleted',
+            eventDescription: 'KSeF token removed',
+            metadata: { tokenHint: 'c4f6' },
+          }),
+        ],
+        totalCount: 1,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 20,
+        hasMore: false,
+        hasPrevious: false,
+      },
+    });
+
+    renderComponent();
+
+    await userEvent.click(await screen.findByText('KSeF token removed', { selector: 'span' }));
+
+    expect(await screen.findByText('••••c4f6')).toBeInTheDocument();
+    expect(screen.getByText('Token removed')).toBeInTheDocument();
+  });
+
+  it('should not make log rows without details expandable', async () => {
+    mockedApiClient.get.mockResolvedValue({
+      data: {
+        logs: [createMockAuditLog({ connectionName: null, ipAddress: null, errorMessage: '' })],
+        totalCount: 1,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 20,
+        hasMore: false,
+        hasPrevious: false,
+      },
+    });
+
+    renderComponent();
+
+    const row = await screen.findByText(/SSO login success/i);
+    expect(row.closest('button')).toBeDisabled();
   });
 
   it('should show failed event with failed styling', async () => {

@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "Erreur"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Mappage de groupes appliqué"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "Configuration IdP activée"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "Configuration IdP créée"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "Configuration IdP désactivée"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "Configuration IdP supprimée"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "Configuration IdP mise à jour"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "Jeton KSeF supprimé"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "Jeton KSeF enregistré"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "Jeton KSeF testé"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "Groupe SCIM créé"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "Groupe SCIM supprimé"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "Groupe SCIM mis à jour"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "Utilisateur SCIM créé"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "Utilisateur SCIM supprimé"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "Utilisateur SCIM mis à jour"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "Connexion contournant SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "Échec de la connexion SSO"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "Connexion SSO initiée"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "Connexion SSO réussie"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "Déconnexion SSO"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "Utilisateur provisionné via JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "Utilisateur mis à jour via SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Échec"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "Adresse IP"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Rejeté par KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Pas encore vérifié"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Vérifié"
+  },
   "Audit / Last page": {
     "defaultMessage": "Dernière page"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Sélectionner la date de début"
   },
+  "Audit / Status": {
+    "defaultMessage": "Statut"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Échec"
   },
   "Audit / Status Success": {
     "defaultMessage": "Réussi"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Action"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "Nouveau jeton enregistré"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Jeton supprimé"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Jeton existant remplacé"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Jeton se terminant par"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Nom du jeton dans KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Filtrer par e-mail..."
@@ -1378,6 +1474,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "Paramètres de sauvegarde mis à jour avec succès"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Aller à aujourd'hui"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Maintenant"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Aujourd'hui"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Abonnement actif :"

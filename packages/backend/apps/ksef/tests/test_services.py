@@ -8,6 +8,8 @@ from apps.ksef import crypto, services
 from apps.ksef.client import TokenCheck
 from apps.ksef.constants import KsefCredentialStatus, KsefErrorCode
 from apps.ksef.models import KsefCredential
+from apps.sso.constants import SSOAuditEventType
+from apps.sso.models import SSOAuditLog
 
 pytestmark = pytest.mark.django_db
 
@@ -156,3 +158,57 @@ def test_delete_removes_token(polish_tenant):
     assert services.delete_token(polish_tenant, None) is True
     assert not KsefCredential.objects.filter(tenant=polish_tenant).exists()
     assert services.delete_token(polish_tenant, None) is False
+
+
+def _security_events(tenant, event_type):
+    return list(SSOAuditLog.objects.filter(tenant=tenant, event_type=event_type))
+
+
+def test_saving_token_adds_security_log_entry_without_token(polish_tenant):
+    token = "secret-token-9876"
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, token)
+
+    [event] = _security_events(polish_tenant, SSOAuditEventType.KSEF_TOKEN_SAVED)
+    assert event.success is True
+    assert event.metadata["token_hint"] == "9876"
+    assert event.metadata["created"] is True
+    assert token not in str(event.metadata) and token not in event.event_description
+
+
+def test_checking_revoked_token_adds_failed_security_log_entry(polish_tenant):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, "token-to-check")
+    with patch.object(services, "verify_token", return_value=INVALID):
+        services.retest_token(polish_tenant, None)
+
+    [event] = _security_events(polish_tenant, SSOAuditEventType.KSEF_TOKEN_TESTED)
+    assert event.success is False
+    assert event.error_message == KsefErrorCode.INVALID_TOKEN
+    assert "token-to-check" not in str(event.metadata)
+
+
+def test_deleting_token_adds_security_log_entry(polish_tenant):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, "token-to-remove")
+    services.delete_token(polish_tenant, None)
+
+    [event] = _security_events(polish_tenant, SSOAuditEventType.KSEF_TOKEN_DELETED)
+    assert event.success is True
+    assert event.metadata["token_hint"] == "move"
+
+
+def test_security_log_entries_include_token_name(polish_tenant):
+    named = TokenCheck(status=KsefCredentialStatus.VALID, token_name="KlarvidoTest")
+    with patch.object(services, "verify_token", return_value=named):
+        services.save_token(polish_tenant, None, "named-token-7777")
+    with patch.object(services, "verify_token", return_value=named):
+        services.retest_token(polish_tenant, None)
+    services.delete_token(polish_tenant, None)
+
+    [saved] = _security_events(polish_tenant, SSOAuditEventType.KSEF_TOKEN_SAVED)
+    [tested] = _security_events(polish_tenant, SSOAuditEventType.KSEF_TOKEN_TESTED)
+    [deleted] = _security_events(polish_tenant, SSOAuditEventType.KSEF_TOKEN_DELETED)
+    assert saved.metadata["token_name"] == "KlarvidoTest"
+    assert tested.metadata["token_name"] == "KlarvidoTest"
+    assert deleted.metadata["token_name"] == "KlarvidoTest"

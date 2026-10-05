@@ -118,7 +118,6 @@ const ROLE_COLORS = [
   { value: 'GREEN', className: 'bg-emerald-500', ring: 'ring-emerald-500/30' },
   { value: 'RED', className: 'bg-rose-500', ring: 'ring-rose-500/30' },
   { value: 'YELLOW', className: 'bg-amber-500', ring: 'ring-amber-500/30' },
-  { value: 'PURPLE', className: 'bg-violet-500', ring: 'ring-violet-500/30' },
   { value: 'ORANGE', className: 'bg-orange-500', ring: 'ring-orange-500/30' },
   { value: 'PINK', className: 'bg-pink-500', ring: 'ring-pink-500/30' },
   { value: 'TEAL', className: 'bg-teal-500', ring: 'ring-teal-500/30' },
@@ -245,6 +244,13 @@ const getRoleMutationErrorMessage = (intl: IntlShape, error: ApolloErrorLike): s
     );
   }
 
+  if (message === 'This color is reserved for the Owner role.') {
+    return intl.formatMessage({
+      defaultMessage: 'This color is reserved for the owner role. Choose a different color.',
+      id: 'Roles / Error / Color reserved for owner',
+    });
+  }
+
   const nameExistsMatch = message.match(/^A role with the name '(.+)' already exists\.$/);
   if (nameExistsMatch) {
     return intl.formatMessage(
@@ -344,7 +350,7 @@ const RoleColorBadge = ({ color, size = 'sm' }: { color: string; size?: 'sm' | '
   const colorConfig = ROLE_COLORS.find((c) => c.value.toUpperCase() === color?.toUpperCase()) || ROLE_COLORS[0];
   const sizeClass = size === 'lg' ? 'h-4 w-4' : size === 'md' ? 'h-3.5 w-3.5' : 'h-3 w-3';
   return (
-    <div className={cn('rounded-full ring-2', colorConfig.className, colorConfig.ring, sizeClass)} />
+    <div className={cn('shrink-0 rounded-full ring-2', colorConfig.className, colorConfig.ring, sizeClass)} />
   );
 };
 
@@ -708,8 +714,10 @@ const RoleEditorDialog = ({
   const [color, setColor] = useState<string>('BLUE');
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
 
-  // Reset form when role changes
+  // Reset form whenever the dialog opens or the role changes. Create always passes role=null, so keying on
+  // `role` alone would keep the previous values when creating a second role.
   useEffect(() => {
+    if (!open) return;
     if (role) {
       setName(role.name);
       setDescription(role.description || '');
@@ -721,7 +729,7 @@ const RoleEditorDialog = ({
       setColor('BLUE');
       setSelectedPermissions(new Set());
     }
-  }, [role]);
+  }, [open, role]);
 
   const [createRole, { loading: creating }] = useMutation(createOrganizationRoleMutation, {
     onCompleted: () => {
@@ -843,7 +851,7 @@ const RoleEditorDialog = ({
                 <FormattedMessage defaultMessage="Role Details" id="Roles / Details Section" />
               </h3>
               
-              <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="role-name" className="text-sm font-medium">
                     <FormattedMessage defaultMessage="Name" id="Roles / Name Label" />
@@ -865,7 +873,7 @@ const RoleEditorDialog = ({
                     <FormattedMessage defaultMessage="Color" id="Roles / Color Label" />
                   </Label>
                   <Select value={color} onValueChange={setColor} disabled={isLoading}>
-                    <SelectTrigger id="role-color" className="w-[140px] h-10">
+                    <SelectTrigger id="role-color" className="w-full h-10">
                       <SelectValue>
                         <div className="flex items-center gap-2">
                           <RoleColorBadge color={color} size="sm" />
@@ -1198,12 +1206,12 @@ export const TenantRoles = () => {
         {/* Header Card */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                   <Shield className="h-5 w-5 text-primary" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <CardTitle className="text-lg">
                     <FormattedMessage defaultMessage="Roles" id="Roles / Title" />
                   </CardTitle>
@@ -1217,7 +1225,7 @@ export const TenantRoles = () => {
               </div>
               {canManageRoles && (
                 <div className="flex items-center gap-2">
-                  <Button onClick={handleCreateRole} disabled={isLoading} className="gap-2 shrink-0">
+                  <Button onClick={handleCreateRole} disabled={isLoading} className="w-full gap-2 sm:w-auto sm:shrink-0">
                     <Plus className="h-4 w-4" />
                     <FormattedMessage defaultMessage="Create Role" id="Roles / Create Button" />
                   </Button>

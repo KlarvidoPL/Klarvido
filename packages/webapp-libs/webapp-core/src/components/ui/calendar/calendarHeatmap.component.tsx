@@ -14,6 +14,7 @@ import {
   differenceInDays,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, CircleDot } from 'lucide-react';
+import { useIntl } from 'react-intl';
 import { cn } from '../../../lib/utils';
 
 export interface CalendarHeatmapProps {
@@ -183,6 +184,7 @@ export function CalendarHeatmap({
     return start;
   }, [selected?.from, weeksToShow, weekStartsOn]);
 
+  const intl = useIntl();
   const [visibleStart, setVisibleStart] = useState<Date>(
     controlledVisibleStart ?? defaultVisibleStart
   );
@@ -502,10 +504,10 @@ export function CalendarHeatmap({
               'hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-foreground',
               'transition-colors duration-150'
             )}
-            title="Jump to today"
+            title={intl.formatMessage({ id: 'Calendar / Jump to today', defaultMessage: 'Jump to today' })}
           >
             <CircleDot className="h-3 w-3" />
-            Today
+            {intl.formatMessage({ id: 'Calendar / Today button', defaultMessage: 'Today' })}
           </button>
         </div>
 
@@ -714,7 +716,9 @@ export function CalendarHeatmap({
               className="rounded-sm bg-neutral-100 dark:bg-neutral-800 ring-2 ring-inset ring-neutral-500 dark:ring-neutral-400"
               style={{ width: '10px', height: '10px' }}
             />
-            <span className="hidden sm:inline">Today</span>
+            <span className="hidden sm:inline">
+              {intl.formatMessage({ id: 'Calendar / Today button', defaultMessage: 'Today' })}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <div 

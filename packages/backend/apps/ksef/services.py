@@ -11,6 +11,8 @@ from typing import Optional
 from django.utils import timezone
 
 from apps.multitenancy.constants import ActionType, CompanyCountry
+from apps.sso.constants import SSOAuditEventType
+from apps.sso.models import SSOAuditLog
 from common.action_logging.service import log_action
 
 from . import crypto
@@ -53,6 +55,19 @@ def _log(tenant, user, action_type: str, credential: Optional[KsefCredential], m
     )
 
 
+def _log_security_event(tenant, user, event_type: str, description: str, metadata: dict, error_code: str = "") -> None:
+    """Record the change in the organization's Security audit log. Never pass the token itself in metadata."""
+    SSOAuditLog.log_event(
+        event_type=event_type,
+        tenant=tenant,
+        user=user,
+        description=description,
+        metadata=metadata,
+        success=not error_code,
+        error_message=error_code,
+    )
+
+
 def save_token(tenant, user, token: str) -> CredentialResult:
     """Verify the token with KSeF and, unless KSeF rejected it, store it encrypted (replacing any previous token)."""
     error = _eligibility_error(tenant)
@@ -92,6 +107,19 @@ def save_token(tenant, user, token: str) -> CredentialResult:
         ActionType.CREATE if created else ActionType.UPDATE,
         credential,
         {"operation": "set", "status": credential.status, "token_hint": credential.token_hint},
+    )
+    _log_security_event(
+        tenant,
+        user,
+        SSOAuditEventType.KSEF_TOKEN_SAVED,
+        "KSeF token saved",
+        {
+            "created": created,
+            "status": credential.status,
+            "token_hint": credential.token_hint,
+            "token_name": credential.token_name,
+        },
+        check.error_code if check.status != KsefCredentialStatus.VALID else "",
     )
     return CredentialResult(credential, check.error_code)
 
@@ -138,6 +166,14 @@ def retest_token(tenant, user) -> CredentialResult:
         credential,
         {"operation": "test", "status": credential.status, "token_hint": credential.token_hint},
     )
+    _log_security_event(
+        tenant,
+        user,
+        SSOAuditEventType.KSEF_TOKEN_TESTED,
+        "KSeF token checked",
+        {"status": credential.status, "token_hint": credential.token_hint, "token_name": credential.token_name},
+        check.error_code if check.status != KsefCredentialStatus.VALID else "",
+    )
     return CredentialResult(credential, check.error_code)
 
 
@@ -146,6 +182,14 @@ def delete_token(tenant, user) -> bool:
     if credential is None:
         return False
     hint = credential.token_hint
+    name = credential.token_name
     credential.delete()
     _log(tenant, user, ActionType.DELETE, None, {"operation": "delete", "token_hint": hint})
+    _log_security_event(
+        tenant,
+        user,
+        SSOAuditEventType.KSEF_TOKEN_DELETED,
+        "KSeF token removed",
+        {"token_hint": hint, "token_name": name},
+    )
     return True

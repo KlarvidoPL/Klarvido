@@ -54,6 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 
 // View toggle button styles
 const viewToggleButtonClass = cn(
@@ -183,6 +184,7 @@ export function DateRangePicker({
   align = 'start',
   clearable = true,
 }: DateRangePickerProps) {
+  const dateLocale = useDateFnsLocale();
   const intl = useIntl();
   const [open, setOpen] = useState(false);
 
@@ -299,10 +301,10 @@ export function DateRangePicker({
   const formatDateRange = useCallback(
     (from: Date | undefined, to: Date | undefined) => {
       if (!from) return resolvedPlaceholder;
-      if (!to) return format(from, 'dd MMM yyyy');
-      return `${format(from, 'dd MMM yyyy')} – ${format(to, 'dd MMM yyyy')}`;
+      if (!to) return format(from, 'dd MMM yyyy', { locale: dateLocale });
+      return `${format(from, 'dd MMM yyyy', { locale: dateLocale })} – ${format(to, 'dd MMM yyyy', { locale: dateLocale })}`;
     },
-    [resolvedPlaceholder]
+    [resolvedPlaceholder, dateLocale]
   );
 
   // Sync temp range when popover opens
