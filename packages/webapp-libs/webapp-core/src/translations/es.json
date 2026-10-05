@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "Verifica todos los dominios permitidos de esta conexión antes de activarla."
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Su proveedor de identidad no ha verificado esta dirección de correo. Pida a su administrador que revise la configuración."
+  },
   "SSO / Error / generic": {
     "defaultMessage": "Se produjo un error al iniciar sesión. Inténtelo de nuevo o contacte con soporte."
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "La validación de seguridad falló. Inténtelo de nuevo."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Su solicitud de inicio de sesión ha caducado o se inició en otro navegador. Vuelva a iniciar sesión."
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "La comprobación de seguridad falló. Inicie el proceso de inicio de sesión de nuevo."
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "URL SSO (Login URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "Actívelo solo si su proveedor de identidad no envía la notificación email_verified, por ejemplo Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Aceptar correos no verificados"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "Actívelo solo si su proveedor de identidad solo permite iniciar sesión con direcciones de correo que sean del propio usuario. De lo contrario, un usuario podría iniciar sesión como otra persona."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "Volver al inicio de sesión"

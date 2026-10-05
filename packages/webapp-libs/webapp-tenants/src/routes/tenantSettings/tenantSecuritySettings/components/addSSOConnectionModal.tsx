@@ -3,10 +3,24 @@ import { Connection_Type } from '@sb/webapp-api-client/graphql';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Input } from '@sb/webapp-core/components/forms';
 import { Label } from '@sb/webapp-core/components/ui/label';
+import { Switch } from '@sb/webapp-core/components/ui/switch';
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { camelCaseKeys } from '@sb/webapp-core/utils';
-import { ArrowLeft, Building2, Check, CheckCircle2, Copy, Globe, Key, Link2, Loader2, Shield, X } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Building2,
+  Check,
+  CheckCircle2,
+  Copy,
+  Globe,
+  Key,
+  Link2,
+  Loader2,
+  Shield,
+  X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -51,6 +65,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
     issuer: '',
     clientId: '',
     clientSecret: '',
+    trustUnverifiedEmail: false,
   });
   const [domainInput, setDomainInput] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -127,6 +142,7 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
             allowedDomains: JSON.stringify(formData.allowedDomains),
             oidcIssuer: formData.issuer,
             oidcClientId: formData.clientId,
+            oidcTrustUnverifiedEmail: formData.trustUnverifiedEmail,
             ...(formData.clientSecret.trim() ? { oidcClientSecret: formData.clientSecret } : {}),
           };
 
@@ -680,6 +696,43 @@ export const AddSSOConnectionModal = ({ closeModal, onSuccess, tenantId }: AddSS
                       onChange={(e) => updateFormData('clientSecret', e.target.value)}
                       error={fieldErrors['clientSecret']}
                     />
+                  </div>
+                  <div className="space-y-2 rounded-md border p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 space-y-1">
+                        <Label htmlFor="trust-unverified-email">
+                          <FormattedMessage
+                            defaultMessage="Accept unverified emails"
+                            id="SSO Form / Trust unverified email Label"
+                          />
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          <FormattedMessage
+                            defaultMessage="Turn this on only if your identity provider does not send the email_verified claim, for example Microsoft Entra ID."
+                            id="SSO Form / Trust unverified email Help"
+                          />
+                        </p>
+                      </div>
+                      <Switch
+                        id="trust-unverified-email"
+                        className="shrink-0"
+                        checked={formData.trustUnverifiedEmail}
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({ ...prev, trustUnverifiedEmail: checked }))
+                        }
+                      />
+                    </div>
+                    {formData.trustUnverifiedEmail && (
+                      <p className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400">
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          <FormattedMessage
+                            defaultMessage="Only enable this if your identity provider lets users sign in only with email addresses they own. Otherwise a user could sign in as someone else."
+                            id="SSO Form / Trust unverified email Warning"
+                          />
+                        </span>
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

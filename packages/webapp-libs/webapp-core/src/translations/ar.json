@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "تحقق من جميع النطاقات المسموح بها لهذا الاتصال قبل تفعيله."
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "لم يتحقق مزود الهوية من عنوان البريد الإلكتروني هذا. اطلب من المسؤول مراجعة الإعداد."
+  },
   "SSO / Error / generic": {
     "defaultMessage": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "فشل التحقق الأمني. يرجى المحاولة مرة أخرى."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "انتهت صلاحية طلب تسجيل الدخول أو بدأ في متصفح آخر. يرجى بدء تسجيل الدخول مرة أخرى."
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "فشل فحص الأمان. يرجى بدء عملية تسجيل الدخول من جديد."
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "عنوان SSO (عنوان تسجيل الدخول)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "فعّل هذا الخيار فقط إذا كان مزود الهوية لديك لا يرسل مطالبة email_verified، مثل Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "قبول البريد الإلكتروني غير المُتحقق منه"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "فعّل هذا الخيار فقط إذا كان مزود الهوية لديك يسمح للمستخدمين بتسجيل الدخول بعناوين البريد الإلكتروني التي يملكونها فقط. وإلا فقد يتمكن مستخدم من تسجيل الدخول باسم شخص آخر."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "العودة إلى تسجيل الدخول"

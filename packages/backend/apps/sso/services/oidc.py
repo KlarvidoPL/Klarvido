@@ -405,6 +405,13 @@ class OIDCService:
         if not claims:
             raise ValueError("ID token validation returned empty claims")
 
+        # SECURITY: the email is used to find or create the account. Refuse it unless the IdP vouches for it,
+        # unless the tenant admin has explicitly accepted unverified emails for this connection.
+        email_verified = claims.get("email_verified")
+        if not self.connection.oidc_trust_unverified_email and email_verified not in (True, "true"):
+            logger.error(f"OIDC email is not verified by the IdP (connection {self.connection.id})")
+            raise ValueError("Email address is not verified by the identity provider")
+
         # Get additional user info if needed (supplementary, not for auth)
         access_token = tokens.get("access_token")
         if access_token:

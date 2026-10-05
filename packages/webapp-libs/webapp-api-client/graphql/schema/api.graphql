@@ -424,6 +424,8 @@ type SSOConnectionType implements Node {
   oidcScopes: String!
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString!
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean!
   lastLoginAt: DateTime
   loginCount: Int!
   isActive: Boolean
@@ -1660,6 +1662,8 @@ type CreateSSOConnectionMutationPayload {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   spMetadataXml: String
   metadataLastUpdated: DateTime
   lastLoginAt: DateTime
@@ -1705,6 +1709,8 @@ type UpdateSSOConnectionMutationPayload {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   spMetadataXml: String
   metadataLastUpdated: DateTime
   lastLoginAt: DateTime
@@ -3003,6 +3009,8 @@ input CreateSSOConnectionMutationInput {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   clientMutationId: String
 }
 input UpdateSSOConnectionMutationInput {
@@ -3042,6 +3050,8 @@ input UpdateSSOConnectionMutationInput {
   oidcScopes: String
   "Mapping of OIDC claims to user fields"
   oidcClaimMapping: JSONString
+  "Accept OIDC logins whose email_verified claim is missing or false"
+  oidcTrustUnverifiedEmail: Boolean
   clientMutationId: String
 }
 input DeleteSSOConnectionMutationInput {

@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "Zweryfikuj wszystkie dozwolone domeny tego połączenia przed aktywacją."
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Dostawca tożsamości nie potwierdził tego adresu e-mail. Poproś administratora o sprawdzenie konfiguracji."
+  },
   "SSO / Error / generic": {
     "defaultMessage": "Wystąpił błąd podczas logowania. Spróbuj ponownie lub skontaktuj się z pomocą techniczną."
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "Weryfikacja bezpieczeństwa nie powiodła się. Spróbuj ponownie."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Żądanie logowania wygasło lub zostało rozpoczęte w innej przeglądarce. Zacznij logowanie ponownie."
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "Kontrola bezpieczeństwa nie powiodła się. Rozpocznij logowanie ponownie."
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL (Login URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "Włącz tylko wtedy, gdy dostawca tożsamości nie wysyła roszczenia email_verified, na przykład Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Akceptuj niepotwierdzone adresy e-mail"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "Włącz tylko wtedy, gdy dostawca tożsamości pozwala logować się wyłącznie adresami e-mail należącymi do użytkownika. W przeciwnym razie użytkownik mógłby zalogować się jako ktoś inny."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "Powrót do logowania"

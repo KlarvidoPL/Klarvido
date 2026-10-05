@@ -5671,5 +5671,20 @@
   },
   "Notifications / SSO Domain Record Missing / Title": {
     "defaultMessage": "SSO domain verification record missing"
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Your sign-in request has expired or was started in another browser. Please start the sign-in again."
+  },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Your identity provider has not verified this email address. Ask your administrator to check the setup."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Accept unverified emails"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "Turn this on only if your identity provider does not send the email_verified claim, for example Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "Only enable this if your identity provider lets users sign in only with email addresses they own. Otherwise a user could sign in as someone else."
   }
 }

@@ -9,14 +9,21 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
 
-def create_jwt_tokens(user, session_id: Optional[str] = None, auth_method: str = 'password') -> dict:
+def create_jwt_tokens(
+    user,
+    session_id: Optional[str] = None,
+    auth_method: str = 'password',
+    sso_tenant_id: Optional[str] = None,
+) -> dict:
     """
     Create JWT access and refresh tokens for a user.
 
     Args:
         user: The user to create tokens for
         session_id: Optional session ID to include in the token for session tracking
-        auth_method: How the user authenticated ('password' or 'sso')
+        auth_method: How the user authenticated ('password', 'sso', ...)
+        sso_tenant_id: For 'sso' logins, the tenant whose identity provider authenticated the user.
+            Enforcement uses it so an SSO login for one tenant does not satisfy another tenant's SSO rule.
 
     Returns:
         Dict with 'access', 'refresh' token strings, and 'session_id' if provided
@@ -25,6 +32,10 @@ def create_jwt_tokens(user, session_id: Optional[str] = None, auth_method: str =
 
     refresh['auth_method'] = auth_method
     refresh.access_token['auth_method'] = auth_method
+
+    if sso_tenant_id:
+        refresh['sso_tenant_id'] = str(sso_tenant_id)
+        refresh.access_token['sso_tenant_id'] = str(sso_tenant_id)
 
     if session_id:
         refresh["session_id"] = session_id
@@ -53,6 +64,21 @@ def get_auth_method_from_token(request) -> str:
     except (AttributeError, TypeError):
         pass
     return 'password'
+
+
+def get_sso_tenant_id_from_token(request) -> Optional[str]:
+    """
+    Extract the SSO tenant claim from the current request's JWT token.
+
+    Returns the tenant ID whose identity provider issued this 'sso' login, or None if absent.
+    """
+    try:
+        if hasattr(request, 'auth') and request.auth:
+            value = request.auth.get('sso_tenant_id')
+            return str(value) if value else None
+    except (AttributeError, TypeError):
+        pass
+    return None
 
 
 def get_session_id_from_token(request) -> Optional[str]:

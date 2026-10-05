@@ -62,6 +62,16 @@ const ERROR_MESSAGES: Record<string, { id: string; defaultMessage: string }> = {
     id: 'SSO / Error / account_not_member',
     defaultMessage: 'An account with this email already exists. Ask your organization administrator to invite you.',
   },
+  sso_request_expired: {
+    id: 'SSO / Error / sso_request_expired',
+    defaultMessage:
+      'Your sign-in request has expired or was started in another browser. Please start the sign-in again.',
+  },
+  email_not_verified: {
+    id: 'SSO / Error / email_not_verified',
+    defaultMessage:
+      'Your identity provider has not verified this email address. Ask your administrator to check the setup.',
+  },
   generic: {
     id: 'SSO / Error / generic',
     defaultMessage: 'An error occurred during sign-in. Please try again or contact support.',

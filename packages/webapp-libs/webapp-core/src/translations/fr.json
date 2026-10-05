@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "Vérifiez tous les domaines autorisés de cette connexion avant de l'activer."
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Votre fournisseur d'identité n'a pas vérifié cette adresse e-mail. Demandez à votre administrateur de vérifier la configuration."
+  },
   "SSO / Error / generic": {
     "defaultMessage": "Une erreur est survenue lors de la connexion. Veuillez réessayer ou contacter le support."
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "La validation de sécurité a échoué. Veuillez réessayer."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Votre demande de connexion a expiré ou a été lancée dans un autre navigateur. Veuillez recommencer la connexion."
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "Échec de la vérification de sécurité. Veuillez recommencer la connexion."
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "URL SSO (URL de connexion)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "N'activez cette option que si votre fournisseur d'identité n'envoie pas la revendication email_verified, par exemple Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Accepter les e-mails non vérifiés"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "N'activez cette option que si votre fournisseur d'identité n'autorise la connexion qu'avec des adresses e-mail appartenant aux utilisateurs. Sinon, un utilisateur pourrait se connecter sous l'identité d'une autre personne."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "Retour à la connexion"

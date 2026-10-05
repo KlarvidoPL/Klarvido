@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "激活前，请验证此连接允许的所有域名。"
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "您的身份提供商尚未验证此电子邮件地址。请让管理员检查配置。"
+  },
   "SSO / Error / generic": {
     "defaultMessage": "登录时出错，请重试或联系支持人员。"
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "安全验证失败，请重试。"
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "登录请求已过期，或是在其他浏览器中发起的。请重新开始登录。"
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "安全检查失败，请重新开始登录。"
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL（登录 URL）"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "仅当您的身份提供商未发送 email_verified 声明时（例如 Microsoft Entra ID）才开启此项。"
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "接受未验证的电子邮件"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "仅当您的身份提供商只允许用户使用其本人拥有的电子邮件地址登录时才开启此项。否则，用户可能以他人身份登录。"
   },
   "SSO Login / Back to login": {
     "defaultMessage": "返回登录"

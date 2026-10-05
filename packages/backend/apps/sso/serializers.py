@@ -52,6 +52,7 @@ class TenantSSOConnectionSerializer(serializers.ModelSerializer):
             "oidc_jwks_uri",
             "oidc_scopes",
             "oidc_claim_mapping",
+            "oidc_trust_unverified_email",
             # Metadata
             "sp_metadata_xml",
             "metadata_last_updated",

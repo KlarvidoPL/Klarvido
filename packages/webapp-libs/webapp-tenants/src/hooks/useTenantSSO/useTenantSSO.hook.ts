@@ -17,6 +17,7 @@ const SSO_CONNECTIONS_QUERY = gql(`
           samlSsoUrl
           oidcIssuer
           oidcClientId
+          oidcTrustUnverifiedEmail
           lastLoginAt
           loginCount
           createdAt

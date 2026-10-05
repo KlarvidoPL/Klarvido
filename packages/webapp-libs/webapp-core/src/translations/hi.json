@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "सक्रिय करने से पहले इस कनेक्शन के सभी अनुमत डोमेन सत्यापित करें।"
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "आपके पहचान प्रदाता ने इस ईमेल पते की पुष्टि नहीं की है। सेटअप जाँचने के लिए अपने व्यवस्थापक से कहें।"
+  },
   "SSO / Error / generic": {
     "defaultMessage": "साइन-इन के दौरान त्रुटि हुई। कृपया फिर से प्रयास करें या सहायता से संपर्क करें।"
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "सुरक्षा सत्यापन विफल रहा। कृपया फिर से प्रयास करें।"
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "आपका साइन-इन अनुरोध समाप्त हो गया है या किसी अन्य ब्राउज़र में शुरू किया गया था। कृपया साइन-इन फिर से शुरू करें।"
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "सुरक्षा जाँच विफल रही। कृपया साइन-इन प्रक्रिया फिर से शुरू करें।"
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO URL (Login URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "इसे केवल तभी चालू करें जब आपका पहचान प्रदाता email_verified क्लेम नहीं भेजता, जैसे Microsoft Entra ID।"
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "असत्यापित ईमेल स्वीकार करें"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "इसे केवल तभी चालू करें जब आपका पहचान प्रदाता उपयोगकर्ताओं को केवल उन्हीं ईमेल पतों से साइन इन करने दे जो उनके अपने हैं। अन्यथा कोई उपयोगकर्ता किसी और के रूप में साइन इन कर सकता है।"
   },
   "SSO Login / Back to login": {
     "defaultMessage": "लॉगिन पर वापस जाएं"

@@ -109,6 +109,13 @@ class TenantSSOConnection(TimestampedMixin, models.Model):
     # OIDC claim mapping
     oidc_claim_mapping = models.JSONField(default=dict, blank=True, help_text="Mapping of OIDC claims to user fields")
 
+    # Some IdPs (e.g. Microsoft Entra ID) do not send email_verified. Logins are refused without it unless
+    # the tenant admin explicitly opts in for this connection.
+    oidc_trust_unverified_email = models.BooleanField(
+        default=False,
+        help_text="Accept OIDC logins whose email_verified claim is missing or false",
+    )
+
     # Metadata caching
     idp_metadata_xml = models.TextField(blank=True, default="")
     sp_metadata_xml = models.TextField(blank=True, default="")

@@ -93,6 +93,7 @@ class SSOConnectionType(DjangoObjectType):
             "oidc_jwks_uri",
             "oidc_scopes",
             "oidc_claim_mapping",
+            "oidc_trust_unverified_email",
             # Stats
             "last_login_at",
             "login_count",

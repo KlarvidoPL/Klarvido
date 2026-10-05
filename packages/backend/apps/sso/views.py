@@ -8,12 +8,10 @@ Security Features:
 - Proper input validation
 """
 
-import base64
 import logging
+import secrets
 from urllib.parse import urlencode
 from functools import wraps
-
-from defusedxml.ElementTree import fromstring as parse_xml
 
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -196,12 +194,40 @@ def _sso_error_redirect(error_code: str):
     return HttpResponseRedirect(f"{web_app_url}/en/auth/sso/error?code={error_code}")
 
 
-def _saml_in_response_to(saml_response: str) -> str | None:
-    """Return the InResponseTo of a base64 SAML response, used to find the stored login request."""
-    try:
-        return parse_xml(base64.b64decode(saml_response)).get("InResponseTo")
-    except Exception:
-        return None
+SSO_BINDING_COOKIE_MAX_AGE = 600  # same lifetime as the stored login request (10 minutes)
+SAML_REQUEST_COOKIE = "saml_request_id"
+OIDC_STATE_COOKIE = "oidc_state"
+
+
+def _saml_acs_path(connection_id) -> str:
+    return f"/api/sso/saml/{connection_id}/acs"
+
+
+def _oidc_callback_path(connection_id) -> str:
+    return f"/api/sso/oidc/{connection_id}/callback"
+
+
+def _bind_login_to_browser(response, name: str, value: str, path: str, samesite: str):
+    """Tie a login request to the browser that started it.
+
+    SECURITY: the stored request is looked up by a value only this browser holds. Without this, an attacker can
+    start a login in their own browser and make a victim's browser complete it (login CSRF).
+    """
+    response.set_cookie(
+        name,
+        value,
+        max_age=SSO_BINDING_COOKIE_MAX_AGE,
+        path=path,
+        httponly=True,
+        secure=True,
+        samesite=samesite,
+    )
+    return response
+
+
+def _unbind_login_from_browser(response, name: str, path: str, samesite: str):
+    response.delete_cookie(name, path=path, samesite=samesite)
+    return response
 
 
 @method_decorator(ratelimit(key="ip", rate="20/m", method="GET", block=True), name="get")
@@ -258,7 +284,14 @@ class SAMLLoginView(View):
             ip_address=get_client_ip(request),
         )
 
-        return HttpResponseRedirect(redirect_url)
+        # SameSite=None: the IdP posts the response to the ACS cross-site, and browsers do not send Lax cookies there
+        return _bind_login_to_browser(
+            HttpResponseRedirect(redirect_url),
+            SAML_REQUEST_COOKIE,
+            request_id,
+            path=_saml_acs_path(connection_id),
+            samesite="None",
+        )
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -266,6 +299,10 @@ class SAMLACSView(View):
     """SAML Assertion Consumer Service - handles SAML responses."""
 
     def post(self, request, connection_id):
+        response = self._process_response(request, connection_id)
+        return _unbind_login_from_browser(response, SAML_REQUEST_COOKIE, _saml_acs_path(connection_id), "None")
+
+    def _process_response(self, request, connection_id):
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -280,19 +317,31 @@ class SAMLACSView(View):
         if not saml_response:
             return HttpResponse("Missing SAMLResponse", status=400)
 
-        # Each AuthnRequest is single-use: take its stored login hint and remove it
-        in_response_to = _saml_in_response_to(saml_response)
-        stored_request = cache.get(f"saml_request_{in_response_to}") if in_response_to else None
-        if in_response_to:
-            cache.delete(f"saml_request_{in_response_to}")
-        login_hint = (stored_request or {}).get("login_hint")
+        # SECURITY: the login request is identified by the cookie this browser received when it started the login.
+        # The posted response is not trusted to name it, because nothing in it is verified until the signature check.
+        request_id = request.COOKIES.get(SAML_REQUEST_COOKIE)
+        stored_request = cache.get(f"saml_request_{request_id}") if request_id else None
+        if not stored_request or stored_request.get("connection_id") != str(connection_id):
+            SSOAuditLog.log_event(
+                event_type=SSOAuditEventType.SSO_LOGIN_FAILED,
+                tenant=connection.tenant,
+                sso_connection=connection,
+                description="SAML response without a login request started in this browser",
+                error_message="sso_request_expired",
+                success=False,
+                ip_address=get_client_ip(request),
+            )
+            return _sso_error_redirect("sso_request_expired")
+        login_hint = stored_request.get("login_hint")
 
         saml_service = SAMLService(connection)
 
         try:
-            # Parse and validate SAML response
+            # Parse and validate SAML response; the response must answer exactly this request
             logger.info(f"Processing SAML response for connection {connection_id}")
-            user_attrs = saml_service.parse_saml_response(saml_response)
+            user_attrs = saml_service.parse_saml_response(saml_response, request_id=request_id)
+            # The response is verified and consumed, so the stored request is single-use
+            cache.delete(f"saml_request_{request_id}")
 
             # Validate we have required attributes
             email = user_attrs.get("email")
@@ -324,7 +373,7 @@ class SAMLACSView(View):
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            tokens = create_jwt_tokens(user, auth_method='sso')
+            tokens = create_jwt_tokens(user, auth_method='sso', sso_tenant_id=connection.tenant_id)
 
             # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
@@ -443,13 +492,23 @@ class OIDCLoginView(View):
             ip_address=get_client_ip(request),
         )
 
-        return HttpResponseRedirect(auth_url)
+        return _bind_login_to_browser(
+            HttpResponseRedirect(auth_url),
+            OIDC_STATE_COOKIE,
+            auth_params["state"],
+            path=_oidc_callback_path(connection_id),
+            samesite="Lax",
+        )
 
 
 class OIDCCallbackView(View):
     """Handle OIDC callback after authentication."""
 
     def get(self, request, connection_id):
+        response = self._process_callback(request, connection_id)
+        return _unbind_login_from_browser(response, OIDC_STATE_COOKIE, _oidc_callback_path(connection_id), "Lax")
+
+    def _process_callback(self, request, connection_id):
         try:
             connection = TenantSSOConnection.objects.get(
                 pk=connection_id,
@@ -482,6 +541,12 @@ class OIDCCallbackView(View):
 
         if not code or not state:
             return HttpResponse("Missing code or state", status=400)
+
+        # SECURITY: the state must be the one this browser received when it started the login (login CSRF)
+        bound_state = request.COOKIES.get(OIDC_STATE_COOKIE)
+        if not bound_state or not secrets.compare_digest(bound_state, state):
+            logger.warning(f"OIDC callback without a login started in this browser (connection {connection_id})")
+            return HttpResponse("Invalid or expired state", status=400)
 
         # Retrieve stored state
         stored_data = cache.get(f"oidc_state_{state}")
@@ -522,7 +587,7 @@ class OIDCCallbackView(View):
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
-            tokens = create_jwt_tokens(user, auth_method='sso')
+            tokens = create_jwt_tokens(user, auth_method='sso', sso_tenant_id=connection.tenant_id)
             # Create SSOSession for tracking, linked to the issued refresh token
             session_service = SessionService(user)
             try:

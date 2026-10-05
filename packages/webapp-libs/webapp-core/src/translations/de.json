@@ -4313,6 +4313,9 @@
   "SSO / Error / domains_not_verified": {
     "defaultMessage": "Verifiziere vor der Aktivierung alle erlaubten Domains dieser Verbindung."
   },
+  "SSO / Error / email_not_verified": {
+    "defaultMessage": "Ihr Identitätsanbieter hat diese E-Mail-Adresse nicht bestätigt. Bitten Sie Ihren Administrator, die Einrichtung zu prüfen."
+  },
   "SSO / Error / generic": {
     "defaultMessage": "Beim Anmelden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support."
   },
@@ -4345,6 +4348,9 @@
   },
   "SSO / Error / signature_invalid": {
     "defaultMessage": "Sicherheitsprüfung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "SSO / Error / sso_request_expired": {
+    "defaultMessage": "Ihre Anmeldeanfrage ist abgelaufen oder wurde in einem anderen Browser gestartet. Bitte starten Sie die Anmeldung erneut."
   },
   "SSO / Error / state_mismatch": {
     "defaultMessage": "Sicherheitsprüfung fehlgeschlagen. Bitte starten Sie die Anmeldung erneut."
@@ -4567,6 +4573,15 @@
   },
   "SSO Form / SSO URL Label": {
     "defaultMessage": "SSO-URL (Login-URL)"
+  },
+  "SSO Form / Trust unverified email Help": {
+    "defaultMessage": "Aktivieren Sie dies nur, wenn Ihr Identitätsanbieter den Anspruch email_verified nicht sendet, zum Beispiel Microsoft Entra ID."
+  },
+  "SSO Form / Trust unverified email Label": {
+    "defaultMessage": "Nicht bestätigte E-Mails akzeptieren"
+  },
+  "SSO Form / Trust unverified email Warning": {
+    "defaultMessage": "Aktivieren Sie dies nur, wenn Ihr Identitätsanbieter nur Anmeldungen mit E-Mail-Adressen erlaubt, die den Benutzern gehören. Andernfalls könnte sich ein Benutzer als jemand anderes anmelden."
   },
   "SSO Login / Back to login": {
     "defaultMessage": "Zurück zur Anmeldung"

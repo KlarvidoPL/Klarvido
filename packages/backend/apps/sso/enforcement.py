@@ -14,7 +14,7 @@ from django.db.models import QuerySet
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import TenantSSOConnection, SSOAuditLog
 from apps.sso.services.domain_verification import get_verified_tenant_id_for_domain
-from apps.users.jwt import get_auth_method_from_token
+from apps.users.jwt import get_auth_method_from_token, get_sso_tenant_id_from_token
 
 logger = logging.getLogger(__name__)
 
@@ -49,28 +49,25 @@ def get_sso_enforced_tenant_ids(user) -> set:
     return enforced_ids
 
 
-def should_enforce_sso_for_session(request) -> bool:
-    """Whether this session's auth method needs to be checked against
-    per-tenant SSO enforcement. True for every auth method except a genuine
-    'sso' session (the tenant's own configured SAML/OIDC connection) -
-    password, OAuth, and any other non-SSO method can all bypass that
-    connection just as easily as each other, so all of them must be enforced
-    against equally (a session with a missing/legacy auth_method claim
-    defaults to 'password' - see get_auth_method_from_token - which is
-    correctly treated as "enforce" here too)."""
-    return get_auth_method_from_token(request) != 'sso'
+def should_enforce_sso_for_session(request, tenant_id) -> bool:
+    """Whether this session must be checked against the SSO enforcement of tenant_id.
+
+    A session is exempt only when it is a genuine 'sso' login issued by that same tenant's
+    identity provider (the sso_tenant_id claim matches). An SSO login for another tenant does not
+    count, and neither do password, OAuth or any other method. A session with a missing or legacy
+    claim is enforced as well.
+    """
+    if get_auth_method_from_token(request) != 'sso':
+        return True
+    return get_sso_tenant_id_from_token(request) != str(tenant_id)
 
 
 def filter_tenants_for_password_session(request, queryset: QuerySet) -> QuerySet:
     """
-    If the user did not authenticate via the tenant's own SSO connection
-    (password, OAuth, ...), exclude tenants that enforce SSO for the user's
-    email domain -- unless the user has break-glass permission
+    Exclude tenants that enforce SSO for the user's email domain, unless this session
+    came from that tenant's own SSO connection, or the user has break-glass permission
     (security.sso.manage) on that tenant.
     """
-    if not should_enforce_sso_for_session(request):
-        return queryset
-
     enforced_ids = get_sso_enforced_tenant_ids(request.user)
     if not enforced_ids:
         return queryset
@@ -79,6 +76,8 @@ def filter_tenants_for_password_session(request, queryset: QuerySet) -> QuerySet
 
     ids_to_exclude = set()
     for tenant_id in enforced_ids:
+        if not should_enforce_sso_for_session(request, tenant_id):
+            continue
         try:
             tenant = Tenant.objects.get(pk=tenant_id)
         except Tenant.DoesNotExist:
@@ -101,11 +100,10 @@ def check_tenant_sso_enforcement(request, tenant, user) -> Optional[str]:
     For users with 'security.sso.manage' permission, access is granted (break-glass)
     and an audit log entry is recorded.
     """
-    if not should_enforce_sso_for_session(request):
-        return None
-
     enforced_ids = get_sso_enforced_tenant_ids(user)
     if tenant.pk not in enforced_ids:
+        return None
+    if not should_enforce_sso_for_session(request, tenant.pk):
         return None
 
     from apps.multitenancy.models import get_user_permissions_for_tenant

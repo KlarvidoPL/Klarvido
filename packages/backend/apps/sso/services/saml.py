@@ -183,7 +183,8 @@ class SAMLService:
         """
         conditions = assertion.find(".//saml:Conditions", SAML_NS)
         if conditions is None:
-            return  # No conditions to validate
+            # SECURITY: an assertion without Conditions has no audience and no validity window
+            raise ValueError("SAML assertion has no Conditions element")
 
         now = datetime.now(dt_timezone.utc)
 
@@ -215,12 +216,12 @@ class SAMLService:
                     raise
                 logger.warning(f"Could not parse NotOnOrAfter: {not_on_or_after}")
 
-        # Check Audience
-        audience_restriction = conditions.find(".//saml:AudienceRestriction/saml:Audience", SAML_NS)
-        if audience_restriction is not None and audience_restriction.text:
-            expected_audience = self.get_sp_entity_id()
-            if audience_restriction.text != expected_audience:
-                raise ValueError(f"SAML audience mismatch: expected {expected_audience}")
+        # SECURITY: the assertion must be addressed to this SP. Without this check an assertion issued
+        # for another service provider by the same IdP would be accepted here.
+        expected_audience = self.get_sp_entity_id()
+        audiences = [el.text for el in conditions.findall(".//saml:AudienceRestriction/saml:Audience", SAML_NS)]
+        if expected_audience not in audiences:
+            raise ValueError(f"SAML audience mismatch: expected {expected_audience}")
 
     def get_sp_signing_keys(self) -> Optional[Dict[str, str]]:
         """Retrieve the SP signing key pair from Secrets Manager."""
@@ -431,30 +432,26 @@ class SAMLService:
         # SECURITY: Validate InResponseTo for replay protection
         in_response_to = root.get("InResponseTo")
         if request_id:
-            # Strict validation when request_id is provided
+            # SECURITY: strict validation. Every response must answer the login request this browser started.
+            # A response without InResponseTo is an IdP-initiated or forged response and is refused.
             if not in_response_to:
-                logger.warning(
-                    f"SAML response missing InResponseTo attribute for connection {self.connection.id}. "
-                    f"This weakens replay protection."
-                )
-                # Allow responses without InResponseTo for IdP-initiated flows,
-                # but log for security monitoring
-            elif in_response_to != request_id:
+                logger.error(f"SAML response missing InResponseTo for connection {self.connection.id}")
+                raise ValueError("Request ID missing from SAML response - possible replay attack")
+            if in_response_to != request_id:
                 logger.error(
                     f"SAML InResponseTo mismatch: expected {request_id}, got {in_response_to}. "
                     f"Possible replay attack detected."
                 )
                 raise ValueError("Request ID mismatch - possible replay attack")
 
-            # SECURITY: Mark request_id as consumed to prevent replay
+            # SECURITY: Mark request_id as consumed to prevent replay. cache.add is atomic, so two
+            # concurrent deliveries of the same response cannot both succeed.
             from django.core.cache import cache
 
             consumed_key = f"saml_request_consumed_{request_id}"
-            if cache.get(consumed_key):
+            if not cache.add(consumed_key, True, timeout=3600):
                 logger.error(f"SAML request ID {request_id} has already been used - replay attack detected")
                 raise ValueError("SAML response already processed - replay attack detected")
-            # Mark as consumed with 1 hour expiry (longer than session timeout)
-            cache.set(consumed_key, True, timeout=3600)
         else:
             # Log when called without request_id (IdP-initiated flow)
             logger.info(
