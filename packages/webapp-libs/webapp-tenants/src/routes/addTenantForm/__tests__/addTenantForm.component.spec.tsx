@@ -107,7 +107,8 @@ describe('AddTenantForm: Component', () => {
     await fillStepOne();
 
     expect(await screen.findByDisplayValue('ACME SP. Z O.O.')).toBeInTheDocument();
-    expect(screen.getByText('Company details').closest('li')).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('button', { name: 'Company details' }).closest('li')).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('heading', { name: 'Company details', level: 2 })).toBeInTheDocument();
     expect(screen.getByDisplayValue('123456785')).toBeInTheDocument();
     expect(screen.getByDisplayValue('UL. PRZYKŁADOWA 1, 00-001 WARSZAWA')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveTextContent('Active VAT payer');

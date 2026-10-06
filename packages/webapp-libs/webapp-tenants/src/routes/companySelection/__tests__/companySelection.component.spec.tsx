@@ -4,7 +4,7 @@ import { CommonQuery, commonQueryCurrentUserQuery } from '@sb/webapp-api-client/
 import { currentUserFactory } from '@sb/webapp-api-client/tests/factories';
 import { Locale, formatTranslationMessages } from '@sb/webapp-core/config/i18n';
 import plMessages from '@sb/webapp-core/translations/pl.json';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { HelmetProvider } from 'react-helmet-async';
 import { IntlProvider } from 'react-intl';
@@ -246,4 +246,20 @@ it('redirects the old chooser URL to organizations', async () => {
   show(currentUserFactory({ tenants: [one, two] }), '/pl/companies');
   await screen.findByRole('heading', { name: 'Firma Alpha' });
   expect(screen.getByTestId('location')).toHaveTextContent('/pl/organizations');
+});
+
+it('restores all organizations after clearing a search with no matches', async () => {
+  show(currentUserFactory({ tenants: [one, two] }));
+  await screen.findByRole('heading', { name: 'Firma Alpha' });
+  const input = screen.getByLabelText('Szukaj po nazwie lub NIP-ie');
+  fireEvent.change(input, { target: { value: 'no matching organization' } });
+  expect(screen.queryByRole('heading', { name: 'Firma Alpha' })).not.toBeInTheDocument();
+  const status = screen.getByText('Nie znaleziono organizacji pasujących do wyszukiwania.').closest('[role="status"]') as HTMLElement;
+  expect(status).toHaveTextContent('Nie znaleziono organizacji pasujących do wyszukiwania.');
+  fireEvent.click(within(status).getByRole('button', { name: 'Wyczyść wyszukiwanie' }));
+  expect(input).toHaveValue('');
+  expect(input).toHaveFocus();
+  expect(screen.getByRole('heading', { name: 'Firma Alpha' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Firma Beta' })).toBeInTheDocument();
+  expect(screen.queryByText('Nie znaleziono organizacji pasujących do wyszukiwania.')).not.toBeInTheDocument();
 });
