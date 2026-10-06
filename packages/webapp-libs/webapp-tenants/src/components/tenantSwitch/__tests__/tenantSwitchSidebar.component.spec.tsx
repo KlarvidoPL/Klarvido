@@ -3,13 +3,9 @@ import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-clie
 import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { tenantFactory } from '../../../tests/factories/tenant';
-import {
-  CurrentTenantRouteWrapper,
-  createMockRouterProps,
-  render,
-} from '../../../tests/utils/rendering';
 import { RoutesConfig } from '../../../config/routes';
+import { tenantFactory } from '../../../tests/factories/tenant';
+import { CurrentTenantRouteWrapper, createMockRouterProps, render } from '../../../tests/utils/rendering';
 import { TenantSwitchSidebar } from '../tenantSwitchSidebar.component';
 
 describe('TenantSwitchSidebar: Component', () => {
@@ -38,7 +34,7 @@ describe('TenantSwitchSidebar: Component', () => {
 
     const orgOneElements = screen.getAllByText(/org one/i);
     expect(orgOneElements.length).toBeGreaterThan(0);
-    expect(screen.getByText(/organizations/i)).toBeInTheDocument();
+    expect(screen.getByText(/^organizations$/i)).toBeInTheDocument();
   });
 
   it('should render create new organization option', async () => {
@@ -118,6 +114,7 @@ describe('TenantSwitchSidebar: Component', () => {
     const secondOrgTenant = tenantFactory({
       id: 'org-4',
       name: 'Second Organization',
+      nip: '7740001454',
       type: TenantType.ORGANIZATION,
       membership: { role: 'MEMBER', invitationAccepted: true, invitationToken: 'token2', id: 'm4' },
     });
@@ -142,7 +139,24 @@ describe('TenantSwitchSidebar: Component', () => {
 
       expect(screen.queryByText('Org One')).not.toBeInTheDocument();
       expect(screen.getByText('Second Organization')).toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+      expect(searchInput).toHaveValue('');
+      expect(searchInput).toHaveFocus();
+      expect(screen.getByText('Org One')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument();
     });
+
+    it.each(['7740001454', '774-000-14-54', '774 000', '1454'])(
+      'should find an organization by NIP query %s',
+      async (query) => {
+        const multiOrgUser = currentUserFactory({ tenants: [orgTenant, secondOrgTenant] });
+        render(<Component />, { apolloMocks: [fillCommonQueryWithUser(multiOrgUser)] });
+        await userEvent.click(await screen.findByRole('button'));
+        await userEvent.type(screen.getByPlaceholderText(/search organizations/i), query);
+        expect(screen.queryByText('Org One')).not.toBeInTheDocument();
+        expect(screen.getByText('Second Organization')).toBeInTheDocument();
+      }
+    );
 
     it('should show an empty state when no organization matches the search text', async () => {
       const multiOrgUser = currentUserFactory({ tenants: [orgTenant, secondOrgTenant] });

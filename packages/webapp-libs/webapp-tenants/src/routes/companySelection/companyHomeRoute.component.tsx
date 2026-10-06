@@ -20,7 +20,7 @@ export const CompanyHomeRoute = ({ children }: { children: ReactNode }) => {
   if (loading && !user)
     return (
       <p role="status">
-        <FormattedMessage id="Companies / Loading" defaultMessage="Wczytywanie firm…" />
+        <FormattedMessage id="Companies / Loading" defaultMessage="Loading organizations…" />
       </p>
     );
   if (error || !user)
@@ -28,7 +28,7 @@ export const CompanyHomeRoute = ({ children }: { children: ReactNode }) => {
       <p role="alert">
         <FormattedMessage
           id="Companies / Load error"
-          defaultMessage="Nie udało się wczytać firm. Odśwież stronę i spróbuj ponownie."
+          defaultMessage="Could not load organizations. Refresh the page and try again."
         />
       </p>
     );
@@ -43,6 +43,6 @@ export const CompanyHomeRoute = ({ children }: { children: ReactNode }) => {
   const selected = homeOrganization(organizations, user.defaultOrganizationId);
   if (selected) return <Navigate to={tenantPath(CoreRoutesConfig.home, { tenantId: selected.id })} replace />;
   return (
-    <Navigate to={localePath(organizations.length ? RoutesConfig.companies : CoreRoutesConfig.addTenant)} replace />
+    <Navigate to={localePath(organizations.length ? RoutesConfig.organizations : CoreRoutesConfig.addTenant)} replace />
   );
 };

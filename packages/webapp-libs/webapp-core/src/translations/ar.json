@@ -5314,5 +5314,107 @@
   },
   "Onboarding / Title": {
     "defaultMessage": "إعداد مؤسستك"
+  },
+  "Companies / Add": {
+    "defaultMessage": "إضافة مؤسسة"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "مسؤول"
+  },
+  "Companies / Count": {
+    "defaultMessage": "المؤسسات المتاحة: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "المحددة حاليًا"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "القرارات النشطة"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "الافتراضية"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "تُفتح مؤسستك الافتراضية تلقائيًا بعد تسجيل الدخول."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "تمت إزالة المؤسسة الافتراضية."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "تم حفظ المؤسسة الافتراضية. ستُفتح تلقائيًا بعد تسجيل الدخول."
+  },
+  "Companies / Description": {
+    "defaultMessage": "اختر المؤسسة التي تريد العمل فيها"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "ليس لديك صلاحية الوصول إلى أي مؤسسة بعد. أضف مؤسسة أو اقبل دعوة أدناه."
+  },
+  "Companies / Health": {
+    "defaultMessage": "لا توجد بيانات عن حالة المؤسسة"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "دعوات المؤسسات"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "تعذر تحميل المؤسسات. حدّث الصفحة وحاول مرة أخرى."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "جارٍ تحميل المؤسسات…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "عضو"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "لا توجد شركات تطابق بحثك."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "مالك"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "إزالة الافتراضية"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "المبيعات"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "تعذر حفظ مؤسستك الافتراضية. لم يتغير اختيارك السابق. حاول مرة أخرى."
+  },
+  "Companies / Search": {
+    "defaultMessage": "البحث بالاسم أو NIP"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "تعيين كافتراضية"
+  },
+  "Companies / Title": {
+    "defaultMessage": "المؤسسات"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "غير متاح بعد"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "عرض الدعوة"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "إزالة المؤسسة الافتراضية: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "جارٍ الحفظ…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "جارٍ حفظ المؤسسة الافتراضية: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "تعيين كمؤسسة افتراضية: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "مسؤول النظام"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "جميع المؤسسات"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "مسح البحث"
   }
 }

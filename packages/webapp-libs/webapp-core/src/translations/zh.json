@@ -5314,5 +5314,107 @@
   },
   "Onboarding / Title": {
     "defaultMessage": "设置您的组织"
+  },
+  "Companies / Add": {
+    "defaultMessage": "添加组织"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "管理员"
+  },
+  "Companies / Count": {
+    "defaultMessage": "可用组织：{count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "当前已选择"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "进行中的决策"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "默认"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "登录后将自动打开您的默认组织。"
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "已移除默认组织。"
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "已保存默认组织。登录后将自动打开。"
+  },
+  "Companies / Description": {
+    "defaultMessage": "选择您想要工作的组织"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "您尚无权访问任何组织。请添加组织或接受下方的邀请。"
+  },
+  "Companies / Health": {
+    "defaultMessage": "暂无组织状况数据"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "组织邀请"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "无法加载组织。请刷新页面并重试。"
+  },
+  "Companies / Loading": {
+    "defaultMessage": "正在加载组织…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "成员"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP：{nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "没有与您的搜索匹配的组织。"
+  },
+  "Companies / Owner": {
+    "defaultMessage": "所有者"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "取消默认"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "销售"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "无法保存默认组织。您之前的选择保持不变。请重试。"
+  },
+  "Companies / Search": {
+    "defaultMessage": "按名称或 NIP 搜索"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "设为默认"
+  },
+  "Companies / Title": {
+    "defaultMessage": "组织"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "暂不可用"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "查看邀请"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "移除默认组织：{company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "正在保存…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "正在保存默认组织：{company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "设为默认组织：{company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "系统管理员"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "所有组织"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "清除搜索"
   }
 }

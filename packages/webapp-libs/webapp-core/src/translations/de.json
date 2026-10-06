@@ -5314,5 +5314,107 @@
   },
   "Onboarding / Title": {
     "defaultMessage": "Organisation einrichten"
+  },
+  "Companies / Add": {
+    "defaultMessage": "Organisation hinzufügen"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "Administrator"
+  },
+  "Companies / Count": {
+    "defaultMessage": "Verfügbare Organisationen: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "Aktuell ausgewählt"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "Aktive Entscheidungen"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "Standard"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "Ihre Standardorganisation öffnet sich nach der Anmeldung automatisch."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "Standardorganisation entfernt."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "Standardorganisation gespeichert. Sie öffnet sich nach der Anmeldung automatisch."
+  },
+  "Companies / Description": {
+    "defaultMessage": "Wählen Sie die Organisation, in der Sie arbeiten möchten"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "Sie haben noch keinen Zugriff auf Organisationen. Fügen Sie eine Organisation hinzu oder nehmen Sie unten eine Einladung an."
+  },
+  "Companies / Health": {
+    "defaultMessage": "Keine Daten zum Zustand der Organisation"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "Einladungen zu Organisationen"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "Organisationen konnten nicht geladen werden. Laden Sie die Seite neu und versuchen Sie es erneut."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "Organisationen werden geladen…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "Mitglied"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "Keine Organisationen entsprechen Ihrer Suche."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "Inhaber"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "Standard entfernen"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "Umsatz"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "Ihre Standardorganisation konnte nicht gespeichert werden. Ihre bisherige Auswahl bleibt unverändert. Versuchen Sie es erneut."
+  },
+  "Companies / Search": {
+    "defaultMessage": "Nach Name oder NIP suchen"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "Als Standard festlegen"
+  },
+  "Companies / Title": {
+    "defaultMessage": "Organisationen"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "Noch nicht verfügbar"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "Einladung ansehen"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "Standardorganisation entfernen: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "Wird gespeichert…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "Standardorganisation wird gespeichert: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "Als Standardorganisation festlegen: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "Systemadministrator"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "Alle Organisationen"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "Suche löschen"
   }
 }

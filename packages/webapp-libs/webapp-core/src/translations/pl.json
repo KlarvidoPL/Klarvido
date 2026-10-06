@@ -5329,5 +5329,107 @@
   },
   "Onboarding / Clear draft failed": {
     "defaultMessage": "Nie udało się wyczyścić szkicu. Spróbuj ponownie."
+  },
+  "Companies / Add": {
+    "defaultMessage": "Dodaj organizację"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "Administrator"
+  },
+  "Companies / Count": {
+    "defaultMessage": "Dostępne organizacje: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "Aktualnie wybrana"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "Aktywne decyzje"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "Domyślna"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "Domyślna organizacja otworzy się automatycznie po zalogowaniu."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "Usunięto domyślną organizację."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "Zapisano domyślną organizację. Otworzy się automatycznie po zalogowaniu."
+  },
+  "Companies / Description": {
+    "defaultMessage": "Wybierz organizację, w której chcesz pracować"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "Nie masz jeszcze dostępu do żadnej organizacji. Dodaj organizację lub zaakceptuj zaproszenie poniżej."
+  },
+  "Companies / Health": {
+    "defaultMessage": "Brak danych o kondycji"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "Zaproszenia do organizacji"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "Nie udało się wczytać organizacji. Odśwież stronę i spróbuj ponownie."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "Wczytywanie organizacji…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "Członek"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "Nie znaleziono organizacji pasujących do wyszukiwania."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "Właściciel"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "Usuń domyślną"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "Sprzedaż"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "Nie udało się zapisać domyślnej organizacji. Dotychczasowy wybór pozostaje bez zmian. Spróbuj ponownie."
+  },
+  "Companies / Search": {
+    "defaultMessage": "Szukaj po nazwie lub NIP-ie"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "Ustaw jako domyślną"
+  },
+  "Companies / Title": {
+    "defaultMessage": "Organizacje"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "Jeszcze niedostępne"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "Zobacz zaproszenie"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "Usuń domyślną organizację: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "Zapisywanie…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "Zapisywanie domyślnej organizacji: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "Ustaw jako domyślną organizację: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "Administrator systemu"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "Wszystkie organizacje"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "Wyczyść wyszukiwanie"
   }
 }

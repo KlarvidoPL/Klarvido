@@ -2,11 +2,13 @@ import { MockedProvider } from '@apollo/client/testing/react';
 import { CurrentUserType } from '@sb/webapp-api-client';
 import { CommonQuery, commonQueryCurrentUserQuery } from '@sb/webapp-api-client/providers';
 import { currentUserFactory } from '@sb/webapp-api-client/tests/factories';
+import { Locale, formatTranslationMessages } from '@sb/webapp-core/config/i18n';
+import plMessages from '@sb/webapp-core/translations/pl.json';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { HelmetProvider } from 'react-helmet-async';
 import { IntlProvider } from 'react-intl';
-import { MemoryRouter, Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import { MemoryRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 
 import { CurrentTenantProvider } from '../../../providers';
 import { CURRENT_TENANT_STORAGE_KEY } from '../../../providers/currentTenantProvider/currentTenantProvider.types';
@@ -24,7 +26,7 @@ const Providers = () => (
     <Location />
   </CurrentTenantProvider>
 );
-const show = (user: CurrentUserType, path = '/pl/companies', extraMocks: any[] = []) =>
+const show = (user: CurrentUserType, path = '/pl/organizations', extraMocks: any[] = []) =>
   render(
     <MockedProvider
       mocks={[
@@ -67,7 +69,7 @@ const show = (user: CurrentUserType, path = '/pl/companies', extraMocks: any[] =
       ]}
     >
       <HelmetProvider>
-        <IntlProvider locale="pl" defaultLocale="pl">
+        <IntlProvider locale="pl" defaultLocale="en" messages={formatTranslationMessages(Locale.POLISH, plMessages)}>
           <MemoryRouter initialEntries={[path]}>
             <CommonQuery>
               <Routes>
@@ -80,7 +82,8 @@ const show = (user: CurrentUserType, path = '/pl/companies', extraMocks: any[] =
                       </CompanyHomeRoute>
                     }
                   />
-                  <Route path="companies" element={<CompanySelection />} />
+                  <Route path="organizations" element={<CompanySelection />} />
+                  <Route path="companies" element={<Navigate to="../organizations" replace />} />
                   <Route path="add-tenant" element={<span>Dodawanie firmy</span>} />
                   <Route path="tenant-invitation/:token" element={<span>Zaproszenie</span>} />
                   <Route path="404" element={<span>Brak dostępu</span>} />
@@ -104,7 +107,7 @@ const show = (user: CurrentUserType, path = '/pl/companies', extraMocks: any[] =
 
 beforeEach(() => localStorage.clear());
 
-it('shows cards, neutral KPI placeholders, search and separate invitations', async () => {
+it('shows cards, example metrics, search and separate invitations', async () => {
   const invitation = tenantFactory({
     id: 'invite',
     name: 'Firma Zaproszona',
@@ -112,9 +115,10 @@ it('shows cards, neutral KPI placeholders, search and separate invitations', asy
   });
   show(currentUserFactory({ tenants: [one, two, invitation], defaultOrganizationId: 'one' }));
   await screen.findByRole('heading', { name: 'Firma Alpha' });
-  expect(screen.getByText('Dostępne firmy: 2')).toBeInTheDocument();
-  expect(screen.getByText('Domyślna')).toBeInTheDocument();
-  expect(screen.getAllByText('Jeszcze niedostępne')).toHaveLength(4);
+  expect(screen.getByText('Dostępne organizacje: 2')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Usuń domyślną organizację:/ })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getAllByText(/\+10\s*%/)).toHaveLength(2);
+  expect(screen.getAllByText('0')).toHaveLength(2);
   expect(screen.getByRole('link', { name: 'Zobacz zaproszenie' })).toHaveAttribute(
     'href',
     '/pl/tenant-invitation/invite-token'
@@ -122,6 +126,11 @@ it('shows cards, neutral KPI placeholders, search and separate invitations', asy
   fireEvent.change(screen.getByLabelText('Szukaj po nazwie lub NIP-ie'), { target: { value: '987 654' } });
   expect(screen.queryByRole('heading', { name: 'Firma Alpha' })).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Firma Beta' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Wyczyść wyszukiwanie' }));
+  expect(screen.getByLabelText('Szukaj po nazwie lub NIP-ie')).toHaveValue('');
+  expect(screen.getByLabelText('Szukaj po nazwie lub NIP-ie')).toHaveFocus();
+  expect(screen.getByRole('heading', { name: 'Firma Alpha' })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Wyczyść wyszukiwanie' })).not.toBeInTheDocument();
 });
 
 it('saves and removes the default through the cache without switching the company', async () => {
@@ -130,7 +139,7 @@ it('saves and removes the default through the cache without switching the compan
       setDefaultOrganization: { defaultOrganizationId: 'one', __typename: 'SetDefaultOrganizationMutationPayload' },
     },
   }));
-  show(currentUserFactory({ tenants: [one, two] }), '/pl/companies', [
+  show(currentUserFactory({ tenants: [one, two] }), '/pl/organizations', [
     {
       request: { query: setDefaultOrganizationMutation, variables: { organizationId: 'one' } },
       result: mutationResult,
@@ -141,35 +150,39 @@ it('saves and removes the default through the cache without switching the compan
     },
   ]);
   await screen.findByRole('heading', { name: 'Firma Alpha' });
-  fireEvent.click(screen.getAllByRole('button', { name: /Ustaw jako domyślną firmę:/ })[0]);
-  await screen.findByRole('button', { name: /Usuń domyślną firmę:/ });
+  fireEvent.click(screen.getAllByRole('button', { name: /Ustaw jako domyślną organizację:/ })[0]);
+  await screen.findByRole('button', { name: /Usuń domyślną organizację:/ });
   expect(mutationResult).toHaveBeenCalledTimes(1);
-  expect(screen.getByTestId('location')).toHaveTextContent('/pl/companies');
-  fireEvent.click(screen.getByRole('button', { name: /Usuń domyślną firmę:/ }));
-  await waitFor(() => expect(screen.queryByText('Domyślna')).not.toBeInTheDocument());
+  expect(screen.getByTestId('location')).toHaveTextContent('/pl/organizations');
+  fireEvent.click(screen.getByRole('button', { name: /Usuń domyślną organizację:/ }));
+  await waitFor(() =>
+    expect(screen.queryByRole('button', { name: /Usuń domyślną organizację:/ })).not.toBeInTheDocument()
+  );
 });
 
 it('keeps the existing default after a failed save', async () => {
-  show(currentUserFactory({ tenants: [one, two], defaultOrganizationId: 'one' }), '/pl/companies', [
+  show(currentUserFactory({ tenants: [one, two], defaultOrganizationId: 'one' }), '/pl/organizations', [
     {
       request: { query: setDefaultOrganizationMutation, variables: { organizationId: 'two' } },
       error: new Error('Unavailable'),
     },
   ]);
   await screen.findByRole('heading', { name: 'Firma Beta' });
-  fireEvent.click(screen.getByRole('button', { name: /Ustaw jako domyślną firmę:/ }));
+  fireEvent.click(screen.getByRole('button', { name: /Ustaw jako domyślną organizację:/ }));
   const error = await screen.findByRole('alert');
-  expect(error.closest('div')?.querySelector('button')).toHaveAccessibleName('Ustaw jako domyślną firmę: Firma Beta');
-  expect(screen.getByText('Domyślna')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Usuń domyślną firmę:/ })).toBeInTheDocument();
+  expect(error.closest('div')?.querySelector('button')).toHaveAccessibleName(
+    'Ustaw jako domyślną organizację: Firma Beta'
+  );
+  expect(screen.getByRole('button', { name: /Usuń domyślną organizację:/ })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByRole('button', { name: /Usuń domyślną organizację:/ })).toBeInTheDocument();
 });
 
 it.each([
   [[], null, '/pl/add-tenant'],
   [[one], null, '/pl/one'],
-  [[one, two], null, '/pl/companies'],
+  [[one, two], null, '/pl/organizations'],
   [[one, two], 'two', '/pl/two'],
-  [[one, two], 'revoked', '/pl/companies'],
+  [[one, two], 'revoked', '/pl/organizations'],
 ])(
   'routes home based on available companies and explicit default',
   async (tenants, defaultOrganizationId, expected) => {
@@ -206,24 +219,31 @@ it('opens the chosen company with the keyboard independently of the default', as
   expect(screen.getByTestId('location')).toHaveTextContent('/pl/one');
 });
 
-it('identifies a superuser without membership as a system administrator', async () => {
+it('shows an accessible company without displaying an application role', async () => {
   show(currentUserFactory({ isSuperuser: true, tenants: [tenantFactory({ ...one, membership: null })] }));
-  await screen.findByText('Administrator systemu');
+  await screen.findByRole('heading', { name: 'Firma Alpha' });
+  expect(screen.queryByText('Administrator systemu')).not.toBeInTheDocument();
   expect(screen.queryByText('Właściciel')).not.toBeInTheDocument();
 });
 
 it('announces pending saves and prevents duplicate preference changes', async () => {
-  show(currentUserFactory({ tenants: [one, two] }), '/pl/companies', [
+  show(currentUserFactory({ tenants: [one, two] }), '/pl/organizations', [
     {
       request: { query: setDefaultOrganizationMutation, variables: { organizationId: 'one' } },
       delay: 100,
       result: { data: { setDefaultOrganization: { defaultOrganizationId: 'one' } } },
     },
   ]);
-  const button = await screen.findByRole('button', { name: 'Ustaw jako domyślną firmę: Firma Alpha' });
+  const button = await screen.findByRole('button', { name: 'Ustaw jako domyślną organizację: Firma Alpha' });
   fireEvent.click(button);
   expect(await screen.findByText('Zapisywanie…')).toHaveAttribute('role', 'status');
-  expect(screen.getByRole('button', { name: 'Zapisywanie domyślnej firmy: Firma Alpha' })).toBeDisabled();
-  expect(screen.getByRole('button', { name: 'Ustaw jako domyślną firmę: Firma Beta' })).toBeDisabled();
-  await screen.findByRole('button', { name: 'Usuń domyślną firmę: Firma Alpha' });
+  expect(screen.getByRole('button', { name: 'Zapisywanie domyślnej organizacji: Firma Alpha' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Ustaw jako domyślną organizację: Firma Beta' })).toBeDisabled();
+  await screen.findByRole('button', { name: 'Usuń domyślną organizację: Firma Alpha' });
+});
+
+it('redirects the old chooser URL to organizations', async () => {
+  show(currentUserFactory({ tenants: [one, two] }), '/pl/companies');
+  await screen.findByRole('heading', { name: 'Firma Alpha' });
+  expect(screen.getByTestId('location')).toHaveTextContent('/pl/organizations');
 });

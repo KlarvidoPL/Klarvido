@@ -32,7 +32,7 @@ import {
   TenantSettings,
 } from '@sb/webapp-tenants/routes';
 import { CompanyHomeRoute } from '@sb/webapp-tenants/routes/companySelection/companyHomeRoute.component';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Role } from '../modules/auth/auth.types';
 import { Admin } from '../routes/admin';
@@ -283,7 +283,11 @@ export const App = () => {
           </Route>
 
           <Route element={<AuthRoute />}>
-            <Route path={RoutesConfig.companies} element={<CompanySelection />} />
+            <Route path={RoutesConfig.organizations} element={<CompanySelection />} />
+            <Route
+              path={RoutesConfig.legacyCompanies}
+              element={<Navigate to={`../${RoutesConfig.organizations}`} replace />}
+            />
             <Route path={RoutesConfig.profile} element={<Profile />} />
             <Route path={RoutesConfig.addTenant} element={<AddTenantForm />} />
             <Route path={RoutesConfig.tenantInvitation} element={<TenantInvitation />} />

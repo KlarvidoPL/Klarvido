@@ -5280,102 +5280,105 @@
     "defaultMessage": "Could not clear this draft. Please try again."
   },
   "Companies / Add": {
-    "defaultMessage": "Dodaj firmę"
+    "defaultMessage": "Add organization"
   },
   "Companies / Admin": {
     "defaultMessage": "Administrator"
   },
   "Companies / Count": {
-    "defaultMessage": "Dostępne firmy: {count}"
+    "defaultMessage": "Available organizations: {count}"
   },
   "Companies / Current": {
-    "defaultMessage": "Aktualnie wybrana"
+    "defaultMessage": "Currently selected"
   },
   "Companies / Decisions": {
-    "defaultMessage": "Aktywne decyzje"
+    "defaultMessage": "Active decisions"
   },
   "Companies / Default badge": {
-    "defaultMessage": "Domyślna"
+    "defaultMessage": "Default"
   },
   "Companies / Default hint": {
-    "defaultMessage": "Domyślna firma otworzy się automatycznie po zalogowaniu."
+    "defaultMessage": "Your default organization opens automatically after you sign in."
   },
   "Companies / Default removed": {
-    "defaultMessage": "Usunięto domyślną firmę."
+    "defaultMessage": "Default organization removed."
   },
   "Companies / Default saved": {
-    "defaultMessage": "Zapisano domyślną firmę. Otworzy się automatycznie po zalogowaniu."
+    "defaultMessage": "Default organization saved. It will open automatically after you sign in."
   },
   "Companies / Description": {
-    "defaultMessage": "Wybierz firmę, w której chcesz pracować"
+    "defaultMessage": "Choose the organization you want to work in"
   },
   "Companies / Empty": {
-    "defaultMessage": "Nie masz jeszcze dostępu do żadnej firmy. Dodaj firmę lub zaakceptuj zaproszenie poniżej."
+    "defaultMessage": "You do not have access to any organizations yet. Add an organization or accept an invitation below."
   },
   "Companies / Health": {
-    "defaultMessage": "Kondycja firmy: jeszcze niedostępna"
+    "defaultMessage": "No organization health data"
   },
   "Companies / Invitations": {
-    "defaultMessage": "Zaproszenia do firm"
+    "defaultMessage": "Organization invitations"
   },
   "Companies / Load error": {
-    "defaultMessage": "Nie udało się wczytać firm. Odśwież stronę i spróbuj ponownie."
+    "defaultMessage": "Could not load organizations. Refresh the page and try again."
   },
   "Companies / Loading": {
-    "defaultMessage": "Wczytywanie firm…"
+    "defaultMessage": "Loading organizations…"
   },
   "Companies / Member": {
-    "defaultMessage": "Członek"
+    "defaultMessage": "Member"
   },
   "Companies / NIP": {
     "defaultMessage": "NIP: {nip}"
   },
   "Companies / No matches": {
-    "defaultMessage": "Nie znaleziono firm pasujących do wyszukiwania."
+    "defaultMessage": "No organizations match your search."
   },
   "Companies / Owner": {
-    "defaultMessage": "Właściciel"
+    "defaultMessage": "Owner"
   },
   "Companies / Remove default": {
-    "defaultMessage": "Usuń domyślną"
+    "defaultMessage": "Remove default"
   },
   "Companies / Sales": {
-    "defaultMessage": "Sprzedaż"
+    "defaultMessage": "Sales"
   },
   "Companies / Save error": {
-    "defaultMessage": "Nie udało się zapisać domyślnej firmy. Dotychczasowy wybór pozostaje bez zmian. Spróbuj ponownie."
+    "defaultMessage": "Could not save your default organization. Your previous selection is unchanged. Try again."
   },
   "Companies / Search": {
-    "defaultMessage": "Szukaj po nazwie lub NIP-ie"
+    "defaultMessage": "Search by name or NIP"
   },
   "Companies / Set default": {
-    "defaultMessage": "Ustaw jako domyślną"
+    "defaultMessage": "Set as default"
   },
   "Companies / Title": {
-    "defaultMessage": "Firmy"
+    "defaultMessage": "Organizations"
   },
   "Companies / Unavailable": {
-    "defaultMessage": "Jeszcze niedostępne"
+    "defaultMessage": "Not yet available"
   },
   "Companies / View invitation": {
-    "defaultMessage": "Zobacz zaproszenie"
+    "defaultMessage": "View invitation"
   },
   "TenantSwitch / All companies": {
-    "defaultMessage": "Wszystkie firmy"
+    "defaultMessage": "All organizations"
   },
   "Companies / Remove default label": {
-    "defaultMessage": "Usuń domyślną firmę: {company}"
+    "defaultMessage": "Remove default organization: {company}"
   },
   "Companies / Saving": {
-    "defaultMessage": "Zapisywanie…"
+    "defaultMessage": "Saving…"
   },
   "Companies / Saving label": {
-    "defaultMessage": "Zapisywanie domyślnej firmy: {company}"
+    "defaultMessage": "Saving default organization: {company}"
   },
   "Companies / Set default label": {
-    "defaultMessage": "Ustaw jako domyślną firmę: {company}"
+    "defaultMessage": "Set as default organization: {company}"
   },
   "Companies / System admin": {
-    "defaultMessage": "Administrator systemu"
+    "defaultMessage": "System administrator"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "Clear search"
   }
 }

@@ -20,15 +20,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@sb/webapp-core/compone
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { cn } from '@sb/webapp-core/lib/utils';
-import { Building2, ChevronDown, Plus, Search, User, UserPlus } from 'lucide-react';
+import { Building2, ChevronDown, LayoutGrid, Plus, Search, User, UserPlus, X } from 'lucide-react';
 import { groupBy, head, prop } from 'ramda';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import { RoutesConfig as TenantRoutesConfig } from '../../config/routes';
 import { useGenerateTenantPath, useTenants } from '../../hooks';
 import { useCurrentTenant } from '../../providers';
+import { matchesCompany } from '../../routes/companySelection/companySelection.utils';
 
 export type TenantSwitchSidebarProps = {
   collapsed?: boolean;
@@ -48,6 +49,7 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
   const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonQueryData?.currentUser);
   const isSuperuser = !!currentUser?.isSuperuser;
   const [searchQuery, setSearchQuery] = useState('');
+  const searchInput = useRef<HTMLInputElement>(null);
 
   const tenantsGrouped = groupBy(prop<string>('type'), tenants);
   const personalTenant = head(tenantsGrouped[TenantType.PERSONAL] ?? []);
@@ -60,7 +62,7 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
     return membership.invitationAccepted ? 'organizations' : 'invitations';
   }, tenantsGrouped[TenantType.ORGANIZATION] ?? []);
   const filteredOrganizations = (organizationTenants?.organizations ?? []).filter((tenant) =>
-    (tenant?.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+    tenant ? matchesCompany(tenant, searchQuery) : false
   );
 
   const handleTenantChange = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
@@ -140,6 +142,7 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
               <div className="relative">
                 <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
+                  ref={searchInput}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
@@ -151,8 +154,24 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
                     defaultMessage: 'Search organizations…',
                     id: 'TenantSwitch / Search organizations placeholder',
                   })}
-                  className="h-8 pl-8 text-sm"
+                  className="h-8 pl-8 pr-8 text-sm"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    aria-label={intl.formatMessage({ id: 'Companies / Clear search', defaultMessage: 'Clear search' })}
+                    className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Escape') event.stopPropagation();
+                    }}
+                    onClick={() => {
+                      setSearchQuery('');
+                      searchInput.current?.focus();
+                    }}
+                  >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                )}
               </div>
             </div>
             <div className="max-h-60 overflow-y-auto">
@@ -199,13 +218,13 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            navigate(generateLocalePath(TenantRoutesConfig.companies));
+            navigate(generateLocalePath(TenantRoutesConfig.organizations));
             onNavigate?.();
           }}
           className="gap-2"
         >
-          <Building2 className="h-4 w-4" />
-          <FormattedMessage id="TenantSwitch / All companies" defaultMessage="Wszystkie firmy" />
+          <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+          <FormattedMessage id="TenantSwitch / All companies" defaultMessage="All organizations" />
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleNewTenantClick} className="gap-2">
           <Plus className="h-4 w-4" />

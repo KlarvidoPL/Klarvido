@@ -48,6 +48,7 @@ Thumbs.db
 .env.prod
 .env.prod.example
 # Nx
+.pnpm-store/
 .nx/cache
 .nx/workspace-data
 

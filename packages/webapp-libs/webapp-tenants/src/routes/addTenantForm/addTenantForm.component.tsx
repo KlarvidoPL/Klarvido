@@ -4,10 +4,10 @@ import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
-import { useToast } from '@sb/webapp-core/toast';
 import { Alert, AlertDescription } from '@sb/webapp-core/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
+import { Card, CardContent, CardHeader } from '@sb/webapp-core/components/ui/card';
 import { cn } from '@sb/webapp-core/lib/utils';
+import { useToast } from '@sb/webapp-core/toast';
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, CheckCircle2, Info, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -30,8 +30,8 @@ import {
 } from '../../hooks/useCompanyLookup';
 import { DEFAULT_COMPANY_COUNTRY, normalizeTaxId } from '../../utils/companyCountries';
 import { normalizeDigits } from '../../utils/nip';
-import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
 import { OnboardingStep } from '../organizationOnboarding/onboardingSteps';
+import { OrganizationOnboarding } from '../organizationOnboarding/organizationOnboarding.component';
 import {
   clearOrganizationOnboardingDraftMutation,
   organizationOnboardingDraftQuery,
@@ -191,97 +191,101 @@ export const AddTenantForm = () => {
 
   return (
     <PageLayout>
-      <Card className="mx-auto w-full max-w-screen-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
+      <div className="mx-auto w-full max-w-5xl space-y-8">
+        <div className="space-y-4">
+          <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+            <Building2 className="h-6 w-6 shrink-0 text-primary" />
             <FormattedMessage defaultMessage="Add Organization" id="Tenant form / AddTenant / Card title" />
-          </CardTitle>
-          <CardDescription>
+          </h1>
+          <p className="text-lg text-muted-foreground">
             <FormattedMessage
               defaultMessage="Enter the details for your new organization"
               id="Tenant form / AddTenant / Card description"
             />
-          </CardDescription>
-          <OnboardingProgress step={step + 1} />
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              className="flex flex-col gap-4"
-              noValidate
-              onSubmit={(event) => {
-                if (step === OnboardingStep.ORGANIZATION) {
-                  event.preventDefault();
-                  handleNext();
-                  return;
-                }
-                onSubmit(event);
-              }}
-            >
-              {step === OnboardingStep.ORGANIZATION && (
-                <>
-                  <DisplayNameField />
-                  <CountryField />
-                  <NipField />
-                </>
-              )}
-
-              {step === OnboardingStep.COMPANY_DETAILS && (
-                <>
-                  <LookupResultNote found={!!companyFound} missingFields={missingFields} />
-                  <CompanyDetailsFields />
-                </>
-              )}
-
-              {hasGenericErrorOnly && (
-                <div className="text-sm text-destructive dark:text-red-400">
-                  <span>{genericError}</span>
-                </div>
-              )}
-
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-                {/* Distinct keys: without them React reuses the same <button> across steps, so clicking Back flips
-                    it to type="submit" mid-click and the browser submits the form (= Next) right back to step 2 */}
-                {step === OnboardingStep.ORGANIZATION ? (
-                  <Button
-                    key="next"
-                    type="submit"
-                    disabled={lookupLoading}
-                    className="w-full sm:w-fit"
-                    icon={lookupLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
-                  >
-                    <FormattedMessage defaultMessage="Next" id="Tenant form / AddTenant / Next button" />
-                    {!lookupLoading && <ArrowRight className="ml-2 h-4 w-4" />}
-                  </Button>
-                ) : (
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <OnboardingProgress step={step + 1} />
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                className="flex flex-col gap-4"
+                noValidate
+                onSubmit={(event) => {
+                  if (step === OnboardingStep.ORGANIZATION) {
+                    event.preventDefault();
+                    handleNext();
+                    return;
+                  }
+                  onSubmit(event);
+                }}
+              >
+                {step === OnboardingStep.ORGANIZATION && (
                   <>
-                    <Button
-                      key="back"
-                      type="button"
-                      variant={ButtonVariant.SECONDARY}
-                      onClick={() => setStep(OnboardingStep.ORGANIZATION)}
-                      disabled={loadingMutation}
-                      className="w-full sm:w-fit"
-                      icon={<ArrowLeft className="h-4 w-4" />}
-                    >
-                      <FormattedMessage defaultMessage="Back" id="Tenant form / AddTenant / Back button" />
-                    </Button>
-                    <Button
-                      key="create"
-                      type="submit"
-                      disabled={loadingMutation || companyDetailsIncomplete}
-                      className="w-full sm:w-fit"
-                    >
-                      <FormattedMessage defaultMessage="Next" id="Tenant form / AddTenant / Next button" />
-                    </Button>
+                    <DisplayNameField />
+                    <CountryField />
+                    <NipField />
                   </>
                 )}
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+
+                {step === OnboardingStep.COMPANY_DETAILS && (
+                  <>
+                    <LookupResultNote found={!!companyFound} missingFields={missingFields} />
+                    <CompanyDetailsFields />
+                  </>
+                )}
+
+                {hasGenericErrorOnly && (
+                  <div className="text-sm text-destructive dark:text-red-400">
+                    <span>{genericError}</span>
+                  </div>
+                )}
+
+                <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                  {/* Distinct keys: without them React reuses the same <button> across steps, so clicking Back flips
+                    it to type="submit" mid-click and the browser submits the form (= Next) right back to step 2 */}
+                  {step === OnboardingStep.ORGANIZATION ? (
+                    <Button
+                      key="next"
+                      type="submit"
+                      disabled={lookupLoading}
+                      className="w-full sm:w-fit"
+                      icon={lookupLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
+                    >
+                      <FormattedMessage defaultMessage="Next" id="Tenant form / AddTenant / Next button" />
+                      {!lookupLoading && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        key="back"
+                        type="button"
+                        variant={ButtonVariant.SECONDARY}
+                        onClick={() => setStep(OnboardingStep.ORGANIZATION)}
+                        disabled={loadingMutation}
+                        className="w-full sm:w-fit"
+                        icon={<ArrowLeft className="h-4 w-4" />}
+                      >
+                        <FormattedMessage defaultMessage="Back" id="Tenant form / AddTenant / Back button" />
+                      </Button>
+                      <Button
+                        key="create"
+                        type="submit"
+                        disabled={loadingMutation || companyDetailsIncomplete}
+                        className="w-full sm:w-fit"
+                      >
+                        <FormattedMessage defaultMessage="Next" id="Tenant form / AddTenant / Next button" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </PageLayout>
   );
 };
