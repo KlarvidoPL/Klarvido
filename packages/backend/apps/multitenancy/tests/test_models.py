@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from django.db import IntegrityError
 
 from ..constants import TenantUserRole
+from ..disabled_permissions import DISABLED_PERMISSION_CODES
 from ..models import (
     Permission,
     Tenant,
@@ -127,7 +128,7 @@ class TestSuperuserBypassHelpers:
 class TestGetUserPermissionsForTenantSuperuserBypass:
     def test_superuser_without_membership_gets_all_permissions(self, tenant, user_factory):
         superuser = user_factory(is_superuser=True)
-        all_permission_codes = set(Permission.objects.values_list("code", flat=True))
+        all_permission_codes = set(Permission.objects.values_list("code", flat=True)) - DISABLED_PERMISSION_CODES
         assert all_permission_codes, "expected at least one Permission row to exist from app migrations"
 
         permissions = get_user_permissions_for_tenant(superuser, tenant)
@@ -140,7 +141,7 @@ class TestGetUserPermissionsForTenantSuperuserBypass:
         superuser = user_factory(is_superuser=True)
         tenant_membership_factory(user=superuser, tenant=tenant, role=TenantUserRole.MEMBER, is_accepted=True)
 
-        all_permission_codes = set(Permission.objects.values_list("code", flat=True))
+        all_permission_codes = set(Permission.objects.values_list("code", flat=True)) - DISABLED_PERMISSION_CODES
         assert all_permission_codes, "expected at least one Permission row to exist from app migrations"
         permissions = get_user_permissions_for_tenant(superuser, tenant)
 

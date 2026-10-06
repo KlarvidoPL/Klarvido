@@ -439,7 +439,6 @@ Control which authentication methods are shown on the login page:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `VITE_ENABLE_SSO` | `true` | Show SSO discovery (enterprise single sign-on) |
 | `VITE_ENABLE_PASSKEYS` | `true` | Show "Sign in with Passkey" (WebAuthn) |
 | `VITE_ENABLE_SOCIAL_LOGIN` | `true` | Show Google/Facebook social login buttons |
 | `VITE_ENABLE_PASSWORD_LOGIN` | `true` | Show email/password login form |
@@ -447,7 +446,6 @@ Control which authentication methods are shown on the login page:
 **Example: Passkey-only authentication:**
 ```bash
 VITE_ENABLE_PASSKEYS=true
-VITE_ENABLE_SSO=false
 VITE_ENABLE_SOCIAL_LOGIN=false
 VITE_ENABLE_PASSWORD_LOGIN=false
 ```

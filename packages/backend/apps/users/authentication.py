@@ -9,7 +9,17 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from common.csrf import enforce_api_csrf
 
 
-class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
+class SupportedJWTAuthentication(authentication.JWTAuthentication):
+    """Reject previously issued enterprise SSO tokens across all JWT transports."""
+
+    def get_validated_token(self, raw_token):
+        token = super().get_validated_token(raw_token)
+        if token.get("auth_method") == "sso":
+            raise InvalidToken("Enterprise SSO is disabled.")
+        return token
+
+
+class JSONWebTokenCookieAuthentication(SupportedJWTAuthentication):
     """
     Custom JWT authentication that reads the token from cookies.
 
@@ -46,7 +56,7 @@ class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
         - IsAuthenticated endpoints will still fail with 403
 
         This is important for the login page where we need to fetch translations
-        and SSO options even if the user has expired cookies.
+        even if the user has expired cookies.
         """
         try:
             result = super().authenticate(request)
@@ -61,7 +71,7 @@ class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
         return result
 
 
-class JSONWebTokenChannelsAuthentication(authentication.JWTAuthentication):
+class JSONWebTokenChannelsAuthentication(SupportedJWTAuthentication):
     """
     JWT authentication for Django Channels WebSocket connections.
     Reads the token from cookies in the WebSocket connection scope.

@@ -61,7 +61,7 @@ class TenantDependentAccess(AccessPolicy):
         "org.settings.edit",  # Can edit org settings
         "members.roles.edit",  # Can edit member roles
         "members.remove",  # Can remove members
-        "security.sso.manage",  # Can manage SSO
+        # "security.sso.manage",  # Enterprise SSO disabled.
     ]
 
     def _get_user_rbac_info(self, request) -> dict:

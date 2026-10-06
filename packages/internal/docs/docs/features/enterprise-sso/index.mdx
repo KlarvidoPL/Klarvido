@@ -5,6 +5,9 @@ description: Complete guide to implementing enterprise single sign-on, directory
 
 # Enterprise SSO & Directory Sync
 
+:::warning Currently disabled in Klarvido
+SAML/OIDC and SCIM entry points, settings, role permissions, and notifications are disabled in code. This page documents the retained implementation for future review. Passkeys, session/device controls, and audit logs remain available. Environment flags cannot restore enterprise SSO.
+:::
 The SaaS Boilerplate includes a comprehensive Enterprise SSO solution that provides:
 
 - **SAML 2.0** - Industry-standard SSO protocol used by Okta, Azure AD, OneLogin, and more
@@ -51,7 +54,6 @@ SaaS developers can enable/disable authentication features via environment varia
 
 ```bash
 # .env
-VITE_ENABLE_SSO=true          # Enable SSO discovery on login page
 VITE_ENABLE_PASSKEYS=true     # Enable passkey/WebAuthn login
 VITE_ENABLE_SOCIAL_LOGIN=true # Enable Google/Facebook login
 VITE_ENABLE_PASSWORD_LOGIN=true # Enable email/password login
@@ -564,7 +566,6 @@ If you don't need enterprise SSO features, you can disable them entirely:
 
 ```bash
 # .env
-VITE_ENABLE_SSO=false
 VITE_ENABLE_PASSKEYS=false
 ```
 

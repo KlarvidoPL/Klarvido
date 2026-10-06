@@ -4,9 +4,9 @@ Django admin configuration for SSO models.
 
 from django.contrib import admin
 from .models import (
-    TenantSSOConnection,
-    SCIMToken,
-    SSOUserLink,
+    # TenantSSOConnection,  # Enterprise SSO/SCIM disabled.
+    # SCIMToken,  # Enterprise SSO/SCIM disabled.
+    # SSOUserLink,  # Enterprise SSO/SCIM disabled.
     SSOSession,
     UserDevice,
     UserPasskey,
@@ -15,7 +15,7 @@ from .models import (
 )
 
 
-@admin.register(TenantSSOConnection)
+# Enterprise SSO disabled: @admin.register(TenantSSOConnection)
 class TenantSSOConnectionAdmin(admin.ModelAdmin):
     list_display = ["name", "tenant", "connection_type", "status", "last_login_at", "login_count"]
     list_filter = ["connection_type", "status", "jit_provisioning_enabled"]
@@ -75,7 +75,7 @@ class TenantSSOConnectionAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(SCIMToken)
+# Enterprise SSO disabled: @admin.register(SCIMToken)
 class SCIMTokenAdmin(admin.ModelAdmin):
     list_display = ["name", "tenant", "token_prefix", "is_active", "expires_at", "last_used_at"]
     list_filter = ["is_active"]
@@ -83,7 +83,7 @@ class SCIMTokenAdmin(admin.ModelAdmin):
     readonly_fields = ["token_hash", "token_prefix", "created_at", "updated_at", "last_used_at", "request_count"]
 
 
-@admin.register(SSOUserLink)
+# Enterprise SSO disabled: @admin.register(SSOUserLink)
 class SSOUserLinkAdmin(admin.ModelAdmin):
     list_display = ["user", "sso_connection", "idp_user_id", "provisioned_via_jit", "last_login_at"]
     list_filter = ["provisioned_via_jit", "provisioned_via_scim"]

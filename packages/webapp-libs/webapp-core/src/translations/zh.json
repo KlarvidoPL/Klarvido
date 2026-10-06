@@ -3777,7 +3777,7 @@
     "defaultMessage": "管理单点登录"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "查看 SSO 连接、通行密钥和安全配置"
+    "defaultMessage": "查看安全配置"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "查看安全设置"

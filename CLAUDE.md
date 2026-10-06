@@ -182,7 +182,7 @@ Besides the tenant-scoped permission registry above (`register_app_permissions`,
 
 Other auth extension points: new OAuth provider → `SOCIAL_AUTH_<PROVIDER>_KEY`/`SECRET` in `settings.py` + add to the frontend `OAuthProvider` enum (`modules/auth/auth.types.ts`) + wire a button via `useOAuthLogin(provider)`; `SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS` is the allow-list for OAuth redirect targets. New profile field → add to `UserProfile` model + migration, thread through `UserManager.create_user`, `UserSignupSerializer`, `CurrentUserType` (custom `graphene.String()` + `resolve_<field>`), and `UserProfileSerializer` if user-editable post-signup.
 
-### Enterprise SSO & directory sync
+### Enterprise SSO (disabled) & directory sync
 
 A whole feature area, distinct from both authorization layers above: `apps.sso` (backend) + `@sb/webapp-sso` (frontend). Three independently-toggleable pieces:
 
@@ -190,9 +190,9 @@ A whole feature area, distinct from both authorization layers above: `apps.sso` 
 2. **SCIM 2.0 directory sync** — provisioning/deprovisioning at `/api/sso/scim/v2/{Users,Groups}`, bearer-token auth (shown once on creation); requires an active SSO connection first. SCIM groups map read-only to tenant roles.
 3. **WebAuthn/Passkeys** — **personal, not org-scoped**: a passkey authenticates the _user_ across all their tenant memberships, managed only from the user's own Profile — an org admin can't see/delete another user's passkey. Organization Settings → Security has no passkey section, and the `security.passkeys.manage` permission no longer exists. New passkey registrations notify only that user, never owners or admins. The same personal-vs-org distinction applies to session management (Profile → Active Sessions: each user manages only their own devices).
 
-Feature flags (env-driven, default all `true`, UI-only — don't fully remove `apps.sso` to "disable" it, that's destructive to existing SSO data): `VITE_ENABLE_SSO`, `VITE_ENABLE_PASSKEYS`, `VITE_ENABLE_SOCIAL_LOGIN`, `VITE_ENABLE_PASSWORD_LOGIN`.
+**Enterprise SSO and SCIM are currently disabled in code**, including REST/GraphQL entry points, organization configuration, `security.sso.manage`, and SSO notifications. Existing SSO JWTs are rejected. `VITE_ENABLE_SSO` cannot reactivate the feature. Retained code and archived `.disabled` tests are documented in `packages/backend/apps/sso/DISABLED.md`. Do not restore SSO without a security review. Keep `apps.sso` installed: passkeys, normal login sessions, device controls, and audit logs still use its shared models and services.
 
-A Django superuser (see the superuser cross-tenant bypass note above) is exempt from per-tenant SSO enforcement as a side effect of never having a real `TenantMembership` row — `get_sso_enforced_tenant_ids()` (`apps/sso/enforcement.py`) only enforces SSO against tenants the user already has a real membership in, so this isn't a special case that needed its own code path, just something to know if you're reasoning about SSO enforcement's coverage.
+Supported login UI flags: `VITE_ENABLE_PASSKEYS`, `VITE_ENABLE_SOCIAL_LOGIN`, `VITE_ENABLE_PASSWORD_LOGIN` (default `true`).
 
 Every SSO/SCIM/passkey event is auto-logged to `SSOAuditLog` (tenant-isolated, viewable at Organization Settings → Security → Audit Log or `GET /api/sso/tenant/{id}/audit-logs/`); extend event types in `apps/sso/constants.py`, log custom ones with `SSOAuditLog.log_event(...)`. Provider setup (Okta, Azure AD/Entra ID) follows the same shape: create app in IdP → point ACS URL (`/api/sso/saml/{id}/acs`) or OIDC redirect URI (`/api/sso/oidc/{id}/callback`) at this app → copy IdP metadata/cert into the tenant's SSO connection → optionally enable SCIM. Azure AD caps group claims at 200 groups; mapping by Group ID (stable, unreadable) vs. display name (readable, breaks on rename) is a real tradeoff.
 

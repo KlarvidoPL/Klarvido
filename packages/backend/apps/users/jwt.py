@@ -21,6 +21,9 @@ def create_jwt_tokens(user, session_id: Optional[str] = None, auth_method: str =
     Returns:
         Dict with 'access', 'refresh' token strings, and 'session_id' if provided
     """
+    if auth_method == "sso":
+        raise TokenError("Enterprise SSO is disabled.")
+
     refresh = RefreshToken.for_user(user)
 
     refresh['auth_method'] = auth_method

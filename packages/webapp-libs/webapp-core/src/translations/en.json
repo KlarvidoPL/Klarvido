@@ -3951,7 +3951,7 @@
     "defaultMessage": "Manage SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "View SSO connections, passkeys, and security configurations"
+    "defaultMessage": "View security configurations"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "View Security Settings"

@@ -782,7 +782,8 @@ class Query(graphene.ObjectType):
     my_passkeys = graphene.relay.ConnectionField(PasskeyConnection)
     my_sessions = graphene.relay.ConnectionField(SSOSessionConnection)
     my_devices = graphene.relay.ConnectionField(UserDeviceConnection)
-    sso_discover = graphene.Field(SSODiscoveryResultType, email=graphene.String(required=True))
+    # Enterprise discovery disabled; retained resolver is not registered.
+    # sso_discover = graphene.Field(SSODiscoveryResultType, email=graphene.String(required=True))
 
     @staticmethod
     def resolve_my_passkeys(root, info, **kwargs):
@@ -875,19 +876,20 @@ class TenantSSOQuery(graphene.ObjectType):
     - security.sso.manage: Full access to SSO management
     """
 
-    sso_connections = graphene.relay.ConnectionField(
-        SSOConnectionConnection,
-        tenant_id=graphene.ID(required=True),
-    )
-    sso_connection = graphene.Field(
-        SSOConnectionType,
-        tenant_id=graphene.ID(required=True),
-        id=graphene.ID(),
-    )
-    scim_tokens = graphene.relay.ConnectionField(
-        SCIMTokenConnection,
-        tenant_id=graphene.ID(required=True),
-    )
+    # Enterprise configuration queries disabled.
+    # sso_connections = graphene.relay.ConnectionField(
+    #     SSOConnectionConnection,
+    #     tenant_id=graphene.ID(required=True),
+    # )
+    # sso_connection = graphene.Field(
+    #     SSOConnectionType,
+    #     tenant_id=graphene.ID(required=True),
+    #     id=graphene.ID(),
+    # )
+    # scim_tokens = graphene.relay.ConnectionField(
+    #     SCIMTokenConnection,
+    #     tenant_id=graphene.ID(required=True),
+    # )
     sso_audit_logs = graphene.relay.ConnectionField(
         SSOAuditLogConnection,
         tenant_id=graphene.ID(required=True),

@@ -17,7 +17,6 @@ Control which authentication methods are available on the login page:
 
 | Name                       | Description                                              | Default |
 |----------------------------|----------------------------------------------------------|---------|
-| VITE_ENABLE_SSO            | Show SSO discovery when user enters email with SSO domain | `true`  |
 | VITE_ENABLE_PASSKEYS       | Show "Sign in with Passkey" button (WebAuthn)            | `true`  |
 | VITE_ENABLE_SOCIAL_LOGIN   | Show Google/Facebook login buttons                       | `true`  |
 | VITE_ENABLE_PASSWORD_LOGIN | Show email/password login form                           | `true`  |
@@ -26,7 +25,6 @@ Control which authentication methods are available on the login page:
 Set these to `false` to disable the corresponding authentication method. For example, to build a passkey-only app:
 ```bash
 VITE_ENABLE_PASSKEYS=true
-VITE_ENABLE_SSO=false
 VITE_ENABLE_SOCIAL_LOGIN=false
 VITE_ENABLE_PASSWORD_LOGIN=false
 ```

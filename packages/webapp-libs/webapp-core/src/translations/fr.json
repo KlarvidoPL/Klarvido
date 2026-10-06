@@ -3777,7 +3777,7 @@
     "defaultMessage": "Gérer le SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Afficher les connexions SSO, les clés d'accès et les configurations de sécurité"
+    "defaultMessage": "Afficher la configuration de sécurité"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Afficher les paramètres de sécurité"

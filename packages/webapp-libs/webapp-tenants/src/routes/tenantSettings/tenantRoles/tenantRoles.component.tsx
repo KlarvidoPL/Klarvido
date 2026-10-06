@@ -1164,13 +1164,17 @@ export const TenantRoles = () => {
   const allPermissions = useMemo(() => {
     return (permissionsData?.allPermissions?.edges || [])
       .map((edge) => edge?.node)
-      .filter(Boolean) as Permission[];
+      .filter((permission) => permission && permission.code !== 'security.sso.manage') as Permission[];
   }, [permissionsData]);
 
   const allRoles = useMemo(() => {
     return (rolesData?.allOrganizationRoles?.edges || [])
       .map((edge) => edge?.node)
-      .filter(Boolean) as OrganizationRole[];
+      .filter(Boolean)
+      .map((role) => ({
+        ...role,
+        permissions: role!.permissions?.filter((permission) => permission && permission.code !== 'security.sso.manage') ?? [],
+      })) as OrganizationRole[];
   }, [rolesData]);
 
   const handleCreateRole = useCallback(() => {

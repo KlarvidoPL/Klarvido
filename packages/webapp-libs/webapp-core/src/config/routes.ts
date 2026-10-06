@@ -15,9 +15,5 @@ export const RoutesConfig = {
   }),
   addTenant: 'add-tenant',
   tenantInvitation: 'tenant-invitation/:token',
-  // SSO routes
-  ssoCallback: 'auth/sso/callback',
-  ssoError: 'auth/sso/error',
-  ssoLogin: 'auth/sso/login',
   oauthCallback: 'auth/oauth/callback',
 };

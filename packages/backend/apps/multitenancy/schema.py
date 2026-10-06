@@ -1,5 +1,6 @@
 from dataclasses import asdict
 
+from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
 import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
@@ -19,7 +20,6 @@ from common.action_logging.service import log_action, log_delete
 from common.ratelimiting import graphql_ratelimit, RateLimitKey
 from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
-from apps.sso.enforcement import filter_tenants_for_password_session
 from . import models
 from . import notifications
 from . import serializers
@@ -75,6 +75,11 @@ class PermissionType(DjangoObjectType):
 
     def resolve_id(self, info):
         return to_global_id("PermissionType", self.id)
+
+    def resolve_description(self, info):
+        if self.code == "security.view":
+            return "View security configurations"
+        return self.description
 
     def resolve_category(self, info):
         return self.category
@@ -140,7 +145,7 @@ class OrganizationRoleType(DjangoObjectType):
         return self.is_owner_role
 
     def resolve_permissions(self, info):
-        return self.permissions.all()
+        return self.permissions.exclude(code__in=DISABLED_PERMISSION_CODES)
 
     def resolve_member_count(self, info):
         return self.member_assignments.count()
@@ -956,7 +961,7 @@ class CreateOrganizationRoleMutation(graphene.Mutation):
         if color == OWNER_ROLE_COLOR:
             raise exceptions.GraphQlValidationError("This color is reserved for the Owner role.")
 
-        unavailable = get_permission_codes_unavailable_for_country(tenant.country)
+        unavailable = get_permission_codes_unavailable_for_country(tenant.country) | DISABLED_PERMISSION_CODES
         for perm_id in permission_ids:
             _, perm_pk = from_global_id(perm_id)
             permission = get_object_or_404(models.Permission, pk=perm_pk)
@@ -1052,7 +1057,7 @@ class UpdateOrganizationRoleMutation(graphene.Mutation):
 
         # SECURITY CHECK 2: If adding permissions, verify user has those permissions
         if permission_ids is not None:
-            unavailable = get_permission_codes_unavailable_for_country(tenant.country)
+            unavailable = get_permission_codes_unavailable_for_country(tenant.country) | DISABLED_PERMISSION_CODES
             for perm_id in permission_ids:
                 _, perm_pk = from_global_id(perm_id)
                 permission = get_object_or_404(models.Permission, pk=perm_pk)
@@ -1090,8 +1095,10 @@ class UpdateOrganizationRoleMutation(graphene.Mutation):
 
             if permission_ids is not None:
                 # Replace all permissions
-                old_perms = list(role.permissions.values_list("code", flat=True))
-                role.role_permissions.all().delete()
+                old_perms = list(
+                    role.permissions.exclude(code__in=DISABLED_PERMISSION_CODES).values_list("code", flat=True)
+                )
+                role.role_permissions.exclude(permission__code__in=DISABLED_PERMISSION_CODES).delete()
                 new_perms = []
                 for perm_id in permission_ids:
                     _, perm_pk = from_global_id(perm_id)
@@ -1198,7 +1205,11 @@ class DeleteOrganizationRoleMutation(graphene.Mutation):
 
             if not is_acting_user_owner:
                 user_permissions = models.get_user_permissions_for_tenant(user, tenant)
-                replacement_permissions = set(replacement_role.permissions.values_list("code", flat=True))
+                replacement_permissions = set(
+                    replacement_role.permissions.exclude(code__in=DISABLED_PERMISSION_CODES).values_list(
+                        "code", flat=True
+                    )
+                )
                 missing_permissions = replacement_permissions - user_permissions
                 if missing_permissions:
                     permissions_list = ", ".join(list(missing_permissions)[:3])
@@ -1320,7 +1331,9 @@ class AssignRolesToMemberMutation(graphene.Mutation):
             # SECURITY CHECK 3: Users can only assign roles with permissions they have
             # (owners can assign any role)
             if not is_acting_user_owner:
-                role_permissions = set(role.permissions.values_list("code", flat=True))
+                role_permissions = set(
+                    role.permissions.exclude(code__in=DISABLED_PERMISSION_CODES).values_list("code", flat=True)
+                )
                 missing_permissions = role_permissions - user_permissions
                 if missing_permissions:
                     permissions_list = ", ".join(list(missing_permissions)[:3])
@@ -1593,7 +1606,7 @@ class Query(graphene.ObjectType):
     def resolve_all_tenants(root, info, **kwargs):
         if info.context.user.is_authenticated:
             qs = models.get_visible_tenants_for_user(info.context.user)
-            return filter_tenants_for_password_session(info.context, qs)
+            return qs
         return []
 
     @staticmethod
@@ -1645,7 +1658,7 @@ class Query(graphene.ObjectType):
 
         Permissions are global data, so only authentication is required.
         """
-        qs = models.Permission.objects.all()
+        qs = models.Permission.objects.exclude(code__in=DISABLED_PERMISSION_CODES)
         if category:
             qs = qs.filter(category=category)
         if tenant_id:

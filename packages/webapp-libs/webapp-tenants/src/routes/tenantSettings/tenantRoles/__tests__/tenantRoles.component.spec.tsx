@@ -1,7 +1,7 @@
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { Tabs } from '@sb/webapp-core/components/ui/tabs';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { RoutesConfig } from '../../../../config/routes';
@@ -31,6 +31,12 @@ const createPermissionsMock = (permissions: string[] = []) =>
     data: {
       allPermissions: {
         edges: [
+          ...(permissions.includes('security.sso.manage') ? [{
+            node: {
+              id: 'legacy-sso', code: 'security.sso.manage', name: 'Manage SSO',
+              description: 'Configure SSO and SCIM', category: 'SECURITY', sortOrder: 20,
+            },
+          }] : []),
           {
             node: {
               id: 'perm-1',
@@ -118,6 +124,16 @@ describe('TenantRoles: Component', () => {
       routerProps,
     });
   };
+
+  it('hides a legacy SSO permission from the role editor', async () => {
+    const permissionsMock = createPermissionsMock(['security.sso.manage']);
+    renderComponent([permissionsMock, createRolesMock([])]);
+    const createButton = await screen.findByRole('button', { name: /create role/i });
+    await waitFor(() => expect(createButton).toBeEnabled());
+    await userEvent.click(createButton);
+    expect(await screen.findByText(/View Organization Settings/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Manage SSO|Configure SSO and SCIM/i)).not.toBeInTheDocument();
+  });
 
   it('should render roles header', async () => {
     const permissionsMock = createPermissionsMock();

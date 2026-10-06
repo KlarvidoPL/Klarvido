@@ -1,5 +1,5 @@
 """
-Tests for SSO views/endpoints.
+Tests for the retained shared security endpoints.
 """
 
 import pytest
@@ -14,8 +14,8 @@ from . import factories
 pytestmark = pytest.mark.django_db
 
 
-class TestSSOEndpointBasics:
-    """Basic tests for SSO endpoint structure."""
+class TestSharedSecurityEndpointBasics:
+    """Basic tests for shared security endpoint structure."""
 
     @pytest.fixture
     def api_client(self):
@@ -29,11 +29,10 @@ class TestSSOEndpointBasics:
         assert hasattr(urls, 'urlpatterns')
         assert len(urls.urlpatterns) > 0
 
-    def test_passkeys_list_requires_auth(self, api_client):
-        """Test passkey list requires authentication."""
-        url = "/api/sso/passkeys/"
+    def test_passkey_registration_requires_auth(self, api_client):
+        """Test passkey registration requires authentication."""
+        url = "/api/sso/passkeys/register/options"
 
-        response = api_client.get(url)
+        response = api_client.post(url)
 
-        # Either 401 or 404 is acceptable (401 if auth checked first, 404 if not found)
-        assert response.status_code in [status.HTTP_401_UNAUTHORIZED, status.HTTP_404_NOT_FOUND]
+        assert response.status_code in [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN]

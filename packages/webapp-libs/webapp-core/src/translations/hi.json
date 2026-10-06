@@ -3777,7 +3777,7 @@
     "defaultMessage": "SSO प्रबंधित करें"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "SSO कनेक्शन, पासकी और सुरक्षा कॉन्फ़िगरेशन देखें"
+    "defaultMessage": "सुरक्षा कॉन्फ़िगरेशन देखें"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "सुरक्षा सेटिंग्स देखें"

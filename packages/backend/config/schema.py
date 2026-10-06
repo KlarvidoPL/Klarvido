@@ -45,7 +45,7 @@ schema = graphene.Schema(
             multitenancy_schema.Mutation,
             multitenancy_schema.TenantOwnerMutation,
             sso_schema.Mutation,
-            sso_schema.TenantOwnerMutation,
+            # sso_schema.TenantOwnerMutation,  # Enterprise SSO/SCIM disabled.
             translations_schema.TranslationsMutation,
             backup_schema.BackupMutation,
             ksef_schema.KsefMutation,

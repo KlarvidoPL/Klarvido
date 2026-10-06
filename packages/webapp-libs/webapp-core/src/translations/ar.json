@@ -3777,7 +3777,7 @@
     "defaultMessage": "إدارة تسجيل الدخول الموحد"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "عرض اتصالات تسجيل الدخول الموحد ومفاتيح المرور وإعدادات الأمان"
+    "defaultMessage": "عرض إعدادات الأمان"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "عرض إعدادات الأمان"

@@ -91,16 +91,8 @@ export const getPermissionDisplay = (
       return {
         name: intl.formatMessage({ defaultMessage: 'View Security Settings', id: 'Roles / Permission / security.view / Name' }),
         description: intl.formatMessage({
-          defaultMessage: 'View SSO connections, passkeys, and security configurations',
+          defaultMessage: 'View security configurations',
           id: 'Roles / Permission / security.view / Description',
-        }),
-      };
-    case 'security.sso.manage':
-      return {
-        name: intl.formatMessage({ defaultMessage: 'Manage SSO', id: 'Roles / Permission / security.sso.manage / Name' }),
-        description: intl.formatMessage({
-          defaultMessage: 'Configure Single Sign-On connections and SCIM provisioning',
-          id: 'Roles / Permission / security.sso.manage / Description',
         }),
       };
     case 'security.logs.view':
