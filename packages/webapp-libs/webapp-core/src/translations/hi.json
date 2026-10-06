@@ -932,6 +932,9 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "क्या आपका खाता नहीं है?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "बहुत अधिक गलत कोड। 15 मिनट बाद फिर से कोशिश करें।"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Passkey से साइन इन करें"
   },

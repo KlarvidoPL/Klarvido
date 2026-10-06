@@ -28,6 +28,14 @@ export const ValidateOtpForm = () => {
   const { search } = useLocation();
 
   const form = useApiForm<ValidateOtpFormFields>({
+    errorMessages: {
+      nonFieldErrors: {
+        'Too many incorrect codes. Try again in 15 minutes.': intl.formatMessage({
+          id: 'Auth / OTP / Attempt limit',
+          defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
+        }),
+      },
+    },
     defaultValues: {
       token: '',
     },

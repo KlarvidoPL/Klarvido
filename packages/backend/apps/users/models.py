@@ -61,6 +61,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     otp_verified = models.BooleanField(default=False)
     otp_base32 = models.CharField(max_length=255, blank=True, default="")
     otp_auth_url = models.CharField(max_length=255, blank=True, default="")
+    otp_failed_attempts = models.PositiveSmallIntegerField(default=0, editable=False)
+    otp_locked_until = models.DateTimeField(null=True, blank=True, editable=False)
 
     objects = UserManager()
 

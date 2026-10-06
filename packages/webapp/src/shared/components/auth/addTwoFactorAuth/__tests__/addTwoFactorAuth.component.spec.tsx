@@ -68,37 +68,41 @@ describe('AddTwoFactorAuth: Component', () => {
     expect(trackEvent).toHaveBeenNthCalledWith(2, 'auth', 'otp-verify');
   });
 
-  it('should display error message if token is invalid', async () => {
-    const token = '111111';
-    const errorMessage = 'Verification token is invalid';
-    const generateOtpMock = getGenerateOtpMock();
-    // Remove data field so composeMockedQueryResult uses error field instead of result.errors
-    const verifyMock = composeMockedQueryResult(verifyOtpMutation, {
-      variables: { input: { otpToken: token } },
-      data: {},
-      errors: [
-        new GraphQLError('GraphQlValidationError', {
-          extensions: { token: [{ message: errorMessage, code: errorMessage }] },
-        }),
-      ],
-    });
+  it.each(['Verification token is invalid', 'Too many incorrect codes. Try again in 15 minutes.'])(
+    'should display OTP error: %s',
+    async (errorMessage) => {
+      const token = '111111';
+      const generateOtpMock = getGenerateOtpMock();
+      // Remove data field so composeMockedQueryResult uses error field instead of result.errors
+      const verifyMock = composeMockedQueryResult(verifyOtpMutation, {
+        variables: { input: { otpToken: token } },
+        data: {},
+        errors: [
+          errorMessage.startsWith('Too many')
+            ? new GraphQLError(errorMessage)
+            : new GraphQLError('GraphQlValidationError', {
+                extensions: { token: [{ message: errorMessage, code: errorMessage }] },
+              }),
+        ],
+      });
 
-    const { waitForApolloMocks } = render(<Component />, {
-      apolloMocks: (apolloMocks) => [...apolloMocks, generateOtpMock, verifyMock],
-    });
+      const { waitForApolloMocks } = render(<Component />, {
+        apolloMocks: (apolloMocks) => [...apolloMocks, generateOtpMock, verifyMock],
+      });
 
-    // Wait for generateOtp mutation to complete first
-    await waitForApolloMocks(0); // Wait for first mock (CommonQuery)
-    await waitForApolloMocks(1); // Wait for generateOtpMock
+      // Wait for generateOtp mutation to complete first
+      await waitForApolloMocks(0); // Wait for first mock (CommonQuery)
+      await waitForApolloMocks(1); // Wait for generateOtpMock
 
-    // Wait for the component to finish loading (input appears after generateOtp completes)
-    const input = await screen.findByPlaceholderText(/000000/i);
-    const submitButton = screen.getByText(/Activate 2FA/i);
+      // Wait for the component to finish loading (input appears after generateOtp completes)
+      const input = await screen.findByPlaceholderText(/000000/i);
+      const submitButton = screen.getByText(/Activate 2FA/i);
 
-    await userEvent.type(input, token);
-    await userEvent.click(submitButton);
+      await userEvent.type(input, token);
+      await userEvent.click(submitButton);
 
-    // Wait for error to be processed and displayed (don't use waitForApolloMocks for error mocks)
-    expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
-  });
+      // Wait for error to be processed and displayed (don't use waitForApolloMocks for error mocks)
+      expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
+    }
+  );
 });

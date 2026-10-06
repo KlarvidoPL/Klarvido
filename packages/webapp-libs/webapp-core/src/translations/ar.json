@@ -932,6 +932,9 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "ليس لديك حساب؟"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "عدد كبير جدًا من الرموز غير الصحيحة. حاول مرة أخرى بعد 15 دقيقة."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "تسجيل الدخول باستخدام Passkey"
   },

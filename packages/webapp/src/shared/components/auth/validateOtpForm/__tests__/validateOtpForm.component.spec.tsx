@@ -54,29 +54,33 @@ describe('ValidateOtpForm: Component', () => {
     expect(trackEvent).toHaveBeenCalledWith('auth', 'otp-validate');
   });
 
-  it('should display error if token is invalid', async () => {
-    const token = '111111';
-    const errorMessage = 'Verification token is invalid';
-    // Remove data field so composeMockedQueryResult uses error field instead of result.errors
-    const requestMock = composeMockedQueryResult(validateOtpMutation, {
-      variables: { input: { otpToken: token } },
-      data: {},
-      errors: [
-        new GraphQLError('GraphQlValidationError', {
-          extensions: { token: [{ message: errorMessage, code: errorMessage }] },
-        }),
-      ],
-    });
+  it.each(['Verification token is invalid', 'Too many incorrect codes. Try again in 15 minutes.'])(
+    'should display OTP error: %s',
+    async (errorMessage) => {
+      const token = '111111';
+      // Remove data field so composeMockedQueryResult uses error field instead of result.errors
+      const requestMock = composeMockedQueryResult(validateOtpMutation, {
+        variables: { input: { otpToken: token } },
+        data: {},
+        errors: [
+          errorMessage.startsWith('Too many')
+            ? new GraphQLError(errorMessage)
+            : new GraphQLError('GraphQlValidationError', {
+                extensions: { token: [{ message: errorMessage, code: errorMessage }] },
+              }),
+        ],
+      });
 
-    render(<Component />, { apolloMocks: append(requestMock) });
+      render(<Component />, { apolloMocks: append(requestMock) });
 
-    const input = await screen.findByPlaceholderText(/000000/i);
-    const submitButton = screen.getByRole('button', { name: /verify code/i });
+      const input = await screen.findByPlaceholderText(/000000/i);
+      const submitButton = screen.getByRole('button', { name: /verify code/i });
 
-    await userEvent.type(input, token);
-    await userEvent.click(submitButton);
+      await userEvent.type(input, token);
+      await userEvent.click(submitButton);
 
-    // Wait for error to be processed and displayed
-    expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
-  });
+      // Wait for error to be processed and displayed
+      expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
+    }
+  );
 });

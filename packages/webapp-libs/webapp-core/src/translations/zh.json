@@ -932,6 +932,9 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "还没有账户？"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "错误验证码次数过多。请在15分钟后重试。"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "使用 Passkey 登录"
   },

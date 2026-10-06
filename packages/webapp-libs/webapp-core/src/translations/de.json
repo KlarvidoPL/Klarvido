@@ -932,6 +932,9 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "Du hast noch kein Konto?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Zu viele falsche Codes. Versuche es in 15 Minuten erneut."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Mit Passkey anmelden"
   },

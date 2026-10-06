@@ -29,7 +29,16 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
   const [otpAuthUrl, setOtpAuthUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const form = useApiForm<VerifyOtpFormFields>();
+  const form = useApiForm<VerifyOtpFormFields>({
+    errorMessages: {
+      nonFieldErrors: {
+        'Too many incorrect codes. Try again in 15 minutes.': intl.formatMessage({
+          id: 'Auth / OTP / Attempt limit',
+          defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
+        }),
+      },
+    },
+  });
 
   const {
     handleSubmit,
@@ -138,7 +147,10 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
   }, [commitGenerateOtpMutation]);
 
   return (
-    <form onSubmit={handleSubmit(submitHandler)} className="-m-6 flex h-[85vh] max-h-[700px] flex-col overflow-hidden sm:rounded-lg">
+    <form
+      onSubmit={handleSubmit(submitHandler)}
+      className="-m-6 flex h-[85vh] max-h-[700px] flex-col overflow-hidden sm:rounded-lg"
+    >
       {/* Fixed Header */}
       <div className="flex shrink-0 items-center gap-3 border-b bg-background px-6 py-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
@@ -225,9 +237,7 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <code className="flex-1 rounded bg-background px-2 py-1.5 font-mono text-xs">
-                  {base32 || '...'}
-                </code>
+                <code className="flex-1 rounded bg-background px-2 py-1.5 font-mono text-xs">{base32 || '...'}</code>
                 <Button
                   type="button"
                   variant={ButtonVariant.SECONDARY}

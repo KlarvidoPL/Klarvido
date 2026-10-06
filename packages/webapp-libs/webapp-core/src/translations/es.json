@@ -932,6 +932,9 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "¿No tienes una cuenta?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Demasiados códigos incorrectos. Vuelve a intentarlo en 15 minutos."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Iniciar sesión con Passkey"
   },
