@@ -5361,7 +5361,10 @@
     "defaultMessage": "Wybierz organizację, w której chcesz pracować"
   },
   "Companies / Empty": {
-    "defaultMessage": "Nie masz jeszcze dostępu do żadnej organizacji. Dodaj organizację lub zaakceptuj zaproszenie poniżej."
+    "defaultMessage": "Dodaj pierwszą organizację, aby rozpocząć pracę w Klarvido."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "Nie masz jeszcze organizacji"
   },
   "Companies / Health": {
     "defaultMessage": "Brak danych o kondycji"

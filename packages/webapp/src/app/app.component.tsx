@@ -282,7 +282,11 @@ export const App = () => {
               element={<Navigate to={`../${RoutesConfig.organizations}`} replace />}
             />
             <Route path={RoutesConfig.profile} element={<Profile />} />
-            <Route path={RoutesConfig.addTenant} element={<AddTenantForm />} />
+            <Route path={RoutesConfig.addOrganization} element={<AddTenantForm />} />
+            <Route
+              path={RoutesConfig.legacyAddTenant}
+              element={<Navigate to={`../${RoutesConfig.addOrganization}`} replace />}
+            />
             <Route path={RoutesConfig.tenantInvitation} element={<TenantInvitation />} />
             <Route path="*" element={<NotFound />} />
           </Route>

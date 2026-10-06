@@ -139,7 +139,7 @@ describe('TenantSwitch: Component', () => {
     const newTenantButton = await screen.findByText(/create new organization/i);
     await userEvent.click(newTenantButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith(`/en/add-tenant`);
+    expect(mockNavigate).toHaveBeenCalledWith(`/en/add-organization`);
   });
 
   it('should handle settings click', async () => {

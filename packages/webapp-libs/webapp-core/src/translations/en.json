@@ -5307,7 +5307,10 @@
     "defaultMessage": "Choose the organization you want to work in"
   },
   "Companies / Empty": {
-    "defaultMessage": "You do not have access to any organizations yet. Add an organization or accept an invitation below."
+    "defaultMessage": "Add your first organization to start working in Klarvido."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "You don't have any organizations yet"
   },
   "Companies / Health": {
     "defaultMessage": "No organization health data"

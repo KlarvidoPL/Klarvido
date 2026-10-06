@@ -30,6 +30,50 @@ Local URLs: webapp `:3000`, backend/GraphQL `:5001`, admin `admin.localhost:5001
 
 `.env` files have distinct roles, per package: `.env` (real secrets, per-environment, **never committed**) vs `.env.shared` (committed, non-secret defaults e.g. `PROJECT_NAME`) vs `.env.test` (CI test-run overrides). The first superuser is created automatically from the initial backend migration **if `ADMIN_EMAIL` + `ADMIN_DEFAULT_PASSWORD` are set** at first `migrate` — not a separate seed command; change the password immediately outside local dev (the shared default in `.env.shared` is dev-only).
 
+### Fresh local instance (manual reset)
+
+When asked for a fresh local instance, provide commands for the user to run;
+do not execute the reset unless explicitly asked. Do not add a committed reset
+script. This procedure permanently deletes development data and must never be
+used on a VPS/production host or against a remote Docker context. Check
+`docker context show` and any `DOCKER_HOST`/`DOCKER_CONTEXT` overrides first.
+
+Stop the running `pnpm saas up` process. From the repository root, resolve the
+actual database volume name using the local files explicitly (do not assume
+`PROJECT_NAME` or let `COMPOSE_FILE` select production configuration):
+
+```sh
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml config --format json | node -e 'let s=""; process.stdin.on("data", c => s += c); process.stdin.on("end", () => console.log(JSON.parse(s).volumes.web_backend_db_data.name));'
+```
+
+Then substitute the printed name for `<local-db-volume>` below. The current
+development name is `Klarvido-web-backend-db-data`, but verify it each time.
+
+```sh
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml down --volumes --remove-orphans
+docker volume rm <local-db-volume>
+docker volume create <local-db-volume>
+pnpm saas up
+```
+
+Postgres is an **external volume**, so `down --volumes` alone does not reset
+users or business data. The commands also clear Redis, generated static files,
+anonymous volumes, and container-held LocalStack uploads/Mailcatcher emails.
+They retain images, build caches, source, `.env` files, and the `/tmp/localstack`
+host scratch bind (the local configuration does not mount LocalStack's persistent
+`/var/lib/localstack` directory). If `STORAGE_BACKEND=local`, also provide a
+separate command to remove the verified local upload directory (normally
+`packages/backend/media`) before restarting; inspect a custom `MEDIA_ROOT` first.
+Externally hosted storage is not cleared by this procedure.
+
+Ensure `ADMIN_EMAIL` and `ADMIN_DEFAULT_PASSWORD` are set in
+`packages/backend/.env` before restarting. The initial migration recreates that
+admin; startup also initializes permissions, locales, translations, and configured
+Contentful/Stripe data. A fresh instance therefore has no previous users/business
+data, but still contains normal system records. Remind the user to clear browser
+site data (cookies/local storage) for `localhost:3000` and
+`admin.localhost:5001` to discard stale sessions and organization selections.
+
 ### Lint / type-check / test (frontend — per-package, via Nx)
 
 Every `webapp` and `webapp-libs/*` package has `lint`, `type-check`, `test` targets even though `project.json` often shows `"targets": {}` (they're added by inferred Nx plugins — use `pnpm nx show project <name>` if unsure what's available).

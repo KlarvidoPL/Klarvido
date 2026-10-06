@@ -84,7 +84,7 @@ const show = (user: CurrentUserType, path = '/pl/organizations', extraMocks: any
                   />
                   <Route path="organizations" element={<CompanySelection />} />
                   <Route path="companies" element={<Navigate to="../organizations" replace />} />
-                  <Route path="add-tenant" element={<span>Dodawanie firmy</span>} />
+                  <Route path="add-organization" element={<span>Dodawanie firmy</span>} />
                   <Route path="tenant-invitation/:token" element={<span>Zaproszenie</span>} />
                   <Route path="404" element={<span>Brak dostępu</span>} />
                   <Route
@@ -178,7 +178,7 @@ it('keeps the existing default after a failed save', async () => {
 });
 
 it.each([
-  [[], null, '/pl/add-tenant'],
+  [[], null, '/pl/'],
   [[one], null, '/pl/one'],
   [[one, two], null, '/pl/organizations'],
   [[one, two], 'two', '/pl/two'],
@@ -192,6 +192,13 @@ it.each([
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(expected));
   }
 );
+
+it('shows the panel without an organization instead of redirecting to organization creation', async () => {
+  show(currentUserFactory({ tenants: [], defaultOrganizationId: 'revoked' }), '/pl/');
+  await screen.findByText('Dashboard');
+  expect(screen.getByTestId('location')).toHaveTextContent(/^\/pl\/$/);
+  expect(screen.queryByText('Dodawanie firmy')).not.toBeInTheDocument();
+});
 
 it('honors a direct company URL over the default and preserves the stored preference', async () => {
   show(currentUserFactory({ tenants: [one, two], defaultOrganizationId: 'two' }), '/pl/one');

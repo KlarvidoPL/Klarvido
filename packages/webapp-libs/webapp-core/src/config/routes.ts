@@ -13,7 +13,8 @@ export const RoutesConfig = {
   passwordReset: nestedPath('auth/reset-password', {
     confirm: 'confirm/:user/:token',
   }),
-  addTenant: 'add-tenant',
+  addOrganization: 'add-organization',
+  legacyAddTenant: 'add-tenant',
   tenantInvitation: 'tenant-invitation/:token',
   oauthCallback: 'auth/oauth/callback',
 };

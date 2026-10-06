@@ -80,7 +80,7 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
   };
 
   const handleNewTenantClick = () => {
-    navigate(generateLocalePath(RoutesConfig.addTenant));
+    navigate(generateLocalePath(RoutesConfig.addOrganization));
     onNavigate?.();
   };
 
