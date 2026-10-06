@@ -2,15 +2,9 @@ import { apiClient, apiURL } from '@sb/webapp-api-client/api';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
-import { Input } from '@sb/webapp-core/components/ui/input';
 import { DatePicker } from '@sb/webapp-core/components/ui/datePicker';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@sb/webapp-core/components/ui/select';
+import { Input } from '@sb/webapp-core/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sb/webapp-core/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@sb/webapp-core/components/ui/tooltip';
 import { cn } from '@sb/webapp-core/lib/utils';
 import {
@@ -23,9 +17,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Clock,
-  KeyRound,
   Filter,
   Fingerprint,
+  KeyRound,
   Loader2,
   LogIn,
   LogOut,
@@ -41,7 +35,7 @@ import {
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FormattedMessage, defineMessages, useIntl, type IntlShape } from 'react-intl';
+import { FormattedMessage, type IntlShape, defineMessages, useIntl } from 'react-intl';
 
 import { useCurrentTenant } from '../../../../providers';
 
@@ -148,8 +142,14 @@ const EVENT_TYPE_MESSAGES = defineMessages({
   idp_config_created: { id: 'Audit / Event / IdP Configuration Created', defaultMessage: 'IdP Configuration Created' },
   idp_config_updated: { id: 'Audit / Event / IdP Configuration Updated', defaultMessage: 'IdP Configuration Updated' },
   idp_config_deleted: { id: 'Audit / Event / IdP Configuration Deleted', defaultMessage: 'IdP Configuration Deleted' },
-  idp_config_activated: { id: 'Audit / Event / IdP Configuration Activated', defaultMessage: 'IdP Configuration Activated' },
-  idp_config_deactivated: { id: 'Audit / Event / IdP Configuration Deactivated', defaultMessage: 'IdP Configuration Deactivated' },
+  idp_config_activated: {
+    id: 'Audit / Event / IdP Configuration Activated',
+    defaultMessage: 'IdP Configuration Activated',
+  },
+  idp_config_deactivated: {
+    id: 'Audit / Event / IdP Configuration Deactivated',
+    defaultMessage: 'IdP Configuration Deactivated',
+  },
   sso_login_initiated: { id: 'Audit / Event / SSO Login Initiated', defaultMessage: 'SSO Login Initiated' },
   sso_login_success: { id: 'Audit / Event / SSO Login Success', defaultMessage: 'SSO Login Success' },
   sso_login_failed: { id: 'Audit / Event / SSO Login Failed', defaultMessage: 'SSO Login Failed' },
@@ -484,10 +484,7 @@ export const AuditLogCard = () => {
               </div>
               <div className="min-w-0">
                 <CardTitle className="text-lg">
-                  <FormattedMessage
-                    defaultMessage="Security Audit Log"
-                    id="Tenant Security Settings / Audit Header"
-                  />
+                  <FormattedMessage defaultMessage="Security Audit Log" id="Tenant Security Settings / Audit Header" />
                 </CardTitle>
                 <CardDescription className="mt-0.5">
                   <FormattedMessage
@@ -516,21 +513,12 @@ export const AuditLogCard = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <FormattedMessage
-                    defaultMessage="Filter audit log events"
-                    id="Audit / Filters Tooltip"
-                  />
+                  <FormattedMessage defaultMessage="Filter audit log events" id="Audit / Filters Tooltip" />
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleRefresh}
-                    disabled={isFetching}
-                    className="h-9 w-9"
-                  >
+                  <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isFetching} className="h-9 w-9">
                     <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
                   </Button>
                 </TooltipTrigger>
@@ -771,7 +759,7 @@ export const AuditLogCard = () => {
                       'hover:shadow-sm hover:border-primary/20',
                       log.success
                         ? 'border-l-2 border-l-emerald-500'
-                        : 'border-l-2 border-l-destructive bg-destructive/5'
+                        : 'border-l-2 border-l-destructive bg-destructive/5 dark:border-l-red-400 dark:bg-red-400/5'
                     )}
                   >
                     <button
@@ -787,16 +775,18 @@ export const AuditLogCard = () => {
                             'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
                             log.success
                               ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                              : 'bg-destructive/10 text-destructive'
+                              : 'bg-destructive/10 text-destructive dark:bg-red-400/10 dark:text-red-400'
                           )}
                         >
                           {log.success ? getEventIcon(log.eventType) : <AlertTriangle className="h-4 w-4" />}
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm">{getEventTypeLabel(intl, log.eventType, log.eventTypeLabel)}</span>
+                            <span className="font-medium text-sm">
+                              {getEventTypeLabel(intl, log.eventType, log.eventTypeLabel)}
+                            </span>
                             {!log.success && (
-                              <Badge variant="destructive" className="text-xs">
+                              <Badge variant="destructive" className="text-xs dark:bg-red-400">
                                 <FormattedMessage defaultMessage="Failed" id="Audit / Failed badge" />
                               </Badge>
                             )}
@@ -851,10 +841,10 @@ export const AuditLogCard = () => {
                           )}
                           {log.errorMessage && (
                             <div className="col-span-2">
-                              <dt className="text-xs font-medium text-destructive mb-1">
+                              <dt className="text-xs font-medium text-destructive mb-1 dark:text-red-400">
                                 <FormattedMessage defaultMessage="Error" id="Audit / Error" />
                               </dt>
-                              <dd className="text-destructive">{log.errorMessage}</dd>
+                              <dd className="text-destructive dark:text-red-400">{log.errorMessage}</dd>
                             </div>
                           )}
                           {renderKsefDetails(log)}
@@ -867,12 +857,7 @@ export const AuditLogCard = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div
-                  className={cn(
-                    'flex items-center justify-between border-t pt-4',
-                    isFetching && 'opacity-60'
-                  )}
-                >
+                <div className={cn('flex items-center justify-between border-t pt-4', isFetching && 'opacity-60')}>
                   <p className="text-sm text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="Showing {start}-{end} of {total} events"
