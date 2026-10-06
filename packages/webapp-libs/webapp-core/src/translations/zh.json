@@ -3701,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "使用次数"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "添加另一个 Passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "添加我的通行密钥"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "删除 Passkey 失败。请重试。"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey 删除成功。"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "按用户名或邮箱搜索…"
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "删除通行密钥需要组织上下文。"
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "至少 8 个字符"
   },
@@ -4120,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "查看活动日志"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "查看和管理组织的通行密钥（Passkey）策略"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "管理通行密钥"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "配置单点登录（SSO）连接和 SCIM 预配置"
@@ -5000,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "是"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "添加 Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "添加 Token"
   },
@@ -5039,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "尝试调整或清除筛选条件以查看所有事件。"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "尝试使用其他搜索词"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "尚未注册任何 Passkey"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "没有与搜索条件匹配的 Passkey"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "目录同步需要先启用 SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "尚未配置任何 SSO 连接"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "您组织中的用户尚未注册任何 Passkey"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "注册 Passkey，享受更快捷、更安全的登录体验"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "为组织内所有用户管理 Passkey"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "使用生物识别或安全密钥实现无密码认证"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys（WebAuthn）"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "兼容的身份提供商"
@@ -5703,7 +5652,7 @@
     "defaultMessage": "选择您想要工作的组织"
   },
   "Companies / Empty": {
-    "defaultMessage": "您尚无权访问任何组织。请添加组织或接受下方的邀请。"
+    "defaultMessage": "添加您的第一个组织，开始在 Klarvido 中工作。"
   },
   "Companies / Health": {
     "defaultMessage": "暂无组织状况数据"
@@ -5773,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "清除搜索"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "您如何做出关键决策？"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "打开企业资料"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "完成或更新您的组织入职问答。"
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "企业资料"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "第 {step} 步，共 {total} 步"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "此颜色为所有者角色保留。请选择其他颜色。"
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "您还没有任何组织"
   }
 }

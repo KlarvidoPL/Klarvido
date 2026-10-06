@@ -3701,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "عدد مرات الاستخدام"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "إضافة Passkey أخرى"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "إضافة مفتاح المرور الخاص بي"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "فشل حذف Passkey. يُرجى المحاولة مرة أخرى."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "تم حذف Passkey بنجاح."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "ابحث بالاسم أو البريد الإلكتروني..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "سياق المؤسسة مطلوب لحذف مفاتيح المرور."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8 أحرف أو أكثر"
   },
@@ -4120,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "عرض سجلات النشاط"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "عرض سياسات مفاتيح المرور (Passkeys) الخاصة بالمؤسسة وإدارتها"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "إدارة مفاتيح المرور"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "تهيئة اتصالات تسجيل الدخول الموحد (SSO) وتوفير SCIM"
@@ -5000,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "نعم"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "إضافة Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "إضافة Token"
   },
@@ -5039,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "جرّب تعديل عوامل التصفية أو مسحها لعرض جميع الأحداث."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "جرّب مصطلح بحث مختلفًا"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "لا توجد مفاتيح مرور مسجّلة"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "لا توجد مفاتيح مرور تطابق بحثك"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "مزامنة الدليل تتطلب SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "لا توجد اتصالات SSO مُعدّة"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "لا يوجد أي مستخدم في مؤسستك سجّل مفاتيح مرور بعد"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "سجّل مفتاح مرور لتسجيل دخول أسرع وأكثر أمانًا"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "إدارة مفاتيح المرور لجميع مستخدمي مؤسستك"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "استخدم البيانات الحيوية أو مفاتيح الأمان لتسجيل دخول بدون كلمة مرور"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "مزودو الهوية المتوافقون"
@@ -5703,7 +5652,7 @@
     "defaultMessage": "اختر المؤسسة التي تريد العمل فيها"
   },
   "Companies / Empty": {
-    "defaultMessage": "ليس لديك صلاحية الوصول إلى أي مؤسسة بعد. أضف مؤسسة أو اقبل دعوة أدناه."
+    "defaultMessage": "أضف أول مؤسسة لك لتبدأ العمل في Klarvido."
   },
   "Companies / Health": {
     "defaultMessage": "لا توجد بيانات عن حالة المؤسسة"
@@ -5773,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "مسح البحث"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "كيف تتخذ القرارات الرئيسية؟"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "فتح الملف التجاري"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "أكمل إجابات إعداد المؤسسة أو حدّثها."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "الملف التجاري"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "الخطوة {step} من {total}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "هذا اللون محجوز لدور المالك. اختر لونًا آخر."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "ليس لديك أي مؤسسة بعد"
   }
 }

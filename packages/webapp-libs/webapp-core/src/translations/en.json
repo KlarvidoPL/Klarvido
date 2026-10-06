@@ -5740,5 +5740,8 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "Clear search"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
   }
 }

@@ -3701,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Verwendet"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Weiteren Passkey hinzufügen"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Meinen Passkey hinzufügen"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Passkey konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey erfolgreich gelöscht."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Nach Benutzername oder E-Mail suchen..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Für das Löschen von Passkeys ist ein Organisationskontext erforderlich."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "Mindestens 8 Zeichen"
   },
@@ -4120,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "Aktivitätsprotokolle anzeigen"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "Passkey-Richtlinien der Organisation anzeigen und verwalten"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Passkeys verwalten"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Single-Sign-On-Verbindungen und SCIM-Bereitstellung konfigurieren"
@@ -5000,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Ja"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Passkey hinzufügen"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Token hinzufügen"
   },
@@ -5039,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Passe deine Filter an oder lösche sie, um alle Ereignisse zu sehen."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Versuche einen anderen Suchbegriff"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "Keine Passkeys registriert"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "Keine Passkeys entsprechen deiner Suche"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "Verzeichnis-Sync erfordert SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "Keine SSO-Verbindungen konfiguriert"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "Noch keine Benutzer in deiner Organisation haben Passkeys registriert"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Registriere einen Passkey für schnelleres und sichereres Anmelden"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Verwalte Passkeys für alle Benutzer in deiner Organisation"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Nutze Biometrie oder Sicherheitsschlüssel für passwortlose Authentifizierung"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Kompatible Identity Provider"
@@ -5703,7 +5652,7 @@
     "defaultMessage": "Wählen Sie die Organisation, in der Sie arbeiten möchten"
   },
   "Companies / Empty": {
-    "defaultMessage": "Sie haben noch keinen Zugriff auf Organisationen. Fügen Sie eine Organisation hinzu oder nehmen Sie unten eine Einladung an."
+    "defaultMessage": "Fügen Sie Ihre erste Organisation hinzu, um mit Klarvido zu arbeiten."
   },
   "Companies / Health": {
     "defaultMessage": "Keine Daten zum Zustand der Organisation"
@@ -5773,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "Suche löschen"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "Wie treffen Sie wichtige Entscheidungen?"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Unternehmensprofil öffnen"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Vervollständigen oder aktualisieren Sie Ihre Angaben zur Einrichtung der Organisation."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Unternehmensprofil"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "Schritt {step} von {total}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Diese Farbe ist der Rolle „Inhaber“ vorbehalten. Wählen Sie eine andere Farbe."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "Sie haben noch keine Organisationen"
   }
 }

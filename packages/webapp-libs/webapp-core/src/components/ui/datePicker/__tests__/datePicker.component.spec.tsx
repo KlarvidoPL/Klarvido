@@ -19,6 +19,18 @@ it.each(['en', 'pl', 'de', 'fr', 'es', 'zh', 'hi', 'ar'])(
   }
 );
 
+it.each([
+  ['5:37 PM', 'en', { hours: 17, minutes: 37 }],
+  ['12:05 am', 'en', { hours: 0, minutes: 5 }],
+  ['12:05 PM', 'en', { hours: 12, minutes: 5 }],
+  ['١٧:٣٧', 'ar', { hours: 17, minutes: 37 }],
+  ['१७:३७', 'hi', { hours: 17, minutes: 37 }],
+  ['५:३७ PM', 'hi', { hours: 17, minutes: 37 }],
+  ['5:00 AM PM', 'en', undefined],
+])('parses typed time %s in %s', (value, locale, expected) => {
+  expect(parseTimeInput(value, locale)).toEqual(expected);
+});
+
 it.each(['24:00', '17:60', '0:30 PM', '13:00 AM', 'invalid'])('rejects invalid pasted time %s', (value) => {
   expect(parseTimeInput(value, 'en')).toBeUndefined();
 });

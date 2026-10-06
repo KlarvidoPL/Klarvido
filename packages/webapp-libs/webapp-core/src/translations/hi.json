@@ -3701,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "उपयोग की बार"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "एक और passkey जोड़ें"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "मेरा पासकी जोड़ें"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Passkey हटाने में विफल। कृपया दोबारा प्रयास करें।"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey सफलतापूर्वक हटा दिया गया।"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "उपयोगकर्ता नाम या ईमेल से खोजें..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "पासकी हटाने के लिए संगठन संदर्भ आवश्यक है।"
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ अक्षर"
   },
@@ -4120,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "गतिविधि लॉग देखें"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "संगठन की पासकी नीतियां देखें और प्रबंधित करें"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "पासकी प्रबंधित करें"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "सिंगल साइन-ऑन (SSO) कनेक्शन और SCIM प्रोविज़निंग कॉन्फ़िगर करें"
@@ -5000,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "हाँ"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Passkey जोड़ें"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Token जोड़ें"
   },
@@ -5039,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "सभी इवेंट देखने के लिए अपने फ़िल्टर बदलें या उन्हें साफ़ करें।"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "कोई और सर्च शब्द आज़माएँ"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "कोई पासकी रजिस्टर्ड नहीं"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "आपकी खोज से कोई पासकी मेल नहीं खा रही"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "डायरेक्टरी सिंक के लिए SSO आवश्यक है"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "कोई SSO कनेक्शन कॉन्फ़िगर नहीं है"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "आपके संगठन में अभी तक किसी यूज़र ने पासकी रजिस्टर नहीं की है"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "तेज़ और अधिक सुरक्षित साइन-इन के लिए पासकी रजिस्टर करें"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "अपने संगठन के सभी यूज़र्स के लिए पासकीज़ प्रबंधित करें"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "पासवर्ड-रहित ऑथेंटिकेशन के लिए बायोमेट्रिक्स या सिक्योरिटी कीज़ का उपयोग करें"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "संगत Identity Providers"
@@ -5703,7 +5652,7 @@
     "defaultMessage": "वह संगठन चुनें जिसमें आप काम करना चाहते हैं"
   },
   "Companies / Empty": {
-    "defaultMessage": "अभी आपके पास किसी संगठन तक पहुँच नहीं है। संगठन जोड़ें या नीचे दिया गया आमंत्रण स्वीकार करें।"
+    "defaultMessage": "Klarvido में काम शुरू करने के लिए अपना पहला संगठन जोड़ें।"
   },
   "Companies / Health": {
     "defaultMessage": "संगठन की स्थिति का डेटा उपलब्ध नहीं"
@@ -5773,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "खोज साफ़ करें"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "आप मुख्य निर्णय कैसे लेते हैं?"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "व्यावसायिक प्रोफ़ाइल खोलें"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "संगठन की ऑनबोर्डिंग के उत्तर पूरे करें या अपडेट करें।"
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "व्यावसायिक प्रोफ़ाइल"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "{total} में से चरण {step}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "यह रंग स्वामी भूमिका के लिए आरक्षित है। कोई दूसरा रंग चुनें।"
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "आपके पास अभी कोई संगठन नहीं है"
   }
 }

@@ -3701,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Nombre d’utilisations"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Ajouter une autre passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Ajouter ma passkey"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Échec de la suppression de la passkey. Veuillez réessayer."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey supprimée avec succès."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Rechercher par nom d’utilisateur ou e‑mail..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Le contexte de l'organisation est requis pour supprimer des clés d'accès."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ caractères"
   },
@@ -4120,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "Afficher les journaux d'activité"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "Afficher et gérer les politiques de clés d'accès (passkeys) de l'organisation"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Gérer les clés d'accès"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Configurer les connexions d'authentification unique (SSO) et le provisionnement SCIM"
@@ -5000,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Oui"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Ajouter une Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Ajouter un jeton"
   },
@@ -5039,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Essayez d’ajuster vos filtres ou de les réinitialiser pour voir tous les événements."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Essayez un autre terme de recherche"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "Aucune passkey enregistrée"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "Aucune passkey ne correspond à votre recherche"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "La synchronisation d’annuaire nécessite le SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "Aucune connexion SSO configurée"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "Aucun utilisateur de votre organisation n’a encore enregistré de passkey"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Enregistrez une passkey pour une connexion plus rapide et plus sécurisée"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Gérez les passkeys pour tous les utilisateurs de votre organisation"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Utilisez la biométrie ou des clés de sécurité pour une authentification sans mot de passe"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Fournisseurs d’identité compatibles"
@@ -5703,7 +5652,7 @@
     "defaultMessage": "Choisissez l’organisation dans laquelle vous souhaitez travailler"
   },
   "Companies / Empty": {
-    "defaultMessage": "Vous n’avez encore accès à aucune organisation. Ajoutez une organisation ou acceptez une invitation ci-dessous."
+    "defaultMessage": "Ajoutez votre première organisation pour commencer à travailler dans Klarvido."
   },
   "Companies / Health": {
     "defaultMessage": "Aucune donnée sur l’état de l’organisation"
@@ -5773,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "Effacer la recherche"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "Comment prenez-vous les décisions importantes ?"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Ouvrir le profil de l’entreprise"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Complétez ou mettez à jour vos réponses de configuration de l’organisation."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Profil de l’entreprise"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "Étape {step} sur {total}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Cette couleur est réservée au rôle Propriétaire. Choisissez une autre couleur."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "Vous n’avez encore aucune organisation"
   }
 }
