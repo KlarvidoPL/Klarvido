@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from apps.backup.encryption import get_backup_encryption_service
 from common.storages import get_exports_storage
+from common.csv import spreadsheet_safe_cell
 
 logger = logging.getLogger(__name__)
 
@@ -155,13 +156,13 @@ def export_action_logs(self, export_id: str):
                 "changes",
                 "metadata",
             ]
-            writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
+            writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
             writer.writeheader()
             for row in export_data:
                 csv_row = row.copy()
                 csv_row["changes"] = json.dumps(row["changes"], ensure_ascii=False)
                 csv_row["metadata"] = json.dumps(row["metadata"], ensure_ascii=False)
-                writer.writerow(csv_row)
+                writer.writerow({key: spreadsheet_safe_cell(value) for key, value in csv_row.items()})
 
         csv_content = csv_buffer.getvalue()
 
