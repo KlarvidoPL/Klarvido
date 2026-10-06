@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/w
 import { Separator } from '@sb/webapp-core/components/ui/separator';
 import { ENV } from '@sb/webapp-core/config/env';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
+import { cn } from '@sb/webapp-core/lib/utils';
 import { Building2 } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
@@ -27,7 +28,7 @@ export const Login = () => {
 
   return (
     <AuthPageLayout>
-      <Card className={`w-full max-w-md ${AUTH_GLASS_CARD_CLASS}`}>
+      <Card className={cn('w-full max-w-md', AUTH_GLASS_CARD_CLASS)}>
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <AuthLogo />
