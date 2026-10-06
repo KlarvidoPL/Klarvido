@@ -77,13 +77,7 @@ describe('AddTwoFactorAuth: Component', () => {
       const verifyMock = composeMockedQueryResult(verifyOtpMutation, {
         variables: { input: { otpToken: token } },
         data: {},
-        errors: [
-          errorMessage.startsWith('Too many')
-            ? new GraphQLError(errorMessage)
-            : new GraphQLError('GraphQlValidationError', {
-                extensions: { token: [{ message: errorMessage, code: errorMessage }] },
-              }),
-        ],
+        errors: [new GraphQLError(errorMessage)],
       });
 
       const { waitForApolloMocks } = render(<Component />, {
@@ -102,7 +96,13 @@ describe('AddTwoFactorAuth: Component', () => {
       await userEvent.click(submitButton);
 
       // Wait for error to be processed and displayed (don't use waitForApolloMocks for error mocks)
-      expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
+      expect(
+        await screen.findByText(
+          errorMessage === 'Verification token is invalid' ? 'The verification code is invalid.' : errorMessage,
+          {},
+          { timeout: 3000 }
+        )
+      ).toBeInTheDocument();
     }
   );
 });

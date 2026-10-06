@@ -935,6 +935,9 @@
   "Auth / OTP / Attempt limit": {
     "defaultMessage": "Too many incorrect codes. Try again in 15 minutes."
   },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "The verification code is invalid."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Sign in with Passkey"
   },

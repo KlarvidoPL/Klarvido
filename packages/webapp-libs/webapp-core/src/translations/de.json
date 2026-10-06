@@ -935,6 +935,9 @@
   "Auth / OTP / Attempt limit": {
     "defaultMessage": "Zu viele falsche Codes. Versuche es in 15 Minuten erneut."
   },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "Der Bestätigungscode ist ungültig."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Mit Passkey anmelden"
   },

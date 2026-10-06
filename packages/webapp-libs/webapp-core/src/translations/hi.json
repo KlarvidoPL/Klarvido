@@ -935,6 +935,9 @@
   "Auth / OTP / Attempt limit": {
     "defaultMessage": "बहुत अधिक गलत कोड। 15 मिनट बाद फिर से कोशिश करें।"
   },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "सत्यापन कोड अमान्य है।"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Passkey से साइन इन करें"
   },

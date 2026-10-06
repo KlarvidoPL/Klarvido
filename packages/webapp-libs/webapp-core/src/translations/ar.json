@@ -935,6 +935,9 @@
   "Auth / OTP / Attempt limit": {
     "defaultMessage": "عدد كبير جدًا من الرموز غير الصحيحة. حاول مرة أخرى بعد 15 دقيقة."
   },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "رمز التحقق غير صالح."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "تسجيل الدخول باستخدام Passkey"
   },

@@ -30,6 +30,10 @@ export const ValidateOtpForm = () => {
   const form = useApiForm<ValidateOtpFormFields>({
     errorMessages: {
       nonFieldErrors: {
+        'Verification token is invalid': intl.formatMessage({
+          id: 'Auth / OTP / Invalid code',
+          defaultMessage: 'The verification code is invalid.',
+        }),
         'Too many incorrect codes. Try again in 15 minutes.': intl.formatMessage({
           id: 'Auth / OTP / Attempt limit',
           defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',

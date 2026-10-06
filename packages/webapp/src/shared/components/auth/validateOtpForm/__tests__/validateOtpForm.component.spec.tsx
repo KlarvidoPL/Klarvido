@@ -62,13 +62,7 @@ describe('ValidateOtpForm: Component', () => {
       const requestMock = composeMockedQueryResult(validateOtpMutation, {
         variables: { input: { otpToken: token } },
         data: {},
-        errors: [
-          errorMessage.startsWith('Too many')
-            ? new GraphQLError(errorMessage)
-            : new GraphQLError('GraphQlValidationError', {
-                extensions: { token: [{ message: errorMessage, code: errorMessage }] },
-              }),
-        ],
+        errors: [new GraphQLError(errorMessage)],
       });
 
       render(<Component />, { apolloMocks: append(requestMock) });
@@ -80,7 +74,13 @@ describe('ValidateOtpForm: Component', () => {
       await userEvent.click(submitButton);
 
       // Wait for error to be processed and displayed
-      expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
+      expect(
+        await screen.findByText(
+          errorMessage === 'Verification token is invalid' ? 'The verification code is invalid.' : errorMessage,
+          {},
+          { timeout: 3000 }
+        )
+      ).toBeInTheDocument();
     }
   );
 });
