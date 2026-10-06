@@ -294,14 +294,14 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
               placeholder="000000"
               maxLength={6}
               autoFocus
-              error={errors.token?.message}
+              aria-invalid={!!errors.token}
               autoComplete="one-time-code"
               className="w-full max-w-[160px] text-center font-mono text-lg tracking-widest"
             />
 
-            {genericError && (
+            {(errors.token?.message || genericError) && (
               <div className="text-sm text-destructive dark:text-red-400">
-                <Small>{genericError}</Small>
+                <Small>{errors.token?.message || genericError}</Small>
               </div>
             )}
           </div>
