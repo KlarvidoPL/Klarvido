@@ -1,4 +1,7 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "请输入有效的电子邮件地址"
+  },
   "Activity Logs / Detail / status": {
     "defaultMessage": "状态"
   },

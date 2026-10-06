@@ -1,4 +1,7 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "कृपया एक मान्य ईमेल पता दर्ज करें"
+  },
   "Activity Logs / Detail / status": {
     "defaultMessage": "स्थिति"
   },

@@ -20,6 +20,9 @@ import { allOrganizationRolesQuery } from '../../routes/tenantSettings/tenantRol
 import { getSystemRoleDisplay } from '../../utils/organizationRoleDisplay';
 import { UseTenantInvitationFormHookProps, useTenantInvitationForm } from './tenantInvitationForm.hook';
 
+const EMAIL_PATTERN =
+  /^[a-zA-Z0-9!#$%&'*+/=?^`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$/;
+
 export type TenantInvitationFormFields = {
   email: string;
   organizationRoleIds: string[];
@@ -165,7 +168,7 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form className="flex flex-col gap-6" onSubmit={handleFormSubmit}>
+          <form className="flex flex-col gap-6" onSubmit={handleFormSubmit} noValidate>
             {hasGenericErrorOnly && (
               <div className="text-sm text-destructive dark:text-red-400">
                 <span>{genericError}</span>
@@ -180,7 +183,16 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                     <FormControl>
                       <Input
                         {...field}
+                        type="email"
+                        autoComplete="email"
+                        inputMode="email"
                         {...register('email', {
+                          validate: (value) =>
+                            (value.trim().length <= 254 && EMAIL_PATTERN.test(value.trim())) ||
+                            intl.formatMessage({
+                              defaultMessage: 'Please enter a valid email address',
+                              id: 'Tenant invitation form / Email invalid',
+                            }),
                           required: {
                             value: true,
                             message: intl.formatMessage({
@@ -212,7 +224,7 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                     <FormLabel>
                       <p
                         className={cn(`mb-1.5 text-sm font-medium`, {
-                          'text-destructive': !!fieldState.error,
+                          'text-destructive dark:text-red-400': !!fieldState.error,
                           'text-foreground': !fieldState.error,
                         })}
                       >
@@ -230,7 +242,7 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                           'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
                           'disabled:cursor-not-allowed disabled:opacity-50',
                           {
-                            'border-destructive': !!fieldState.error,
+                            'border-destructive dark:border-red-400': !!fieldState.error,
                             'border-input': !fieldState.error,
                           }
                         )}
@@ -241,11 +253,11 @@ export const TenantInvitationForm = ({ initialData, onSubmit, error, loading }: 
                           })}
                         >
                           {rolesLoading
-                          ? intl.formatMessage({
-                              defaultMessage: 'Loading...',
-                              id: 'Tenant invitation form / Roles loading',
-                            })
-                          : getSelectedRolesDisplay()}
+                            ? intl.formatMessage({
+                                defaultMessage: 'Loading...',
+                                id: 'Tenant invitation form / Roles loading',
+                              })
+                            : getSelectedRolesDisplay()}
                         </span>
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </button>

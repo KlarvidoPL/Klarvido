@@ -26,7 +26,7 @@ export const useTenantInvitationForm = ({ error, onSubmit, initialData }: UseTen
   }, [error, setApolloGraphQLResponseErrors]);
 
   const handleFormSubmit = handleSubmit(async (formData: TenantInvitationFormFields) => {
-    const succeeded = await onSubmit(formData);
+    const succeeded = await onSubmit({ ...formData, email: formData.email.trim() });
     if (succeeded !== false) {
       rhfForm.reset();
     }

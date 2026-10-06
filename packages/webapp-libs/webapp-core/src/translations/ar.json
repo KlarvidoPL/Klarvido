@@ -1,4 +1,7 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "يرجى إدخال عنوان بريد إلكتروني صالح"
+  },
   "Activity Logs / Detail / status": {
     "defaultMessage": "الحالة"
   },

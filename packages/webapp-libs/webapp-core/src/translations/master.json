@@ -1,4 +1,7 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "Please enter a valid email address"
+  },
   "Activity Logs / Detail / status": {
     "defaultMessage": "Status"
   },
