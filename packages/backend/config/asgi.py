@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/asgi/
 import os
 
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import OriginValidator
+from django.conf import settings
 from django.core.asgi import get_asgi_application
 from django.urls import path
 
@@ -23,12 +25,15 @@ from apps.websockets.consumers import DefaultGraphqlWsConsumer  # noqa
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
-        "websocket": JSONWebTokenCookieMiddleware(
-            URLRouter(
-                [
-                    path("api/graphql/", DefaultGraphqlWsConsumer.as_asgi()),
-                ]
-            )
+        "websocket": OriginValidator(
+            JSONWebTokenCookieMiddleware(
+                URLRouter(
+                    [
+                        path("api/graphql/", DefaultGraphqlWsConsumer.as_asgi()),
+                    ]
+                )
+            ),
+            settings.WEBSOCKET_ALLOWED_ORIGINS,
         ),
     }
 )
