@@ -83,4 +83,22 @@ describe('ValidateOtpForm: Component', () => {
       ).toBeInTheDocument();
     }
   );
+  it('should translate an expired login challenge without exposing cookie details', async () => {
+    const token = '111111';
+    const technicalMessage = "No valid token found in cookie 'otp_auth_token'";
+    const requestMock = composeMockedQueryResult(validateOtpMutation, {
+      variables: { input: { otpToken: token } },
+      data: {},
+      errors: [
+        new GraphQLError(technicalMessage, {
+          extensions: { non_field_errors: [{ message: technicalMessage, code: 'invalid_token' }] },
+        }),
+      ],
+    });
+    render(<Component />, { apolloMocks: append(requestMock) });
+    await userEvent.type(await screen.findByPlaceholderText(/000000/i), token);
+    await userEvent.click(screen.getByRole('button', { name: /verify code/i }));
+    expect(await screen.findByText('Your sign-in session has expired. Please sign in again.')).toBeInTheDocument();
+    expect(screen.queryByText(technicalMessage)).not.toBeInTheDocument();
+  });
 });

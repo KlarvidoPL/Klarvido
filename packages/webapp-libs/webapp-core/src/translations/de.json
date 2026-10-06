@@ -938,6 +938,9 @@
   "Auth / OTP / Invalid code": {
     "defaultMessage": "Der Bestätigungscode ist ungültig."
   },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Deine Anmeldesitzung ist abgelaufen. Bitte melde dich erneut an."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Mit Passkey anmelden"
   },

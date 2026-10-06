@@ -938,6 +938,9 @@
   "Auth / OTP / Invalid code": {
     "defaultMessage": "El código de verificación no es válido."
   },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Tu sesión de inicio de sesión ha caducado. Vuelve a iniciar sesión."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Iniciar sesión con Passkey"
   },

@@ -938,6 +938,9 @@
   "Auth / OTP / Invalid code": {
     "defaultMessage": "رمز التحقق غير صالح."
   },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "انتهت صلاحية جلسة تسجيل الدخول. يُرجى تسجيل الدخول مرة أخرى."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "تسجيل الدخول باستخدام Passkey"
   },

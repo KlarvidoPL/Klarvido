@@ -938,6 +938,9 @@
   "Auth / OTP / Invalid code": {
     "defaultMessage": "验证码无效。"
   },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "登录会话已过期。请重新登录。"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "使用 Passkey 登录"
   },

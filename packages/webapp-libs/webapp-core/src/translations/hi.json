@@ -938,6 +938,9 @@
   "Auth / OTP / Invalid code": {
     "defaultMessage": "सत्यापन कोड अमान्य है।"
   },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "आपका साइन-इन सत्र समाप्त हो गया है। कृपया फिर से साइन इन करें।"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Passkey से साइन इन करें"
   },
