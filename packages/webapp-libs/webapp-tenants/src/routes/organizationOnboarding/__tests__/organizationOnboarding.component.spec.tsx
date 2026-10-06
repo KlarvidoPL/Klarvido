@@ -60,6 +60,27 @@ const profileMock = (currentStep = 6, isRequired = false) =>
   });
 
 describe('OrganizationOnboarding', () => {
+  it('advances one step after editing an earlier answer even when the saved profile is at summary', async () => {
+    render(<OrganizationOnboarding />, {
+      TenantWrapper,
+      apolloMocks: (mocks) => [
+        ...mocks,
+        profileMock(6),
+        composeMockedQueryResult(saveOrganizationOnboardingStepMutation, {
+          variables: { tenantId, step: 2, respondentRole: profile.respondentRole, customerType: profile.customerType },
+          data: { saveOrganizationOnboardingStep: { profile } },
+        }),
+        profileMock(6),
+      ],
+    });
+    await screen.findByText('Your business profile');
+    await userEvent.click(screen.getByRole('button', { name: 'Customers' }));
+    expect(screen.getByText('Who usually pays you?')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('What do customers pay you for?')).toBeInTheDocument();
+    expect(screen.queryByText('Your business profile')).not.toBeInTheDocument();
+  });
+
   it('goes back from Customers to company details and restores an unfinished answer', async () => {
     render(
       <>
@@ -80,7 +101,10 @@ describe('OrganizationOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Mostly consumers (B2C)' }));
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByTestId('location')).toHaveTextContent('/en/tenant-1/tenant/onboarding');
-    expect(screen.getByRole('button', { name: 'Company details' }).closest('li')).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('button', { name: 'Company details' }).closest('li')).toHaveAttribute(
+      'aria-current',
+      'step'
+    );
     await userEvent.click(within(progress).getByRole('button', { name: /Customers/ }));
     expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Mostly consumers (B2C)' })).toHaveAttribute('aria-pressed', 'true');

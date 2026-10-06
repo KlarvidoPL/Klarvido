@@ -3398,6 +3398,9 @@
   "Onboarding / Settings title": {
     "defaultMessage": "Business profile"
   },
+  "Onboarding / Step count": {
+    "defaultMessage": "Step {step} of {total}"
+  },
   "Onboarding / Step costs": {
     "defaultMessage": "Costs"
   },

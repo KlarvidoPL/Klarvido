@@ -3398,6 +3398,9 @@
   "Onboarding / Settings title": {
     "defaultMessage": "Profil firmy"
   },
+  "Onboarding / Step count": {
+    "defaultMessage": "Krok {step} z {total}"
+  },
   "Onboarding / Step costs": {
     "defaultMessage": "Koszty"
   },

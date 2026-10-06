@@ -1,10 +1,11 @@
 import { cn } from '@sb/webapp-core/lib/utils';
+import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import type { Option } from './onboardingOptions.hook';
 
 // Below the sm breakpoint tiles stack in one column and span the full width, like the Back/Next buttons.
-// From sm up they share one width per row: the grid stretches to the widest label, capped so long labels wrap instead.
+// Wider screens use at most three columns so longer answers stay readable.
 export const ChoiceGroup = ({
   options,
   selected,
@@ -23,7 +24,7 @@ export const ChoiceGroup = ({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {options.map((option) => {
         const active = selected.includes(option.value);
         return (
@@ -34,11 +35,19 @@ export const ChoiceGroup = ({
             disabled={max > 1 && !active && selected.length >= max}
             onClick={() => onChange(nextSelection(option.value))}
             className={cn(
-              'flex min-h-10 flex-col items-center justify-center rounded-lg border bg-card px-3 py-2 text-center text-sm font-normal transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-50',
+              'group relative flex min-h-16 flex-col items-center justify-center overflow-hidden rounded-lg border bg-card px-8 py-4 text-center text-sm font-normal transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-50',
               active && 'border-primary bg-primary/5 ring-1 ring-primary'
             )}
           >
-            {option.label}
+            <span
+              aria-hidden="true"
+              className={cn(
+                'pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#42F272] blur-2xl transition-opacity',
+                active ? 'opacity-[0.08]' : 'opacity-0 group-hover:opacity-[0.04] group-disabled:opacity-0'
+              )}
+            />
+            <span className="relative">{option.label}</span>
+            {active && <Check className="absolute right-2 top-2 h-3.5 w-3.5 text-primary" aria-hidden="true" />}
           </button>
         );
       })}
@@ -46,8 +55,7 @@ export const ChoiceGroup = ({
   );
 };
 
-// A question heading with an optional hint, followed by its answer tiles. Returns siblings so the parent's
-// spacing (space-y-6 on the form) keeps applying between the heading and the tiles.
+// Keep the heading close to its answers and let the form separate question groups.
 export const ChoiceQuestion = ({
   title,
   hint,
@@ -60,11 +68,11 @@ export const ChoiceQuestion = ({
   onChange: (values: string[]) => void;
   max?: number;
 }) => (
-  <>
+  <section className="space-y-3">
     <div>
       <h2 className="text-base font-semibold">{title}</h2>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
     <ChoiceGroup {...groupProps} />
-  </>
+  </section>
 );
