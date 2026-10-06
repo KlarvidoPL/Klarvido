@@ -25,6 +25,18 @@ describe('OnboardingProgress', () => {
     expect(items[0]).not.toHaveAttribute('aria-current');
   });
 
+  it('shows the step count and checks only the completed steps', async () => {
+    render(<OnboardingProgress step={3} />);
+
+    expect(await screen.findByText('Step 3 of 7')).toBeInTheDocument();
+    const items = within(screen.getByRole('list', { name: 'Onboarding steps' })).getAllByRole('listitem');
+    expect(items[0].querySelector('svg')).toBeInTheDocument();
+    expect(items[1].querySelector('svg')).toBeInTheDocument();
+    expect(items[2].querySelector('svg')).not.toBeInTheDocument();
+    expect(items[2]).toHaveTextContent('3');
+    expect(items[3].querySelector('svg')).not.toBeInTheDocument();
+  });
+
   it('lets the user return to completed steps and blocks steps beyond the furthest one reached', async () => {
     const onStepChange = jest.fn();
     render(<OnboardingProgress step={3} maxStep={4} onStepChange={onStepChange} />);

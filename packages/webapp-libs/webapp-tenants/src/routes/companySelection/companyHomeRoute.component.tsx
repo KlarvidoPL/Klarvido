@@ -40,9 +40,8 @@ export const CompanyHomeRoute = ({ children }: { children: ReactNode }) => {
     return <>{children}</>;
   }
   const { organizations } = companyGroups(tenants, !!user.isSuperuser);
+  if (!organizations.length) return <>{children}</>;
   const selected = homeOrganization(organizations, user.defaultOrganizationId);
   if (selected) return <Navigate to={tenantPath(CoreRoutesConfig.home, { tenantId: selected.id })} replace />;
-  return (
-    <Navigate to={localePath(organizations.length ? RoutesConfig.organizations : CoreRoutesConfig.addTenant)} replace />
-  );
+  return <Navigate to={localePath(RoutesConfig.organizations)} replace />;
 };

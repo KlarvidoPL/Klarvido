@@ -1,4 +1,265 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "Introduce una dirección de correo electrónico válida"
+  },
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "Estado"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "Número de registros"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "Operación"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "Filtros"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "ID de configuración"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "ID de copia de seguridad"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "Estrategia de conflictos"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "Cantidad de registros"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "Creados"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "Actualizados"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "Omitidos"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "Fallidos"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "Motivo"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "Terminación del token"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "Nombre del token"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "Código de error"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "Correo de facturación"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "Identificador URL"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "Tipo"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "Rol"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "Roles"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "Ninguno"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "Pendiente"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "En proceso"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "Completado"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "Completado parcialmente"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "Válido"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "No válido"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "Sin verificar"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "Política de retención"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "Configuración de la organización modificada"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "Nombre"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "Descripción"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "Color"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "Permisos"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "Activado"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "Intervalo de copias (horas)"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "Retención (días)"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "Destinatarios de correo"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "Módulos seleccionados"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "Modelos seleccionados"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "Modelos excluidos"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "Registro de actividad"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "Método de pago predeterminado"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "Plan de suscripción"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "Invitación enviada"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "Invitación reenviada"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "Invitación aceptada"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "Invitación rechazada"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "Configuración de copias de seguridad modificada"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "Copia de seguridad solicitada"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "Copia de seguridad eliminada"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "Copia de seguridad descargada"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "Copia de seguridad completada"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "Error en la copia de seguridad"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "Restauración solicitada"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "Restauración completada"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "Restauración completada parcialmente"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "Error en la restauración"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "Exportación del registro de actividad solicitada"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "Exportación del registro de actividad completada"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "Error al exportar el registro de actividad"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "Registro de actividad activado"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "Registro de actividad desactivado"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "Método de pago predeterminado modificado"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "Plan de suscripción modificado"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "Invitación a la organización"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "Configuración de copias de seguridad"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "Copia de seguridad"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "Restauración de copia de seguridad"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "Exportación del registro de actividad"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "Elemento CRUD"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "Usuario"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "Agente de IA"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "Superadministrador"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "Sistema (sincronización)"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "Sistema (importación)"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "Sistema (tarea en segundo plano)"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "Sistema (migración)"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "Método de pago"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "Suscripción"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "Token SCIM"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "Conexión SSO"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "Miembro de la organización"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "Rol de la organización"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "Organización"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "Accediendo a las fuentes de datos"
   },
@@ -56,6 +317,27 @@
   "Access Denied / Title": {
     "defaultMessage": "Acceso denegado"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "Creado"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "Actualizado"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "Eliminado"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "Configuración modificada"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "Importado"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "Sincronizado"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "Eliminación masiva"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "Actor"
   },
@@ -106,6 +388,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "Activado"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "Cliente"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "Proyecto"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "Persona"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "Rol"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "Ingreso"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "Coste"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "Tipo de cambio"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "Asignación"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "Iteración"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "Factura"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "Operación"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "Configuración"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "Configuración de la organización"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "Token KSeF"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "ID de entidad"
@@ -1484,11 +1808,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Configuración de copias de seguridad actualizada correctamente"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "Borrar fecha"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "Borrar"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "Listo"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "Ir a hoy"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "Mes siguiente"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "Año siguiente"
+  },
   "Calendar / Now button": {
     "defaultMessage": "Ahora"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "Hora"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "Seleccionar fecha y hora"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "Año anterior"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "Mes anterior"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "Seleccionar fecha"
   },
   "Calendar / Today button": {
     "defaultMessage": "Hoy"
@@ -2735,6 +3089,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "Se ha producido un error al conectar con KSeF. Inténtalo de nuevo."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "Este token no tiene permiso para leer facturas (InvoiceRead). Genera un nuevo token con este permiso."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF no ha aceptado este token. Comprueba que se ha copiado correctamente y que no ha sido revocado."
   },
@@ -3344,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Veces usada"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Agregar otra passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Añadir mi passkey"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "No se pudo eliminar la passkey. Inténtalo de nuevo."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey eliminada correctamente."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Buscar por nombre de usuario o correo..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Se requiere el contexto de la organización para eliminar claves de acceso."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ caracteres"
   },
@@ -3763,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "Ver registros de actividad"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "Ver y gestionar las políticas de claves de acceso (passkeys) de la organización"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Gestionar claves de acceso"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Configurar conexiones de inicio de sesión único (SSO) y aprovisionamiento SCIM"
@@ -4643,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Sí"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Agregar Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Agregar token"
   },
@@ -4682,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Prueba a ajustar tus filtros o borrarlos para ver todos los eventos."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Prueba con otro término de búsqueda"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "No hay passkeys registradas"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "Ninguna passkey coincide con tu búsqueda"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "La sincronización de directorio requiere SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "No hay conexiones SSO configuradas"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "Ningún usuario de tu organización ha registrado passkeys todavía"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Registra una passkey para un acceso más rápido y seguro"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Administra las passkeys de todos los usuarios de tu organización"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Usa biometría o llaves de seguridad para autenticación sin contraseña"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Proveedores de identidad compatibles"
@@ -5346,7 +5652,7 @@
     "defaultMessage": "Elige la organización en la que quieres trabajar"
   },
   "Companies / Empty": {
-    "defaultMessage": "Todavía no tienes acceso a ninguna organización. Añade una organización o acepta una invitación a continuación."
+    "defaultMessage": "Añade tu primera organización para empezar a trabajar en Klarvido."
   },
   "Companies / Health": {
     "defaultMessage": "Sin datos sobre el estado de la organización"
@@ -5416,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "Borrar búsqueda"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "¿Cómo tomas las decisiones importantes?"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "Abrir el perfil de empresa"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "Completa o actualiza tus respuestas de configuración de la organización."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "Perfil de empresa"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "Paso {step} de {total}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Este color está reservado para el rol de Propietario. Elige otro color."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "Todavía no tienes ninguna organización"
   }
 }

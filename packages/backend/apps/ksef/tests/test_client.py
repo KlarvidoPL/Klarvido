@@ -47,6 +47,7 @@ def _mock_ksef(
     captured=None,
     tokens_status=200,
     token_description="KlarvidoTest",
+    invoices_status=200,
 ):
     """Mock KSeF endpoints. auth_codes is the sequence of StatusInfo codes returned by GET /auth/{ref}."""
     codes = list(auth_codes)
@@ -102,6 +103,12 @@ def _mock_ksef(
                     "continuationToken": None,
                 },
             )
+        if request.method == "POST" and path == "/v2/invoices/query/metadata":
+            if captured is not None:
+                captured["invoice_query"] = json.loads(request.content)
+                captured["invoice_authorization"] = request.headers["Authorization"]
+                captured["invoice_page_size"] = request.url.params["pageSize"]
+            return httpx.Response(invoices_status, json={"invoices": [], "hasMore": False, "isTruncated": False})
         if request.method == "DELETE" and path == "/v2/auth/sessions/current":
             if captured is not None:
                 captured["closed_with"] = request.headers["Authorization"]
@@ -137,6 +144,33 @@ def test_valid_token_sends_encrypted_token_in_expected_format(certificate):
         padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None),
     )
     assert plaintext == f"{TOKEN}|{TIMESTAMP_MS}".encode()
+    assert captured["closed_with"] == "Bearer ACCESS"
+    assert captured["invoice_authorization"] == "Bearer ACCESS"
+    assert captured["invoice_page_size"] == "10"
+    assert captured["invoice_query"]["subjectType"] == "Subject1"
+    assert captured["invoice_query"]["dateRange"]["dateType"] == "PermanentStorage"
+
+
+@pytest.mark.parametrize(
+    "http_status,status,error_code",
+    [
+        (403, KsefCredentialStatus.INVALID, KsefErrorCode.INVOICE_READ_MISSING),
+        (401, KsefCredentialStatus.INVALID, KsefErrorCode.INVALID_TOKEN),
+        (429, KsefCredentialStatus.UNVERIFIED, KsefErrorCode.SERVICE_UNAVAILABLE),
+        (503, KsefCredentialStatus.UNVERIFIED, KsefErrorCode.SERVICE_UNAVAILABLE),
+        (400, KsefCredentialStatus.UNVERIFIED, KsefErrorCode.SERVICE_UNAVAILABLE),
+    ],
+)
+def test_invoice_read_check_failure_never_marks_token_valid_and_closes_session(
+    certificate, http_status, status, error_code
+):
+    private_key, der = certificate
+    captured = {}
+    result = client.verify_token(
+        NIP, TOKEN, http_client=_mock_ksef(private_key, der, captured=captured, invoices_status=http_status)
+    )
+    assert result.status == status
+    assert result.error_code == error_code
     assert captured["closed_with"] == "Bearer ACCESS"
 
 

@@ -1,3 +1,4 @@
+from common.action_logging.service import log_request_action
 import datetime
 
 from django.conf import settings
@@ -80,7 +81,18 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
 class UpdateDefaultPaymentMethodSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         customer, _ = djstripe_models.Customer.get_or_create(self.context["request"].tenant)
+        old_id = str(customer.default_payment_method_id) if customer.default_payment_method_id else None
         customers.set_default_payment_method(customer=customer, payment_method=instance)
+        if old_id != str(instance.pk):
+            log_request_action(
+                self.context["request"],
+                tenant_id=self.context["request"].tenant.pk,
+                action_type="UPDATE",
+                entity_type="payment_method",
+                entity_id=str(instance.pk),
+                changes={"default_payment_method": {"old": old_id, "new": str(instance.pk)}},
+                metadata={"operation": "default_payment_method_changed"},
+            )
         return instance
 
 

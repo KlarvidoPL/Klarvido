@@ -30,6 +30,50 @@ Local URLs: webapp `:3000`, backend/GraphQL `:5001`, admin `admin.localhost:5001
 
 `.env` files have distinct roles, per package: `.env` (real secrets, per-environment, **never committed**) vs `.env.shared` (committed, non-secret defaults e.g. `PROJECT_NAME`) vs `.env.test` (CI test-run overrides). The first superuser is created automatically from the initial backend migration **if `ADMIN_EMAIL` + `ADMIN_DEFAULT_PASSWORD` are set** at first `migrate` — not a separate seed command; change the password immediately outside local dev (the shared default in `.env.shared` is dev-only).
 
+### Fresh local instance (manual reset)
+
+When asked for a fresh local instance, provide commands for the user to run;
+do not execute the reset unless explicitly asked. Do not add a committed reset
+script. This procedure permanently deletes development data and must never be
+used on a VPS/production host or against a remote Docker context. Check
+`docker context show` and any `DOCKER_HOST`/`DOCKER_CONTEXT` overrides first.
+
+Stop the running `pnpm saas up` process. From the repository root, resolve the
+actual database volume name using the local files explicitly (do not assume
+`PROJECT_NAME` or let `COMPOSE_FILE` select production configuration):
+
+```sh
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml config --format json | node -e 'let s=""; process.stdin.on("data", c => s += c); process.stdin.on("end", () => console.log(JSON.parse(s).volumes.web_backend_db_data.name));'
+```
+
+Then substitute the printed name for `<local-db-volume>` below. The current
+development name is `Klarvido-web-backend-db-data`, but verify it each time.
+
+```sh
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml down --volumes --remove-orphans
+docker volume rm <local-db-volume>
+docker volume create <local-db-volume>
+pnpm saas up
+```
+
+Postgres is an **external volume**, so `down --volumes` alone does not reset
+users or business data. The commands also clear Redis, generated static files,
+anonymous volumes, and container-held LocalStack uploads/Mailcatcher emails.
+They retain images, build caches, source, `.env` files, and the `/tmp/localstack`
+host scratch bind (the local configuration does not mount LocalStack's persistent
+`/var/lib/localstack` directory). If `STORAGE_BACKEND=local`, also provide a
+separate command to remove the verified local upload directory (normally
+`packages/backend/media`) before restarting; inspect a custom `MEDIA_ROOT` first.
+Externally hosted storage is not cleared by this procedure.
+
+Ensure `ADMIN_EMAIL` and `ADMIN_DEFAULT_PASSWORD` are set in
+`packages/backend/.env` before restarting. The initial migration recreates that
+admin; startup also initializes permissions, locales, translations, and configured
+Contentful/Stripe data. A fresh instance therefore has no previous users/business
+data, but still contains normal system records. Remind the user to clear browser
+site data (cookies/local storage) for `localhost:3000` and
+`admin.localhost:5001` to discard stale sessions and organization selections.
+
 ### Lint / type-check / test (frontend — per-package, via Nx)
 
 Every `webapp` and `webapp-libs/*` package has `lint`, `type-check`, `test` targets even though `project.json` often shows `"targets": {}` (they're added by inferred Nx plugins — use `pnpm nx show project <name>` if unsure what's available).
@@ -137,7 +181,9 @@ After generating `backend`/`crud`: add the app to `INSTALLED_APPS`, register its
 - **Tests use pytest fixtures, not `django.test.TestCase`** (`TestCase` can cause `InterfaceError: connection already closed`). Mark with `pytestmark = pytest.mark.django_db`, use factories (`user_factory`, `tenant_factory`, ...). Factories that must not duplicate a row need `django_get_or_create` in `class Meta`. Factories become fixtures automatically via `pytest_factoryboy.register(...)` in each app's `tests/fixtures.py`, wired into `pytest_plugins` in the root `conftest.py` — that's why e.g. `product_factory`/`product` are available without importing them.
 - Emails go through `common.emails.Email` subclasses (`.send()`), not raw SMTP calls — the subclass has a `name` (e.g. `'ACCOUNT_ACTIVATION'`) and a `serializer_class` (DRF serializer validating the template's `data` dict). In-app notifications go through `apps.notifications.sender.send_notification`; which channels actually fire is controlled by the `NOTIFICATIONS_STRATEGIES` setting (default in-app only) — add e.g. push/SMS by subclassing `BaseNotificationStrategy` in `apps/notifications/strategies.py`.
 - **New Django app manually** (what `plop backend` automates): `pnpm saas backend shell` → `cd apps && django-admin startapp <name>`, fix `apps.py`'s `name = 'apps.<name>'`, add to `LOCAL_APPS` in `settings.py`. Model IDs conventionally use `hashid_field.HashidAutoField` (obfuscated, non-sequential).
-- **Activity/audit logging**: `common.action_logging` provides a `@log_create`/`@log_update`/`@log_delete` decorator form for mutations, or manual `ActionLogService.log_action(...)` + `compute_changes(old_instance, new_instance, fields_to_track=[...])` for auto-diffing field changes. Sensitive fields are never logged — configured in `EXCLUDED_LOGGING_FIELDS` (`password`, `secret_key`, `api_key`, `token`, ...); add any new sensitive field there. Retention via `ACTION_LOG_RETENTION_DAYS`.
+- **Activity/audit logging is part of every new user-facing functionality**: whenever a feature adds or changes organization data, settings, memberships, permissions, billing, integrations, backups/restores, imports or exports, add the corresponding activity events as part of the implementation. Include user requests and background completion/failure outcomes where relevant; avoid logging ordinary page views/searches or successful events for failed operations. Preserve organization scope, stable entity IDs, useful old/new changes, and the correct user/AI/superuser/system actor. Respect `action_logging_enabled`; changes to the logging toggle must themselves be recorded with `force_log=True`.
+- **Logging implementation**: use `@action_logged(...)` from `common.action_logging.decorators` for standard CRUD mutations. For custom request operations use `log_request_action(request, ...)` from `common.action_logging.service`; background jobs use `log_action(...)` with an explicit system actor. `compute_changes(...)` tracks old/new field values; `SENSITIVE_FIELDS` in that service excludes passwords, secrets and tokens from automatic snapshots. Add new sensitive fields there, and keep sensitive contents out of manually supplied changes/metadata too. Keep authentication/session events in security audit logs. Organization deletion needs an independent durable audit record because its activity logs are cascade-deleted.
+- **Logging UI and tests**: add each new entity to the activity-log filter/label map, and translate event titles, actor labels, detail fields and enum values in all eight supported languages (`en`, `pl`, `de`, `fr`, `es`, `zh`, `hi`, `ar`). Preserve user-entered names; store/export stable raw values and translate only their display. Snapshot organization roles with their names and `system_role_type`, rather than mixing legacy membership roles with assigned roles. Add focused tests covering the actual operation, relevant failure outcomes, actor attribution, organization isolation, filters and translated display.
 - **GraphQL error response shape** differs by error source — check both when handling errors on the frontend: field-validator errors come back as `extensions.<fieldName>`, object-level `validate()` errors as `extensions.non_field_errors`. Use the existing `extractGraphQLErrors` + `form.setApolloGraphQLResponseErrors` helpers rather than parsing `extensions` manually.
 
 ### Frontend patterns

@@ -122,7 +122,7 @@ export const CompanySelection = () => {
             </div>
           </div>
           <Button variant="outline" className="shrink-0 self-start sm:self-auto" asChild>
-            <Link to={localePath(CoreRoutesConfig.addTenant)}>
+            <Link to={localePath(CoreRoutesConfig.addOrganization)}>
               <Plus className="mr-2 h-4 w-4" />
               <FormattedMessage id="Companies / Add" defaultMessage="Add organization" />
             </Link>
@@ -143,16 +143,6 @@ export const CompanySelection = () => {
         )}
         {user && !loadError && (
           <>
-            {!organizations.length && (
-              <Card>
-                <CardContent className="py-10 text-center text-muted-foreground">
-                  <FormattedMessage
-                    id="Companies / Empty"
-                    defaultMessage="You do not have access to any organizations yet. Add an organization or accept an invitation below."
-                  />
-                </CardContent>
-              </Card>
-            )}
             <p className="text-sm text-muted-foreground">
               <FormattedMessage
                 id="Companies / Count"
@@ -160,7 +150,39 @@ export const CompanySelection = () => {
                 values={{ count: organizations.length }}
               />
             </p>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {!organizations.length && (
+                <Card className="group relative col-span-full flex min-h-64 flex-col overflow-hidden">
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#42F272] opacity-15 blur-2xl transition-opacity group-hover:opacity-25"
+                  />
+                  <CardContent
+                    className="relative flex flex-1 flex-col items-center justify-center gap-4 px-5 py-10 text-center text-muted-foreground"
+                    role="status"
+                  >
+                    <Building2 className="h-10 w-10 opacity-50" aria-hidden="true" />
+                    <h2 className="text-xl font-semibold text-foreground">
+                      <FormattedMessage
+                        id="Companies / Empty title"
+                        defaultMessage="You don't have any organizations yet"
+                      />
+                    </h2>
+                    <p className="max-w-lg text-sm">
+                      <FormattedMessage
+                        id="Companies / Empty"
+                        defaultMessage="Add your first organization to start working in Klarvido."
+                      />
+                    </p>
+                    <Button variant="outline" asChild>
+                      <Link to={localePath(CoreRoutesConfig.addOrganization)}>
+                        <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                        <FormattedMessage id="Companies / Add" defaultMessage="Add organization" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
               {organizations.length > 0 && !filtered.length && (
                 <Card className="group relative col-span-full flex min-h-64 flex-col overflow-hidden">
                   <div

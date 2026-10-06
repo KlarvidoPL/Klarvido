@@ -3,12 +3,14 @@ GraphQL schema for backup functionality.
 """
 
 import logging
+from copy import deepcopy
 
 import graphene
 from graphene import relay
 from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql_relay import from_global_id, to_global_id
 
+from common.action_logging.service import compute_changes, log_request_action
 from common.graphql.acl import permission_classes, requires
 from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE
 from rest_framework.exceptions import PermissionDenied
@@ -237,6 +239,9 @@ class UpdateBackupConfigMutation(graphene.Mutation):
             selected_models = input.get('selected_models', []) or []
             excluded_models = input.get('excluded_models', []) or []
 
+            old_config = models.BackupConfig.objects.filter(tenant=tenant).first()
+            old_config = deepcopy(old_config) if old_config else None
+
             # Get or create backup config
             backup_config, created = models.BackupConfig.objects.update_or_create(
                 tenant=tenant,
@@ -251,6 +256,17 @@ class UpdateBackupConfigMutation(graphene.Mutation):
                 },
             )
 
+            changes = compute_changes(old_config, backup_config)
+            if changes:
+                log_request_action(
+                    info.context,
+                    tenant_id=tenant.pk,
+                    action_type="SETTINGS_CHANGE",
+                    entity_type="backup_config",
+                    entity_id=str(backup_config.pk),
+                    changes=changes,
+                    metadata={"operation": "backup_settings_changed"},
+                )
             return cls(backup_config=backup_config, ok=True)
 
         except Exception as e:
@@ -287,8 +303,16 @@ class DeleteBackupMutation(graphene.Mutation):
                 except Exception as e:
                     logger.warning(f"Failed to delete backup file {backup.file_path}: {e}")
 
-            # Delete backup record
+            backup_pk = str(backup.pk)
             backup.delete()
+            log_request_action(
+                info.context,
+                tenant_id=tenant.pk,
+                action_type="DELETE",
+                entity_type="backup",
+                entity_id=backup_pk,
+                metadata={"operation": "backup_deleted"},
+            )
 
             return cls(ok=True)
 
@@ -329,6 +353,14 @@ class TriggerBackupMutation(graphene.Mutation):
                 config_id=config_id,
             )
 
+            log_request_action(
+                info.context,
+                tenant_id=tenant.pk,
+                action_type="CREATE",
+                entity_type="backup",
+                entity_id=str(tenant.pk),
+                metadata={"operation": "backup_requested", "config_id": config_id},
+            )
             return cls(ok=True, backup_id=None)  # Backup ID will be created by the task
 
         except Exception as e:
@@ -415,6 +447,18 @@ class RestoreBackupMutation(graphene.Mutation):
                 conflict_strategy=conflict_strategy_value,
             )
 
+            log_request_action(
+                info.context,
+                tenant_id=tenant.pk,
+                action_type="IMPORT",
+                entity_type="backup_restore",
+                entity_id=str(restore_record.pk),
+                metadata={
+                    "operation": "restore_requested",
+                    "backup_id": str(backup_record.pk),
+                    "conflict_strategy": conflict_strategy_value,
+                },
+            )
             restore_global_id = to_global_id('RestoreRecordType', str(restore_record.id))
             return cls(ok=True, restore_id=restore_global_id)
 
@@ -491,6 +535,14 @@ class DownloadBackupDecryptedMutation(graphene.Mutation):
                 logger.error(f"Failed to decode backup content: {e}")
                 return cls(ok=False, error="Failed to decode backup content")
 
+            log_request_action(
+                info.context,
+                tenant_id=tenant.pk,
+                action_type="UPDATE",
+                entity_type="backup",
+                entity_id=str(backup.pk),
+                metadata={"operation": "backup_downloaded"},
+            )
             return cls(ok=True, content=xml_content)
 
         except models.BackupRecord.DoesNotExist:

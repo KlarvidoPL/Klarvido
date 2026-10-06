@@ -6,6 +6,8 @@ from graphql_relay import to_global_id, from_global_id
 
 from apps.content import models as content_models
 from common.graphql import mutations
+from common.action_logging.decorators import action_logged
+from apps.multitenancy.constants import ActionType
 from common.acl.policies import IsTenantMemberAccess, IsAuthenticatedFullAccess
 from common.graphql.acl import permission_classes, permission_required
 from common.graphql.pagination.fields import UIPagedConnection, UIPagedConnectionField
@@ -47,6 +49,7 @@ class ContentfulDemoItemFavoriteConnection(graphene.Connection):
 
 
 @permission_required("features.crud.manage")
+@action_logged(entity_type="crud_item", action_type=ActionType.CREATE)
 class CreateCrudDemoItemMutation(mutations.CreateTenantDependentModelMutation):
     class Meta:
         serializer_class = serializers.CrudDemoItemSerializer
@@ -111,6 +114,7 @@ class DeleteDocumentDemoItemMutation(mutations.DeleteModelMutation):
 
 
 @permission_required("features.crud.manage")
+@action_logged(entity_type="crud_item", action_type=ActionType.UPDATE)
 class UpdateCrudDemoItemMutation(mutations.UpdateTenantDependentModelMutation):
     class Meta:
         serializer_class = serializers.CrudDemoItemSerializer
@@ -118,6 +122,7 @@ class UpdateCrudDemoItemMutation(mutations.UpdateTenantDependentModelMutation):
 
 
 @permission_required("features.crud.manage")
+@action_logged(entity_type="crud_item", action_type=ActionType.DELETE)
 class DeleteCrudDemoItemMutation(mutations.DeleteTenantDependentModelMutation):
     class Meta:
         model = models.CrudDemoItem

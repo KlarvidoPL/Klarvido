@@ -1,4 +1,265 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "कृपया एक मान्य ईमेल पता दर्ज करें"
+  },
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "स्थिति"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "लॉग की संख्या"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "कार्यवाही"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "फ़िल्टर"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "कॉन्फ़िगरेशन ID"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "बैकअप ID"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "टकराव की रणनीति"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "रिकॉर्ड की संख्या"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "बनाए गए"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "अपडेट किए गए"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "छोड़े गए"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "विफल"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "कारण"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "टोकन का अंतिम भाग"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "टोकन का नाम"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "त्रुटि कोड"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "बिलिंग ईमेल"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "URL पहचानकर्ता"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "प्रकार"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "भूमिका"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "भूमिकाएँ"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "कोई नहीं"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "लंबित"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "प्रक्रिया में"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "पूरा हुआ"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "आंशिक रूप से पूरा हुआ"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "मान्य"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "अमान्य"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "असत्यापित"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "संग्रह नीति"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "संगठन की सेटिंग बदली गई"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "नाम"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "विवरण"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "रंग"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "अनुमतियाँ"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "सक्षम"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "बैकअप अंतराल (घंटे)"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "संग्रह अवधि (दिन)"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "ईमेल प्राप्तकर्ता"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "चयनित मॉड्यूल"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "चयनित मॉडल"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "बहिष्कृत मॉडल"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "गतिविधि लॉगिंग"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "डिफ़ॉल्ट भुगतान विधि"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "सदस्यता योजना"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "आमंत्रण भेजा गया"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "आमंत्रण दोबारा भेजा गया"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "आमंत्रण स्वीकार किया गया"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "आमंत्रण अस्वीकार किया गया"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "बैकअप सेटिंग बदली गई"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "बैकअप का अनुरोध किया गया"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "बैकअप हटाया गया"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "बैकअप डाउनलोड किया गया"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "बैकअप पूरा हुआ"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "बैकअप विफल हुआ"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "पुनर्स्थापना का अनुरोध किया गया"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "पुनर्स्थापना पूरी हुई"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "पुनर्स्थापना आंशिक रूप से पूरी हुई"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "पुनर्स्थापना विफल हुई"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "गतिविधि लॉग निर्यात का अनुरोध किया गया"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "गतिविधि लॉग निर्यात पूरा हुआ"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "गतिविधि लॉग निर्यात विफल हुआ"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "गतिविधि लॉगिंग सक्षम की गई"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "गतिविधि लॉगिंग अक्षम की गई"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "डिफ़ॉल्ट भुगतान विधि बदली गई"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "सदस्यता योजना बदली गई"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "संगठन का आमंत्रण"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "बैकअप सेटिंग"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "बैकअप"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "बैकअप पुनर्स्थापना"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "गतिविधि लॉग निर्यात"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "CRUD आइटम"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "उपयोगकर्ता"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "AI एजेंट"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "सुपर एडमिन"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "सिस्टम (सिंक्रोनाइज़ेशन)"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "सिस्टम (आयात)"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "सिस्टम (पृष्ठभूमि कार्य)"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "सिस्टम (माइग्रेशन)"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "भुगतान विधि"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "सदस्यता"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "SCIM टोकन"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "SSO कनेक्शन"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "संगठन का सदस्य"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "संगठन की भूमिका"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "संगठन"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "डेटा स्रोतों तक पहुंच हो रही है"
   },
@@ -56,6 +317,27 @@
   "Access Denied / Title": {
     "defaultMessage": "एक्सेस अस्वीकृत"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "बनाया गया"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "अपडेट किया गया"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "हटाया गया"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "सेटिंग बदली गई"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "आयात किया गया"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "सिंक किया गया"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "एक साथ हटाया गया"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "एक्टर"
   },
@@ -106,6 +388,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "Enabled"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "ग्राहक"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "परियोजना"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "व्यक्ति"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "भूमिका"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "आय"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "लागत"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "विनिमय दर"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "आवंटन"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "पुनरावृत्ति"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "चालान"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "सौदा"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "सेटिंग"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "संगठन की सेटिंग"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "KSeF टोकन"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "Entity ID"
@@ -1484,11 +1808,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "बैकअप सेटिंग्स सफलतापूर्वक अपडेट की गईं"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "तारीख साफ़ करें"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "साफ़ करें"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "पूर्ण"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "आज पर जाएँ"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "अगला महीना"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "अगला वर्ष"
+  },
   "Calendar / Now button": {
     "defaultMessage": "अभी"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "समय"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "तारीख और समय चुनें"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "पिछला वर्ष"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "पिछला महीना"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "तारीख चुनें"
   },
   "Calendar / Today button": {
     "defaultMessage": "आज"
@@ -2735,6 +3089,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "KSeF से कनेक्ट करते समय त्रुटि हुई। फिर से प्रयास करें।"
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "इस टोकन में चालान पढ़ने की अनुमति (InvoiceRead) नहीं है। इस अनुमति के साथ नया टोकन बनाएँ।"
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF ने यह टोकन स्वीकार नहीं किया। जाँचें कि यह सही तरह से कॉपी हुआ है और रद्द नहीं किया गया है।"
   },
@@ -3344,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "उपयोग की बार"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "एक और passkey जोड़ें"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "मेरा पासकी जोड़ें"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Passkey हटाने में विफल। कृपया दोबारा प्रयास करें।"
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey सफलतापूर्वक हटा दिया गया।"
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "उपयोगकर्ता नाम या ईमेल से खोजें..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "पासकी हटाने के लिए संगठन संदर्भ आवश्यक है।"
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ अक्षर"
   },
@@ -3763,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "गतिविधि लॉग देखें"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "संगठन की पासकी नीतियां देखें और प्रबंधित करें"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "पासकी प्रबंधित करें"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "सिंगल साइन-ऑन (SSO) कनेक्शन और SCIM प्रोविज़निंग कॉन्फ़िगर करें"
@@ -4643,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "हाँ"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Passkey जोड़ें"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Token जोड़ें"
   },
@@ -4682,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "सभी इवेंट देखने के लिए अपने फ़िल्टर बदलें या उन्हें साफ़ करें।"
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "कोई और सर्च शब्द आज़माएँ"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "कोई पासकी रजिस्टर्ड नहीं"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "आपकी खोज से कोई पासकी मेल नहीं खा रही"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "डायरेक्टरी सिंक के लिए SSO आवश्यक है"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "कोई SSO कनेक्शन कॉन्फ़िगर नहीं है"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "आपके संगठन में अभी तक किसी यूज़र ने पासकी रजिस्टर नहीं की है"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "तेज़ और अधिक सुरक्षित साइन-इन के लिए पासकी रजिस्टर करें"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "अपने संगठन के सभी यूज़र्स के लिए पासकीज़ प्रबंधित करें"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "पासवर्ड-रहित ऑथेंटिकेशन के लिए बायोमेट्रिक्स या सिक्योरिटी कीज़ का उपयोग करें"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "संगत Identity Providers"
@@ -5346,7 +5652,7 @@
     "defaultMessage": "वह संगठन चुनें जिसमें आप काम करना चाहते हैं"
   },
   "Companies / Empty": {
-    "defaultMessage": "अभी आपके पास किसी संगठन तक पहुँच नहीं है। संगठन जोड़ें या नीचे दिया गया आमंत्रण स्वीकार करें।"
+    "defaultMessage": "Klarvido में काम शुरू करने के लिए अपना पहला संगठन जोड़ें।"
   },
   "Companies / Health": {
     "defaultMessage": "संगठन की स्थिति का डेटा उपलब्ध नहीं"
@@ -5416,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "खोज साफ़ करें"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "आप मुख्य निर्णय कैसे लेते हैं?"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "व्यावसायिक प्रोफ़ाइल खोलें"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "संगठन की ऑनबोर्डिंग के उत्तर पूरे करें या अपडेट करें।"
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "व्यावसायिक प्रोफ़ाइल"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "{total} में से चरण {step}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "यह रंग स्वामी भूमिका के लिए आरक्षित है। कोई दूसरा रंग चुनें।"
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "आपके पास अभी कोई संगठन नहीं है"
   }
 }

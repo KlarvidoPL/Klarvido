@@ -172,7 +172,7 @@ export const AddTenantForm = () => {
     }
   };
 
-  if (draftLoading)
+  if (draftLoading && !draft)
     return (
       <PageLayout>
         <Loader2 className="mx-auto my-8 animate-spin" />

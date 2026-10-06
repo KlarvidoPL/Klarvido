@@ -11,6 +11,8 @@ from django.utils import timezone
 from datetime import timedelta
 
 from apps.multitenancy.models import Tenant
+from common.action_logging.service import log_action
+from apps.multitenancy.constants import ActionActorType
 from common.storages import get_exports_storage
 
 from .models import BackupConfig, BackupRecord, RestoreRecord
@@ -19,6 +21,18 @@ from .emails import BackupReadyEmail
 from .encryption import get_backup_encryption_service
 
 logger = logging.getLogger(__name__)
+
+
+def log_backup_result(record, operation, entity_type="backup"):
+    """Record worker outcomes without including backup contents, storage paths or exception payloads."""
+    return log_action(
+        tenant_id=record.tenant_id,
+        action_type="IMPORT" if entity_type == "backup_restore" else "CREATE",
+        entity_type=entity_type,
+        entity_id=str(record.pk),
+        actor_type=ActionActorType.SYSTEM_SCHEDULED,
+        metadata={"operation": operation, "status": record.status, "model_counts": record.model_counts},
+    )
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=300, ignore_result=True)
@@ -125,6 +139,7 @@ def create_backup(self, tenant_id: str, config_id: str = None, scheduled_at: str
         backup_record.is_encrypted = is_encrypted
         backup_record.model_counts = backup_service.model_counts
         backup_record.save()
+        log_backup_result(backup_record, "backup_completed")
 
         # Build link to the backup settings page in the web app (where the user can decrypt & download)
         import os
@@ -213,6 +228,7 @@ def create_backup(self, tenant_id: str, config_id: str = None, scheduled_at: str
         backup_record.status = BackupRecord.Status.FAILED
         backup_record.error_message = str(exc)
         backup_record.save()
+        log_backup_result(backup_record, "backup_failed")
 
         # Notify user of failure
         try:
@@ -276,7 +292,17 @@ def cleanup_old_backups(self):
                             logger.warning(f"Failed to delete backup file {backup.file_path}: {e}")
 
                     # Delete backup record
+                    backup_pk = str(backup.pk)
+                    backup_tenant_id = backup.tenant_id
                     backup.delete()
+                    log_action(
+                        tenant_id=backup_tenant_id,
+                        action_type="DELETE",
+                        entity_type="backup",
+                        entity_id=backup_pk,
+                        actor_type=ActionActorType.SYSTEM_SCHEDULED,
+                        metadata={"operation": "backup_deleted", "reason": "retention"},
+                    )
                     deleted_count += 1
                 except Exception as e:
                     logger.error(f"Error cleaning up backup {backup.id}: {e}")
@@ -324,6 +350,7 @@ def restore_backup(self, backup_record_id: str, restore_record_id: str, conflict
         restore_record.error_message = "Backup record not found"
         restore_record.completed_at = timezone.now()
         restore_record.save()
+        log_backup_result(restore_record, "restore_failed", "backup_restore")
         return {"error": "Backup record not found", "success": False}
 
     tenant = backup_record.tenant
@@ -379,6 +406,7 @@ def restore_backup(self, backup_record_id: str, restore_record_id: str, conflict
             restore_record.status = RestoreRecord.Status.COMPLETED
         restore_record.completed_at = timezone.now()
         restore_record.save()
+        log_backup_result(restore_record, "restore_partial" if has_errors else "restore_completed", "backup_restore")
 
         # Create notification
         try:
@@ -424,6 +452,7 @@ def restore_backup(self, backup_record_id: str, restore_record_id: str, conflict
         restore_record.error_message = f"Conflict detected: {str(e)}"
         restore_record.completed_at = timezone.now()
         restore_record.save()
+        log_backup_result(restore_record, "restore_failed", "backup_restore")
         return {"error": str(e), "success": False}
 
     except RestoreValidationError as e:
@@ -432,6 +461,7 @@ def restore_backup(self, backup_record_id: str, restore_record_id: str, conflict
         restore_record.error_message = f"Validation error: {str(e)}"
         restore_record.completed_at = timezone.now()
         restore_record.save()
+        log_backup_result(restore_record, "restore_failed", "backup_restore")
         return {"error": str(e), "success": False}
 
     except Exception as exc:
@@ -440,6 +470,7 @@ def restore_backup(self, backup_record_id: str, restore_record_id: str, conflict
         restore_record.error_message = str(exc)
         restore_record.completed_at = timezone.now()
         restore_record.save()
+        log_backup_result(restore_record, "restore_failed", "backup_restore")
 
         # Create failure notification
         try:

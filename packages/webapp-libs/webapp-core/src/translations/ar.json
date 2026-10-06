@@ -1,4 +1,265 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "يرجى إدخال عنوان بريد إلكتروني صالح"
+  },
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "الحالة"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "عدد السجلات"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "العملية"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "عوامل التصفية"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "معرّف الإعدادات"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "معرّف النسخة الاحتياطية"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "استراتيجية التعارض"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "عدد السجلات"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "تم إنشاؤها"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "تم تحديثها"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "تم تخطيها"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "فشلت"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "السبب"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "نهاية الرمز"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "اسم الرمز"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "رمز الخطأ"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "بريد الفوترة"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "معرّف URL"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "النوع"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "الدور"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "الأدوار"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "لا يوجد"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "قيد الانتظار"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "قيد المعالجة"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "مكتمل"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "مكتمل جزئيًا"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "صالح"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "غير صالح"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "غير متحقق منه"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "سياسة الاحتفاظ"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "تم تغيير إعدادات المؤسسة"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "الاسم"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "الوصف"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "اللون"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "الصلاحيات"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "مفعّل"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "الفاصل بين النسخ (ساعات)"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "مدة الاحتفاظ (أيام)"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "مستلمو البريد الإلكتروني"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "الوحدات المحددة"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "النماذج المحددة"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "النماذج المستبعدة"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "تسجيل النشاط"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "طريقة الدفع الافتراضية"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "خطة الاشتراك"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "تم إرسال الدعوة"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "تمت إعادة إرسال الدعوة"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "تم قبول الدعوة"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "تم رفض الدعوة"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "تم تغيير إعدادات النسخ الاحتياطي"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "تم طلب نسخة احتياطية"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "تم حذف النسخة الاحتياطية"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "تم تنزيل النسخة الاحتياطية"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "اكتمل النسخ الاحتياطي"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "فشل النسخ الاحتياطي"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "تم طلب الاستعادة"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "اكتملت الاستعادة"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "اكتملت الاستعادة جزئيًا"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "فشلت الاستعادة"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "تم طلب تصدير سجل النشاط"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "اكتمل تصدير سجل النشاط"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "فشل تصدير سجل النشاط"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "تم تفعيل تسجيل النشاط"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "تم تعطيل تسجيل النشاط"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "تم تغيير طريقة الدفع الافتراضية"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "تم تغيير خطة الاشتراك"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "دعوة إلى المؤسسة"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "إعدادات النسخ الاحتياطي"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "نسخة احتياطية"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "استعادة النسخة الاحتياطية"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "تصدير سجل النشاط"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "عنصر CRUD"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "المستخدم"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "وكيل الذكاء الاصطناعي"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "المسؤول الأعلى"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "النظام (المزامنة)"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "النظام (الاستيراد)"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "النظام (مهمة في الخلفية)"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "النظام (الترحيل)"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "طريقة الدفع"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "الاشتراك"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "رمز SCIM"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "اتصال SSO"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "عضو المؤسسة"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "دور في المؤسسة"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "المؤسسة"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "جارٍ الوصول إلى مصادر البيانات"
   },
@@ -56,6 +317,27 @@
   "Access Denied / Title": {
     "defaultMessage": "تم رفض الوصول"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "تم الإنشاء"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "تم التحديث"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "تم الحذف"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "تم تغيير الإعدادات"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "تم الاستيراد"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "تمت المزامنة"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "تم الحذف الجماعي"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "الجهة المنفِّذة"
   },
@@ -106,6 +388,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "مفعّل"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "عميل"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "مشروع"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "شخص"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "دور"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "إيراد"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "تكلفة"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "سعر الصرف"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "تعيين"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "تكرار"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "فاتورة"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "صفقة"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "الإعدادات"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "إعدادات المؤسسة"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "رمز KSeF"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "معرّف الكيان"
@@ -1484,11 +1808,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "تم تحديث إعدادات النسخ الاحتياطي بنجاح"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "مسح التاريخ"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "مسح"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "تم"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "الانتقال إلى اليوم"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "الشهر التالي"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "السنة التالية"
+  },
   "Calendar / Now button": {
     "defaultMessage": "الآن"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "الوقت"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "اختر التاريخ والوقت"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "السنة السابقة"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "الشهر السابق"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "اختر التاريخ"
   },
   "Calendar / Today button": {
     "defaultMessage": "اليوم"
@@ -2735,6 +3089,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "حدث خطأ أثناء الاتصال بـ KSeF. حاول مرة أخرى."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "لا يملك هذا الرمز صلاحية قراءة الفواتير (InvoiceRead). أنشئ رمزًا جديدًا بهذه الصلاحية."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "لم يقبل KSeF هذا الرمز. تحقق من أنه نُسخ بشكل صحيح ولم يتم إلغاؤه."
   },
@@ -3344,24 +3701,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "عدد مرات الاستخدام"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "إضافة Passkey أخرى"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "إضافة مفتاح المرور الخاص بي"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "فشل حذف Passkey. يُرجى المحاولة مرة أخرى."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "تم حذف Passkey بنجاح."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "ابحث بالاسم أو البريد الإلكتروني..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "سياق المؤسسة مطلوب لحذف مفاتيح المرور."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8 أحرف أو أكثر"
   },
@@ -3763,12 +4102,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "عرض سجلات النشاط"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "عرض سياسات مفاتيح المرور (Passkeys) الخاصة بالمؤسسة وإدارتها"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "إدارة مفاتيح المرور"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "تهيئة اتصالات تسجيل الدخول الموحد (SSO) وتوفير SCIM"
@@ -4643,9 +4976,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "نعم"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "إضافة Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "إضافة Token"
   },
@@ -4682,35 +5012,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "جرّب تعديل عوامل التصفية أو مسحها لعرض جميع الأحداث."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "جرّب مصطلح بحث مختلفًا"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "لا توجد مفاتيح مرور مسجّلة"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "لا توجد مفاتيح مرور تطابق بحثك"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "مزامنة الدليل تتطلب SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "لا توجد اتصالات SSO مُعدّة"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "لا يوجد أي مستخدم في مؤسستك سجّل مفاتيح مرور بعد"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "سجّل مفتاح مرور لتسجيل دخول أسرع وأكثر أمانًا"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "إدارة مفاتيح المرور لجميع مستخدمي مؤسستك"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "استخدم البيانات الحيوية أو مفاتيح الأمان لتسجيل دخول بدون كلمة مرور"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "مزودو الهوية المتوافقون"
@@ -5346,7 +5652,7 @@
     "defaultMessage": "اختر المؤسسة التي تريد العمل فيها"
   },
   "Companies / Empty": {
-    "defaultMessage": "ليس لديك صلاحية الوصول إلى أي مؤسسة بعد. أضف مؤسسة أو اقبل دعوة أدناه."
+    "defaultMessage": "أضف أول مؤسسة لك لتبدأ العمل في Klarvido."
   },
   "Companies / Health": {
     "defaultMessage": "لا توجد بيانات عن حالة المؤسسة"
@@ -5416,5 +5722,26 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "مسح البحث"
+  },
+  "Onboarding / Pricing title": {
+    "defaultMessage": "كيف تتخذ القرارات الرئيسية؟"
+  },
+  "Onboarding / Settings action": {
+    "defaultMessage": "فتح الملف التجاري"
+  },
+  "Onboarding / Settings description": {
+    "defaultMessage": "أكمل إجابات إعداد المؤسسة أو حدّثها."
+  },
+  "Onboarding / Settings title": {
+    "defaultMessage": "الملف التجاري"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "الخطوة {step} من {total}"
+  },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "هذا اللون محجوز لدور المالك. اختر لونًا آخر."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "ليس لديك أي مؤسسة بعد"
   }
 }

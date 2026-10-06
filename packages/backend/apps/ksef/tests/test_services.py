@@ -1,5 +1,6 @@
 import base64
 import os
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -8,6 +9,8 @@ from apps.ksef import crypto, services
 from apps.ksef.client import TokenCheck
 from apps.ksef.constants import KsefCredentialStatus, KsefErrorCode
 from apps.ksef.models import KsefCredential
+from apps.multitenancy.constants import ActionActorType, ActionType
+from apps.multitenancy.models import ActionLog
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog
 
@@ -67,6 +70,30 @@ def test_valid_token_is_stored_encrypted(polish_tenant):
     assert credential.last_verified_at is not None
     assert b"real-token-1234" not in bytes(credential.encrypted_token)
     assert crypto.decrypt_token(polish_tenant.pk, credential.encrypted_token) == "real-token-1234"
+
+
+def test_missing_invoice_read_does_not_replace_existing_token(polish_tenant):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, "original-token")
+    denied = TokenCheck(status=KsefCredentialStatus.INVALID, error_code=KsefErrorCode.INVOICE_READ_MISSING)
+    with patch.object(services, "verify_token", return_value=denied):
+        result = services.save_token(polish_tenant, None, "no-read-token")
+    assert result.error_code == KsefErrorCode.INVOICE_READ_MISSING
+    credential = KsefCredential.objects.get(tenant=polish_tenant)
+    assert crypto.decrypt_token(polish_tenant.pk, credential.encrypted_token) == "original-token"
+    assert credential.status == KsefCredentialStatus.VALID
+
+
+def test_retest_marks_token_without_invoice_read_invalid(polish_tenant):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, "original-token")
+    denied = TokenCheck(status=KsefCredentialStatus.INVALID, error_code=KsefErrorCode.INVOICE_READ_MISSING)
+    with patch.object(services, "verify_token", return_value=denied):
+        result = services.retest_token(polish_tenant, None)
+    assert result.error_code == KsefErrorCode.INVOICE_READ_MISSING
+    credential = KsefCredential.objects.get(tenant=polish_tenant)
+    assert credential.status == KsefCredentialStatus.INVALID
+    assert credential.last_error_code == KsefErrorCode.INVOICE_READ_MISSING
 
 
 def test_token_name_is_stored_and_refreshed(polish_tenant):
@@ -212,3 +239,88 @@ def test_security_log_entries_include_token_name(polish_tenant):
     assert saved.metadata["token_name"] == "KlarvidoTest"
     assert tested.metadata["token_name"] == "KlarvidoTest"
     assert deleted.metadata["token_name"] == "KlarvidoTest"
+
+
+@pytest.fixture
+def logged_tenant(tenant_factory):
+    return tenant_factory(nip="5252344078", action_logging_enabled=True)
+
+
+@pytest.fixture
+def request_for(user, logged_tenant):
+    def build(**flags):
+        attributes = {
+            "user": user,
+            "tenant": logged_tenant,
+            "is_ai_agent_request": False,
+            "is_superuser_cross_tenant_access": False,
+        }
+        attributes.update(flags)
+        return SimpleNamespace(**attributes)
+
+    return build
+
+
+def _activity_events(tenant):
+    return ActionLog.objects.filter(tenant=tenant, entity_type="ksef_credential")
+
+
+def test_saving_token_logs_create_without_token_value(logged_tenant, user, request_for):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(logged_tenant, user, "activity-token-1234", request=request_for())
+
+    event = _activity_events(logged_tenant).get()
+    assert event.action_type == ActionType.CREATE
+    assert event.actor_type == ActionActorType.USER
+    assert event.actor_user == user
+    assert event.entity_id == str(logged_tenant.pk)
+    assert event.metadata["operation"] == "set"
+    assert event.metadata["token_hint"] == "1234"
+    assert "activity-token-1234" not in str(event.metadata)
+
+
+def test_replacing_token_logs_update(logged_tenant, user, request_for):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(logged_tenant, user, "first-token-1111", request=request_for())
+        services.save_token(logged_tenant, user, "second-token-2222", request=request_for())
+
+    assert sorted(_activity_events(logged_tenant).values_list("action_type", flat=True)) == [
+        ActionType.CREATE,
+        ActionType.UPDATE,
+    ]
+
+
+@pytest.mark.parametrize(
+    "flag,actor",
+    [
+        (None, ActionActorType.USER),
+        ("is_ai_agent_request", ActionActorType.AI_AGENT),
+        ("is_superuser_cross_tenant_access", ActionActorType.SUPERUSER),
+    ],
+)
+def test_retest_logs_update_with_request_actor(logged_tenant, user, request_for, flag, actor):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(logged_tenant, user, "retest-token-3333")
+        services.retest_token(logged_tenant, user, request=request_for(**({flag: True} if flag else {})))
+
+    event = _activity_events(logged_tenant).get(metadata__operation="test")
+    assert event.action_type == ActionType.UPDATE
+    assert event.actor_type == actor
+    assert event.metadata["token_hint"] == "3333"
+
+
+def test_deleting_token_logs_delete_with_hint(logged_tenant, user, request_for):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(logged_tenant, user, "delete-token-4444")
+    assert services.delete_token(logged_tenant, user, request=request_for())
+
+    event = _activity_events(logged_tenant).get(action_type=ActionType.DELETE)
+    assert event.actor_type == ActionActorType.USER
+    assert event.metadata == {"operation": "delete", "token_hint": "4444"}
+
+
+def test_rejected_token_writes_no_activity_event(logged_tenant, user, request_for):
+    with patch.object(services, "verify_token", return_value=INVALID):
+        services.save_token(logged_tenant, user, "wrong-token-5555", request=request_for())
+
+    assert not _activity_events(logged_tenant).exists()

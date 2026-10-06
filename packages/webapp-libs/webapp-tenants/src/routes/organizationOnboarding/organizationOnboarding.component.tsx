@@ -22,6 +22,7 @@ import {
   DisplayNameField,
   NipField,
 } from '../../components/companyDetailsFields';
+import { VatStatus, useVatStatusLabels } from '../../components/companyDetailsFields/companyDetailsFields.component';
 import { useCompanyFormErrorMessages } from '../../components/companyDetailsFields/companyFormErrors.hook';
 import { OnboardingProgress } from '../../components/onboardingProgress/onboardingProgress.component';
 import { TenantFormFields } from '../../components/tenantForm/tenantForm.component';
@@ -185,6 +186,7 @@ const OnboardingForm = ({
   }));
 
   const update = (patch: Partial<Answers>) => setAnswers((current) => ({ ...current, ...patch }));
+  const vatStatusLabels = useVatStatusLabels();
   const canContinue = isAnswerComplete(step, answers);
   const busy = saving || savingDraft || updatingTenant || lookupLoading;
 
@@ -353,7 +355,7 @@ const OnboardingForm = ({
         tenantForm.getValues('nip'),
         tenantForm.getValues('regon'),
         tenantForm.getValues('address'),
-        tenantForm.getValues('vatStatus'),
+        vatStatusLabels[tenantForm.getValues('vatStatus') as VatStatus] ?? tenantForm.getValues('vatStatus'),
       ]
         .filter(Boolean)
         .join(' · '),
@@ -430,7 +432,7 @@ const OnboardingForm = ({
           <CardContent>
             <Form {...tenantForm}>
               <form
-                className="space-y-6"
+                className="space-y-8"
                 noValidate
                 onSubmit={(event) => {
                   event.preventDefault();
@@ -607,10 +609,10 @@ const OnboardingForm = ({
                           id: 'Onboarding / Clear draft',
                         })}
                         title={intl.formatMessage({ defaultMessage: 'Clear draft', id: 'Onboarding / Clear draft' })}
-                        className="mt-3 flex h-10 w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:mt-0 sm:h-8 sm:w-8 sm:border-0"
+                        className="mt-3 flex h-10 w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:ml-auto sm:mt-0 sm:w-auto sm:border-0 sm:px-3"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
-                        <span className="sm:hidden">
+                        <span>
                           <FormattedMessage defaultMessage="Clear draft" id="Onboarding / Clear draft" />
                         </span>
                       </button>
@@ -643,7 +645,7 @@ export const OrganizationOnboarding = ({
     skip: draftMode || !tenantId,
     fetchPolicy: 'network-only',
   });
-  const { options, loading: optionsLoading, error: optionsError } = useOnboardingOptions();
+  const { options, error: optionsError } = useOnboardingOptions();
 
   const source = draftMode ? draftQuery : profileQuery;
   if (source.error || optionsError)
@@ -654,7 +656,8 @@ export const OrganizationOnboarding = ({
         </p>
       </PageLayout>
     );
-  if (source.loading || optionsLoading || !options || !source.data)
+  // Keep local step and answer state when refreshing an already loaded profile.
+  if (!options || !source.data)
     return (
       <PageLayout>
         <div className="flex justify-center p-8">

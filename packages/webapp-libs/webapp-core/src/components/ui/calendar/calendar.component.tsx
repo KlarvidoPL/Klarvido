@@ -1,12 +1,14 @@
 'use client';
 
-import * as React from 'react';
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { DayPicker, type DayPickerProps, useDayPicker, type DayButtonProps } from 'react-day-picker';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { addYears, subYears } from 'date-fns';
-import { cn } from '../../../lib/utils';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { type DayButtonProps, DayPicker, type DayPickerProps, useDayPicker } from 'react-day-picker';
+import { useIntl } from 'react-intl';
+
 import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
+import { cn } from '../../../lib/utils';
 import { buttonVariants } from '../button';
 
 export type CalendarProps = DayPickerProps & {
@@ -18,12 +20,12 @@ export type CalendarProps = DayPickerProps & {
 
 // Navigation button style - responsive sizing
 const navButtonClass = cn(
-  'h-6 w-6 sm:h-8 sm:w-8 p-0 flex items-center justify-center rounded-md',
-  'border border-border bg-background',
+  'flex h-6 w-6 items-center justify-center rounded-md p-0 sm:h-8 sm:w-8',
+  'border-border bg-background border',
   'text-muted-foreground hover:text-foreground',
   'hover:bg-muted',
-  'active:scale-95 transition-all duration-150',
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+  'transition-all duration-150 active:scale-95',
+  'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
 );
 
 // Custom Nav component with year navigation
@@ -36,6 +38,7 @@ interface CustomNavProps {
 }
 
 function CustomNav({ showYearNavigation, onPreviousClick, onNextClick, previousMonth, nextMonth }: CustomNavProps) {
+  const intl = useIntl();
   const { goToMonth, previousMonth: prevMonth, nextMonth: nxtMonth } = useDayPicker();
 
   const handlePreviousYear = useCallback(() => {
@@ -50,36 +53,44 @@ function CustomNav({ showYearNavigation, onPreviousClick, onNextClick, previousM
     }
   }, [goToMonth, nxtMonth]);
 
-  const handlePreviousMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    if (onPreviousClick) {
-      onPreviousClick(e);
-    } else if (prevMonth) {
-      goToMonth(prevMonth);
-    }
-  }, [onPreviousClick, goToMonth, prevMonth]);
+  const handlePreviousMonth = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (onPreviousClick) {
+        onPreviousClick(e);
+      } else if (prevMonth) {
+        goToMonth(prevMonth);
+      }
+    },
+    [onPreviousClick, goToMonth, prevMonth]
+  );
 
-  const handleNextMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    if (onNextClick) {
-      onNextClick(e);
-    } else if (nxtMonth) {
-      goToMonth(nxtMonth);
-    }
-  }, [onNextClick, goToMonth, nxtMonth]);
+  const handleNextMonth = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (onNextClick) {
+        onNextClick(e);
+      } else if (nxtMonth) {
+        goToMonth(nxtMonth);
+      }
+    },
+    [onNextClick, goToMonth, nxtMonth]
+  );
 
   return (
-    <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-8 z-10 pointer-events-none">
-      <div className="flex items-center gap-1 pointer-events-auto">
+    <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 flex h-8 items-center justify-between">
+      <div className="pointer-events-auto flex items-center gap-1">
         {showYearNavigation && (
           <div className="nav-button-wrapper">
             <button
               type="button"
               className={navButtonClass}
               onClick={handlePreviousYear}
-              aria-label="Go to previous year"
+              aria-label={intl.formatMessage({ id: 'Calendar / Previous year', defaultMessage: 'Previous year' })}
             >
               <ChevronsLeft className="h-4 w-4" strokeWidth={2} />
             </button>
-            <div className="nav-button-tooltip">Previous year</div>
+            <div className="nav-button-tooltip">
+              {intl.formatMessage({ id: 'Calendar / Previous year', defaultMessage: 'Previous year' })}
+            </div>
           </div>
         )}
         <div className="nav-button-wrapper">
@@ -88,25 +99,29 @@ function CustomNav({ showYearNavigation, onPreviousClick, onNextClick, previousM
             className={navButtonClass}
             onClick={handlePreviousMonth}
             disabled={!prevMonth && !previousMonth}
-            aria-label="Go to previous month"
+            aria-label={intl.formatMessage({ id: 'Calendar / Previous month', defaultMessage: 'Previous month' })}
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2} />
           </button>
-          <div className="nav-button-tooltip">Previous month</div>
+          <div className="nav-button-tooltip">
+            {intl.formatMessage({ id: 'Calendar / Previous month', defaultMessage: 'Previous month' })}
+          </div>
         </div>
       </div>
-      <div className="flex items-center gap-1 pointer-events-auto">
+      <div className="pointer-events-auto flex items-center gap-1">
         <div className="nav-button-wrapper">
           <button
             type="button"
             className={navButtonClass}
             onClick={handleNextMonth}
             disabled={!nxtMonth && !nextMonth}
-            aria-label="Go to next month"
+            aria-label={intl.formatMessage({ id: 'Calendar / Next month', defaultMessage: 'Next month' })}
           >
             <ChevronRight className="h-4 w-4" strokeWidth={2} />
           </button>
-          <div className="nav-button-tooltip">Next month</div>
+          <div className="nav-button-tooltip">
+            {intl.formatMessage({ id: 'Calendar / Next month', defaultMessage: 'Next month' })}
+          </div>
         </div>
         {showYearNavigation && (
           <div className="nav-button-wrapper">
@@ -114,11 +129,13 @@ function CustomNav({ showYearNavigation, onPreviousClick, onNextClick, previousM
               type="button"
               className={navButtonClass}
               onClick={handleNextYear}
-              aria-label="Go to next year"
+              aria-label={intl.formatMessage({ id: 'Calendar / Next year', defaultMessage: 'Next year' })}
             >
               <ChevronsRight className="h-4 w-4" strokeWidth={2} />
             </button>
-            <div className="nav-button-tooltip">Next year</div>
+            <div className="nav-button-tooltip">
+              {intl.formatMessage({ id: 'Calendar / Next year', defaultMessage: 'Next year' })}
+            </div>
           </div>
         )}
       </div>
@@ -290,9 +307,7 @@ function Calendar({
   ...props
 }: CalendarProps) {
   const dateLocale = useDateFnsLocale();
-  const [internalMonth, setInternalMonth] = useState<Date>(
-    controlledMonth ?? props.defaultMonth ?? new Date()
-  );
+  const [internalMonth, setInternalMonth] = useState<Date>(controlledMonth ?? props.defaultMonth ?? new Date());
   const [animationKey, setAnimationKey] = useState(0);
   const previousMonthRef = useRef<Date | null>(null);
 
@@ -324,32 +339,32 @@ function Calendar({
     <div className="relative">
       {/* Inject animation styles once */}
       <style>{calendarAnimationStyles}</style>
-      
-    <DayPicker
+
+      <DayPicker
         key={animationKey}
-      showOutsideDays={showOutsideDays}
+        showOutsideDays={showOutsideDays}
         weekStartsOn={weekStartsOn}
         month={currentMonth}
         onMonthChange={handleMonthChange}
         locale={dateLocale}
-      className={cn('p-3', className)}
+        className={cn('p-3', className)}
         modifiers={{
           weekend: { dayOfWeek: [0, 6] }, // Sunday (0) and Saturday (6)
         }}
         modifiersClassNames={{
           weekend: 'calendar-weekend-day',
         }}
-      classNames={{
+        classNames={{
           // Container for all months - responsive padding for nav buttons
           months: cn(
-            'relative flex flex-col sm:flex-row gap-4 sm:gap-8',
+            'relative flex flex-col gap-4 sm:flex-row sm:gap-8',
             showYearNavigation ? 'px-[3.25rem] sm:px-[4.5rem]' : 'px-8 sm:px-10'
           ),
           // Individual month - no animation here (keeps header static)
-        month: 'flex flex-col gap-3 sm:gap-4 calendar-month-container',
+          month: 'flex flex-col gap-3 sm:gap-4 calendar-month-container',
           month_caption: 'flex justify-center pt-1 items-center h-7 sm:h-8',
           caption_label: cn(
-            'text-xs sm:text-sm font-semibold uppercase tracking-wider text-foreground',
+            'text-foreground text-xs font-semibold uppercase tracking-wider sm:text-sm',
             'transition-opacity duration-200'
           ),
           // Hide default nav - we're using custom nav
@@ -357,87 +372,67 @@ function Calendar({
           button_previous: 'hidden',
           button_next: 'hidden',
           // Grid with elegant fade animation
-          month_grid: cn(
-            'w-full border-collapse',
-            'calendar-grid-animate'
-          ),
-        weekdays: 'flex',
-        weekday:
-          'text-muted-foreground rounded-md w-9 sm:w-10 font-medium text-[0.65rem] sm:text-[0.75rem] uppercase tracking-wide',
-        week: 'flex w-full mt-1.5 sm:mt-2 calendar-week-row',
+          month_grid: cn('w-full border-collapse', 'calendar-grid-animate'),
+          weekdays: 'flex',
+          weekday:
+            'text-muted-foreground rounded-md w-9 sm:w-10 font-medium text-[0.65rem] sm:text-[0.75rem] uppercase tracking-wide',
+          week: 'flex w-full mt-1.5 sm:mt-2 calendar-week-row',
           // Day cell - base styling with hover scale - responsive size
           day: cn(
-            'relative p-0 text-center text-xs sm:text-sm focus-within:relative focus-within:z-20',
+            'relative p-0 text-center text-xs focus-within:relative focus-within:z-20 sm:text-sm',
             'h-9 w-9 sm:h-10 sm:w-10',
             'calendar-range-bg'
           ),
           // Day button - enhanced hover with scale effect - responsive size
-        day_button: cn(
-          buttonVariants({ variant: 'ghost' }),
-          'h-9 w-9 sm:h-10 sm:w-10 p-0 font-medium rounded-md text-xs sm:text-sm',
+          day_button: cn(
+            buttonVariants({ variant: 'ghost' }),
+            'h-9 w-9 rounded-md p-0 text-xs font-medium sm:h-10 sm:w-10 sm:text-sm',
             'hover:bg-muted transition-all duration-150 ease-out',
             'calendar-day-hover',
-          'aria-selected:opacity-100'
-        ),
+            'aria-selected:opacity-100'
+          ),
           // Range start - rounded left corners, stronger background
-        range_start: cn(
-          'rounded-l-lg rounded-r-none',
-            'bg-neutral-300 dark:bg-neutral-600',
-            'calendar-range-bg'
-        ),
+          range_start: cn('rounded-l-lg rounded-r-none', 'bg-neutral-300 dark:bg-neutral-600', 'calendar-range-bg'),
           // Range end - rounded right corners, stronger background
-        range_end: cn(
-          'rounded-r-lg rounded-l-none',
-            'bg-neutral-300 dark:bg-neutral-600',
-            'calendar-range-bg'
-        ),
-        // Range middle - no rounding, solid background
-        range_middle: cn(
-          'rounded-none',
-            'bg-neutral-300 dark:bg-neutral-600',
-            'calendar-range-bg'
-        ),
+          range_end: cn('rounded-l-none rounded-r-lg', 'bg-neutral-300 dark:bg-neutral-600', 'calendar-range-bg'),
+          // Range middle - no rounding, solid background
+          range_middle: cn('rounded-none', 'bg-neutral-300 dark:bg-neutral-600', 'calendar-range-bg'),
           // Selected (start/end) button style - stronger contrast with pop animation
-        selected: cn(
+          selected: cn(
             'bg-neutral-800 dark:bg-neutral-200',
-          'text-white dark:text-neutral-900',
+            'text-white dark:text-neutral-900',
             'hover:bg-neutral-700 dark:hover:bg-neutral-300',
             'focus:bg-neutral-800 dark:focus:bg-neutral-200',
-          'font-semibold',
+            'font-semibold',
             'transition-all duration-150',
             'calendar-day-select'
           ),
           // Today indicator - ring style (doesn't conflict with selection)
           today: cn(
-            'ring-2 ring-inset ring-primary',
+            'ring-primary ring-2 ring-inset',
             '[&:not([aria-selected=true])]:text-primary',
             '[&:not([aria-selected=true])]:font-bold'
           ),
-        // Outside days - very subtle
-        outside: cn(
-          'text-neutral-300 dark:text-neutral-600',
+          // Outside days - very subtle
+          outside: cn(
+            'text-neutral-300 dark:text-neutral-600',
             'aria-selected:bg-neutral-200 dark:aria-selected:bg-neutral-700',
-          'aria-selected:text-neutral-400 dark:aria-selected:text-neutral-500'
-        ),
-        disabled: 'text-muted-foreground opacity-50 cursor-not-allowed',
-        hidden: 'invisible',
-        ...classNames,
-      }}
-      components={{
-          Nav: (navProps) => (
-            <CustomNav
-              {...navProps}
-              showYearNavigation={showYearNavigation}
-            />
+            'aria-selected:text-neutral-400 dark:aria-selected:text-neutral-500'
           ),
-        Chevron: ({ orientation }) => {
-          const Icon = orientation === 'left' ? ChevronLeft : ChevronRight;
-          return <Icon className="h-4 w-4" strokeWidth={2} />;
-        },
+          disabled: 'text-muted-foreground opacity-50 cursor-not-allowed',
+          hidden: 'invisible',
+          ...classNames,
+        }}
+        components={{
+          Nav: (navProps) => <CustomNav {...navProps} showYearNavigation={showYearNavigation} />,
+          Chevron: ({ orientation }) => {
+            const Icon = orientation === 'left' ? ChevronLeft : ChevronRight;
+            return <Icon className="h-4 w-4" strokeWidth={2} />;
+          },
           DayButton: CustomDayButton,
-      }}
-      {...props}
-    />
+        }}
+        {...props}
+      />
     </div>
   );
 }

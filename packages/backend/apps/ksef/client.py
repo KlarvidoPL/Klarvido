@@ -6,7 +6,8 @@ Flow (see https://github.com/CIRFMF/ksef-docs):
   2. POST /auth/challenge                         -> challenge + timestampMs
   3. POST /auth/ksef-token                        -> encryptedToken = RSA-OAEP-SHA256("<token>|<timestampMs>")
   4. GET  /auth/{referenceNumber}                 -> poll until status 200 (success) or a failure code
-  5. POST /auth/token/redeem                      -> proves the token works; the session is then closed again
+  5. POST /auth/token/redeem                      -> obtain access token
+  6. POST /invoices/query/metadata                -> prove invoice read access; close the session afterwards
 
 The token is only ever held in memory for the duration of this call and is never logged.
 """
@@ -15,7 +16,7 @@ import base64
 import logging
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import httpx
@@ -160,15 +161,42 @@ def _close_session(http: httpx.Client, access_token: str) -> None:
         logger.warning("Could not close the KSeF check session; it will expire on its own")
 
 
+def _verify_invoice_read(http: httpx.Client, access_token: str) -> None:
+    """Probe read access without downloading invoice contents or retaining invoice metadata."""
+    now = datetime.now(timezone.utc)
+    response = _request(
+        http,
+        "POST",
+        "/invoices/query/metadata",
+        headers=_bearer(access_token),
+        params={"pageOffset": 0, "pageSize": 10},
+        json={
+            "subjectType": "Subject1",
+            "dateRange": {
+                "dateType": "PermanentStorage",
+                "from": (now - timedelta(days=1)).isoformat(),
+                "to": now.isoformat(),
+            },
+        },
+    )
+    if response.status_code == 403:
+        raise _Rejected(KsefErrorCode.INVOICE_READ_MISSING)
+    if response.status_code == 401:
+        raise _Rejected(KsefErrorCode.INVALID_TOKEN)
+    if response.status_code != 200:
+        raise _Unavailable(f"invoice read check answered {response.status_code}")
+
+
 def verify_token(nip: str, token: str, http_client: Optional[httpx.Client] = None) -> TokenCheck:
     """
-    Check that a KSeF token authenticates for the given NIP.
+    Check that a KSeF token authenticates for the given NIP and can read invoices.
 
     Returns VALID, INVALID (KSeF said no, nothing should be stored) or UNVERIFIED (KSeF could not be reached).
     """
     base_url = _base_url()
     owns_client = http_client is None
     http = http_client or httpx.Client(base_url=base_url, timeout=REQUEST_TIMEOUT)
+    access_token = None
     try:
         public_key_id, public_key = _encryption_certificate_key(http)
 
@@ -200,8 +228,8 @@ def verify_token(nip: str, token: str, http_client: Optional[httpx.Client] = Non
         if redeem_response.status_code != 200:
             raise _Unavailable(f"redeem answered {redeem_response.status_code}")
         access_token = redeem_response.json()["accessToken"]["token"]
+        _verify_invoice_read(http, access_token)
         token_name = _fetch_token_name(http, access_token)
-        _close_session(http, access_token)
 
         return TokenCheck(status=KsefCredentialStatus.VALID, token_name=token_name)
     except _Rejected as e:
@@ -211,5 +239,7 @@ def verify_token(nip: str, token: str, http_client: Optional[httpx.Client] = Non
         logger.warning("KSeF token check unavailable: %s", type(e).__name__)
         return TokenCheck(status=KsefCredentialStatus.UNVERIFIED, error_code=KsefErrorCode.SERVICE_UNAVAILABLE)
     finally:
+        if access_token:
+            _close_session(http, access_token)
         if owns_client:
             http.close()

@@ -92,7 +92,9 @@ describe('AddKsefTokenModal: Component', () => {
   });
 
   it('keeps the modal open and explains an invalid token without echoing it', async () => {
-    setToken.mockResolvedValue({ data: { setKsefToken: { ok: false, errorCode: 'INVALID_TOKEN', ksefCredential: null } } });
+    setToken.mockResolvedValue({
+      data: { setKsefToken: { ok: false, errorCode: 'INVALID_TOKEN', ksefCredential: null } },
+    });
     const { waitForApolloMocks } = renderModal();
     await waitForApolloMocks();
 
@@ -115,5 +117,18 @@ describe('AddKsefTokenModal: Component', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/something went wrong/i);
     expect(closeModal).not.toHaveBeenCalled();
+  });
+
+  it('explains missing invoice read permission and keeps the token modal open', async () => {
+    setToken.mockResolvedValue({
+      data: { setKsefToken: { ok: false, errorCode: 'INVOICE_READ_MISSING', ksefCredential: null } },
+    });
+    const { waitForApolloMocks } = renderModal();
+    await waitForApolloMocks();
+    await userEvent.type(tokenInput(), 'no-read-token');
+    await userEvent.click(screen.getByRole('button', { name: /verify and save/i }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/invoice read permission \(InvoiceRead\)/i);
+    expect(closeModal).not.toHaveBeenCalled();
+    expect(onSaved).not.toHaveBeenCalled();
   });
 });

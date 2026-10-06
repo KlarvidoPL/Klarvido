@@ -29,6 +29,7 @@ class KsefErrorCode(models.TextChoices):
 
     INVALID_TOKEN = "INVALID_TOKEN", "KSeF rejected the token"
     NO_PERMISSIONS = "NO_PERMISSIONS", "Token has no permissions for this company"
+    INVOICE_READ_MISSING = "INVOICE_READ_MISSING", "Token cannot read invoices"
     SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE", "KSeF is unavailable"
     COUNTRY_NOT_SUPPORTED = "COUNTRY_NOT_SUPPORTED", "KSeF is only available for Polish organizations"
     NIP_MISSING = "NIP_MISSING", "Organization has no NIP"

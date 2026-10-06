@@ -20,6 +20,24 @@ export enum VatStatus {
   NOT_REGISTERED = 'NOT_REGISTERED',
 }
 
+export const useVatStatusLabels = () => {
+  const intl = useIntl();
+  return {
+    [VatStatus.ACTIVE]: intl.formatMessage({
+      defaultMessage: 'Active VAT payer',
+      id: 'Tenant form / VAT status active',
+    }),
+    [VatStatus.EXEMPT]: intl.formatMessage({
+      defaultMessage: 'Exempt from VAT',
+      id: 'Tenant form / VAT status exempt',
+    }),
+    [VatStatus.NOT_REGISTERED]: intl.formatMessage({
+      defaultMessage: 'Not registered for VAT',
+      id: 'Tenant form / VAT status not registered',
+    }),
+  } satisfies Record<VatStatus, string>;
+};
+
 export type CompanyDetailsFormFields = {
   /** ISO code of the country the company is registered in - decides the tax ID's prefix and validation */
   country: string;
@@ -242,20 +260,7 @@ export const CompanyDetailsFields = ({ disabled, regonLocked, showLockHint }: Co
     formState: { errors },
   } = useFormContext<CompanyDetailsFormFields>();
 
-  const vatStatusLabels: Record<VatStatus, string> = {
-    [VatStatus.ACTIVE]: intl.formatMessage({
-      defaultMessage: 'Active VAT payer',
-      id: 'Tenant form / VAT status active',
-    }),
-    [VatStatus.EXEMPT]: intl.formatMessage({
-      defaultMessage: 'Exempt from VAT',
-      id: 'Tenant form / VAT status exempt',
-    }),
-    [VatStatus.NOT_REGISTERED]: intl.formatMessage({
-      defaultMessage: 'Not registered for VAT',
-      id: 'Tenant form / VAT status not registered',
-    }),
-  };
+  const vatStatusLabels = useVatStatusLabels();
 
   return (
     <div className="flex flex-col gap-4">

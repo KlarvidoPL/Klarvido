@@ -1,4 +1,265 @@
 {
+  "Tenant invitation form / Email invalid": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "Status"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "Number of logs"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "Operation"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "Filters"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "Configuration ID"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "Backup ID"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "Conflict strategy"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "Record counts"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "Created"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "Updated"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "Skipped"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "Failed"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "Reason"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "Token ending"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "Token name"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "Error code"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "Billing email"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "Slug"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "Type"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "Role"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "Roles"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "None"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "Pending"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "Processing"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "Completed"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "Partially completed"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "Valid"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "Invalid"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "Unverified"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "Retention policy"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "Organization settings changed"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "Name"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "Description"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "Color"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "Permissions"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "Enabled"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "Backup interval (hours)"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "Retention (days)"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "Email recipients"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "Selected modules"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "Selected models"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "Excluded models"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "Activity logging"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "Default payment method"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "Subscription plan"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "Invitation sent"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "Invitation resent"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "Invitation accepted"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "Invitation declined"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "Backup settings changed"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "Backup requested"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "Backup deleted"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "Backup downloaded"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "Backup completed"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "Backup failed"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "Restore requested"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "Restore completed"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "Restore partially completed"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "Restore failed"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "Activity log export requested"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "Activity log export completed"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "Activity log export failed"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "Activity logging enabled"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "Activity logging disabled"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "Default payment method changed"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "Subscription plan changed"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "Organization invitation"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "Backup settings"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "Backup"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "Backup restore"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "Activity log export"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "CRUD item"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "User"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "AI agent"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "Superuser"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "System (sync)"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "System (import)"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "System (background task)"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "System (migration)"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "Payment method"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "Subscription"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "SCIM token"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "SSO connection"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "Organization member"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "Organization role"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "Organization"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "Accessing data sources"
   },
@@ -56,6 +317,27 @@
   "Access Denied / Title": {
     "defaultMessage": "Access Denied"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "Created"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "Updated"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "Deleted"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "Settings Changed"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "Imported"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "Synced"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "Bulk Deleted"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "Actor"
   },
@@ -106,6 +388,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "Enabled"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "Client"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "Project"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "Person"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "Role"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "Revenue"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "Cost"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "FX Rate"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "Assignment"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "Iteration"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "Invoice"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "Deal"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "Settings"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "Organization settings"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "KSeF token"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "Entity ID"
@@ -1484,11 +1808,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Backup settings updated successfully"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "Clear date"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "Clear"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "Done"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "Jump to today"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "Next month"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "Next year"
+  },
   "Calendar / Now button": {
     "defaultMessage": "Now"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "Time"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "Select date and time"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "Previous year"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "Previous month"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "Select date"
   },
   "Calendar / Today button": {
     "defaultMessage": "Today"
@@ -2735,6 +3089,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "Something went wrong while connecting KSeF. Try again."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "This token does not have invoice read permission (InvoiceRead). Generate a new token with this permission."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF did not accept this token. Check that it is copied correctly and was not revoked."
   },
@@ -3397,6 +3754,9 @@
   },
   "Onboarding / Settings title": {
     "defaultMessage": "Business profile"
+  },
+  "Onboarding / Step count": {
+    "defaultMessage": "Step {step} of {total}"
   },
   "Onboarding / Step costs": {
     "defaultMessage": "Costs"
@@ -5310,7 +5670,10 @@
     "defaultMessage": "Choose the organization you want to work in"
   },
   "Companies / Empty": {
-    "defaultMessage": "You do not have access to any organizations yet. Add an organization or accept an invitation below."
+    "defaultMessage": "Add your first organization to start working in Klarvido."
+  },
+  "Companies / Empty title": {
+    "defaultMessage": "You don't have any organizations yet"
   },
   "Companies / Health": {
     "defaultMessage": "No organization health data"

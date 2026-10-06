@@ -65,7 +65,7 @@ export const TenantSwitch = () => {
   };
 
   const handleNewTenantClick = () => {
-    navigate(generateLocalePath(RoutesConfig.addTenant));
+    navigate(generateLocalePath(RoutesConfig.addOrganization));
   };
 
   const handleTenantSettingsClick = () => {

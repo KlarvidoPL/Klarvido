@@ -139,4 +139,43 @@ describe('TenantInvitationForm: Component', () => {
 
     expect(await screen.findByText(errorText)).toBeInTheDocument();
   });
+
+  it.each(['not-an-email', 'person@', 'person@example', 'person..name@example.com', 'person@exam_ple.com'])(
+    'should prevent submitting an invalid email: %s',
+    async (email) => {
+      const onSubmit = jest.fn();
+      const { commonQueryMock, rolesMock } = setupMocks();
+      render(<Component onSubmit={onSubmit} initialData={{ email, organizationRoleIds: ['role-1'] }} />, {
+        apolloMocks: [commonQueryMock, rolesMock],
+      });
+
+      await waitFor(() => expect(screen.getByRole('button', { name: /invite/i })).toBeEnabled());
+      await userEvent.click(screen.getByRole('button', { name: /invite/i }));
+
+      expect(await screen.findByText('Please enter a valid email address')).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should trim whitespace and accept plus addressing and subdomains', async () => {
+    const onSubmit = jest.fn();
+    const { commonQueryMock, rolesMock } = setupMocks();
+    render(
+      <Component
+        onSubmit={onSubmit}
+        initialData={{ email: '  person+tag@mail.example.co.uk  ', organizationRoleIds: ['role-1'] }}
+      />,
+      { apolloMocks: [commonQueryMock, rolesMock] }
+    );
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /invite/i })).toBeEnabled());
+    await userEvent.click(screen.getByRole('button', { name: /invite/i }));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        email: 'person+tag@mail.example.co.uk',
+        organizationRoleIds: ['role-1'],
+      });
+    });
+  });
 });

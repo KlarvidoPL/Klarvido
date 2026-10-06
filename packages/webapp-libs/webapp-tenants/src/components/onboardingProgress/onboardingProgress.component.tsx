@@ -1,5 +1,6 @@
 import { cn } from '@sb/webapp-core/lib/utils';
-import { useIntl } from 'react-intl';
+import { Check } from 'lucide-react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 export const OnboardingProgress = ({
   step,
@@ -23,6 +24,13 @@ export const OnboardingProgress = ({
 
   return (
     <div className="space-y-3 pt-4">
+      <p className="text-sm text-muted-foreground">
+        <FormattedMessage
+          id="Onboarding / Step count"
+          defaultMessage="Step {step} of {total}"
+          values={{ step, total: steps.length }}
+        />
+      </p>
       <ol
         className="flex items-center text-sm"
         aria-label={intl.formatMessage({ defaultMessage: 'Onboarding steps', id: 'Onboarding / Steps label' })}
@@ -54,24 +62,25 @@ export const OnboardingProgress = ({
                     isCurrent
                       ? 'border-primary bg-primary text-primary-foreground'
                       : isDone
-                        ? 'border-primary/40'
+                        ? 'border-primary/40 bg-primary/10 text-primary'
                         : 'border-border'
                   )}
                 >
-                  {number}
+                  {isDone ? <Check className="h-3.5 w-3.5" /> : number}
                 </span>
                 <span className="sr-only">{label}</span>
               </button>
               {index < steps.length - 1 && (
-                <div aria-hidden="true" className="mx-1.5 h-px min-w-2 flex-1 bg-border sm:mx-2" />
+                <div
+                  aria-hidden="true"
+                  className={cn('mx-1.5 h-px min-w-2 flex-1 sm:mx-2', isDone ? 'bg-primary/40' : 'bg-border')}
+                />
               )}
             </li>
           );
         })}
       </ol>
-      <h2 className="pt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-        {steps[step - 1]}
-      </h2>
+      <h2 className="pt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{steps[step - 1]}</h2>
     </div>
   );
 };
