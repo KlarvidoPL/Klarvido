@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../app/config/routes';
 import { AuthLogo } from '../../../shared/components/auth/authLogo';
-import { FloatingThemeToggle } from '../../../shared/components/auth/floatingThemeToggle';
+import { AUTH_GLASS_CARD_CLASS, AuthPageLayout } from '../../../shared/components/auth/authPageLayout';
 import { LoginForm } from '../../../shared/components/auth/loginForm';
 import { PasskeyLoginButton } from '../../../shared/components/auth/passkeyLoginButton';
 import { SocialLoginButtons } from '../../../shared/components/auth/socialLoginButtons';
@@ -26,77 +26,74 @@ export const Login = () => {
     [showSocialLogin, showPasskeyLogin, showPasswordLogin, showSSO].filter(Boolean).length > 1;
 
   return (
-    <>
-      <FloatingThemeToggle />
-      <div className="container flex min-h-screen items-center justify-center px-4 py-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-4 text-center">
-            <div className="flex justify-center">
-              <AuthLogo />
-            </div>
-            <CardTitle className="text-3xl font-semibold tracking-tight">
-              <FormattedMessage defaultMessage="Welcome back" id="Auth / Login / heading" />
-            </CardTitle>
-            <CardDescription>
-              <FormattedMessage defaultMessage="Sign in to your account to continue" id="Auth / Login / description" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Passkey Login - top priority for enterprise users */}
-            {showPasskeyLogin && <PasskeyLoginButton />}
+    <AuthPageLayout>
+      <Card className={`w-full max-w-md ${AUTH_GLASS_CARD_CLASS}`}>
+        <CardHeader className="space-y-4 text-center">
+          <div className="flex justify-center">
+            <AuthLogo />
+          </div>
+          <CardTitle className="text-3xl font-semibold tracking-tight">
+            <FormattedMessage defaultMessage="Welcome back" id="Auth / Login / heading" />
+          </CardTitle>
+          <CardDescription>
+            <FormattedMessage defaultMessage="Sign in to your account to continue" id="Auth / Login / description" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Passkey Login - top priority for enterprise users */}
+          {showPasskeyLogin && <PasskeyLoginButton />}
 
-            {/* Social Login Buttons */}
-            {showSocialLogin && <SocialLoginButtons variant={SignupButtonsVariant.LOGIN} />}
+          {/* Social Login Buttons */}
+          {showSocialLogin && <SocialLoginButtons variant={SignupButtonsVariant.LOGIN} />}
 
-            {/* SSO Login Button */}
-            {showSSO && (
-              <Button variant="outline" className="w-full" size="lg" asChild>
-                <Link to={generateLocalePath(RoutesConfig.ssoLogin)}>
-                  <Building2 className="mr-2 h-4 w-4" />
-                  <FormattedMessage defaultMessage="Log in with SSO" id="Auth / Login / SSO button" />
-                </Link>
-              </Button>
-            )}
+          {/* SSO Login Button */}
+          {showSSO && (
+            <Button variant="outline" className="w-full" size="lg" asChild>
+              <Link to={generateLocalePath(RoutesConfig.ssoLogin)}>
+                <Building2 className="mr-2 h-4 w-4" />
+                <FormattedMessage defaultMessage="Log in with SSO" id="Auth / Login / SSO button" />
+              </Link>
+            </Button>
+          )}
 
-            {/* Separator - only show if we have multiple auth methods */}
-            {hasMultipleAuthMethods && showPasswordLogin && (
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    <FormattedMessage defaultMessage="Or continue with email" id="Auth / Login / or" />
-                  </span>
-                </div>
+          {/* Separator - only show if we have multiple auth methods */}
+          {hasMultipleAuthMethods && showPasswordLogin && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator />
               </div>
-            )}
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="rounded-full bg-background/60 px-2 text-muted-foreground backdrop-blur-sm">
+                  <FormattedMessage defaultMessage="Or continue with email" id="Auth / Login / or" />
+                </span>
+              </div>
+            </div>
+          )}
 
-            {/* Email/Password Login Form (includes SSO discovery) */}
-            {showPasswordLogin && <LoginForm />}
+          {/* Email/Password Login Form (includes SSO discovery) */}
+          {showPasswordLogin && <LoginForm />}
 
-            <div className="flex flex-col gap-2 text-center text-sm">
-              {showPasswordLogin && (
-                <div className="flex flex-row items-center justify-center gap-4">
-                  <Button variant="link" className="h-auto p-0 text-sm" asChild>
-                    <Link to={generateLocalePath(RoutesConfig.passwordReset.index)}>
-                      <FormattedMessage defaultMessage="Forgot your password?" id="Auth / login / reset password link" />
-                    </Link>
-                  </Button>
-                </div>
-              )}
-              <div className="text-muted-foreground">
-                <FormattedMessage defaultMessage="Don't have an account?" id="Auth / Login / signup prompt" />{' '}
-                <Button variant="link" className="h-auto p-0 text-sm font-semibold" asChild>
-                  <Link to={generateLocalePath(RoutesConfig.signup)}>
-                    <FormattedMessage defaultMessage="Sign up" id="Auth / Login / signup link" />
+          <div className="flex flex-col gap-2 text-center text-sm">
+            {showPasswordLogin && (
+              <div className="flex flex-row items-center justify-center gap-4">
+                <Button variant="link" className="h-auto p-0 text-sm" asChild>
+                  <Link to={generateLocalePath(RoutesConfig.passwordReset.index)}>
+                    <FormattedMessage defaultMessage="Forgot your password?" id="Auth / login / reset password link" />
                   </Link>
                 </Button>
               </div>
+            )}
+            <div className="text-muted-foreground">
+              <FormattedMessage defaultMessage="Don't have an account?" id="Auth / Login / signup prompt" />{' '}
+              <Button variant="link" className="h-auto p-0 text-sm font-semibold" asChild>
+                <Link to={generateLocalePath(RoutesConfig.signup)}>
+                  <FormattedMessage defaultMessage="Sign up" id="Auth / Login / signup link" />
+                </Link>
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </>
+          </div>
+        </CardContent>
+      </Card>
+    </AuthPageLayout>
   );
 };

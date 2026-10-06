@@ -35,6 +35,7 @@ import { useLocation } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../app/config/routes';
 import { Role } from '../../../../modules/auth/auth.types';
+import { BRAND_COLORS } from '../../../constants';
 import { useAuth } from '../../../hooks';
 import { RoleAccess } from '../../roleAccess';
 import { LayoutContext } from '../layout.context';
@@ -50,7 +51,6 @@ type MenuItem = {
   permissions?: PermissionCode[]; // New: permission-based access
   generatePath: () => string;
 };
-
 type ExpandableMenuSection = {
   id: string;
   label: string;
@@ -488,7 +488,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
             <div className="flex items-center justify-center">
               <SidebarLogo
                 isCollapsed={isSidebarCollapsed && isDesktop}
-                logoColor={theme === Themes.DARK ? 'white' : 'black'}
+                logoColor={theme === Themes.DARK ? BRAND_COLORS.white : BRAND_COLORS.navy}
                 to={generateTenantPath(RoutesConfig.home)}
                 onLogoClick={closeSidebar}
               />
