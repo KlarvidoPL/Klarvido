@@ -2331,6 +2331,12 @@ enum SsoSSOAuditLogEventTypeChoices {
   PASSKEY_CLONE_DETECTED
   "Security Anomaly Detected"
   SECURITY_ANOMALY
+  "KSeF Token Saved"
+  KSEF_TOKEN_SAVED
+  "KSeF Token Tested"
+  KSEF_TOKEN_TESTED
+  "KSeF Token Deleted"
+  KSEF_TOKEN_DELETED
 }
 "An enumeration."
 enum MultitenancyActionLogActionTypeChoices {
@@ -3076,7 +3082,7 @@ input AcceptTenantInvitationMutationInput {
 input DeclineTenantInvitationMutationInput {
   id: String!
   "Token"
-  token: String!
+  token: String
   clientMutationId: String
 }
 input DeleteTenantMembershipMutationInput {

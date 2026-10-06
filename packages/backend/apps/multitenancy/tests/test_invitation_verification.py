@@ -233,3 +233,34 @@ def test_unverified_user_keeps_own_workspace_and_can_create_organization(
     assert result['data']['createTenant']['tenant']['membership']['invitationAccepted']
     user.refresh_from_db()
     assert not user.is_confirmed
+
+
+@pytest.mark.parametrize('own', [True, False])
+def test_unverified_user_can_only_decline_own_invitation_without_token(
+    own, user_factory, tenant_factory, tenant_membership_factory
+):
+    user = user_factory(is_confirmed=False)
+    membership = pending_invitation(user if own else user_factory(), tenant_factory, tenant_membership_factory)
+    response = execute(
+        client_for(user),
+        """mutation($input: DeclineTenantInvitationMutationInput!) {
+        declineTenantInvitation(input: $input) { ok }
+    }""",
+        {'input': {'id': to_global_id('TenantMembershipType', membership.pk)}},
+    )
+    if own:
+        assert not response.get('errors'), response
+        assert response['data']['declineTenantInvitation']['ok']
+    else:
+        assert response.get('errors'), response
+    assert type(membership).objects.get_all().filter(pk=membership.pk).exists() is not own
+
+
+@pytest.mark.parametrize('confirmed', [False, True])
+def test_acceptance_still_requires_token(confirmed, user_factory, tenant_factory, tenant_membership_factory):
+    user = user_factory(is_confirmed=confirmed)
+    membership = pending_invitation(user, tenant_factory, tenant_membership_factory)
+    response = execute(client_for(user), ACCEPT, {'input': {'id': to_global_id('TenantMembershipType', membership.pk)}})
+    assert response.get('errors'), response
+    membership.refresh_from_db()
+    assert not membership.is_accepted

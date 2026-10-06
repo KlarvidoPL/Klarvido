@@ -4751,6 +4751,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Decline"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Verify your email address before accepting this invitation."
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "This invitation is no longer valid."
   },
