@@ -1,8 +1,8 @@
 from openai import APIError
 
 import pytest
-from apps.integrations.openai.types import OpenAICompletionResponse
 from apps.integrations.openai.client import OPEN_AI_API_ERROR_MSG
+from apps.integrations.openai.exceptions import OpenAIClientException
 
 pytestmark = pytest.mark.django_db
 
@@ -42,6 +42,13 @@ class TestGenerateSaasIdeasMutation:
         )
 
         assert executed['errors'][0]['message'] == OPEN_AI_API_ERROR_MSG
+
+    def test_upstream_details_are_not_exposed(self, graphene_client, user, input_data, openai_client_mock):
+        openai_client_mock.get_saas_ideas.side_effect = OpenAIClientException('private upstream configuration detail')
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.mutate(self.MUTATION, variable_values={'input': input_data})
+        assert executed['errors'][0]['message'] == OPEN_AI_API_ERROR_MSG
+        assert 'private upstream' not in str(executed)
 
     def test_success(self, graphene_client, user, input_data, openai_client_mock, open_ai_completion_response_factory):
         # The client returns a string, not a response object

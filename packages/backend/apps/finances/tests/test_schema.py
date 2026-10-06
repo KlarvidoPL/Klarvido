@@ -208,7 +208,6 @@ class TestActiveSubscriptionQuery:
         executed = graphene_client.query(
             self.ACTIVE_SUBSCRIPTION_QUERY, variable_values={"tenantId": to_global_id("TenantType", tenant.id)}
         )
-        print(executed)
 
         self.assert_response(executed['data']['activeSubscription'], subscription_schedule)
 
@@ -962,7 +961,7 @@ class TestPaymentIntentQuery:
         executed = graphene_client.query(self.PAYMENT_INTENT_QUERY, variable_values=variable_values)
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "PaymentIntent matching query does not exist."
+        assert executed["errors"][0]["message"] == "An error occurred while processing your request."
 
     def test_return_payment_intent_by_member(
         self, graphene_client, customer, payment_intent_factory, user_factory, tenant_membership_factory
