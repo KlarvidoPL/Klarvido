@@ -35,7 +35,7 @@ def export_action_logs(self, export_id: str):
     5. Uploads to storage
     6. Creates a notification for the user
     """
-    from .models import ActionLogExport, ActionLog
+    from .models import ActionLogExport, ActionLog, has_tenant_access, user_has_permission
     from apps.notifications.models import Notification
 
     # Load the export job
@@ -49,6 +49,28 @@ def export_action_logs(self, export_id: str):
     if export_job.status in [ActionLogExport.Status.COMPLETED, ActionLogExport.Status.FAILED]:
         logger.info(f"Export {export_id} already {export_job.status}, skipping")
         return {"status": export_job.status}
+
+    def requester_is_authorized():
+        user = export_job.requested_by
+        if user:
+            user.refresh_from_db(fields=["is_active"])
+        return bool(
+            user
+            and user.is_active
+            and has_tenant_access(user, export_job.tenant)
+            and user_has_permission(user, export_job.tenant, "security.logs.export")
+        )
+
+    def deny_export():
+        export_job.status = ActionLogExport.Status.FAILED
+        export_job.error_message = "permission_denied"
+        export_job.completed_at = timezone.now()
+        export_job.save(update_fields=["status", "error_message", "completed_at"])
+        return {"error": "permission_denied"}
+
+    # Recheck queued jobs: membership or permissions may have changed since enqueueing.
+    if not requester_is_authorized():
+        return deny_export()
 
     # Mark as processing
     export_job.status = ActionLogExport.Status.PROCESSING
@@ -176,6 +198,9 @@ def export_action_logs(self, export_id: str):
         # Filename is relative to the storage location ('exports/')
         filename = f"action_logs/{export_job.tenant_id}/{timestamp}_{content_hash}.zip"
 
+        if not requester_is_authorized():
+            return deny_export()
+
         # Upload to storage using exports-specific backend (enforces SigV4 for R2)
         storage = get_exports_storage()
         saved_path = storage.save(filename, ContentFile(zip_content))
@@ -188,6 +213,12 @@ def export_action_logs(self, export_id: str):
         export_job.file_size = file_size
         export_job.log_count = log_count
         export_job.save()
+
+        if not requester_is_authorized():
+            storage.delete(saved_path)
+            export_job.file_path = ""
+            export_job.save(update_fields=["file_path"])
+            return deny_export()
 
         # Create notification for the user
         download_url = export_job.get_download_url()

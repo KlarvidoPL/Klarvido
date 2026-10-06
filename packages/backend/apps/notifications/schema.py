@@ -8,7 +8,7 @@ from common.graphql import mutations
 from common.graphql.acl import permission_classes
 from graphene import relay
 from graphene.types.generic import GenericScalar
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql import GraphQLError
 from . import models
 from . import serializers

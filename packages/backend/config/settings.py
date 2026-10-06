@@ -608,6 +608,7 @@ GRAPHENE = {
         "common.graphql.security.SanitizeErrorsMiddleware",
         "common.middleware.SentryMiddleware",
         "apps.multitenancy.middleware.TenantUserRoleMiddleware",
+        "common.graphql.authorization.ObjectAuthorizationMiddleware",
     ],
 }
 

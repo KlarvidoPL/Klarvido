@@ -1,7 +1,7 @@
 import graphene
 from django.shortcuts import get_object_or_404
 from graphene import relay
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql_relay import to_global_id, from_global_id
 
 from apps.content import models as content_models
@@ -66,7 +66,6 @@ class DocumentDemoItemConnection(graphene.Connection):
 
 
 @permission_classes(IsAuthenticatedFullAccess)
-@permission_required("features.documents.manage")
 class CreateDocumentDemoItemMutation(mutations.CreateModelMutation):
     class Meta:
         serializer_class = serializers.DocumentDemoItemSerializer
@@ -100,7 +99,6 @@ class DeleteFavoriteContentfulDemoItemMutation(mutations.DeleteModelMutation):
 
 
 @permission_classes(IsAuthenticatedFullAccess)
-@permission_required("features.documents.manage")
 class DeleteDocumentDemoItemMutation(mutations.DeleteModelMutation):
     class Meta:
         model = models.DocumentDemoItem
@@ -144,7 +142,6 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     @permission_classes(IsAuthenticatedFullAccess)
-    @permission_required("features.documents.view")
     def resolve_all_document_demo_items(root, info, **kwargs):
         return info.context.user.documents.all()
 

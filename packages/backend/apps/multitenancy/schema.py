@@ -4,7 +4,7 @@ import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
 from graphql_relay import to_global_id, from_global_id
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType, authorized_tenant
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db import close_old_connections
@@ -796,8 +796,8 @@ class UpdateTenantActionLoggingMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, tenant_id, enabled):
-        _, pk = from_global_id(tenant_id)
-        tenant = get_object_or_404(models.Tenant, pk=pk)
+        tenant = authorized_tenant(info, tenant_id, "org.settings.edit")
+        pk = tenant.pk
 
         # Get user from context
         user = getattr(info.context, "user", None) if info.context else None
@@ -884,8 +884,7 @@ class ExportActionLogsMutation(graphene.Mutation):
         to_datetime=None,
         search=None,
     ):
-        _, pk = from_global_id(tenant_id)
-        tenant = get_object_or_404(models.Tenant, pk=pk)
+        tenant = authorized_tenant(info, tenant_id, "security.logs.export")
         user = info.context.user
 
         # Build filters dict for storage

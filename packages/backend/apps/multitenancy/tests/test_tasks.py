@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 
 from apps.multitenancy.tasks import export_action_logs
 from apps.multitenancy.models import ActionLogExport, ActionLog
-from apps.multitenancy.constants import ActionType
+from apps.multitenancy.constants import ActionType, TenantUserRole
 from apps.notifications.models import Notification
 
 
@@ -22,7 +22,7 @@ class TestExportActionLogsTask:
 
     def test_skips_already_completed_export(self, tenant, user_factory, tenant_membership_factory):
         user = user_factory()
-        tenant_membership_factory(user=user, tenant=tenant, is_accepted=True)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
         export_job = ActionLogExport.objects.create(
             tenant=tenant,
             requested_by=user,
@@ -34,7 +34,7 @@ class TestExportActionLogsTask:
 
     def test_skips_already_failed_export(self, tenant, user_factory, tenant_membership_factory):
         user = user_factory()
-        tenant_membership_factory(user=user, tenant=tenant, is_accepted=True)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
         export_job = ActionLogExport.objects.create(
             tenant=tenant,
             requested_by=user,
@@ -47,7 +47,7 @@ class TestExportActionLogsTask:
     @patch("apps.multitenancy.tasks.get_exports_storage")
     def test_exports_logs_successfully(self, mock_get_storage, tenant, user_factory, tenant_membership_factory):
         user = user_factory()
-        tenant_membership_factory(user=user, tenant=tenant, is_accepted=True)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
         ActionLog.objects.create(
             tenant=tenant,
             action_type=ActionType.CREATE,
