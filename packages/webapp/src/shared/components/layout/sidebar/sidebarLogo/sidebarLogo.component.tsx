@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@sb/webapp-core/compone
 import { cn } from '@sb/webapp-core/lib/utils';
 import { useIntl } from 'react-intl';
 
-import { SignetIcon } from '../../../../../images/icons';
+import { SignetIcon, WordmarkIcon } from '../../../../../images/icons';
 
 export type SidebarLogoProps = {
   isCollapsed: boolean;
@@ -11,7 +11,6 @@ export type SidebarLogoProps = {
   to: string;
   onLogoClick?: () => void;
 };
-
 export const SidebarLogo = ({ isCollapsed, logoColor, to, onLogoClick }: SidebarLogoProps) => {
   const intl = useIntl();
 
@@ -71,9 +70,7 @@ export const SidebarLogo = ({ isCollapsed, logoColor, to, onLogoClick }: Sidebar
         )}
       >
         <SignetIcon color={logoColor} className="h-7 w-7 shrink-0" />
-        <span className="text-lg font-bold tracking-tight" style={{ color: logoColor }}>
-          klarvido
-        </span>
+        <WordmarkIcon color={logoColor} className="h-5 w-24" />
       </div>
     </Link>
   );
