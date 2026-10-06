@@ -8,7 +8,7 @@ import { Topography } from '../../backgrounds/topography';
 import { FloatingThemeToggle } from '../floatingThemeToggle';
 
 export const AUTH_GLASS_CARD_CLASS =
-  'border-white/35 !bg-transparent bg-gradient-to-br from-background/60 via-background/45 to-background/30 shadow-2xl shadow-slate-950/20 ring-1 ring-white/20 backdrop-blur-2xl backdrop-saturate-150 dark:border-white/15 dark:from-background/65 dark:via-background/50 dark:to-background/35 dark:ring-white/10';
+  'border-white/45 !bg-transparent bg-gradient-to-br from-background/30 via-background/20 to-background/10 shadow-2xl shadow-slate-950/20 ring-1 ring-white/30 backdrop-blur-sm backdrop-saturate-125 dark:border-white/20 dark:from-background/50 dark:via-background/35 dark:to-background/20 dark:ring-white/15';
 
 type AuthPageLayoutProps = {
   children: ReactNode;
