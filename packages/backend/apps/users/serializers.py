@@ -7,6 +7,7 @@ from django.contrib import auth as dj_auth
 from django.contrib.auth import password_validation, get_user_model
 from django.contrib.auth.models import update_last_login
 from django.utils.translation import gettext as _
+from graphql_relay import from_global_id, to_global_id
 from hashid_field import rest
 from rest_framework import exceptions, serializers, validators
 from rest_framework_simplejwt import serializers as jwt_serializers, tokens as jwt_tokens, exceptions as jwt_exceptions
@@ -17,6 +18,7 @@ from rest_framework_simplejwt.utils import get_md5_hash_password
 from common.decorators import context_user_required
 
 from . import models, tokens, jwt, notifications
+from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
 from .utils import generate_otp_auth_token
@@ -494,3 +496,35 @@ class DisableOTPSerializer(serializers.Serializer):
     def create(self, validated_data):
         otp_services.disable_otp(self.context_user)
         return {"ok": True}
+
+
+class OrganizationIdField(serializers.CharField):
+    pass
+
+
+class SetDefaultOrganizationSerializer(serializers.Serializer):
+    organization_id = OrganizationIdField(required=False, allow_null=True, default=None, write_only=True)
+    default_organization_id = OrganizationIdField(read_only=True, allow_null=True)
+
+    def validate_organization_id(self, value):
+        if value is None:
+            return None
+        node_type, node_id = from_global_id(value)
+        if node_type and node_type != 'TenantType':
+            raise exceptions.ValidationError(_('Organization is not available.'))
+        organization = accessible_organization(self.context['request'], node_id if node_type else value)
+        if not organization:
+            raise exceptions.ValidationError(_('Organization is not available.'))
+        return organization
+
+    def create(self, validated_data):
+        profile = self.context['request'].user.profile
+        profile.default_organization = validated_data['organization_id']
+        profile.save(update_fields=['default_organization'])
+        return {
+            'default_organization_id': (
+                to_global_id('TenantType', str(profile.default_organization_id))
+                if profile.default_organization_id
+                else None
+            )
+        }

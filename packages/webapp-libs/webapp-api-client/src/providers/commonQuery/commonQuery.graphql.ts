@@ -18,6 +18,7 @@ export const commonQueryCurrentUserFragment = gql(/* GraphQL */ `
     hasSeenWelcomeModal
     isConfirmed
     isSuperuser
+    defaultOrganizationId
   }
 `);
 

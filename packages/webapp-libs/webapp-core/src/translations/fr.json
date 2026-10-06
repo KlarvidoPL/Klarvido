@@ -5314,5 +5314,107 @@
   },
   "Onboarding / Title": {
     "defaultMessage": "Configurer votre organisation"
+  },
+  "Companies / Add": {
+    "defaultMessage": "Ajouter une organisation"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "Administrateur"
+  },
+  "Companies / Count": {
+    "defaultMessage": "Organisations disponibles : {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "Actuellement sélectionnée"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "Décisions actives"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "Par défaut"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "Votre organisation par défaut s’ouvre automatiquement après la connexion."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "Organisation par défaut supprimée."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "Organisation par défaut enregistrée. Elle s’ouvrira automatiquement après la connexion."
+  },
+  "Companies / Description": {
+    "defaultMessage": "Choisissez l’organisation dans laquelle vous souhaitez travailler"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "Vous n’avez encore accès à aucune organisation. Ajoutez une organisation ou acceptez une invitation ci-dessous."
+  },
+  "Companies / Health": {
+    "defaultMessage": "Aucune donnée sur l’état de l’organisation"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "Invitations aux organisations"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "Impossible de charger les organisations. Actualisez la page et réessayez."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "Chargement des organisations…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "Membre"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP : {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "Aucune organisation ne correspond à votre recherche."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "Propriétaire"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "Retirer le choix par défaut"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "Ventes"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "Impossible d’enregistrer votre organisation par défaut. Votre choix précédent reste inchangé. Réessayez."
+  },
+  "Companies / Search": {
+    "defaultMessage": "Rechercher par nom ou NIP"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "Définir par défaut"
+  },
+  "Companies / Title": {
+    "defaultMessage": "Organisations"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "Pas encore disponible"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "Voir l’invitation"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "Retirer l’organisation par défaut : {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "Enregistrement…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "Enregistrement de l’organisation par défaut : {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "Définir comme organisation par défaut : {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "Administrateur système"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "Toutes les organisations"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "Effacer la recherche"
   }
 }

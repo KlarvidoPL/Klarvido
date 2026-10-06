@@ -80,7 +80,7 @@ describe('OrganizationOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Mostly consumers (B2C)' }));
     await userEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(screen.getByTestId('location')).toHaveTextContent('/en/tenant-1/tenant/onboarding');
-    expect(screen.getByText('Company details').closest('li')).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('button', { name: 'Company details' }).closest('li')).toHaveAttribute('aria-current', 'step');
     await userEvent.click(within(progress).getByRole('button', { name: /Customers/ }));
     expect(await screen.findByText('Who usually pays you?')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Mostly consumers (B2C)' })).toHaveAttribute('aria-pressed', 'true');

@@ -5314,5 +5314,107 @@
   },
   "Onboarding / Title": {
     "defaultMessage": "अपना संगठन सेट करें"
+  },
+  "Companies / Add": {
+    "defaultMessage": "संगठन जोड़ें"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "व्यवस्थापक"
+  },
+  "Companies / Count": {
+    "defaultMessage": "उपलब्ध संगठन: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "वर्तमान में चयनित"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "सक्रिय निर्णय"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "डिफ़ॉल्ट"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "साइन इन करने के बाद आपका डिफ़ॉल्ट संगठन अपने आप खुल जाएगा।"
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "डिफ़ॉल्ट संगठन हटा दिया गया।"
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "डिफ़ॉल्ट संगठन सहेज दिया गया। साइन इन करने के बाद यह अपने आप खुल जाएगा।"
+  },
+  "Companies / Description": {
+    "defaultMessage": "वह संगठन चुनें जिसमें आप काम करना चाहते हैं"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "अभी आपके पास किसी संगठन तक पहुँच नहीं है। संगठन जोड़ें या नीचे दिया गया आमंत्रण स्वीकार करें।"
+  },
+  "Companies / Health": {
+    "defaultMessage": "संगठन की स्थिति का डेटा उपलब्ध नहीं"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "संगठनों के आमंत्रण"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "संगठन लोड नहीं हो सके। पेज रीफ़्रेश करें और फिर कोशिश करें।"
+  },
+  "Companies / Loading": {
+    "defaultMessage": "संगठन लोड हो रहे हैं…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "सदस्य"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "आपकी खोज से मेल खाने वाला कोई संगठन नहीं मिला।"
+  },
+  "Companies / Owner": {
+    "defaultMessage": "मालिक"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "डिफ़ॉल्ट हटाएँ"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "बिक्री"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "आपका डिफ़ॉल्ट संगठन सहेजा नहीं जा सका। आपका पिछला चयन नहीं बदला है। फिर कोशिश करें।"
+  },
+  "Companies / Search": {
+    "defaultMessage": "नाम या NIP से खोजें"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "डिफ़ॉल्ट के रूप में सेट करें"
+  },
+  "Companies / Title": {
+    "defaultMessage": "संगठन"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "अभी उपलब्ध नहीं"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "आमंत्रण देखें"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "डिफ़ॉल्ट संगठन हटाएँ: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "सहेजा जा रहा है…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "डिफ़ॉल्ट संगठन सहेजा जा रहा है: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "डिफ़ॉल्ट संगठन के रूप में सेट करें: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "सिस्टम व्यवस्थापक"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "सभी संगठन"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "खोज साफ़ करें"
   }
 }

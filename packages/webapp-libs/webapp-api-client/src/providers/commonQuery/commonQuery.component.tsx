@@ -31,7 +31,7 @@ export const CommonQuery = ({ children }: PropsWithChildren) => {
     }
   }, [refetch]);
 
-  const value = useMemo(() => ({ data: data || null, reload }), [data, reload]);
+  const value = useMemo(() => ({ data: data || null, reload, loading, error }), [data, reload, loading, error]);
 
   const userId = (data?.currentUser as CurrentUserType)?.id;
 
@@ -57,7 +57,7 @@ export const CommonQuery = ({ children }: PropsWithChildren) => {
         const pathname = window.location.pathname;
         const localeMatch = pathname.match(/^\/([a-z]{2})\//);
         const locale = localeMatch ? localeMatch[1] : 'en';
-        
+
         // Preserve current URL as redirect parameter (include pathname and search params)
         const currentUrl = pathname + window.location.search;
         const redirectParam = encodeURIComponent(currentUrl);
@@ -89,8 +89,7 @@ export const CommonQuery = ({ children }: PropsWithChildren) => {
   // instead of showing a blank page forever
   if (error && !data) {
     // For non-auth errors or while redirecting, provide empty context to prevent blank page
-    const emptyValue = { data: null, reload };
-    return <commonDataContext.Provider value={emptyValue}>{children}</commonDataContext.Provider>;
+    return <commonDataContext.Provider value={value}>{children}</commonDataContext.Provider>;
   }
 
   if (!data) {

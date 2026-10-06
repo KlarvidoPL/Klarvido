@@ -5314,5 +5314,107 @@
   },
   "Onboarding / Title": {
     "defaultMessage": "Configure su organización"
+  },
+  "Companies / Add": {
+    "defaultMessage": "Añadir organización"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "Administrador"
+  },
+  "Companies / Count": {
+    "defaultMessage": "Organizaciones disponibles: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "Seleccionada actualmente"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "Decisiones activas"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "Predeterminada"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "Tu organización predeterminada se abre automáticamente al iniciar sesión."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "Organización predeterminada eliminada."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "Organización predeterminada guardada. Se abrirá automáticamente al iniciar sesión."
+  },
+  "Companies / Description": {
+    "defaultMessage": "Elige la organización en la que quieres trabajar"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "Todavía no tienes acceso a ninguna organización. Añade una organización o acepta una invitación a continuación."
+  },
+  "Companies / Health": {
+    "defaultMessage": "Sin datos sobre el estado de la organización"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "Invitaciones a organizaciones"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "No se pudieron cargar las organizaciones. Actualiza la página e inténtalo de nuevo."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "Cargando organizaciones…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "Miembro"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "Ninguna organización coincide con tu búsqueda."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "Propietario"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "Quitar predeterminada"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "Ventas"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "No se pudo guardar tu organización predeterminada. Tu selección anterior no ha cambiado. Inténtalo de nuevo."
+  },
+  "Companies / Search": {
+    "defaultMessage": "Buscar por nombre o NIP"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "Establecer como predeterminada"
+  },
+  "Companies / Title": {
+    "defaultMessage": "Organizaciones"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "Aún no disponible"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "Ver invitación"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "Quitar organización predeterminada: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "Guardando…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "Guardando organización predeterminada: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "Establecer como organización predeterminada: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "Administrador del sistema"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "Todas las organizaciones"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "Borrar búsqueda"
   }
 }

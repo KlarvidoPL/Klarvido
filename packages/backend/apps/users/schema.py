@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 import graphene
 from config import settings
 from graphene import relay
+from graphene_django.rest_framework.serializer_converter import get_graphene_type_from_serializer_field
 from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 
 from common.acl import policies
@@ -13,6 +14,7 @@ from apps.multitenancy.schema import TenantType
 from apps.sso.enforcement import filter_tenants_for_password_session
 from . import models
 from . import serializers
+from .services.default_organization import default_organization_id
 from .services.users import get_user_from_resolver, get_role_names, get_user_avatar_url
 
 
@@ -243,8 +245,19 @@ class AnyoneMutation(graphene.ObjectType):
     validate_otp = ValidateOTPMutation.Field()
 
 
+@get_graphene_type_from_serializer_field.register(serializers.OrganizationIdField)
+def organization_id_graphene_type(field):
+    return graphene.ID
+
+
+class SetDefaultOrganizationMutation(mutations.SerializerMutation):
+    class Meta:
+        serializer_class = serializers.SetDefaultOrganizationSerializer
+
+
 @permission_classes(policies.IsAuthenticatedFullAccess)
 class AuthenticatedMutation(graphene.ObjectType):
+    set_default_organization = SetDefaultOrganizationMutation.Field()
     generate_otp = GenerateOTPMutation.Field()
     verify_otp = VerifyOTPMutation.Field()
     disable_otp = DisableOTPMutation.Field()
@@ -253,6 +266,7 @@ class AuthenticatedMutation(graphene.ObjectType):
 
 
 class CurrentUserType(DjangoObjectType):
+    default_organization_id = graphene.ID()
     first_name = graphene.String()
     last_name = graphene.String()
     language = graphene.String()
@@ -288,6 +302,11 @@ class CurrentUserType(DjangoObjectType):
             "tenants",
             "is_superuser",
         )
+
+    @staticmethod
+    def resolve_default_organization_id(parent, info):
+        user = get_user_from_resolver(info)
+        return default_organization_id(user, info.context)
 
     @staticmethod
     def resolve_first_name(parent, info):
@@ -341,7 +360,7 @@ class UserProfileType(DjangoObjectType):
     class Meta:
         model = models.UserProfile
         interfaces = (relay.Node,)
-        fields = "__all__"
+        exclude = ("default_organization",)
 
     def resolve_email(self, info):
         """Return the user's email."""

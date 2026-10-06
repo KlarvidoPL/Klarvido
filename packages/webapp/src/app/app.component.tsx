@@ -31,7 +31,8 @@ import {
   TenantSecuritySettings,
   TenantSettings,
 } from '@sb/webapp-tenants/routes';
-import { Route, Routes } from 'react-router-dom';
+import { CompanyHomeRoute } from '@sb/webapp-tenants/routes/companySelection/companyHomeRoute.component';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Role } from '../modules/auth/auth.types';
 import { Admin } from '../routes/admin';
@@ -39,6 +40,7 @@ import { PasswordReset } from '../routes/auth/passwordReset';
 import ValidateOtp from '../routes/auth/validateOtp';
 import { AnonymousRoute, AuthRoute } from '../shared/components/routes';
 import {
+  CompanySelection,
   ConfirmEmail,
   Home,
   Login,
@@ -82,9 +84,30 @@ export const App = () => {
             <Route element={<PermissionAuthRoute permissions="org.settings.edit" requiresOrganization />}>
               <Route path={RoutesConfig.tenant.onboarding} element={<OrganizationOnboarding />} />
             </Route>
-            <Route index element={<Home />} />
+            <Route
+              index
+              element={
+                <CompanyHomeRoute>
+                  <Home />
+                </CompanyHomeRoute>
+              }
+            />
             {/* Organization Settings - each sub-route has its own permission check */}
-            <Route element={<PermissionAuthRoute permissions={['org.settings.view', 'members.view', 'org.roles.view', 'security.view', 'security.logs.view']} mode="any" requiresOrganization />}>
+            <Route
+              element={
+                <PermissionAuthRoute
+                  permissions={[
+                    'org.settings.view',
+                    'members.view',
+                    'org.roles.view',
+                    'security.view',
+                    'security.logs.view',
+                  ]}
+                  mode="any"
+                  requiresOrganization
+                />
+              }
+            >
               <Route element={<TenantSettings />}>
                 {/* Members route - requires members.view */}
                 <Route element={<PermissionAuthRoute permissions="members.view" />}>
@@ -142,7 +165,10 @@ export const App = () => {
             {/* Content Items - protected by features.content.view */}
             <Route element={<PermissionAuthRoute permissions="features.content.view" requiresOrganization />}>
               <Route path={RoutesConfig.demoItems} element={<DemoItems />} />
-              <Route path={RoutesConfig.demoItem} element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />} />
+              <Route
+                path={RoutesConfig.demoItem}
+                element={<DemoItem routesConfig={{ notFound: RoutesConfig.notFound, list: RoutesConfig.demoItems }} />}
+              />
             </Route>
             {/* CRUD Demo - protected by features.crud.view */}
             <Route element={<PermissionAuthRoute permissions="features.crud.view" requiresOrganization />}>
@@ -157,8 +183,15 @@ export const App = () => {
               <Route path={RoutesConfig.saasIdeas} element={<SaasIdeas />} />
             </Route>
             <Route path={RoutesConfig.tenant.accessDenied} element={<AccessDenied />} />
+            <Route
+              index
+              element={
+                <CompanyHomeRoute>
+                  <Home />
+                </CompanyHomeRoute>
+              }
+            />
             <Route element={<OnboardingCompletionRoute />}>
-              <Route index element={<Home />} />
               {/* Organization Settings - each sub-route has its own permission check */}
               <Route
                 element={
@@ -250,6 +283,11 @@ export const App = () => {
           </Route>
 
           <Route element={<AuthRoute />}>
+            <Route path={RoutesConfig.organizations} element={<CompanySelection />} />
+            <Route
+              path={RoutesConfig.legacyCompanies}
+              element={<Navigate to={`../${RoutesConfig.organizations}`} replace />}
+            />
             <Route path={RoutesConfig.profile} element={<Profile />} />
             <Route path={RoutesConfig.addTenant} element={<AddTenantForm />} />
             <Route path={RoutesConfig.tenantInvitation} element={<TenantInvitation />} />

@@ -5278,5 +5278,107 @@
   },
   "Onboarding / Clear draft failed": {
     "defaultMessage": "Could not clear this draft. Please try again."
+  },
+  "Companies / Add": {
+    "defaultMessage": "Add organization"
+  },
+  "Companies / Admin": {
+    "defaultMessage": "Administrator"
+  },
+  "Companies / Count": {
+    "defaultMessage": "Available organizations: {count}"
+  },
+  "Companies / Current": {
+    "defaultMessage": "Currently selected"
+  },
+  "Companies / Decisions": {
+    "defaultMessage": "Active decisions"
+  },
+  "Companies / Default badge": {
+    "defaultMessage": "Default"
+  },
+  "Companies / Default hint": {
+    "defaultMessage": "Your default organization opens automatically after you sign in."
+  },
+  "Companies / Default removed": {
+    "defaultMessage": "Default organization removed."
+  },
+  "Companies / Default saved": {
+    "defaultMessage": "Default organization saved. It will open automatically after you sign in."
+  },
+  "Companies / Description": {
+    "defaultMessage": "Choose the organization you want to work in"
+  },
+  "Companies / Empty": {
+    "defaultMessage": "You do not have access to any organizations yet. Add an organization or accept an invitation below."
+  },
+  "Companies / Health": {
+    "defaultMessage": "No organization health data"
+  },
+  "Companies / Invitations": {
+    "defaultMessage": "Organization invitations"
+  },
+  "Companies / Load error": {
+    "defaultMessage": "Could not load organizations. Refresh the page and try again."
+  },
+  "Companies / Loading": {
+    "defaultMessage": "Loading organizations…"
+  },
+  "Companies / Member": {
+    "defaultMessage": "Member"
+  },
+  "Companies / NIP": {
+    "defaultMessage": "NIP: {nip}"
+  },
+  "Companies / No matches": {
+    "defaultMessage": "No organizations match your search."
+  },
+  "Companies / Owner": {
+    "defaultMessage": "Owner"
+  },
+  "Companies / Remove default": {
+    "defaultMessage": "Remove default"
+  },
+  "Companies / Sales": {
+    "defaultMessage": "Sales"
+  },
+  "Companies / Save error": {
+    "defaultMessage": "Could not save your default organization. Your previous selection is unchanged. Try again."
+  },
+  "Companies / Search": {
+    "defaultMessage": "Search by name or NIP"
+  },
+  "Companies / Set default": {
+    "defaultMessage": "Set as default"
+  },
+  "Companies / Title": {
+    "defaultMessage": "Organizations"
+  },
+  "Companies / Unavailable": {
+    "defaultMessage": "Not yet available"
+  },
+  "Companies / View invitation": {
+    "defaultMessage": "View invitation"
+  },
+  "TenantSwitch / All companies": {
+    "defaultMessage": "All organizations"
+  },
+  "Companies / Remove default label": {
+    "defaultMessage": "Remove default organization: {company}"
+  },
+  "Companies / Saving": {
+    "defaultMessage": "Saving…"
+  },
+  "Companies / Saving label": {
+    "defaultMessage": "Saving default organization: {company}"
+  },
+  "Companies / Set default label": {
+    "defaultMessage": "Set as default organization: {company}"
+  },
+  "Companies / System admin": {
+    "defaultMessage": "System administrator"
+  },
+  "Companies / Clear search": {
+    "defaultMessage": "Clear search"
   }
 }

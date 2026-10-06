@@ -6,7 +6,7 @@ import { Button, ButtonVariant } from '@sb/webapp-core/components/buttons';
 import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { Form } from '@sb/webapp-core/components/forms';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
+import { Card, CardContent, CardHeader } from '@sb/webapp-core/components/ui/card';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast';
@@ -393,43 +393,19 @@ const OnboardingForm = ({
 
   return (
     <PageLayout>
-      <Card className="mx-auto w-full max-w-screen-2xl">
-        <CardHeader>
+      <div className="mx-auto w-full max-w-5xl space-y-8">
+        <div className="space-y-4">
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
+            <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+              <Building2 className="h-6 w-6 shrink-0 text-primary" />
               {draftMode ? (
                 <FormattedMessage defaultMessage="Add Organization" id="Tenant form / AddTenant / Card title" />
               ) : (
                 <FormattedMessage defaultMessage="Set up your organization" id="Onboarding / Title" />
               )}
-            </CardTitle>
-            {draftMode && onClearDraft && (
-              <ConfirmDialog
-                title={<FormattedMessage defaultMessage="Clear this draft?" id="Onboarding / Clear draft title" />}
-                description={
-                  <FormattedMessage
-                    defaultMessage="All answers for this new organization will be deleted. This cannot be undone."
-                    id="Onboarding / Clear draft description"
-                  />
-                }
-                continueLabel={<FormattedMessage defaultMessage="Clear draft" id="Onboarding / Clear draft confirm" />}
-                variant="destructive"
-                onContinue={() => void onClearDraft()}
-              >
-                <button
-                  type="button"
-                  disabled={clearingDraft}
-                  aria-label={intl.formatMessage({ defaultMessage: 'Clear draft', id: 'Onboarding / Clear draft' })}
-                  title={intl.formatMessage({ defaultMessage: 'Clear draft', id: 'Onboarding / Clear draft' })}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </ConfirmDialog>
-            )}
+            </h1>
           </div>
-          <CardDescription>
+          <p className="text-lg text-muted-foreground">
             {draftMode ? (
               <FormattedMessage
                 defaultMessage="Enter the details for your new organization"
@@ -441,170 +417,211 @@ const OnboardingForm = ({
                 id="Onboarding / Description"
               />
             )}
-          </CardDescription>
-          <OnboardingProgress
-            step={step + 1}
-            maxStep={profile?.completedAt ? LAST_ONBOARDING_STEP + 1 : Math.max(3, (profile?.currentStep ?? 2) + 1)}
-            onStepChange={(nextStep) => setStep(nextStep - 1)}
-          />
-        </CardHeader>
-        <CardContent>
-          <Form {...tenantForm}>
-            <form
-              className="space-y-6"
-              noValidate
-              onSubmit={(event) => {
-                event.preventDefault();
-                onNext();
-              }}
-            >
-              {step === OnboardingStep.ORGANIZATION && (
-                <>
-                  <DisplayNameField />
-                  <CountryField locked={!draftMode && !!tenant?.country} />
-                  <NipField locked={!draftMode && !!tenant?.nip} />
-                </>
-              )}
-              {step === OnboardingStep.COMPANY_DETAILS && (
-                <CompanyDetailsFields
-                  regonLocked={!draftMode && !!tenant?.regon}
-                  showLockHint={!draftMode && (!!tenant?.country || !!tenant?.nip || !!tenant?.regon)}
-                />
-              )}
-              {step === OnboardingStep.CUSTOMERS && (
-                <>
-                  <ChoiceQuestion
-                    title={
-                      <FormattedMessage
-                        defaultMessage="Your role in the company"
-                        id="Onboarding / Respondent role label"
-                      />
-                    }
-                    hint={
-                      <FormattedMessage
-                        defaultMessage="This answer is descriptive and does not change your organization permissions."
-                        id="Onboarding / Respondent role profile hint"
-                      />
-                    }
-                    options={options.roles}
-                    selected={[answers.respondentRole]}
-                    onChange={([respondentRole]) => update({ respondentRole })}
-                  />
-                  <ChoiceQuestion
-                    title={
-                      <FormattedMessage defaultMessage="Who usually pays you?" id="Onboarding / Customers title" />
-                    }
-                    hint={
-                      <FormattedMessage
-                        defaultMessage="This helps estimate how much sales data future integrations can cover."
-                        id="Onboarding / Customers hint"
-                      />
-                    }
-                    options={options.customers}
-                    selected={[answers.customerType]}
-                    onChange={([customerType]) => update({ customerType })}
-                  />
-                </>
-              )}
-              {step === OnboardingStep.REVENUE && (
-                <ChoiceQuestion
-                  title={
-                    <FormattedMessage defaultMessage="What do customers pay you for?" id="Onboarding / Revenue title" />
-                  }
-                  hint={<FormattedMessage defaultMessage="Choose up to two." id="Onboarding / Revenue hint" />}
-                  options={options.revenue}
-                  selected={answers.revenueModels}
-                  onChange={(revenueModels) => update({ revenueModels })}
-                  max={2}
-                />
-              )}
-              {step === OnboardingStep.COSTS && (
-                <ChoiceQuestion
-                  title={
-                    <FormattedMessage
-                      defaultMessage="Which costs grow with your sales?"
-                      id="Onboarding / Costs title"
-                    />
-                  }
-                  hint={<FormattedMessage defaultMessage="Choose up to three." id="Onboarding / Costs hint" />}
-                  options={options.costs}
-                  selected={answers.costDrivers}
-                  onChange={(costDrivers) => update({ costDrivers })}
-                  max={3}
-                />
-              )}
-              {step === OnboardingStep.PRICING && (
-                <>
-                  <div className="space-y-3">
-                    <ChoiceQuestion
-                      title={
-                        <FormattedMessage
-                          defaultMessage="How do you usually set prices?"
-                          id="Onboarding / Pricing question"
-                        />
-                      }
-                      options={options.pricing}
-                      selected={[answers.pricing]}
-                      onChange={([pricing]) => update({ pricing })}
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <ChoiceQuestion
-                      title={
-                        <FormattedMessage
-                          defaultMessage="What do you most want to keep under control?"
-                          id="Onboarding / Goal question"
-                        />
-                      }
-                      options={options.goals}
-                      selected={[answers.mainGoal]}
-                      onChange={([mainGoal]) => update({ mainGoal })}
-                    />
-                  </div>
-                </>
-              )}
-              {step === OnboardingStep.SUMMARY && <SummaryStep rows={summaryRows} onEdit={setStep} />}
-              {hasTenantError && <div className="text-sm text-destructive">{tenantError}</div>}
-              <div className="flex flex-col gap-3 pt-4 sm:flex-row">
-                {step > OnboardingStep.ORGANIZATION && (
-                  <Button
-                    type="button"
-                    variant={ButtonVariant.SECONDARY}
-                    onClick={onBack}
-                    disabled={busy}
-                    icon={<ArrowLeft className="h-4 w-4" />}
-                    className="w-full sm:w-fit"
-                  >
-                    <FormattedMessage defaultMessage="Back" id="Onboarding / Back" />
-                  </Button>
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <OnboardingProgress
+              step={step + 1}
+              maxStep={profile?.completedAt ? LAST_ONBOARDING_STEP + 1 : Math.max(3, (profile?.currentStep ?? 2) + 1)}
+              onStepChange={(nextStep) => setStep(nextStep - 1)}
+            />
+          </CardHeader>
+          <CardContent>
+            <Form {...tenantForm}>
+              <form
+                className="space-y-6"
+                noValidate
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onNext();
+                }}
+              >
+                {step === OnboardingStep.ORGANIZATION && (
+                  <>
+                    <DisplayNameField />
+                    <CountryField locked={!draftMode && !!tenant?.country} />
+                    <NipField locked={!draftMode && !!tenant?.nip} />
+                  </>
                 )}
-                <Button
-                  type="submit"
-                  disabled={busy || !canContinue}
-                  className="w-full sm:w-fit"
-                  icon={busy ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
-                >
-                  {step === OnboardingStep.SUMMARY ? (
-                    draftMode ? (
+                {step === OnboardingStep.COMPANY_DETAILS && (
+                  <CompanyDetailsFields
+                    regonLocked={!draftMode && !!tenant?.regon}
+                    showLockHint={!draftMode && (!!tenant?.country || !!tenant?.nip || !!tenant?.regon)}
+                  />
+                )}
+                {step === OnboardingStep.CUSTOMERS && (
+                  <>
+                    <ChoiceQuestion
+                      title={
+                        <FormattedMessage
+                          defaultMessage="Your role in the company"
+                          id="Onboarding / Respondent role label"
+                        />
+                      }
+                      hint={
+                        <FormattedMessage
+                          defaultMessage="This answer is descriptive and does not change your organization permissions."
+                          id="Onboarding / Respondent role profile hint"
+                        />
+                      }
+                      options={options.roles}
+                      selected={[answers.respondentRole]}
+                      onChange={([respondentRole]) => update({ respondentRole })}
+                    />
+                    <ChoiceQuestion
+                      title={
+                        <FormattedMessage defaultMessage="Who usually pays you?" id="Onboarding / Customers title" />
+                      }
+                      hint={
+                        <FormattedMessage
+                          defaultMessage="This helps estimate how much sales data future integrations can cover."
+                          id="Onboarding / Customers hint"
+                        />
+                      }
+                      options={options.customers}
+                      selected={[answers.customerType]}
+                      onChange={([customerType]) => update({ customerType })}
+                    />
+                  </>
+                )}
+                {step === OnboardingStep.REVENUE && (
+                  <ChoiceQuestion
+                    title={
                       <FormattedMessage
-                        defaultMessage="Create organization"
-                        id="Tenant form / AddTenant / Submit button"
+                        defaultMessage="What do customers pay you for?"
+                        id="Onboarding / Revenue title"
                       />
-                    ) : (
-                      <FormattedMessage defaultMessage="Confirm profile" id="Onboarding / Confirm" />
-                    )
-                  ) : (
-                    <>
-                      <FormattedMessage defaultMessage="Next" id="Onboarding / Next" />
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
+                    }
+                    hint={<FormattedMessage defaultMessage="Choose up to two." id="Onboarding / Revenue hint" />}
+                    options={options.revenue}
+                    selected={answers.revenueModels}
+                    onChange={(revenueModels) => update({ revenueModels })}
+                    max={2}
+                  />
+                )}
+                {step === OnboardingStep.COSTS && (
+                  <ChoiceQuestion
+                    title={
+                      <FormattedMessage
+                        defaultMessage="Which costs grow with your sales?"
+                        id="Onboarding / Costs title"
+                      />
+                    }
+                    hint={<FormattedMessage defaultMessage="Choose up to three." id="Onboarding / Costs hint" />}
+                    options={options.costs}
+                    selected={answers.costDrivers}
+                    onChange={(costDrivers) => update({ costDrivers })}
+                    max={3}
+                  />
+                )}
+                {step === OnboardingStep.PRICING && (
+                  <>
+                    <div className="space-y-3">
+                      <ChoiceQuestion
+                        title={
+                          <FormattedMessage
+                            defaultMessage="How do you usually set prices?"
+                            id="Onboarding / Pricing question"
+                          />
+                        }
+                        options={options.pricing}
+                        selected={[answers.pricing]}
+                        onChange={([pricing]) => update({ pricing })}
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <ChoiceQuestion
+                        title={
+                          <FormattedMessage
+                            defaultMessage="What do you most want to keep under control?"
+                            id="Onboarding / Goal question"
+                          />
+                        }
+                        options={options.goals}
+                        selected={[answers.mainGoal]}
+                        onChange={([mainGoal]) => update({ mainGoal })}
+                      />
+                    </div>
+                  </>
+                )}
+                {step === OnboardingStep.SUMMARY && <SummaryStep rows={summaryRows} onEdit={setStep} />}
+                {hasTenantError && <div className="text-sm text-destructive">{tenantError}</div>}
+                <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+                  {step > OnboardingStep.ORGANIZATION && (
+                    <Button
+                      type="button"
+                      variant={ButtonVariant.SECONDARY}
+                      onClick={onBack}
+                      disabled={busy}
+                      icon={<ArrowLeft className="h-4 w-4" />}
+                      className="w-full sm:w-fit"
+                    >
+                      <FormattedMessage defaultMessage="Back" id="Onboarding / Back" />
+                    </Button>
                   )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                  <Button
+                    type="submit"
+                    disabled={busy || !canContinue}
+                    className="w-full sm:w-fit"
+                    icon={busy ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined}
+                  >
+                    {step === OnboardingStep.SUMMARY ? (
+                      draftMode ? (
+                        <FormattedMessage
+                          defaultMessage="Create organization"
+                          id="Tenant form / AddTenant / Submit button"
+                        />
+                      ) : (
+                        <FormattedMessage defaultMessage="Confirm profile" id="Onboarding / Confirm" />
+                      )
+                    ) : (
+                      <>
+                        <FormattedMessage defaultMessage="Next" id="Onboarding / Next" />
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                  {draftMode && onClearDraft && (
+                    <ConfirmDialog
+                      title={
+                        <FormattedMessage defaultMessage="Clear this draft?" id="Onboarding / Clear draft title" />
+                      }
+                      description={
+                        <FormattedMessage
+                          defaultMessage="All answers for this new organization will be deleted. This cannot be undone."
+                          id="Onboarding / Clear draft description"
+                        />
+                      }
+                      continueLabel={
+                        <FormattedMessage defaultMessage="Clear draft" id="Onboarding / Clear draft confirm" />
+                      }
+                      variant="destructive"
+                      onContinue={() => void onClearDraft()}
+                    >
+                      <button
+                        type="button"
+                        disabled={clearingDraft}
+                        aria-label={intl.formatMessage({
+                          defaultMessage: 'Clear draft',
+                          id: 'Onboarding / Clear draft',
+                        })}
+                        title={intl.formatMessage({ defaultMessage: 'Clear draft', id: 'Onboarding / Clear draft' })}
+                        className="mt-3 flex h-10 w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:mt-0 sm:h-8 sm:w-8 sm:border-0"
+                      >
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
+                        <span className="sm:hidden">
+                          <FormattedMessage defaultMessage="Clear draft" id="Onboarding / Clear draft" />
+                        </span>
+                      </button>
+                    </ConfirmDialog>
+                  )}
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </PageLayout>
   );
 };

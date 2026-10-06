@@ -677,6 +677,7 @@ type CurrentUserType {
   otpEnabled: Boolean!
   otpVerified: Boolean!
   tenants: [TenantType]
+  defaultOrganizationId: ID
   firstName: String
   lastName: String
   language: String
@@ -1519,6 +1520,7 @@ type ApiMutation {
   createSetupIntent(input: CreateSetupIntentMutationInput!): CreateSetupIntentMutationPayload
   changePassword(input: ChangePasswordMutationInput!): ChangePasswordMutationPayload
   updateCurrentUser(input: UpdateCurrentUserMutationInput!): UpdateCurrentUserMutationPayload
+  setDefaultOrganization(input: SetDefaultOrganizationMutationInput!): SetDefaultOrganizationMutationPayload
   generateOtp(input: GenerateOTPMutationInput!): GenerateOTPMutationPayload
   verifyOtp(input: VerifyOTPMutationInput!): VerifyOTPMutationPayload
   disableOtp(input: DisableOTPMutationInput!): DisableOTPMutationPayload
@@ -2043,6 +2045,10 @@ type CurrentUserEdge {
   node: UserProfileType
   "A cursor for use in pagination"
   cursor: String!
+}
+type SetDefaultOrganizationMutationPayload {
+  defaultOrganizationId: ID
+  clientMutationId: String
 }
 type GenerateOTPMutationPayload {
   base32: String
@@ -3142,6 +3148,10 @@ input UpdateCurrentUserMutationInput {
   lastName: String
   avatar: Upload
   language: String
+  clientMutationId: String
+}
+input SetDefaultOrganizationMutationInput {
+  organizationId: ID
   clientMutationId: String
 }
 input GenerateOTPMutationInput {

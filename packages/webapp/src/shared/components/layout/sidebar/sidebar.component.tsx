@@ -455,7 +455,7 @@ export const Sidebar = (props: HTMLAttributes<HTMLDivElement>) => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-[280px] top-4 z-60 xl:hidden"
+          className="fixed left-[280px] top-4 z-[60] bg-background shadow-sm xl:hidden"
           onClick={closeSidebar}
           aria-label={intl.formatMessage({
             defaultMessage: 'Close menu',
