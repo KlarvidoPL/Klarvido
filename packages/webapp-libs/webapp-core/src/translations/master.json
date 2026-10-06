@@ -2735,6 +2735,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "Something went wrong while connecting KSeF. Try again."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "This token does not have invoice read permission (InvoiceRead). Generate a new token with this permission."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF did not accept this token. Check that it is copied correctly and was not revoked."
   },

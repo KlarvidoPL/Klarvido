@@ -2735,6 +2735,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "Une erreur s'est produite lors de la connexion à KSeF. Réessayez."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "Ce jeton ne dispose pas du droit de lecture des factures (InvoiceRead). Générez un nouveau jeton avec ce droit."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF n'a pas accepté ce jeton. Vérifiez qu'il a été copié correctement et qu'il n'a pas été révoqué."
   },

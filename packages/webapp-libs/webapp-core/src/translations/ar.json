@@ -2735,6 +2735,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "حدث خطأ أثناء الاتصال بـ KSeF. حاول مرة أخرى."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "لا يملك هذا الرمز صلاحية قراءة الفواتير (InvoiceRead). أنشئ رمزًا جديدًا بهذه الصلاحية."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "لم يقبل KSeF هذا الرمز. تحقق من أنه نُسخ بشكل صحيح ولم يتم إلغاؤه."
   },

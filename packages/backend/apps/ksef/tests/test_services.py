@@ -69,6 +69,30 @@ def test_valid_token_is_stored_encrypted(polish_tenant):
     assert crypto.decrypt_token(polish_tenant.pk, credential.encrypted_token) == "real-token-1234"
 
 
+def test_missing_invoice_read_does_not_replace_existing_token(polish_tenant):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, "original-token")
+    denied = TokenCheck(status=KsefCredentialStatus.INVALID, error_code=KsefErrorCode.INVOICE_READ_MISSING)
+    with patch.object(services, "verify_token", return_value=denied):
+        result = services.save_token(polish_tenant, None, "no-read-token")
+    assert result.error_code == KsefErrorCode.INVOICE_READ_MISSING
+    credential = KsefCredential.objects.get(tenant=polish_tenant)
+    assert crypto.decrypt_token(polish_tenant.pk, credential.encrypted_token) == "original-token"
+    assert credential.status == KsefCredentialStatus.VALID
+
+
+def test_retest_marks_token_without_invoice_read_invalid(polish_tenant):
+    with patch.object(services, "verify_token", return_value=VALID):
+        services.save_token(polish_tenant, None, "original-token")
+    denied = TokenCheck(status=KsefCredentialStatus.INVALID, error_code=KsefErrorCode.INVOICE_READ_MISSING)
+    with patch.object(services, "verify_token", return_value=denied):
+        result = services.retest_token(polish_tenant, None)
+    assert result.error_code == KsefErrorCode.INVOICE_READ_MISSING
+    credential = KsefCredential.objects.get(tenant=polish_tenant)
+    assert credential.status == KsefCredentialStatus.INVALID
+    assert credential.last_error_code == KsefErrorCode.INVOICE_READ_MISSING
+
+
 def test_token_name_is_stored_and_refreshed(polish_tenant):
     named = TokenCheck(status=KsefCredentialStatus.VALID, token_name="KlarvidoTest")
     with patch.object(services, "verify_token", return_value=named):

@@ -2735,6 +2735,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "KSeF से कनेक्ट करते समय त्रुटि हुई। फिर से प्रयास करें।"
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "इस टोकन में चालान पढ़ने की अनुमति (InvoiceRead) नहीं है। इस अनुमति के साथ नया टोकन बनाएँ।"
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF ने यह टोकन स्वीकार नहीं किया। जाँचें कि यह सही तरह से कॉपी हुआ है और रद्द नहीं किया गया है।"
   },

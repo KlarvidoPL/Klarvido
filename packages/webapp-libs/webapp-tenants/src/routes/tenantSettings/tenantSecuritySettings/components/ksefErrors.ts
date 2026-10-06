@@ -13,6 +13,12 @@ export const getKsefErrorMessage = (intl: IntlShape, errorCode: string | null | 
         id: 'KSeF / Error no permissions',
         defaultMessage: 'This token has no permissions for the company. Generate a new token with invoice read access.',
       });
+    case 'INVOICE_READ_MISSING':
+      return intl.formatMessage({
+        id: 'KSeF / Error invoice read missing',
+        defaultMessage:
+          'This token does not have invoice read permission (InvoiceRead). Generate a new token with this permission.',
+      });
     case 'SERVICE_UNAVAILABLE':
       return intl.formatMessage({
         id: 'KSeF / Error service unavailable',

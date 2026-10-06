@@ -2735,6 +2735,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "Wystąpił błąd podczas łączenia z KSeF. Spróbuj ponownie."
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "Token nie ma uprawnienia do odczytu faktur (InvoiceRead). Wygeneruj nowy token z tym uprawnieniem."
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF nie zaakceptował tego tokenu. Sprawdź, czy został skopiowany poprawnie i nie został unieważniony."
   },

@@ -2735,6 +2735,9 @@
   "KSeF / Error generic": {
     "defaultMessage": "连接 KSeF 时出错。请重试。"
   },
+  "KSeF / Error invoice read missing": {
+    "defaultMessage": "此令牌没有读取发票的权限（InvoiceRead）。请生成具有此权限的新令牌。"
+  },
   "KSeF / Error invalid token": {
     "defaultMessage": "KSeF 未接受此令牌。请检查令牌是否复制正确，以及是否已被撤销。"
   },
