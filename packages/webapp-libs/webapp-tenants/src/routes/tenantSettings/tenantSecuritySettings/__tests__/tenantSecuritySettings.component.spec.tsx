@@ -54,7 +54,6 @@ describe('TenantSecuritySettings: Component', () => {
       const permissionsMock = createPermissionsMock([
         'security.view',
         'security.sso.manage',
-        'security.passkeys.manage',
         'security.logs.view',
       ]);
 
@@ -80,7 +79,6 @@ describe('TenantSecuritySettings: Component', () => {
       const permissionsMock = createPermissionsMock([
         'security.view',
         'security.sso.manage',
-        'security.passkeys.manage',
         'security.logs.view',
       ]);
 
@@ -106,7 +104,6 @@ describe('TenantSecuritySettings: Component', () => {
       const permissionsMock = createPermissionsMock([
         'security.view',
         'security.sso.manage',
-        'security.passkeys.manage',
         'security.logs.view',
       ]);
 
@@ -132,7 +129,6 @@ describe('TenantSecuritySettings: Component', () => {
       const permissionsMock = createPermissionsMock([
         'security.view',
         'security.sso.manage',
-        'security.passkeys.manage',
         'security.logs.view',
       ]);
 

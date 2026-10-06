@@ -608,6 +608,7 @@ GRAPHENE = {
         "common.graphql.security.SanitizeErrorsMiddleware",
         "common.middleware.SentryMiddleware",
         "apps.multitenancy.middleware.TenantUserRoleMiddleware",
+        "common.graphql.authorization.ObjectAuthorizationMiddleware",
     ],
 }
 
@@ -639,10 +640,18 @@ if TRACING_BACKEND == "xray":
     }
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+if IS_LOCAL_DEBUG:
+    CSRF_TRUSTED_ORIGINS += ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 # CORS Configuration for cross-origin deployments (e.g., Render.com)
 # When webapp and backend are on different domains, CORS must be enabled
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+# Browser WebSockets use the same frontend origins as HTTP. VPS already sets CORS_ALLOWED_ORIGINS.
+# Local development needs explicit origins even when HTTP CORS is handled by the dev proxy.
+WEBSOCKET_ALLOWED_ORIGINS = env.list(
+    "WEBSOCKET_ALLOWED_ORIGINS",
+    default=CORS_ALLOWED_ORIGINS or (["http://localhost:3000", "http://127.0.0.1:3000"] if IS_LOCAL_DEBUG else []),
+)
 CORS_ALLOW_CREDENTIALS = True  # Required for cookie-based authentication
 CORS_ALLOW_HEADERS = [
     "accept",

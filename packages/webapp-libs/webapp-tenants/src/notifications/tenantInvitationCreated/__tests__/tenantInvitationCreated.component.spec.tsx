@@ -44,12 +44,10 @@ describe('TenantInvitationCreated: Component', () => {
     expect(screen.getByText(/you have been invited to "test org"/i)).toBeInTheDocument();
   });
 
-  it('should navigate to invitation when clicked and tenant has matching membership', async () => {
-    const membership = membershipFactory({ id: 'inv-1', invitationToken: 'token-123' });
+  it.each(['token-123', null])('should navigate to invitation with token %s', async (token) => {
+    const membership = membershipFactory({ id: 'inv-1', invitationToken: token, invitationAccepted: false });
     const tenant = tenantFactory({ name: 'Test Org', membership });
-    const apolloMocks = [
-      fillCommonQueryWithUser(currentUserFactory({ tenants: [tenant] })),
-    ];
+    const apolloMocks = [fillCommonQueryWithUser(currentUserFactory({ isConfirmed: !!token, tenants: [tenant] }))];
 
     render(
       <TenantInvitationCreated
@@ -68,6 +66,8 @@ describe('TenantInvitationCreated: Component', () => {
     const notification = await screen.findByText(/you have been invited to "test org"/i);
     await userEvent.click(notification);
 
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('token-123'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      token ? expect.stringContaining(token) : '/en/tenant-invitation/pending?membershipId=inv-1'
+    );
   });
 });

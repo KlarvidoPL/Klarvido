@@ -10,10 +10,10 @@ export type TenantInvitationProps = EmailComponentProps & {
   tenantMembershipId: string;
 };
 
-export const Template = ({ token }: TenantInvitationProps) => {
+export const Template = ({ token, tenantMembershipId }: TenantInvitationProps) => {
   const intl = useIntl();
   const generateLocalePath = useGenerateAbsoluteLocalePath();
-  const url = generateLocalePath(RoutesConfig.tenantInvitation, { token });
+  const url = `${generateLocalePath(RoutesConfig.tenantInvitation, { token })}?membershipId=${encodeURIComponent(tenantMembershipId)}`;
 
   const preheaderText = intl.formatMessage({
     defaultMessage: 'Join the team and start collaborating today',
@@ -23,12 +23,7 @@ export const Template = ({ token }: TenantInvitationProps) => {
   return (
     <Layout
       preheader={preheaderText}
-      title={
-        <FormattedMessage
-          defaultMessage="You're invited to join a team"
-          id="Email / TenantInvitation / Title"
-        />
-      }
+      title={<FormattedMessage defaultMessage="You're invited to join a team" id="Email / TenantInvitation / Title" />}
       text={
         <FormattedMessage
           defaultMessage="Great news! You've been invited to join an organization. Click below to view the invitation details and decide whether to accept or decline."

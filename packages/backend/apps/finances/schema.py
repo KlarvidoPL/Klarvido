@@ -6,7 +6,7 @@ from django.http import Http404
 from djstripe import models as djstripe_models, enums as djstripe_enums
 from graphene import relay, ObjectType
 from graphene.types.generic import GenericScalar
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql_relay import to_global_id, from_global_id, offset_to_cursor
 from rest_framework.generics import get_object_or_404
 from stripe.error import InvalidRequestError

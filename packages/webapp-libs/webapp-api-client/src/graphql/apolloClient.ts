@@ -12,6 +12,7 @@ import { GraphQLFormattedError } from 'graphql';
 import { Kind, OperationTypeNode } from 'graphql/language';
 
 import { apiURL, auth } from '../api';
+import { csrfFetch } from '../api/csrf';
 import { Emitter } from '../utils/eventEmitter';
 import { SchemaType } from './types';
 import { WebSocketLink } from './webSocketLink';
@@ -131,6 +132,7 @@ export const redirectToLogin = () => {
 const httpApiLink = new UploadHttpLink({
   uri: apiURL('/graphql/'),
   credentials: 'include', // Required for cookie-based authentication
+  fetch: csrfFetch,
 });
 
 /**
@@ -237,7 +239,7 @@ const handleApiErrors = (
 
 const refreshTokenLink = onError((error: any) => {
   let { graphQLErrors, networkError, operation, forward } = error;
-  
+
   if (!networkError && error.error) {
     networkError = error.error;
   }

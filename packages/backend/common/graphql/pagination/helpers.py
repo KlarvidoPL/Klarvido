@@ -1,4 +1,9 @@
 from graphql_relay import from_global_id
+from common.exceptions import DomainException
+
+
+class PaginationValidationError(DomainException):
+    """An intentional, client-visible error in pagination arguments."""
 
 
 # forked from
@@ -58,15 +63,15 @@ def check_paging_sanity(args):
     is_backward_paging = bool(last) or bool(before)
 
     if is_forward_paging and is_backward_paging:
-        raise Exception("cursor-based pagination cannot be forwards AND backwards")
+        raise PaginationValidationError("cursor-based pagination cannot be forwards AND backwards")
     if is_forward_paging and before or is_backward_paging and after:
-        raise Exception("paging must use either first/after or last/before")
+        raise PaginationValidationError("paging must use either first/after or last/before")
     if is_forward_paging and first < 0 or is_backward_paging and last < 0:
-        raise Exception("paging limit must be positive")
+        raise PaginationValidationError("paging limit must be positive")
     # This is a weird corner case. We'd have to invert the ordering of query to
     # get the last few items then re-invert it when emitting the results. We'll
     # just ignore it for now.
     if last and not before:
-        raise Exception("when paging backwards, a 'before' argument is required")
+        raise PaginationValidationError("when paging backwards, a 'before' argument is required")
 
     return [is_forward_paging, is_backward_paging]

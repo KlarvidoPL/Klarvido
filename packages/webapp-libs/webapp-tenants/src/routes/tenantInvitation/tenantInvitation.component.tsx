@@ -1,6 +1,10 @@
 import { useMutation } from '@apollo/client/react';
 import { getFragmentData } from '@sb/webapp-api-client';
-import { commonQueryMembershipFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
+import {
+  commonQueryCurrentUserFragment,
+  commonQueryMembershipFragment,
+  useCommonQuery,
+} from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { PageLayout } from '@sb/webapp-core/components/pageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
@@ -11,7 +15,7 @@ import { useToast } from '@sb/webapp-core/toast';
 import { MailOpen } from 'lucide-react';
 import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { useGenerateTenantPath, useTenants } from '../../hooks';
 import { acceptTenantInvitationMutation, declineTenantInvitationMutation } from './tenantInvitation.graphql';
@@ -22,7 +26,11 @@ export type InvitationPathParams = {
 
 export const TenantInvitation = () => {
   const params = useParams<InvitationPathParams>();
-  const { reload: reloadCommonQuery } = useCommonQuery();
+  const { data, reload: reloadCommonQuery } = useCommonQuery();
+  const currentUser = getFragmentData(commonQueryCurrentUserFragment, data?.currentUser);
+  const isConfirmed = !!currentUser?.isConfirmed;
+  const [searchParams] = useSearchParams();
+  const membershipId = searchParams.get('membershipId');
   const tenants = useTenants();
   const navigate = useNavigate();
   const generateTenantPath = useGenerateTenantPath();
@@ -46,11 +54,13 @@ export const TenantInvitation = () => {
     defaultMessage: 'This invitation is no longer valid.',
   });
 
-  const tenant = tenants.find(
-    (t) => getFragmentData(commonQueryMembershipFragment, t?.membership)?.invitationToken === token
-  );
+  const tenant = tenants.find((t) => {
+    const membership = getFragmentData(commonQueryMembershipFragment, t?.membership);
+    return membershipId ? membership?.id === membershipId : !!token && membership?.invitationToken === token;
+  });
   const tenantMembership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
   const tenantMembershipId = tenantMembership?.id || '';
+  const acceptanceToken = tenantMembership?.invitationToken;
 
   const [commitAcceptMutation, { loading: acceptLoading }] = useMutation(acceptTenantInvitationMutation, {
     onCompleted: () => {
@@ -67,16 +77,16 @@ export const TenantInvitation = () => {
   });
 
   const handleAccept = useCallback(() => {
-    if (!token || !tenant) return;
+    if (!isConfirmed || !acceptanceToken || !tenant) return;
     commitAcceptMutation({
       variables: {
         input: {
-          token,
+          token: acceptanceToken,
           id: tenantMembershipId,
         },
       },
     });
-  }, [token, commitAcceptMutation, tenant, tenantMembershipId]);
+  }, [isConfirmed, acceptanceToken, commitAcceptMutation, tenant, tenantMembershipId]);
 
   const [commitDeclineMutation, { loading: declineLoading }] = useMutation(declineTenantInvitationMutation, {
     onCompleted: () => {
@@ -93,16 +103,22 @@ export const TenantInvitation = () => {
   });
 
   const handleDecline = useCallback(() => {
-    if (!token || !tenant) return;
+    if (!tenant) return;
     commitDeclineMutation({
       variables: {
         input: {
-          token,
+          ...(tenantMembership?.invitationToken ? { token: tenantMembership.invitationToken } : {}),
           id: tenantMembershipId,
         },
       },
     });
-  }, [token, commitDeclineMutation, tenant, tenantMembershipId]);
+  }, [tenantMembership, commitDeclineMutation, tenant, tenantMembershipId]);
+
+  useEffect(() => {
+    const refresh = () => reloadCommonQuery();
+    window.addEventListener('focus', refresh);
+    return () => window.removeEventListener('focus', refresh);
+  }, [reloadCommonQuery]);
 
   let redirectPath: string | null = null;
 
@@ -146,8 +162,21 @@ export const TenantInvitation = () => {
             </p>
             <p className="text-lg font-medium">{tenant.name}</p>
           </div>
+          {!isConfirmed && (
+            <p className="text-sm text-muted-foreground" id="invitation-verification-message">
+              <FormattedMessage
+                defaultMessage="Verify your email address before accepting this invitation."
+                id="Tenant Invitation / Email verification required"
+              />
+            </p>
+          )}
           <div className="flex gap-3">
-            <Button onClick={handleAccept} disabled={isLoading}>
+            <Button
+              onClick={handleAccept}
+              disabled={isLoading || !isConfirmed || !acceptanceToken}
+              className={!isConfirmed ? 'bg-muted text-muted-foreground' : undefined}
+              aria-describedby={!isConfirmed ? 'invitation-verification-message' : undefined}
+            >
               <FormattedMessage defaultMessage="Accept invitation" id="Tenant Invitation / Accept button" />
             </Button>
             <Button variant="outline" onClick={handleDecline} disabled={isLoading}>

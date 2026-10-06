@@ -70,9 +70,10 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
   };
 
   const handleInvitationClick = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
-    const token = getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationToken;
-    if (!token) return;
-    navigate(generateLocalePath(RoutesConfig.tenantInvitation, { token }));
+    const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+    if (!membership) return;
+    const path = generateLocalePath(RoutesConfig.tenantInvitation, { token: membership.invitationToken || 'pending' });
+    navigate(membership.invitationToken ? path : `${path}?membershipId=${encodeURIComponent(membership.id)}`);
     onNavigate?.();
   };
 

@@ -108,10 +108,8 @@ type Documents = {
     "\n  mutation TenantSecuritySetKsefToken($tenantId: ID!, $token: String!) {\n    setKsefToken(tenantId: $tenantId, token: $token) {\n      ok\n      errorCode\n      ksefCredential {\n        status\n        tokenName\n        tokenHint\n        lastVerifiedAt\n        lastErrorCode\n        updatedAt\n      }\n    }\n  }\n": typeof types.TenantSecuritySetKsefTokenDocument,
     "\n  mutation TenantSecurityTestKsefToken($tenantId: ID!) {\n    testKsefToken(tenantId: $tenantId) {\n      ok\n      errorCode\n      ksefCredential {\n        status\n        tokenName\n        tokenHint\n        lastVerifiedAt\n        lastErrorCode\n        updatedAt\n      }\n    }\n  }\n": typeof types.TenantSecurityTestKsefTokenDocument,
     "\n  mutation TenantSecurityDeleteKsefToken($tenantId: ID!) {\n    deleteKsefToken(tenantId: $tenantId) {\n      ok\n      errorCode\n    }\n  }\n": typeof types.TenantSecurityDeleteKsefTokenDocument,
-    "\n  query TenantPasskeysQuery($tenantId: ID!, $search: String) {\n    tenantPasskeys(tenantId: $tenantId, search: $search) {\n      id\n      name\n      authenticatorType\n      createdAt\n      lastUsedAt\n      useCount\n      userEmail\n      userName\n    }\n  }\n": typeof types.TenantPasskeysQueryDocument,
     "\n  query MyPasskeysQuery {\n    myPasskeys(first: 50) {\n      edges {\n        node {\n          id\n          name\n          authenticatorType\n          createdAt\n          lastUsedAt\n          useCount\n        }\n      }\n    }\n  }\n": typeof types.MyPasskeysQueryDocument,
     "\n  mutation TenantSecurityDeletePasskey($input: DeletePasskeyMutationInput!) {\n    deletePasskey(input: $input) {\n      deletedIds\n    }\n  }\n": typeof types.TenantSecurityDeletePasskeyDocument,
-    "\n  mutation TenantSecurityDeleteTenantPasskey($id: ID!, $tenantId: ID!) {\n    deleteTenantPasskey(id: $id, tenantId: $tenantId) {\n      ok\n    }\n  }\n": typeof types.TenantSecurityDeleteTenantPasskeyDocument,
     "\n  query TenantSCIMTokensQuery($tenantId: ID!) {\n    scimTokens(tenantId: $tenantId, first: 50) {\n      edges {\n        node {\n          id\n          name\n          tokenPrefix\n          isActive\n          expiresAt\n          lastUsedAt\n          lastUsedIp\n          requestCount\n          createdAt\n        }\n      }\n    }\n  }\n": typeof types.TenantScimTokensQueryDocument,
     "\n  mutation TenantSecurityCreateSCIMToken($input: CreateSCIMTokenMutationInput!) {\n    createScimToken(input: $input) {\n      scimToken {\n        id\n        name\n        tokenPrefix\n      }\n      rawToken\n    }\n  }\n": typeof types.TenantSecurityCreateScimTokenDocument,
     "\n  mutation TenantSecurityRevokeSCIMToken($id: ID!, $tenantId: ID!) {\n    revokeScimToken(id: $id, tenantId: $tenantId) {\n      ok\n    }\n  }\n": typeof types.TenantSecurityRevokeScimTokenDocument,
@@ -264,10 +262,8 @@ const documents: Documents = {
     "\n  mutation TenantSecuritySetKsefToken($tenantId: ID!, $token: String!) {\n    setKsefToken(tenantId: $tenantId, token: $token) {\n      ok\n      errorCode\n      ksefCredential {\n        status\n        tokenName\n        tokenHint\n        lastVerifiedAt\n        lastErrorCode\n        updatedAt\n      }\n    }\n  }\n": types.TenantSecuritySetKsefTokenDocument,
     "\n  mutation TenantSecurityTestKsefToken($tenantId: ID!) {\n    testKsefToken(tenantId: $tenantId) {\n      ok\n      errorCode\n      ksefCredential {\n        status\n        tokenName\n        tokenHint\n        lastVerifiedAt\n        lastErrorCode\n        updatedAt\n      }\n    }\n  }\n": types.TenantSecurityTestKsefTokenDocument,
     "\n  mutation TenantSecurityDeleteKsefToken($tenantId: ID!) {\n    deleteKsefToken(tenantId: $tenantId) {\n      ok\n      errorCode\n    }\n  }\n": types.TenantSecurityDeleteKsefTokenDocument,
-    "\n  query TenantPasskeysQuery($tenantId: ID!, $search: String) {\n    tenantPasskeys(tenantId: $tenantId, search: $search) {\n      id\n      name\n      authenticatorType\n      createdAt\n      lastUsedAt\n      useCount\n      userEmail\n      userName\n    }\n  }\n": types.TenantPasskeysQueryDocument,
     "\n  query MyPasskeysQuery {\n    myPasskeys(first: 50) {\n      edges {\n        node {\n          id\n          name\n          authenticatorType\n          createdAt\n          lastUsedAt\n          useCount\n        }\n      }\n    }\n  }\n": types.MyPasskeysQueryDocument,
     "\n  mutation TenantSecurityDeletePasskey($input: DeletePasskeyMutationInput!) {\n    deletePasskey(input: $input) {\n      deletedIds\n    }\n  }\n": types.TenantSecurityDeletePasskeyDocument,
-    "\n  mutation TenantSecurityDeleteTenantPasskey($id: ID!, $tenantId: ID!) {\n    deleteTenantPasskey(id: $id, tenantId: $tenantId) {\n      ok\n    }\n  }\n": types.TenantSecurityDeleteTenantPasskeyDocument,
     "\n  query TenantSCIMTokensQuery($tenantId: ID!) {\n    scimTokens(tenantId: $tenantId, first: 50) {\n      edges {\n        node {\n          id\n          name\n          tokenPrefix\n          isActive\n          expiresAt\n          lastUsedAt\n          lastUsedIp\n          requestCount\n          createdAt\n        }\n      }\n    }\n  }\n": types.TenantScimTokensQueryDocument,
     "\n  mutation TenantSecurityCreateSCIMToken($input: CreateSCIMTokenMutationInput!) {\n    createScimToken(input: $input) {\n      scimToken {\n        id\n        name\n        tokenPrefix\n      }\n      rawToken\n    }\n  }\n": types.TenantSecurityCreateScimTokenDocument,
     "\n  mutation TenantSecurityRevokeSCIMToken($id: ID!, $tenantId: ID!) {\n    revokeScimToken(id: $id, tenantId: $tenantId) {\n      ok\n    }\n  }\n": types.TenantSecurityRevokeScimTokenDocument,
@@ -719,19 +715,11 @@ export function gql(source: "\n  mutation TenantSecurityDeleteKsefToken($tenantI
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query TenantPasskeysQuery($tenantId: ID!, $search: String) {\n    tenantPasskeys(tenantId: $tenantId, search: $search) {\n      id\n      name\n      authenticatorType\n      createdAt\n      lastUsedAt\n      useCount\n      userEmail\n      userName\n    }\n  }\n"): (typeof documents)["\n  query TenantPasskeysQuery($tenantId: ID!, $search: String) {\n    tenantPasskeys(tenantId: $tenantId, search: $search) {\n      id\n      name\n      authenticatorType\n      createdAt\n      lastUsedAt\n      useCount\n      userEmail\n      userName\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n  query MyPasskeysQuery {\n    myPasskeys(first: 50) {\n      edges {\n        node {\n          id\n          name\n          authenticatorType\n          createdAt\n          lastUsedAt\n          useCount\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query MyPasskeysQuery {\n    myPasskeys(first: 50) {\n      edges {\n        node {\n          id\n          name\n          authenticatorType\n          createdAt\n          lastUsedAt\n          useCount\n        }\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation TenantSecurityDeletePasskey($input: DeletePasskeyMutationInput!) {\n    deletePasskey(input: $input) {\n      deletedIds\n    }\n  }\n"): (typeof documents)["\n  mutation TenantSecurityDeletePasskey($input: DeletePasskeyMutationInput!) {\n    deletePasskey(input: $input) {\n      deletedIds\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  mutation TenantSecurityDeleteTenantPasskey($id: ID!, $tenantId: ID!) {\n    deleteTenantPasskey(id: $id, tenantId: $tenantId) {\n      ok\n    }\n  }\n"): (typeof documents)["\n  mutation TenantSecurityDeleteTenantPasskey($id: ID!, $tenantId: ID!) {\n    deleteTenantPasskey(id: $id, tenantId: $tenantId) {\n      ok\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

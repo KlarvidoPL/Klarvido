@@ -252,8 +252,6 @@ export type ApiMutation = {
    * - Cannot remove the last owner
    */
   deleteTenantMembership?: Maybe<DeleteTenantMembershipMutationPayload>;
-  /** Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context. */
-  deleteTenantPasskey?: Maybe<DeleteTenantPasskeyMutation>;
   disableOtp?: Maybe<DisableOtpMutationPayload>;
   /** Download a backup file with decryption applied in-memory. */
   downloadBackupDecrypted?: Maybe<DownloadBackupDecryptedMutation>;
@@ -510,12 +508,6 @@ export type ApiMutationDeleteTenantArgs = {
 
 export type ApiMutationDeleteTenantMembershipArgs = {
   input: DeleteTenantMembershipMutationInput;
-};
-
-
-export type ApiMutationDeleteTenantPasskeyArgs = {
-  id: Scalars['ID']['input'];
-  tenantId: Scalars['ID']['input'];
 };
 
 
@@ -1721,7 +1713,7 @@ export type DeclineTenantInvitationMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
   /** Token */
-  token: Scalars['String']['input'];
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DeclineTenantInvitationMutationPayload = {
@@ -1862,12 +1854,6 @@ export type DeleteTenantMutationPayload = {
   __typename?: 'DeleteTenantMutationPayload';
   clientMutationId?: Maybe<Scalars['String']['output']>;
   deletedIds?: Maybe<Array<Maybe<Scalars['ID']['output']>>>;
-};
-
-/** Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context. */
-export type DeleteTenantPasskeyMutation = {
-  __typename?: 'DeleteTenantPasskeyMutation';
-  ok?: Maybe<Scalars['Boolean']['output']>;
 };
 
 /** [See type definition](https://app.contentful.com/spaces/m7e7pnsr61vp/content_types/demoItem) */
@@ -3131,7 +3117,6 @@ export type Query = {
   ssoConnections?: Maybe<SsoConnectionConnection>;
   ssoDiscover?: Maybe<SsoDiscoveryResultType>;
   tenant?: Maybe<TenantType>;
-  tenantPasskeys?: Maybe<Array<Maybe<TenantPasskeyType>>>;
   /** Get translation sync status (admin only) */
   translationSyncStatus?: Maybe<TranslationSyncStatusType>;
   unreadNotificationsCount?: Maybe<Scalars['Int']['output']>;
@@ -3475,12 +3460,6 @@ export type QuerySsoDiscoverArgs = {
 
 export type QueryTenantArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryTenantPasskeysArgs = {
-  search?: InputMaybe<Scalars['String']['input']>;
-  tenantId: Scalars['ID']['input'];
 };
 
 /**
@@ -3901,6 +3880,12 @@ export enum SsoSsoAuditLogEventTypeChoices {
   IDP_CONFIG_DELETED = 'IDP_CONFIG_DELETED',
   /** IdP Configuration Updated */
   IDP_CONFIG_UPDATED = 'IDP_CONFIG_UPDATED',
+  /** KSeF Token Deleted */
+  KSEF_TOKEN_DELETED = 'KSEF_TOKEN_DELETED',
+  /** KSeF Token Saved */
+  KSEF_TOKEN_SAVED = 'KSEF_TOKEN_SAVED',
+  /** KSeF Token Tested */
+  KSEF_TOKEN_TESTED = 'KSEF_TOKEN_TESTED',
   /** Passkey Auth Failed */
   PASSKEY_AUTH_FAILED = 'PASSKEY_AUTH_FAILED',
   /** Passkey Auth Success */
@@ -4709,21 +4694,6 @@ export type TenantMembershipType = Node & {
   role?: Maybe<TenantUserRole>;
   userEmail?: Maybe<Scalars['String']['output']>;
   userId?: Maybe<Scalars['ID']['output']>;
-};
-
-export type TenantPasskeyType = {
-  __typename?: 'TenantPasskeyType';
-  authenticatorType?: Maybe<Scalars['String']['output']>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
-  deviceType?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  isActive?: Maybe<Scalars['Boolean']['output']>;
-  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  transports?: Maybe<Scalars['GenericScalar']['output']>;
-  useCount?: Maybe<Scalars['Int']['output']>;
-  userEmail?: Maybe<Scalars['String']['output']>;
-  userName?: Maybe<Scalars['String']['output']>;
 };
 
 export type TenantType = Node & {
@@ -5856,14 +5826,6 @@ export type TenantSecurityDeleteKsefTokenMutationVariables = Exact<{
 
 export type TenantSecurityDeleteKsefTokenMutation = { __typename?: 'ApiMutation', deleteKsefToken?: { __typename?: 'DeleteKsefTokenMutation', ok?: boolean | null, errorCode?: string | null } | null };
 
-export type TenantPasskeysQueryQueryVariables = Exact<{
-  tenantId: Scalars['ID']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type TenantPasskeysQueryQuery = { __typename?: 'Query', tenantPasskeys?: Array<{ __typename?: 'TenantPasskeyType', id?: string | null, name?: string | null, authenticatorType?: string | null, createdAt?: any | null, lastUsedAt?: any | null, useCount?: number | null, userEmail?: string | null, userName?: string | null } | null> | null };
-
 export type MyPasskeysQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5875,14 +5837,6 @@ export type TenantSecurityDeletePasskeyMutationVariables = Exact<{
 
 
 export type TenantSecurityDeletePasskeyMutation = { __typename?: 'ApiMutation', deletePasskey?: { __typename?: 'DeletePasskeyMutationPayload', deletedIds?: Array<string | null> | null } | null };
-
-export type TenantSecurityDeleteTenantPasskeyMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  tenantId: Scalars['ID']['input'];
-}>;
-
-
-export type TenantSecurityDeleteTenantPasskeyMutation = { __typename?: 'ApiMutation', deleteTenantPasskey?: { __typename?: 'DeleteTenantPasskeyMutation', ok?: boolean | null } | null };
 
 export type TenantScimTokensQueryQueryVariables = Exact<{
   tenantId: Scalars['ID']['input'];
@@ -6411,10 +6365,8 @@ export const TenantSecurityKsefCredentialQueryDocument = {"kind":"Document","def
 export const TenantSecuritySetKsefTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecuritySetKsefToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setKsefToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"errorCode"}},{"kind":"Field","name":{"kind":"Name","value":"ksefCredential"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"tokenName"}},{"kind":"Field","name":{"kind":"Name","value":"tokenHint"}},{"kind":"Field","name":{"kind":"Name","value":"lastVerifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastErrorCode"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecuritySetKsefTokenMutation, TenantSecuritySetKsefTokenMutationVariables>;
 export const TenantSecurityTestKsefTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityTestKsefToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"testKsefToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"errorCode"}},{"kind":"Field","name":{"kind":"Name","value":"ksefCredential"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"tokenName"}},{"kind":"Field","name":{"kind":"Name","value":"tokenHint"}},{"kind":"Field","name":{"kind":"Name","value":"lastVerifiedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastErrorCode"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]} as unknown as DocumentNode<TenantSecurityTestKsefTokenMutation, TenantSecurityTestKsefTokenMutationVariables>;
 export const TenantSecurityDeleteKsefTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeleteKsefToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteKsefToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"errorCode"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeleteKsefTokenMutation, TenantSecurityDeleteKsefTokenMutationVariables>;
-export const TenantPasskeysQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantPasskeysQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantPasskeys"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatorType"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"useCount"}},{"kind":"Field","name":{"kind":"Name","value":"userEmail"}},{"kind":"Field","name":{"kind":"Name","value":"userName"}}]}}]}}]} as unknown as DocumentNode<TenantPasskeysQueryQuery, TenantPasskeysQueryQueryVariables>;
 export const MyPasskeysQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyPasskeysQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPasskeys"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatorType"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"useCount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MyPasskeysQueryQuery, MyPasskeysQueryQueryVariables>;
 export const TenantSecurityDeletePasskeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeletePasskey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeletePasskeyMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletePasskey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletedIds"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeletePasskeyMutation, TenantSecurityDeletePasskeyMutationVariables>;
-export const TenantSecurityDeleteTenantPasskeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityDeleteTenantPasskey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTenantPasskey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityDeleteTenantPasskeyMutation, TenantSecurityDeleteTenantPasskeyMutationVariables>;
 export const TenantScimTokensQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSCIMTokensQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scimTokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedIp"}},{"kind":"Field","name":{"kind":"Name","value":"requestCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<TenantScimTokensQueryQuery, TenantScimTokensQueryQueryVariables>;
 export const TenantSecurityCreateScimTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityCreateSCIMToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateSCIMTokenMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScimToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scimToken"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokenPrefix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"rawToken"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityCreateScimTokenMutation, TenantSecurityCreateScimTokenMutationVariables>;
 export const TenantSecurityRevokeScimTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TenantSecurityRevokeSCIMToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeScimToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}}]}}]}}]} as unknown as DocumentNode<TenantSecurityRevokeScimTokenMutation, TenantSecurityRevokeScimTokenMutationVariables>;

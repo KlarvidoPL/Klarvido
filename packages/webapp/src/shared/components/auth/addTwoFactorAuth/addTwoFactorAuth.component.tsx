@@ -29,7 +29,20 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
   const [otpAuthUrl, setOtpAuthUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const form = useApiForm<VerifyOtpFormFields>();
+  const form = useApiForm<VerifyOtpFormFields>({
+    errorMessages: {
+      nonFieldErrors: {
+        'Verification token is invalid': intl.formatMessage({
+          id: 'Auth / OTP / Invalid code',
+          defaultMessage: 'The verification code is invalid.',
+        }),
+        'Too many incorrect codes. Try again in 15 minutes.': intl.formatMessage({
+          id: 'Auth / OTP / Attempt limit',
+          defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
+        }),
+      },
+    },
+  });
 
   const {
     handleSubmit,
@@ -138,7 +151,10 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
   }, [commitGenerateOtpMutation]);
 
   return (
-    <form onSubmit={handleSubmit(submitHandler)} className="-m-6 flex h-[85vh] max-h-[700px] flex-col overflow-hidden sm:rounded-lg">
+    <form
+      onSubmit={handleSubmit(submitHandler)}
+      className="-m-6 flex h-[85vh] max-h-[700px] flex-col overflow-hidden sm:rounded-lg"
+    >
       {/* Fixed Header */}
       <div className="flex shrink-0 items-center gap-3 border-b bg-background px-6 py-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
@@ -225,9 +241,7 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <code className="flex-1 rounded bg-background px-2 py-1.5 font-mono text-xs">
-                  {base32 || '...'}
-                </code>
+                <code className="flex-1 rounded bg-background px-2 py-1.5 font-mono text-xs">{base32 || '...'}</code>
                 <Button
                   type="button"
                   variant={ButtonVariant.SECONDARY}
@@ -280,14 +294,14 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
               placeholder="000000"
               maxLength={6}
               autoFocus
-              error={errors.token?.message}
+              aria-invalid={!!errors.token}
               autoComplete="one-time-code"
               className="w-full max-w-[160px] text-center font-mono text-lg tracking-widest"
             />
 
-            {genericError && (
+            {(errors.token?.message || genericError) && (
               <div className="text-sm text-destructive dark:text-red-400">
-                <Small>{genericError}</Small>
+                <Small>{errors.token?.message || genericError}</Small>
               </div>
             )}
           </div>

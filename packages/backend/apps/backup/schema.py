@@ -6,7 +6,7 @@ import logging
 
 import graphene
 from graphene import relay
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql_relay import from_global_id, to_global_id
 
 from common.graphql.acl import permission_classes, requires

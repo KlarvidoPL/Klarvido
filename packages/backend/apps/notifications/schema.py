@@ -1,5 +1,6 @@
 import channels_graphql_ws
 import graphene
+from apps.multitenancy.constants import Notification as TenantNotification
 from apps.users.models import User
 from apps.users.services.users import get_user_avatar_url
 from channels.db import database_sync_to_async
@@ -8,7 +9,7 @@ from common.graphql import mutations
 from common.graphql.acl import permission_classes
 from graphene import relay
 from graphene.types.generic import GenericScalar
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql import GraphQLError
 from . import models
 from . import serializers
@@ -59,6 +60,14 @@ class NotificationType(DjangoObjectType):
         model = models.Notification
         interfaces = (relay.Node,)
         fields = "__all__"
+
+    @staticmethod
+    def resolve_data(parent, info):
+        # Legacy notifications may contain invitation secrets. The membership field
+        # supplies them only after email verification; notifications never need them.
+        if parent.type == TenantNotification.TENANT_INVITATION_CREATED.value and isinstance(parent.data, dict):
+            return {key: value for key, value in parent.data.items() if key != "token"}
+        return parent.data
 
     @staticmethod
     def resolve_issuer(parent, info):

@@ -2,12 +2,17 @@ import channels_graphql_ws
 from graphql import GraphQLError, OperationDefinitionNode, OperationType, parse
 
 from config.schema import schema as graphql_schema
+from common.graphql.security import sanitize_graphql_error
 
 
 class DefaultGraphqlWsConsumer(channels_graphql_ws.GraphqlWsConsumer):
     """Channels WebSocket consumer which provides GraphQL API."""
 
     schema = graphql_schema
+
+    @staticmethod
+    def _format_error(error):
+        return channels_graphql_ws.GraphqlWsConsumer._format_error(sanitize_graphql_error(error, request_error=True))
 
     async def on_operation(self, op_id, payload):
         """

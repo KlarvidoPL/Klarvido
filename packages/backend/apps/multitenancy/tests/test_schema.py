@@ -8,6 +8,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.notifications.models import Notification
 from ..constants import (
+    OWNER_ROLE_COLOR,
+    RoleColor,
     TenantType,
     TenantUserRole,
     ActionActorType,
@@ -1422,6 +1424,8 @@ class TestAcceptTenantInvitationMutation:
     def test_accept_invitation_by_invitee(
         self, mocker, graphene_client, user, tenant_factory, tenant_membership_factory
     ):
+        user.is_confirmed = True
+        user.save(update_fields=["is_confirmed"])
         check_token = mocker.patch(
             "apps.multitenancy.tokens.TenantInvitationTokenGenerator.check_token", return_value=True
         )
@@ -1602,7 +1606,7 @@ class TestAllTenantsQuery:
             }
         }
         """
-        user = user_factory(has_avatar=True)
+        user = user_factory(has_avatar=True, is_confirmed=True)
         tenant_factory.create_batch(10)
         make_token = mocker.patch(
             "apps.multitenancy.tokens.TenantInvitationTokenGenerator.make_token", return_value="token"
@@ -1836,7 +1840,7 @@ class TestTenantQuery:
           }
         }
         """
-        user = user_factory(has_avatar=True)
+        user = user_factory(has_avatar=True, is_confirmed=True)
         tenant_factory.create_batch(10)
         make_token = mocker.patch(
             "apps.multitenancy.tokens.TenantInvitationTokenGenerator.make_token", return_value="token"
@@ -2240,3 +2244,95 @@ class TestDeleteOrganizationRoleMutationReplacementRoleSecurity:
         assert TenantMembershipRole.objects.filter(
             membership=target_membership, role__system_role_type=SystemRoleType.OWNER
         ).exists()
+
+
+class TestCustomRoleColorRestriction:
+    """The Owner role's color is reserved: custom roles must not be created or recolored to it, so the
+    color stays a reliable marker for the owner. Editing a role that already has it (legacy data) is still allowed."""
+
+    CREATE_MUTATION = '''
+        mutation CreateOrganizationRole($tenantId: ID!, $name: String!, $permissionIds: [ID]!) {
+          createOrganizationRole(tenantId: $tenantId, name: $name, color: PURPLE, permissionIds: $permissionIds) {
+            ok
+            role { id color }
+          }
+        }
+    '''
+
+    UPDATE_MUTATION = '''
+        mutation UpdateOrganizationRole($id: ID!, $tenantId: ID!, $name: String, $color: RoleColor) {
+          updateOrganizationRole(id: $id, tenantId: $tenantId, name: $name, color: $color) {
+            ok
+            role { id color }
+          }
+        }
+    '''
+
+    def test_owner_cannot_create_custom_role_with_reserved_color(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER, is_accepted=True)
+
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = graphene_client.mutate(
+            self.CREATE_MUTATION,
+            variable_values={
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Purple Role",
+                "permissionIds": [],
+            },
+        )
+
+        assert "This color is reserved for the Owner role." in str(executed["errors"])
+        assert not OrganizationRole.objects.filter(tenant=tenant, name="Purple Role").exists()
+
+    def test_owner_cannot_recolor_custom_role_to_reserved_color(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER, is_accepted=True)
+        custom_role = OrganizationRole.objects.create(
+            tenant=tenant, name="Custom", description="", color=RoleColor.BLUE
+        )
+
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = graphene_client.mutate(
+            self.UPDATE_MUTATION,
+            variable_values={
+                "id": to_global_id("OrganizationRoleType", custom_role.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "color": OWNER_ROLE_COLOR.name,
+            },
+        )
+
+        assert "This color is reserved for the Owner role." in str(executed["errors"])
+        custom_role.refresh_from_db()
+        assert custom_role.color == RoleColor.BLUE
+
+    def test_owner_can_edit_legacy_custom_role_that_already_has_reserved_color(
+        self, graphene_client, user, tenant_factory, tenant_membership_factory
+    ):
+        tenant = tenant_factory(name="Tenant 1", type=TenantType.ORGANIZATION)
+        tenant_membership_factory(tenant=tenant, user=user, role=TenantUserRole.OWNER, is_accepted=True)
+        legacy_role = OrganizationRole.objects.create(
+            tenant=tenant, name="Legacy", description="", color=OWNER_ROLE_COLOR
+        )
+
+        graphene_client.force_authenticate(user)
+        graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
+        executed = graphene_client.mutate(
+            self.UPDATE_MUTATION,
+            variable_values={
+                "id": to_global_id("OrganizationRoleType", legacy_role.id),
+                "tenantId": to_global_id("TenantType", tenant.id),
+                "name": "Renamed",
+                "color": OWNER_ROLE_COLOR.name,
+            },
+        )
+
+        assert "errors" not in executed, executed.get("errors")
+        legacy_role.refresh_from_db()
+        assert legacy_role.name == "Renamed"

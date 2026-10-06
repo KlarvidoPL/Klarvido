@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "Error"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Asignación de grupos aplicada"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "Configuración de IdP activada"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "Configuración de IdP creada"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "Configuración de IdP desactivada"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "Configuración de IdP eliminada"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "Configuración de IdP actualizada"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "Token de KSeF eliminado"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "Token de KSeF guardado"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "Token de KSeF comprobado"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "Grupo SCIM creado"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "Grupo SCIM eliminado"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "Grupo SCIM actualizado"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "Usuario SCIM creado"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "Usuario SCIM eliminado"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "Usuario SCIM actualizado"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "Inicio de sesión omitiendo SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "Error de inicio de sesión SSO"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "Inicio de sesión SSO iniciado"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "Inicio de sesión SSO correcto"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "Cierre de sesión SSO"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "Usuario aprovisionado mediante JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "Usuario actualizado mediante SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Fallido"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "Dirección IP"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Rechazado por KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Aún no verificado"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Verificado"
+  },
   "Audit / Last page": {
     "defaultMessage": "Última página"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Selecciona fecha de inicio"
   },
+  "Audit / Status": {
+    "defaultMessage": "Estado"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Fallido"
   },
   "Audit / Status Success": {
     "defaultMessage": "Correcto"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Acción"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "Nuevo token guardado"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Token eliminado"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Token existente reemplazado"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token que termina en"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Nombre del token en KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Filtrar por correo electrónico..."
@@ -835,6 +931,15 @@
   },
   "Auth / Login / signup prompt": {
     "defaultMessage": "¿No tienes una cuenta?"
+  },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Demasiados códigos incorrectos. Vuelve a intentarlo en 15 minutos."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "El código de verificación no es válido."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Tu sesión de inicio de sesión ha caducado. Vuelve a iniciar sesión."
   },
   "Auth / Passkey / button": {
     "defaultMessage": "Iniciar sesión con Passkey"
@@ -1378,6 +1483,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "Configuración de copias de seguridad actualizada correctamente"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Ir a hoy"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Ahora"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Hoy"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Plan activo:"
@@ -4471,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Rechazar"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Verifica tu dirección de correo electrónico antes de aceptar esta invitación."
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "Esta invitación ya no es válida."

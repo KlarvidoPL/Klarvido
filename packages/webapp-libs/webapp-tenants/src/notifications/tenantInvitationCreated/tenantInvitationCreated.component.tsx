@@ -28,10 +28,11 @@ export const TenantInvitationCreated = ({
       (tenant) => getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.id === id
     );
 
-    const token = getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationToken;
-    if (!token) return;
+    const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+    if (!membership) return;
 
-    navigate(generateLocalePath(RoutesConfig.tenantInvitation, { token }));
+    const path = generateLocalePath(RoutesConfig.tenantInvitation, { token: membership.invitationToken || 'pending' });
+    navigate(membership.invitationToken ? path : `${path}?membershipId=${encodeURIComponent(membership.id)}`);
   };
 
   return (

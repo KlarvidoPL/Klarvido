@@ -54,29 +54,51 @@ describe('ValidateOtpForm: Component', () => {
     expect(trackEvent).toHaveBeenCalledWith('auth', 'otp-validate');
   });
 
-  it('should display error if token is invalid', async () => {
+  it.each(['Verification token is invalid', 'Too many incorrect codes. Try again in 15 minutes.'])(
+    'should display OTP error: %s',
+    async (errorMessage) => {
+      const token = '111111';
+      // Remove data field so composeMockedQueryResult uses error field instead of result.errors
+      const requestMock = composeMockedQueryResult(validateOtpMutation, {
+        variables: { input: { otpToken: token } },
+        data: {},
+        errors: [new GraphQLError(errorMessage)],
+      });
+
+      render(<Component />, { apolloMocks: append(requestMock) });
+
+      const input = await screen.findByPlaceholderText(/000000/i);
+      const submitButton = screen.getByRole('button', { name: /verify code/i });
+
+      await userEvent.type(input, token);
+      await userEvent.click(submitButton);
+
+      // Wait for error to be processed and displayed
+      expect(
+        await screen.findByText(
+          errorMessage === 'Verification token is invalid' ? 'The verification code is invalid.' : errorMessage,
+          {},
+          { timeout: 3000 }
+        )
+      ).toBeInTheDocument();
+    }
+  );
+  it('should translate an expired login challenge without exposing cookie details', async () => {
     const token = '111111';
-    const errorMessage = 'Verification token is invalid';
-    // Remove data field so composeMockedQueryResult uses error field instead of result.errors
+    const technicalMessage = "No valid token found in cookie 'otp_auth_token'";
     const requestMock = composeMockedQueryResult(validateOtpMutation, {
       variables: { input: { otpToken: token } },
       data: {},
       errors: [
-        new GraphQLError('GraphQlValidationError', {
-          extensions: { token: [{ message: errorMessage, code: errorMessage }] },
+        new GraphQLError(technicalMessage, {
+          extensions: { non_field_errors: [{ message: technicalMessage, code: 'invalid_token' }] },
         }),
       ],
     });
-
     render(<Component />, { apolloMocks: append(requestMock) });
-
-    const input = await screen.findByPlaceholderText(/000000/i);
-    const submitButton = screen.getByRole('button', { name: /verify code/i });
-
-    await userEvent.type(input, token);
-    await userEvent.click(submitButton);
-
-    // Wait for error to be processed and displayed
-    expect(await screen.findByText(errorMessage, {}, { timeout: 3000 })).toBeInTheDocument();
+    await userEvent.type(await screen.findByPlaceholderText(/000000/i), token);
+    await userEvent.click(screen.getByRole('button', { name: /verify code/i }));
+    expect(await screen.findByText('Your sign-in session has expired. Please sign in again.')).toBeInTheDocument();
+    expect(screen.queryByText(technicalMessage)).not.toBeInTheDocument();
   });
 });

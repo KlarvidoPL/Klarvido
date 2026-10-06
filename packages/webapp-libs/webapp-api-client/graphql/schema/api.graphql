@@ -62,7 +62,6 @@ type Query {
   ssoConnection(tenantId: ID!, id: ID): SSOConnectionType
   scimTokens(tenantId: ID!, before: String, after: String, first: Int, last: Int): SCIMTokenConnection
   ssoAuditLogs(tenantId: ID!, eventType: String, userEmail: String, success: Boolean, startDate: String, endDate: String, search: String, before: String, after: String, first: Int, last: Int): SSOAuditLogConnection
-  tenantPasskeys(tenantId: ID!, search: String): [TenantPasskeyType]
   myPasskeys(before: String, after: String, first: Int, last: Int): PasskeyConnection
   mySessions(before: String, after: String, first: Int, last: Int): SSOSessionConnection
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
@@ -490,19 +489,6 @@ type SSOAuditLogType implements Node {
   errorMessage: String!
   userEmail: String
   connectionName: String
-}
-type TenantPasskeyType {
-  id: ID
-  name: String
-  authenticatorType: String
-  transports: GenericScalar
-  isActive: Boolean
-  lastUsedAt: DateTime
-  useCount: Int
-  deviceType: String
-  createdAt: DateTime
-  userEmail: String
-  userName: String
 }
 type PasskeyConnection {
   "Pagination data for this connection."
@@ -1425,8 +1411,6 @@ type ApiMutation {
   createScimToken(input: CreateSCIMTokenMutationInput!): CreateSCIMTokenMutationPayload
   "Revoke a SCIM token. Requires tenantId for tenant context."
   revokeScimToken(id: ID!, tenantId: ID!): RevokeSCIMTokenMutation
-  "Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context."
-  deleteTenantPasskey(id: ID!, tenantId: ID!): DeleteTenantPasskeyMutation
   "Revoke an SSO session."
   revokeSession(reason: String, sessionId: String!): RevokeSessionMutation
   "Revoke all SSO sessions for the current user except the current session."
@@ -1756,10 +1740,6 @@ type CreateSCIMTokenMutationPayload {
 }
 "Revoke a SCIM token. Requires tenantId for tenant context."
 type RevokeSCIMTokenMutation {
-  ok: Boolean
-}
-"Delete a passkey as tenant admin (for any tenant member). Requires tenantId for tenant context."
-type DeleteTenantPasskeyMutation {
   ok: Boolean
 }
 "Revoke an SSO session."
@@ -2357,6 +2337,12 @@ enum SsoSSOAuditLogEventTypeChoices {
   PASSKEY_CLONE_DETECTED
   "Security Anomaly Detected"
   SECURITY_ANOMALY
+  "KSeF Token Saved"
+  KSEF_TOKEN_SAVED
+  "KSeF Token Tested"
+  KSEF_TOKEN_TESTED
+  "KSeF Token Deleted"
+  KSEF_TOKEN_DELETED
 }
 "An enumeration."
 enum MultitenancyActionLogActionTypeChoices {
@@ -3102,7 +3088,7 @@ input AcceptTenantInvitationMutationInput {
 input DeclineTenantInvitationMutationInput {
   id: String!
   "Token"
-  token: String!
+  token: String
   clientMutationId: String
 }
 input DeleteTenantMembershipMutationInput {

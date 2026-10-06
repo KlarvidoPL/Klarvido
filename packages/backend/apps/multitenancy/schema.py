@@ -4,7 +4,7 @@ import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
 from graphql_relay import to_global_id, from_global_id
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType, authorized_tenant
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db import close_old_connections
@@ -34,6 +34,7 @@ from .constants import (
     TenantUserRole,
     TenantType as ConstantsTenantType,
     ActionType,
+    OWNER_ROLE_COLOR,
     PermissionCategory,
     RoleColor,
     SystemRoleType,
@@ -208,7 +209,7 @@ class TenantMembershipType(DjangoObjectType):
     @staticmethod
     def resolve_invitation_token(parent, info):
         user = get_user_from_resolver(info)
-        if parent.user and user == parent.user and not parent.is_accepted:
+        if parent.user and user == parent.user and user.is_confirmed and not parent.is_accepted:
             return tenant_invitation_token.make_token(user.email, parent)
         return None
 
@@ -795,8 +796,8 @@ class UpdateTenantActionLoggingMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, tenant_id, enabled):
-        _, pk = from_global_id(tenant_id)
-        tenant = get_object_or_404(models.Tenant, pk=pk)
+        tenant = authorized_tenant(info, tenant_id, "org.settings.edit")
+        pk = tenant.pk
 
         # Get user from context
         user = getattr(info.context, "user", None) if info.context else None
@@ -883,8 +884,7 @@ class ExportActionLogsMutation(graphene.Mutation):
         to_datetime=None,
         search=None,
     ):
-        _, pk = from_global_id(tenant_id)
-        tenant = get_object_or_404(models.Tenant, pk=pk)
+        tenant = authorized_tenant(info, tenant_id, "security.logs.export")
         user = info.context.user
 
         # Build filters dict for storage
@@ -952,6 +952,9 @@ class CreateOrganizationRoleMutation(graphene.Mutation):
         # Check for duplicate name
         if models.OrganizationRole.objects.filter(tenant=tenant, name=name).exists():
             raise exceptions.GraphQlValidationError(f"A role with the name '{name}' already exists.")
+
+        if color == OWNER_ROLE_COLOR:
+            raise exceptions.GraphQlValidationError("This color is reserved for the Owner role.")
 
         unavailable = get_permission_codes_unavailable_for_country(tenant.country)
         for perm_id in permission_ids:
@@ -1042,6 +1045,10 @@ class UpdateOrganizationRoleMutation(graphene.Mutation):
         # Cannot modify OWNER role permissions
         if role.is_owner_role:
             raise exceptions.GraphQlValidationError("Cannot modify the Owner role.")
+
+        # Only reject a change to the reserved colour, so a role that already has it can still be edited.
+        if color is not None and color != role.color and color == OWNER_ROLE_COLOR:
+            raise exceptions.GraphQlValidationError("This color is reserved for the Owner role.")
 
         # SECURITY CHECK 2: If adding permissions, verify user has those permissions
         if permission_ids is not None:

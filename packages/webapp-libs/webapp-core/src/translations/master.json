@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "Error"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Group Mapping Applied"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "IdP Configuration Activated"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "IdP Configuration Created"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "IdP Configuration Deactivated"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "IdP Configuration Deleted"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "IdP Configuration Updated"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "KSeF token removed"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "KSeF token saved"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "KSeF token tested"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "SCIM Group Created"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "SCIM Group Deleted"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "SCIM Group Updated"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "SCIM User Created"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "SCIM User Deleted"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "SCIM User Updated"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "SSO Enforce Bypass Login"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO Login Failed"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "SSO Login Initiated"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO Login Success"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO Logout"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "User Provisioned via JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "User Updated via SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Failed"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP Address"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Rejected by KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Not verified yet"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Verified"
+  },
   "Audit / Last page": {
     "defaultMessage": "Last page"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Select start date"
   },
+  "Audit / Status": {
+    "defaultMessage": "Status"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Failed"
   },
   "Audit / Status Success": {
     "defaultMessage": "Success"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Action"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "New token saved"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Token removed"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Replaced existing token"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token ending in"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Token name in KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Filter by email..."
@@ -835,6 +931,15 @@
   },
   "Auth / Login / signup prompt": {
     "defaultMessage": "Don't have an account?"
+  },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Too many incorrect codes. Try again in 15 minutes."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "The verification code is invalid."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Your sign-in session has expired. Please sign in again."
   },
   "Auth / Passkey / button": {
     "defaultMessage": "Sign in with Passkey"
@@ -1378,6 +1483,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "Backup settings updated successfully"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Jump to today"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Now"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Today"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Active plan:"
@@ -3428,24 +3542,6 @@
   "Passkeys / Use count label": {
     "defaultMessage": "Times used"
   },
-  "Passkeys Card / Add Another Button": {
-    "defaultMessage": "Add another passkey"
-  },
-  "Passkeys Card / Add My Passkey Button": {
-    "defaultMessage": "Add my passkey"
-  },
-  "Passkeys Card / Delete Error": {
-    "defaultMessage": "Failed to delete passkey. Please try again."
-  },
-  "Passkeys Card / Delete Success": {
-    "defaultMessage": "Passkey deleted successfully."
-  },
-  "Passkeys Card / Search Placeholder": {
-    "defaultMessage": "Search by user name or email..."
-  },
-  "Passkeys Card / Tenant Required": {
-    "defaultMessage": "Tenant context is required to delete passkeys."
-  },
   "Password Requirements / Min length": {
     "defaultMessage": "8+ characters"
   },
@@ -3680,6 +3776,9 @@
   "Roles / Error / Role assigned to members": {
     "defaultMessage": "This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / Role name exists": {
     "defaultMessage": "A role named \"{name}\" already exists. Choose a different name."
   },
@@ -3847,12 +3946,6 @@
   },
   "Roles / Permission / security.logs.view / Name": {
     "defaultMessage": "View Activity Logs"
-  },
-  "Roles / Permission / security.passkeys.manage / Description": {
-    "defaultMessage": "View and manage organization passkey policies"
-  },
-  "Roles / Permission / security.passkeys.manage / Name": {
-    "defaultMessage": "Manage Passkeys"
   },
   "Roles / Permission / security.sso.manage / Description": {
     "defaultMessage": "Configure Single Sign-On connections and SCIM provisioning"
@@ -4670,6 +4763,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Decline"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Verify your email address before accepting this invitation."
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "This invitation is no longer valid."
   },
@@ -4724,9 +4820,6 @@
   "Tenant Membersip Entry / Yes": {
     "defaultMessage": "Yes"
   },
-  "Tenant Security Settings / Add Passkey Button": {
-    "defaultMessage": "Add Passkey"
-  },
   "Tenant Security Settings / Add SCIM Token Button": {
     "defaultMessage": "Add Token"
   },
@@ -4737,7 +4830,7 @@
     "defaultMessage": "Configure SSO"
   },
   "Tenant Security Settings / Audit Description": {
-    "defaultMessage": "View recent security events for your organization"
+    "defaultMessage": "View recent SSO, SCIM and KSeF events for your organization"
   },
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Security Audit Log"
@@ -4755,7 +4848,7 @@
     "defaultMessage": "No security events yet"
   },
   "Tenant Security Settings / No Audit Events Hint": {
-    "defaultMessage": "Security events like SSO logins, user provisioning, and configuration changes will appear here."
+    "defaultMessage": "SSO and SCIM events, such as SSO logins, user provisioning and configuration changes, and KSeF token changes, will appear here."
   },
   "Tenant Security Settings / No Filtered Audit Events": {
     "defaultMessage": "No events match your filters"
@@ -4763,35 +4856,11 @@
   "Tenant Security Settings / No Filtered Audit Events Hint": {
     "defaultMessage": "Try adjusting your filters or clearing them to see all events."
   },
-  "Tenant Security Settings / No Match Hint": {
-    "defaultMessage": "Try a different search term"
-  },
-  "Tenant Security Settings / No Passkeys": {
-    "defaultMessage": "No passkeys registered"
-  },
-  "Tenant Security Settings / No Passkeys Match": {
-    "defaultMessage": "No passkeys match your search"
-  },
   "Tenant Security Settings / No SCIM Available": {
     "defaultMessage": "Directory sync requires SSO"
   },
   "Tenant Security Settings / No SSO": {
     "defaultMessage": "No SSO connections configured"
-  },
-  "Tenant Security Settings / Passkey Admin Hint": {
-    "defaultMessage": "No users in your organization have registered passkeys yet"
-  },
-  "Tenant Security Settings / Passkey Hint": {
-    "defaultMessage": "Register a passkey for faster, more secure sign-in"
-  },
-  "Tenant Security Settings / Passkeys Admin Description": {
-    "defaultMessage": "Manage passkeys for all users in your organization"
-  },
-  "Tenant Security Settings / Passkeys Description": {
-    "defaultMessage": "Use biometrics or security keys for passwordless authentication"
-  },
-  "Tenant Security Settings / Passkeys Header": {
-    "defaultMessage": "Passkeys (WebAuthn)"
   },
   "Tenant Security Settings / SCIM Compatible IdPs": {
     "defaultMessage": "Compatible Identity Providers"

@@ -51,7 +51,6 @@ export const ADMIN_PERMISSIONS = [
   'members.remove',
   'security.view',
   'security.sso.manage',
-  'security.passkeys.manage',
   'billing.view',
   'billing.manage',
 ];

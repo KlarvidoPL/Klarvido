@@ -6,6 +6,7 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 from rest_framework import permissions
 from django.conf import settings
 
+from common.csrf import csrf_token
 from common.graphql.views import DRFAuthenticatedGraphQLView
 
 api_info = openapi.Info(title="Documentation", default_version="v1")
@@ -35,6 +36,7 @@ urlpatterns = [
         "api/",
         include(
             [
+                path("auth/csrf/", csrf_token, name="csrf_token"),
                 path("graphql/", DRFAuthenticatedGraphQLView.as_view(graphiql=settings.DEBUG)),
                 path("content/", include("apps.content.urls")),
                 path("demo/", include("apps.demo.urls")),

@@ -4,12 +4,14 @@ import * as React from 'react';
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { format, parse, parseISO, isValid, setHours, setMinutes, getHours, getMinutes, startOfDay } from 'date-fns';
 import { CalendarIcon, X, Clock } from 'lucide-react';
+import { useIntl } from 'react-intl';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../buttons';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { Calendar } from '../calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 
 export interface DatePickerProps {
   /** The selected date as ISO string (YYYY-MM-DD or YYYY-MM-DDTHH:mm) or Date object */
@@ -214,6 +216,8 @@ export function DatePicker({
   showTime = false,
   timeStep = 5,
 }: DatePickerProps) {
+  const intl = useIntl();
+  const dateLocale = useDateFnsLocale();
   const [open, setOpen] = useState(false);
   
   // Parse the value into a Date - memoized to prevent infinite loops
@@ -305,7 +309,7 @@ export function DatePicker({
   }, [onChange, showTime]);
 
   const displayText = selectedDate 
-    ? format(selectedDate, actualDisplayFormat) 
+    ? format(selectedDate, actualDisplayFormat, { locale: dateLocale }) 
     : actualPlaceholder;
 
   const currentHours = selectedDate ? getHours(selectedDate) : 9;
@@ -404,7 +408,9 @@ export function DatePicker({
             onClick={showTime ? handleNowClick : handleTodayClick}
             className="text-xs h-7"
           >
-            {showTime ? 'Now' : 'Today'}
+            {showTime
+              ? intl.formatMessage({ id: 'Calendar / Now button', defaultMessage: 'Now' })
+              : intl.formatMessage({ id: 'Calendar / Today button', defaultMessage: 'Today' })}
           </Button>
           <div className="flex items-center gap-2">
             {clearable && selectedDate && (

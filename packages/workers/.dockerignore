@@ -5,3 +5,15 @@ node_modules
 __pypackages__
 .venv
 .esbuild
+
+# Keep private environment files out of image layers and build caches.
+**/.env
+**/.env.*
+**/*.env
+**/*.env.*
+# Non-secret configuration used by builds, tests, and documentation.
+!**/.env.shared
+!**/.env.test
+!**/.test.env
+!**/.env*.example
+!**/*.env.example

@@ -7,6 +7,10 @@ import { render } from '../../../../../tests/utils/rendering';
 import { PasskeyLoginButton } from '../passkeyLoginButton.component';
 
 jest.mock('@sb/webapp-core/services/analytics');
+// Transport security is covered by the API-client tests; these tests isolate WebAuthn UI behavior.
+jest.mock('@sb/webapp-api-client/api/csrf', () => ({
+  csrfFetch: (...args: Parameters<typeof fetch>) => fetch(...args),
+}));
 
 const mockFetch = jest.fn();
 const mockCredentialsGet = jest.fn();

@@ -2,6 +2,7 @@ import json
 import logging
 
 import six
+from django.conf import settings
 from graphene_file_upload.django import FileUploadGraphQLView
 from graphene_file_upload.utils import place_files_in_operations
 from graphql import get_operation_ast, parse
@@ -13,6 +14,8 @@ from rest_framework.settings import api_settings
 from sentry_sdk import start_transaction, capture_exception
 
 from common.acl import policies
+from common.csrf import enforce_api_csrf
+from common.graphql.security import sanitize_graphql_error
 
 
 logger = logging.getLogger(__name__)
@@ -42,10 +45,11 @@ class DRFAuthenticatedGraphQLView(FileUploadGraphQLView):
 
     @staticmethod
     def format_error(error):
+        error = sanitize_graphql_error(error, request_error=True)
         if hasattr(error, "original_error"):
             if isinstance(error.original_error, APIException):
                 error.extensions = error.original_error.get_full_details()
-            else:
+            elif error.original_error is not None and settings.DEBUG:
                 capture_exception(error.original_error)
 
         if isinstance(error, GraphQLError):
@@ -73,6 +77,7 @@ class DRFAuthenticatedGraphQLView(FileUploadGraphQLView):
         @permission_classes((policies.AnyoneFullAccess,))
         @throttle_classes(throttle_cls)
         def view(request, *args, **kwargs):
+            enforce_api_csrf(request)
             return graphene_view(request, *args, **kwargs)
 
         return view
@@ -83,7 +88,8 @@ class DRFAuthenticatedGraphQLView(FileUploadGraphQLView):
         except Exception as e:
             return ExecutionResult(errors=[e])
 
-        operation_type = get_operation_ast(document, operation_name).operation.value if query else None
+        operation = get_operation_ast(document, operation_name)
+        operation_type = operation.operation.value if operation else "graphql"
 
         with start_transaction(op=operation_type, name=operation_name or data.get("id")):
             return super().execute_graphql_request(request, data, query, variables, operation_name, show_graphiql)

@@ -159,7 +159,7 @@ class TenantInvitationActionSerializer(serializers.Serializer):
         if not membership:
             raise exceptions.NotFound("Invitation not found.")
 
-        if not tenant_invitation_token.check_token(user.email, attrs["token"], membership):
+        if "token" in attrs and not tenant_invitation_token.check_token(user.email, attrs["token"], membership):
             raise exceptions.ValidationError(_("Malformed tenant invitation token"))
 
         return attrs
@@ -169,6 +169,12 @@ class AcceptTenantInvitationSerializer(TenantInvitationActionSerializer):
     """
     Updates not accepted invitation membership object to be accepted one.
     """
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not self.context["request"].user.is_confirmed:
+            raise exceptions.ValidationError(_("Confirm your email before accepting an organization invitation."))
+        return attrs
 
     def create(self, validated_data):
         membership_id = validated_data["id"]
@@ -188,6 +194,9 @@ class DeclineTenantInvitationSerializer(TenantInvitationActionSerializer):
     """
     Removes membership object if user decides to decline invitation.
     """
+
+    # Declining grants no access; authenticated ownership of a pending invitation is sufficient.
+    token = serializers.CharField(write_only=True, required=False, help_text=_("Token"))
 
     def create(self, validated_data):
         membership_id = validated_data["id"]

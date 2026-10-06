@@ -1,6 +1,10 @@
 import { TenantType } from '@sb/webapp-api-client/constants';
 import { CommonQueryTenantItemFragmentFragment, TenantUserRole, getFragmentData } from '@sb/webapp-api-client/graphql';
-import { commonQueryCurrentUserFragment, commonQueryMembershipFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
+import {
+  commonQueryCurrentUserFragment,
+  commonQueryMembershipFragment,
+  useCommonQuery,
+} from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
 import {
   DropdownMenu,
@@ -39,17 +43,14 @@ export const TenantSwitch = () => {
 
   const tenantsGrouped = groupBy(prop<string>('type'), tenants);
   const personalTenant = head(tenantsGrouped[TenantType.PERSONAL] ?? []);
-  const organizationTenants = groupBy(
-    (tenant) => {
-      const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
-      // A superuser sees every organization via an owner-equivalent access bypass that
-      // creates no real membership row - `membership` is then null, not a pending
-      // invitation, so it must not be bucketed with genuine unaccepted invitations.
-      if (!membership) return isSuperuser ? 'organizations' : 'invitations';
-      return membership.invitationAccepted ? 'organizations' : 'invitations';
-    },
-    tenantsGrouped[TenantType.ORGANIZATION] ?? []
-  );
+  const organizationTenants = groupBy((tenant) => {
+    const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+    // A superuser sees every organization via an owner-equivalent access bypass that
+    // creates no real membership row - `membership` is then null, not a pending
+    // invitation, so it must not be bucketed with genuine unaccepted invitations.
+    if (!membership) return isSuperuser ? 'organizations' : 'invitations';
+    return membership.invitationAccepted ? 'organizations' : 'invitations';
+  }, tenantsGrouped[TenantType.ORGANIZATION] ?? []);
 
   const handleTenantChange = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
     if (!tenant) return;
@@ -57,9 +58,10 @@ export const TenantSwitch = () => {
   };
 
   const handleInvitationClick = (tenant?: CommonQueryTenantItemFragmentFragment | null) => () => {
-    const token = getFragmentData(commonQueryMembershipFragment, tenant?.membership)?.invitationToken;
-    if (!token) return;
-    navigate(generateLocalePath(RoutesConfig.tenantInvitation, { token }));
+    const membership = getFragmentData(commonQueryMembershipFragment, tenant?.membership);
+    if (!membership) return;
+    const path = generateLocalePath(RoutesConfig.tenantInvitation, { token: membership.invitationToken || 'pending' });
+    navigate(membership.invitationToken ? path : `${path}?membershipId=${encodeURIComponent(membership.id)}`);
   };
 
   const handleNewTenantClick = () => {
@@ -109,9 +111,7 @@ export const TenantSwitch = () => {
           <Button data-testid="tenant-switch-trigger-btn" variant="outline" className="relative overflow-hidden">
             <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-full">{currentTenant?.name}</div>
             <ChevronDown className="ml-2 mr--2" />
-            {hasPendingInvitations && (
-              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
-            )}
+            {hasPendingInvitations && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>

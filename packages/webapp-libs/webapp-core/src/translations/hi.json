@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "त्रुटि"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "समूह मैपिंग लागू की गई"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन सक्रिय की गई"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन बनाई गई"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन निष्क्रिय की गई"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन हटाई गई"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "IdP कॉन्फ़िगरेशन अपडेट की गई"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "KSeF टोकन हटाया गया"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "KSeF टोकन सहेजा गया"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "KSeF टोकन की जाँच की गई"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "SCIM समूह बनाया गया"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "SCIM समूह हटाया गया"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "SCIM समूह अपडेट किया गया"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "SCIM उपयोगकर्ता बनाया गया"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "SCIM उपयोगकर्ता हटाया गया"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "SCIM उपयोगकर्ता अपडेट किया गया"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "SSO को छोड़कर लॉगिन"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "SSO लॉगिन विफल"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "SSO लॉगिन शुरू किया गया"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "SSO लॉगिन सफल"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "SSO लॉगआउट"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "JIT के माध्यम से उपयोगकर्ता बनाया गया"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "SSO के माध्यम से उपयोगकर्ता अपडेट किया गया"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "असफल"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "IP Address"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "KSeF द्वारा अस्वीकृत"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "अभी सत्यापित नहीं"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "सत्यापित"
+  },
   "Audit / Last page": {
     "defaultMessage": "आखिरी पेज"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "प्रारंभ तिथि चुनें"
   },
+  "Audit / Status": {
+    "defaultMessage": "स्थिति"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "असफल"
   },
   "Audit / Status Success": {
     "defaultMessage": "सफल"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "कार्रवाई"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "नया टोकन सहेजा गया"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "टोकन हटाया गया"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "मौजूदा टोकन बदला गया"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "टोकन के अंतिम अंक"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "KSeF में टोकन का नाम"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "ईमेल से फ़िल्टर करें..."
@@ -835,6 +931,15 @@
   },
   "Auth / Login / signup prompt": {
     "defaultMessage": "क्या आपका खाता नहीं है?"
+  },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "बहुत अधिक गलत कोड। 15 मिनट बाद फिर से कोशिश करें।"
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "सत्यापन कोड अमान्य है।"
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "आपका साइन-इन सत्र समाप्त हो गया है। कृपया फिर से साइन इन करें।"
   },
   "Auth / Passkey / button": {
     "defaultMessage": "Passkey से साइन इन करें"
@@ -1378,6 +1483,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "बैकअप सेटिंग्स सफलतापूर्वक अपडेट की गईं"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "आज पर जाएँ"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "अभी"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "आज"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "सक्रिय प्लान:"
@@ -4471,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "अस्वीकार करें"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "यह आमंत्रण स्वीकार करने से पहले अपना ईमेल पता सत्यापित करें।"
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "यह निमंत्रण अब मान्य नहीं है।"

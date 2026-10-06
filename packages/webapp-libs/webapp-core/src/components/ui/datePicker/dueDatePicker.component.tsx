@@ -6,6 +6,7 @@ import { format, addDays, parseISO, isValid } from 'date-fns';
 import { useIntl } from 'react-intl';
 
 import { cn } from '../../../lib/utils';
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 import { DatePicker, DatePickerProps } from './datePicker.component';
 
 export interface DueDatePickerProps extends Omit<DatePickerProps, 'showTime' | 'timeStep'> {
@@ -46,6 +47,7 @@ export function DueDatePicker({
   className,
   ...datePickerProps
 }: DueDatePickerProps) {
+  const dateLocale = useDateFnsLocale();
   const intl = useIntl();
   const parsedReferenceDate = useMemo(() => parseValue(referenceDate), [referenceDate]);
 
@@ -95,7 +97,7 @@ export function DueDatePicker({
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border-border'
               )}
-              title={format(option.date, 'dd MMM yyyy')}
+              title={format(option.date, 'dd MMM yyyy', { locale: dateLocale })}
             >
               +{option.label}
             </button>

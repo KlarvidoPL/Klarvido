@@ -3,6 +3,7 @@ import os
 import re
 
 import pytest
+from PIL import Image
 from common.acl.helpers import CommonGroups
 from config import settings
 from graphene_file_upload.django.testing import file_graphql_query
@@ -324,6 +325,7 @@ class TestCurrentUserQuery:
             }
         '''
         user = user_factory(
+            is_confirmed=True,
             has_avatar=True,
             email="test@example.com",
             profile__first_name="Grzegorz",
@@ -386,9 +388,14 @@ class TestUpdateCurrentUserMutation:
             'avatar': None,
         }
 
-    def test_update_avatar(self, api_client, user_factory, image_factory):
+    @pytest.mark.parametrize(
+        ('extension', 'image_format'),
+        [('jpg', 'JPEG'), ('jpeg', 'JPEG'), ('png', 'PNG'), ('gif', 'GIF'), ('webp', 'WEBP')],
+    )
+    def test_update_avatar(self, api_client, user_factory, image_factory, extension, image_format):
         user = user_factory(profile__first_name="FIRSTNAME", profile__last_name="LASTNAME")
-        avatar_file = image_factory(name="avatar_new.png", params={"width": 1})
+        file_name = f"avatar_new.{extension}"
+        avatar_file = image_factory(name=file_name, params={"width": 512, "height": 256, "format": image_format})
         query = '''
             mutation($input: UpdateCurrentUserMutationInput!)  {
               updateCurrentUser(input: $input) {
@@ -416,7 +423,11 @@ class TestUpdateCurrentUserMutation:
         assert "errors" not in executed
         response_file_name = os.path.split(executed["data"]["updateCurrentUser"]["userProfile"]["user"]["avatar"])[1]
 
-        assert user_file_name == response_file_name == "avatar_new.png"
+        assert user_file_name == response_file_name == file_name
+        with user.profile.avatar.thumbnail.open('rb') as thumbnail, Image.open(thumbnail) as image:
+            image.load()
+            assert image.format == image_format
+            assert image.size == (128, 64)
 
     def test_not_authenticated(self, graphene_client):
         query = '''

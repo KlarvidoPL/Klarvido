@@ -6,7 +6,7 @@ response text), which the frontend maps to translated messages.
 """
 
 import graphene
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from rest_framework.exceptions import PermissionDenied
 
 from common.acl.policies import IsTenantMemberAccess

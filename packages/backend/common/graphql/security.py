@@ -5,6 +5,15 @@ This module provides security-related middleware for GraphQL operations.
 """
 
 import logging
+from inspect import isawaitable
+
+from django.core.exceptions import PermissionDenied as DjangoPermissionDenied, ValidationError as DjangoValidationError
+from django.http import Http404
+from promise import Promise
+from rest_framework.exceptions import APIException
+from sentry_sdk import capture_exception
+
+from common.exceptions import DomainException
 
 from django.conf import settings
 from graphql.error import GraphQLError
@@ -65,102 +74,75 @@ class DisableIntrospectionMiddleware:
         return next(root, info, **args)
 
 
-class SanitizeErrorsMiddleware:
-    """
-    Middleware to sanitize error messages in production.
+GENERIC_ERROR = "An error occurred while processing your request."
+SAFE_GRAPHQL_MESSAGES = frozenset(
+    {
+        GENERIC_ERROR,
+        "permission_denied",
+        "You do not have permission to perform this action.",
+        "You don't have permission to access this resource",
+        "Permission denied",
+        "Permission denied. Admin access required.",
+        "Authentication required for notifications subscription",
+        "Invalid translations format. Expected JSON object.",
+        "Version not found",
+        "Invalid GraphQL document",
+        "Only subscriptions are allowed over WebSocket; send queries and mutations over HTTP",
+        DisableIntrospectionMiddleware.INTROSPECTION_ERROR,
+    }
+)
 
-    SECURITY: In production, detailed error messages can leak sensitive
-    information about the application's internals. This middleware ensures
-    that only safe error messages are returned to clients.
 
-    In DEBUG mode, full error details are preserved for development.
-
-    Usage:
-        Add to GRAPHENE["MIDDLEWARE"] in settings.py:
-        GRAPHENE = {
-            "MIDDLEWARE": [
-                "common.graphql.security.SanitizeErrorsMiddleware",
-                ...
-            ],
-        }
-    """
-
-    GENERIC_ERROR = "An error occurred while processing your request."
-
-    # Error types that are safe to expose to users
-    SAFE_ERROR_TYPES = (
-        "ValidationError",
-        "GraphQlValidationError",
-        "PermissionDenied",
-        "AuthenticationFailed",
-        "NotAuthenticated",
-        "NotFound",
-        "Http404",
+def sanitize_graphql_error(error, *, request_error=False):
+    """Allow intentional client errors; never trust exception names or message prefixes."""
+    if settings.DEBUG:
+        return error
+    original = getattr(error, "original_error", None)
+    cause = original or error
+    # Inspect the cause, rather than trusting a wrapper's potentially misleading message.
+    while getattr(cause, "original_error", None) is not None:
+        cause = cause.original_error
+    safe = isinstance(cause, (DomainException, DjangoValidationError, DjangoPermissionDenied, Http404))
+    safe = safe or (isinstance(cause, APIException) and cause.status_code < 500)
+    if safe:
+        return error
+    if isinstance(cause, GraphQLError):
+        if cause.message in SAFE_GRAPHQL_MESSAGES:
+            return error
+        # Parsing, schema-validation and variable-coercion errors have no resolver cause.
+        if request_error and getattr(error, "path", None) is None:
+            return error
+    capture_exception(cause)
+    return GraphQLError(
+        GENERIC_ERROR,
+        nodes=getattr(error, "nodes", None),
+        path=getattr(error, "path", None),
+        extensions={"code": "internal_server_error"},
     )
 
+
+class SanitizeErrorsMiddleware:
+    """Protect resolver failures, including awaitables and legacy Promise resolvers."""
+
+    GENERIC_ERROR = GENERIC_ERROR
+
     def on_error(self, error):
-        """
-        Handle errors by sanitizing messages in production.
-
-        Args:
-            error: The exception that occurred
-
-        Returns:
-            The original error (in debug) or re-raises with sanitized message
-        """
-        # In DEBUG mode, preserve full error details
-        if settings.DEBUG:
-            raise error
-
-        # Log the actual error before sanitizing (for debugging production issues)
-        error_type = type(error).__name__
-        original_error = getattr(error, "original_error", None)
-        original_type = type(original_error).__name__ if original_error else None
-
-        logger.error(
-            f"GraphQL error being sanitized: {error_type}: {error}. Original error: {original_type}: {original_error}"
-        )
-
-        # Check if this is a "safe" error type that can be exposed
-        if hasattr(error, "original_error"):
-            if original_type in self.SAFE_ERROR_TYPES:
-                raise error
-        elif error_type in self.SAFE_ERROR_TYPES:
-            raise error
-
-        # For GraphQLError, check if it has a safe message
-        if isinstance(error, GraphQLError):
-            # Check if the error message starts with known safe prefixes
-            safe_prefixes = (
-                "You don't have permission",
-                "Authentication required",
-                "Not found",
-                "Validation error",
-                "Invalid",
-                "permission_denied",
-            )
-            if error.message and any(error.message.lower().startswith(p.lower()) for p in safe_prefixes):
-                raise error
-
-        # For unknown errors, return generic message
-        raise GraphQLError(self.GENERIC_ERROR)
+        raise sanitize_graphql_error(error)
 
     def resolve(self, next, root, info, **args):
-        """
-        Wrap the resolver to catch and sanitize errors.
+        try:
+            result = next(root, info, **args)
+        except Exception as error:
+            self.on_error(error)
+        if isinstance(result, Promise):
+            return result.catch(self.on_error)
+        if isawaitable(result):
 
-        Args:
-            next: The next resolver in the middleware chain
-            root: The root value
-            info: GraphQL ResolveInfo object
-            **args: Additional arguments
+            async def await_result():
+                try:
+                    return await result
+                except Exception as error:
+                    self.on_error(error)
 
-        Returns:
-            The result of the next resolver
-
-        Raises:
-            GraphQLError: With sanitized message in production
-        """
-        # TEMPORARILY DISABLED - causing login issues
-        # TODO: Fix promise error handling before re-enabling
-        return next(root, info, **args)
+            return await_result()
+        return result

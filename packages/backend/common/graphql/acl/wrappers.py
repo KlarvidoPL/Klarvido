@@ -1,5 +1,4 @@
 import functools
-import threading
 from typing import Type, Callable
 
 import graphene
@@ -10,69 +9,71 @@ from rest_framework.request import Request
 from . import types
 
 PERMISSION_DENIED_MESSAGE = "permission_denied"
-__wrapped_fns = threading.local()
-__wrapped_field_names = threading.local()
 
 
 def check_permissions(perms: types.PermissionsClasses, request: Request | dict, root):
-    # WebSocket (channels) requests have no DRF request to evaluate permissions against. That's only safe because the
-    # WebSocket consumer (apps/websockets/consumers.py) refuses everything but subscriptions - queries and mutations
-    # must go over HTTP, where these checks run.
+    # Only subscriptions are accepted by the WebSocket consumer.
     if hasattr(request, "channels_scope"):
         return
-
     for permission_class in perms:
-        permission = permission_class()
-        if not permission.has_permission(request=request, view=root):
+        if not permission_class().has_permission(request=request, view=root):
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
 
 def wraps_resolver_function(fn: Callable, perms: types.PermissionsClasses, node_resolver: bool = False) -> Callable:
-    if not hasattr(__wrapped_fns, "value"):
-        __wrapped_fns.value = set()
-
-    # Avoid wrapping function twice
-    if fn in __wrapped_fns.value:
-        return fn
+    previous = getattr(fn, "_graphql_permissions", ())
+    combined = tuple(dict.fromkeys((*previous, *perms)))
+    original = getattr(fn, "_graphql_original_resolver", fn)
 
     if node_resolver:
 
-        @functools.wraps(fn)
+        @functools.wraps(original)
         def wrapped(only_type, root, info, id):
-            check_permissions(perms=perms, request=info.context, root=root)
-            return fn(only_type, root, info, id)
+            check_permissions(combined, info.context, root)
+            return original(only_type, root, info, id)
 
     else:
 
-        @functools.wraps(fn)
+        @functools.wraps(original)
         def wrapped(root, info, *args, **kwargs):
-            check_permissions(perms=perms, request=info.context, root=root)
-            return fn(root, info, *args, **kwargs)
+            check_permissions(combined, info.context, root)
+            return original(root, info, *args, **kwargs)
 
-    __wrapped_fns.value.add(wrapped)
+    wrapped._graphql_permissions = combined
+    wrapped._graphql_original_resolver = original
     return wrapped
 
 
+class PermissionNodeField(NodeField):
+    """Keep permissions local to this field, rather than mutating the shared Node class."""
+
+    def wrap_resolve(self, parent_resolver):
+        return wraps_resolver_function(super().wrap_resolve(parent_resolver), self._graphql_permissions)
+
+
 def wraps_field(field: Field, perms: types.PermissionsClasses, parent_resolver=None) -> Field:
-    resolver = parent_resolver or field.resolver
-    if resolver:
-        field.resolver = wraps_resolver_function(fn=resolver, perms=perms)
-    elif type(field) == NodeField:
-        field.node_type.node_resolver = wraps_resolver_function(
-            fn=field.node_type.node_resolver, perms=perms, node_resolver=True
-        )
+    if isinstance(field, NodeField):
+        if not isinstance(field, PermissionNodeField) and not hasattr(field, "_graphql_permissions"):
+            original_wrap_resolve = field.wrap_resolve
+
+            def wrap_node_resolver(parent):
+                return wraps_resolver_function(original_wrap_resolve(parent), field._graphql_permissions)
+
+            field.wrap_resolve = wrap_node_resolver
+        field._graphql_permissions = tuple(dict.fromkeys((*getattr(field, "_graphql_permissions", ()), *perms)))
+    else:
+        resolver = field.resolver or parent_resolver
+        if resolver:
+            field.resolver = wraps_resolver_function(resolver, perms)
     return field
 
 
-def wraps_object_type(obj: Type[graphene.ObjectType], perms: types.PermissionsClasses) -> Type[graphene.ObjectType]:
-    if not hasattr(__wrapped_field_names, "value"):
-        __wrapped_field_names.value = set()
-
+def wraps_object_type(obj: Type[graphene.ObjectType], perms: types.PermissionsClasses, defaults=False):
     for field_name, field in obj._meta.fields.items():
         parent_resolver = getattr(obj, f"resolve_{field_name}", None)
-        # for overwriting mutation's fields
-        if field in __wrapped_field_names.value:
+        resolver = field.resolver or parent_resolver
+        # Global defaults are a fallback; explicit public permissions intentionally replace them.
+        if defaults and (getattr(resolver, "_graphql_permissions", ()) or getattr(field, "_graphql_permissions", ())):
             continue
-        wraps_field(field=field, perms=perms, parent_resolver=parent_resolver)
-        __wrapped_field_names.value.add(field)
+        wraps_field(field, perms, parent_resolver)
     return obj

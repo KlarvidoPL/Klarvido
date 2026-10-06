@@ -228,6 +228,7 @@ services:
       - VITE_WEB_APP_URL=https://${DOMAIN}
       - VITE_EMAIL_ASSETS_URL=https://${DOMAIN}/email-assets
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN},https://api.${DOMAIN}
+      # Also supplies the default WebSocket origin allowlist.
       - CORS_ALLOWED_ORIGINS=https://${DOMAIN}
       - PARENT_HOST=${DOMAIN}
       

@@ -578,6 +578,72 @@
   "Audit / Error": {
     "defaultMessage": "Błąd"
   },
+  "Audit / Event / Group Mapping Applied": {
+    "defaultMessage": "Zastosowano mapowanie grup"
+  },
+  "Audit / Event / IdP Configuration Activated": {
+    "defaultMessage": "Aktywowano konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Created": {
+    "defaultMessage": "Utworzono konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Deactivated": {
+    "defaultMessage": "Dezaktywowano konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Deleted": {
+    "defaultMessage": "Usunięto konfigurację IdP"
+  },
+  "Audit / Event / IdP Configuration Updated": {
+    "defaultMessage": "Zaktualizowano konfigurację IdP"
+  },
+  "Audit / Event / KSeF token removed": {
+    "defaultMessage": "Usunięto token KSeF"
+  },
+  "Audit / Event / KSeF token saved": {
+    "defaultMessage": "Zapisano token KSeF"
+  },
+  "Audit / Event / KSeF token tested": {
+    "defaultMessage": "Sprawdzono token KSeF"
+  },
+  "Audit / Event / SCIM Group Created": {
+    "defaultMessage": "Utworzono grupę SCIM"
+  },
+  "Audit / Event / SCIM Group Deleted": {
+    "defaultMessage": "Usunięto grupę SCIM"
+  },
+  "Audit / Event / SCIM Group Updated": {
+    "defaultMessage": "Zaktualizowano grupę SCIM"
+  },
+  "Audit / Event / SCIM User Created": {
+    "defaultMessage": "Utworzono użytkownika SCIM"
+  },
+  "Audit / Event / SCIM User Deleted": {
+    "defaultMessage": "Usunięto użytkownika SCIM"
+  },
+  "Audit / Event / SCIM User Updated": {
+    "defaultMessage": "Zaktualizowano użytkownika SCIM"
+  },
+  "Audit / Event / SSO Enforce Bypass Login": {
+    "defaultMessage": "Logowanie z pominięciem SSO"
+  },
+  "Audit / Event / SSO Login Failed": {
+    "defaultMessage": "Nieudane logowanie SSO"
+  },
+  "Audit / Event / SSO Login Initiated": {
+    "defaultMessage": "Rozpoczęto logowanie SSO"
+  },
+  "Audit / Event / SSO Login Success": {
+    "defaultMessage": "Zalogowano przez SSO"
+  },
+  "Audit / Event / SSO Logout": {
+    "defaultMessage": "Wylogowano z SSO"
+  },
+  "Audit / Event / User Provisioned via JIT": {
+    "defaultMessage": "Utworzono użytkownika przez JIT"
+  },
+  "Audit / Event / User Updated via SSO": {
+    "defaultMessage": "Zaktualizowano użytkownika przez SSO"
+  },
   "Audit / Failed badge": {
     "defaultMessage": "Niepowodzenie"
   },
@@ -611,6 +677,15 @@
   "Audit / IP Address": {
     "defaultMessage": "Adres IP"
   },
+  "Audit / KSeF status rejected": {
+    "defaultMessage": "Odrzucony przez KSeF"
+  },
+  "Audit / KSeF status unverified": {
+    "defaultMessage": "Jeszcze niezweryfikowany"
+  },
+  "Audit / KSeF status verified": {
+    "defaultMessage": "Zweryfikowany"
+  },
   "Audit / Last page": {
     "defaultMessage": "Ostatnia strona"
   },
@@ -638,11 +713,32 @@
   "Audit / Start Date Placeholder": {
     "defaultMessage": "Wybierz datę początkową"
   },
+  "Audit / Status": {
+    "defaultMessage": "Status"
+  },
   "Audit / Status Failed": {
     "defaultMessage": "Niepowodzenie"
   },
   "Audit / Status Success": {
     "defaultMessage": "Sukces"
+  },
+  "Audit / Token action": {
+    "defaultMessage": "Działanie"
+  },
+  "Audit / Token action created": {
+    "defaultMessage": "Zapisano nowy token"
+  },
+  "Audit / Token action removed": {
+    "defaultMessage": "Usunięto token"
+  },
+  "Audit / Token action replaced": {
+    "defaultMessage": "Zastąpiono istniejący token"
+  },
+  "Audit / Token ending in": {
+    "defaultMessage": "Token zakończony na"
+  },
+  "Audit / Token name in KSeF": {
+    "defaultMessage": "Nazwa tokenu w KSeF"
   },
   "Audit / User email placeholder": {
     "defaultMessage": "Filtruj po e-mailu..."
@@ -835,6 +931,15 @@
   },
   "Auth / Login / signup prompt": {
     "defaultMessage": "Nie masz konta?"
+  },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Zbyt wiele nieprawidłowych kodów. Spróbuj ponownie za 15 minut."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "Kod weryfikacyjny jest nieprawidłowy."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Sesja logowania wygasła. Zaloguj się ponownie."
   },
   "Auth / Passkey / button": {
     "defaultMessage": "Zaloguj się za pomocą Passkey"
@@ -1378,6 +1483,15 @@
   },
   "Backup Settings / Update Success": {
     "defaultMessage": "Ustawienia kopii zapasowej zostały zaktualizowane"
+  },
+  "Calendar / Jump to today": {
+    "defaultMessage": "Przejdź do dzisiaj"
+  },
+  "Calendar / Now button": {
+    "defaultMessage": "Teraz"
+  },
+  "Calendar / Today button": {
+    "defaultMessage": "Dziś"
   },
   "Cancel subscription / Active plan": {
     "defaultMessage": "Aktywny plan:"
@@ -3680,6 +3794,9 @@
   "Roles / Error / Role assigned to members": {
     "defaultMessage": "Ta rola jest przypisana do {count, plural, one {# członka} few {# członków} many {# członków} other {# członka}}. Wybierz rolę zastępczą."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "Ten kolor jest zarezerwowany dla roli właściciela. Wybierz inny kolor."
+  },
   "Roles / Error / Role name exists": {
     "defaultMessage": "Rola o nazwie „{name}” już istnieje. Wybierz inną nazwę."
   },
@@ -4670,6 +4787,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Odrzuć"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Zweryfikuj swój adres e-mail, zanim zaakceptujesz to zaproszenie."
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "To zaproszenie jest już nieważne."
   },
@@ -4737,7 +4857,7 @@
     "defaultMessage": "Skonfiguruj SSO"
   },
   "Tenant Security Settings / Audit Description": {
-    "defaultMessage": "Przeglądaj ostatnie zdarzenia bezpieczeństwa w swojej organizacji"
+    "defaultMessage": "Przeglądaj ostatnie zdarzenia SSO, SCIM i KSeF w swojej organizacji"
   },
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Dziennik zdarzeń bezpieczeństwa"
@@ -4755,7 +4875,7 @@
     "defaultMessage": "Brak zdarzeń zabezpieczeń"
   },
   "Tenant Security Settings / No Audit Events Hint": {
-    "defaultMessage": "Zdarzenia zabezpieczeń, takie jak logowania SSO, tworzenie użytkowników i zmiany konfiguracji, pojawią się tutaj."
+    "defaultMessage": "Zdarzenia SSO i SCIM, takie jak logowania przez SSO, tworzenie użytkowników i zmiany konfiguracji, oraz zmiany tokenu KSeF, pojawią się tutaj."
   },
   "Tenant Security Settings / No Filtered Audit Events": {
     "defaultMessage": "Brak zdarzeń spełniających kryteria filtrów"

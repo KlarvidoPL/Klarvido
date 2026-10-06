@@ -5,7 +5,7 @@ import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { getLocalePath, getTenantPathHelper } from '@sb/webapp-core/utils';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Route, Routes } from 'react-router-dom';
 
@@ -25,6 +25,61 @@ describe('TenantInvitation: Component', () => {
     </Routes>
   );
   const routePath = RoutesConfig.tenantInvitation;
+
+  it('shows an unverified invitation, blocks acceptance, and allows decline without a token', async () => {
+    const targetTenant = tenantFactory({
+      name: 'Invited organization',
+      type: TenantTypeType.ORGANIZATION,
+      membership: { invitationAccepted: false, invitationToken: null },
+    });
+    const user = currentUserFactory({ isConfirmed: false, tenants: [targetTenant] });
+    const requestMock = composeMockedQueryResult(declineTenantInvitationMutation, {
+      variables: { input: { id: targetTenant.membership.id } },
+      data: { declineTenantInvitation: { ok: true } },
+    });
+    const routerProps = createMockRouterProps(routePath, { tenantId: '', token: 'pending' });
+    routerProps.initialEntries = [
+      `/en/tenant-invitation/pending?membershipId=${encodeURIComponent(targetTenant.membership.id)}`,
+    ];
+    render(<Component />, {
+      routerProps,
+      apolloMocks: [fillCommonQueryWithUser(user), requestMock, fillCommonQueryWithUser({ ...user, tenants: [] })],
+    });
+    expect(await screen.findByText('Invited organization')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /accept invitation/i })).toBeDisabled();
+    expect(screen.getByText('Verify your email address before accepting this invitation.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /decline/i })).toBeEnabled();
+    await userEvent.click(screen.getByRole('button', { name: /decline/i }));
+    expect(await screen.findByTestId('toast-1')).toHaveTextContent('Invitation declined.');
+    expect(requestMock.result).toHaveBeenCalled();
+  });
+
+  it('enables acceptance after returning from email verification', async () => {
+    const targetTenant = tenantFactory({
+      name: 'Verification organization',
+      type: TenantTypeType.ORGANIZATION,
+      membership: { invitationAccepted: false, invitationToken: null },
+    });
+    const user = currentUserFactory({ isConfirmed: false, tenants: [targetTenant] });
+    const verifiedUser = {
+      ...user,
+      isConfirmed: true,
+      tenants: [{ ...targetTenant, membership: { ...targetTenant.membership, invitationToken: 'verified-token' } }],
+    };
+    const routerProps = createMockRouterProps(routePath, { tenantId: '', token: 'pending' });
+    routerProps.initialEntries = [
+      `/en/tenant-invitation/pending?membershipId=${encodeURIComponent(targetTenant.membership.id)}`,
+    ];
+    render(<Component />, {
+      routerProps,
+      apolloMocks: [fillCommonQueryWithUser(user), fillCommonQueryWithUser(verifiedUser)],
+    });
+    expect(await screen.findByText('Verification organization')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /accept invitation/i })).toBeDisabled();
+    fireEvent(window, new Event('focus'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /accept invitation/i })).toBeEnabled());
+    expect(screen.queryByText('Verify your email address before accepting this invitation.')).not.toBeInTheDocument();
+  });
 
   describe('token is invalid', () => {
     it('should redirect to home', async () => {
