@@ -7,6 +7,7 @@ from django.db.models import UniqueConstraint, Q
 from django.core.cache import cache
 
 from . import constants
+from .disabled_permissions import DISABLED_PERMISSION_CODES
 from .managers import TenantManager, TenantMembershipManager
 from common.models import TimestampedMixin
 
@@ -531,11 +532,13 @@ class OrganizationRole(TimestampedMixin, models.Model):
         Owner role always has all permissions.
         Supports wildcard matching (e.g., 'dashboard.*' matches 'dashboard.projects.view').
         """
+        if permission_code in DISABLED_PERMISSION_CODES:
+            return False
         if self.is_owner_role:
             return True
 
         # Check for exact match or wildcard
-        role_permissions = self.permissions.values_list("code", flat=True)
+        role_permissions = self.permissions.exclude(code__in=DISABLED_PERMISSION_CODES).values_list("code", flat=True)
         for perm in role_permissions:
             if perm == permission_code:
                 return True
@@ -672,7 +675,7 @@ def get_user_permissions_for_tenant(user, tenant):
     cache_key = f"user_permissions:{user.id}:{tenant.id}"
     cached = cache.get(cache_key)
     if cached is not None:
-        return cached
+        return set(cached) - DISABLED_PERMISSION_CODES
 
     membership = TenantMembership.objects.filter(
         user=user,
@@ -683,7 +686,9 @@ def get_user_permissions_for_tenant(user, tenant):
     if not membership:
         if is_superuser_bypass_eligible(user):
             # SUPERUSER BYPASS: owner-equivalent access without a real membership row.
-            permissions = set(Permission.objects.values_list("code", flat=True))
+            permissions = set(
+                Permission.objects.exclude(code__in=DISABLED_PERMISSION_CODES).values_list("code", flat=True)
+            )
             cache.set(cache_key, permissions, 300)
             return permissions
         return set()
@@ -700,12 +705,14 @@ def get_user_permissions_for_tenant(user, tenant):
             break
         else:
             # Get permissions from this role
-            role_perms = mr.role.permissions.values_list("code", flat=True)
+            role_perms = mr.role.permissions.exclude(code__in=DISABLED_PERMISSION_CODES).values_list("code", flat=True)
             permissions.update(role_perms)
 
     # No legacy fallback: RBAC roles are the sole source of truth for all tenants
     # (both personal/default and organization). Default tenants get system roles
     # and OWNER assignment when created via get_or_create_user_default_tenant.
+
+    permissions.difference_update(DISABLED_PERMISSION_CODES)
 
     # Cache for 5 minutes
     cache.set(cache_key, permissions, 300)
@@ -718,6 +725,9 @@ def user_has_permission(user, tenant, permission_code):
 
     Supports wildcard matching in role permissions.
     """
+    if permission_code in DISABLED_PERMISSION_CODES:
+        return False
+
     permissions = get_user_permissions_for_tenant(user, tenant)
 
     if permission_code in permissions:

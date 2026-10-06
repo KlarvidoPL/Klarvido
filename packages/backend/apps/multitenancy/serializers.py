@@ -1,3 +1,4 @@
+from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
 from hashid_field import rest as hidrest
 from rest_framework import serializers, exceptions
 from django.contrib.auth import get_user_model
@@ -334,7 +335,9 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
                 # SECURITY: Users can only invite members with roles whose permissions they also have
                 # (owners can invite with any role) - mirrors AssignRolesToMemberMutation in schema.py.
                 if not is_inviter_owner:
-                    role_permissions = set(role.permissions.values_list("code", flat=True))
+                    role_permissions = set(
+                        role.permissions.exclude(code__in=DISABLED_PERMISSION_CODES).values_list("code", flat=True)
+                    )
                     missing_permissions = role_permissions - inviter_permissions
                     if missing_permissions:
                         permissions_list = ", ".join(list(missing_permissions)[:3])

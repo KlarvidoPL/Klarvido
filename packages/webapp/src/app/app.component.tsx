@@ -48,9 +48,6 @@ import {
   NotFound,
   OAuthCallback,
   Profile,
-  SSOCallback,
-  SSOError,
-  SSOLogin,
   Signup,
 } from './asyncComponents';
 import { LANG_PREFIX, RoutesConfig, TENANT_PREFIX } from './config/routes';
@@ -73,10 +70,6 @@ export const App = () => {
             <Route path={RoutesConfig.signup} element={<Signup />} />
             <Route path={RoutesConfig.login} element={<Login />} />
             <Route path={RoutesConfig.validateOtp} element={<ValidateOtp />} />
-            {/* SSO routes - accessible without authentication */}
-            <Route path={RoutesConfig.ssoLogin} element={<SSOLogin />} />
-            <Route path={RoutesConfig.ssoCallback} element={<SSOCallback />} />
-            <Route path={RoutesConfig.ssoError} element={<SSOError />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 

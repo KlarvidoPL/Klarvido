@@ -7,9 +7,6 @@ export const Login = asyncComponent(() => import('../routes/auth/login'));
 export const Logout = asyncComponent(() => import('../routes/auth/logout'));
 export const Profile = asyncComponent(() => import('../routes/profile'));
 export const ConfirmEmail = asyncComponent(() => import('../routes/auth/confirmEmail'));
-export const SSOCallback = asyncComponent(() => import('../routes/auth/ssoCallback'));
 export const OAuthCallback = asyncComponent(() => import('../routes/auth/oauthCallback'));
-export const SSOError = asyncComponent(() => import('../routes/auth/ssoError'));
-export const SSOLogin = asyncComponent(() => import('../routes/auth/ssoLogin'));
 export const CompanySelection = asyncComponent(() => import('@sb/webapp-tenants/routes/companySelection'));
 //<-- IMPORT ROUTE -->

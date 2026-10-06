@@ -278,8 +278,6 @@ services:
       
       # Authentication feature flags (optional, all true by default)
       # Set to "false" to disable specific login methods
-      # - key: VITE_ENABLE_SSO
-      #   value: "true"
       # - key: VITE_ENABLE_PASSKEYS
       #   value: "true"
       # - key: VITE_ENABLE_SOCIAL_LOGIN

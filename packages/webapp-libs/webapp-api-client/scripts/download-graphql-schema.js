@@ -8,11 +8,13 @@ function runCommand(command, args) {
 
     cmd.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(`"${command} ${args.join(' ')}" failed with code ${code}`));
+        // Arguments may contain CSRF headers; do not include them in errors.
+        reject(new Error(`${command} failed with code ${code}`));
       } else {
         resolve();
       }
     });
+    cmd.on('error', reject);
   });
 }
 
@@ -21,11 +23,33 @@ function runCommand(command, args) {
     dotenv.config({ path: '../../webapp/.env' });
 
     const apiUrl = 'http://localhost:5001/api/graphql/';
+    // Introspection uses POST, so initialize the same CSRF protection as the app.
+    const csrfResponse = await fetch(new URL('../auth/csrf/', apiUrl));
+    if (!csrfResponse.ok) throw new Error(`CSRF initialization failed: HTTP ${csrfResponse.status}`);
+    const { csrfToken } = await csrfResponse.json();
+    if (typeof csrfToken !== 'string' || !csrfToken) throw new Error('Missing CSRF token');
+    const cookie = csrfResponse.headers
+      .getSetCookie()
+      .map((value) => value.split(';')[0])
+      .join('; ');
+    if (!cookie) throw new Error('Missing CSRF cookie');
 
+    await runCommand('pnpm', [
+      'rover',
+      'graph',
+      'introspect',
+      apiUrl,
+      '--header',
+      `Cookie: ${cookie}`,
+      '--header',
+      `X-CSRFToken: ${csrfToken}`,
+      '--output',
+      'graphql/schema/api.graphql',
+    ]);
+
+    // Remove obsolete outputs only after a successful download.
     await fs.remove('./src/graphql/__generated/types.ts');
     await fs.remove('./src/graphql/__generated/hooks.ts');
-
-    await runCommand('pnpm', ['rover', 'graph', 'introspect', apiUrl, '--output', 'graphql/schema/api.graphql']);
   } catch (error) {
     console.error(`Error: ${error.message}`);
     process.exit(1);

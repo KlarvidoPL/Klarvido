@@ -50,7 +50,6 @@ export const ADMIN_PERMISSIONS = [
   'members.roles.edit',
   'members.remove',
   'security.view',
-  'security.sso.manage',
   'billing.view',
   'billing.manage',
 ];

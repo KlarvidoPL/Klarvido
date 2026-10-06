@@ -58,14 +58,10 @@ type Query {
   translationSyncStatus: TranslationSyncStatusType
   "Get translation progress for all locales"
   localeProgress: [LocaleProgressType]
-  ssoConnections(tenantId: ID!, before: String, after: String, first: Int, last: Int): SSOConnectionConnection
-  ssoConnection(tenantId: ID!, id: ID): SSOConnectionType
-  scimTokens(tenantId: ID!, before: String, after: String, first: Int, last: Int): SCIMTokenConnection
   ssoAuditLogs(tenantId: ID!, eventType: String, userEmail: String, success: Boolean, startDate: String, endDate: String, search: String, before: String, after: String, first: Int, last: Int): SSOAuditLogConnection
   myPasskeys(before: String, after: String, first: Int, last: Int): PasskeyConnection
   mySessions(before: String, after: String, first: Int, last: Int): SSOSessionConnection
   myDevices(before: String, after: String, first: Int, last: Int): UserDeviceConnection
-  ssoDiscover(email: String!): SSODiscoveryResultType
   organizationOnboardingDraft: OrganizationOnboardingProfileType
   organizationOnboardingChoices: OrganizationOnboardingChoicesType
   allTenants(before: String, after: String, first: Int, last: Int): TenantConnection
@@ -374,96 +370,6 @@ type LocaleProgressType {
   publishedTranslations: Int
   progress: Float
 }
-type SSOConnectionConnection {
-  "Pagination data for this connection."
-  pageInfo: PageInfo!
-  "Contains the nodes in this connection."
-  edges: [SSOConnectionEdge]!
-}
-"A Relay edge containing a `SSOConnection` and its cursor."
-type SSOConnectionEdge {
-  "The item at the end of the edge"
-  node: SSOConnectionType
-  "A cursor for use in pagination"
-  cursor: String!
-}
-"GraphQL type for SSO connections."
-type SSOConnectionType implements Node {
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  id: ID!
-  "Display name for this SSO connection"
-  name: String!
-  connectionType: SsoTenantSSOConnectionConnectionTypeChoices!
-  status: SsoTenantSSOConnectionStatusChoices!
-  "List of email domains allowed to use this SSO connection"
-  allowedDomains: JSONString!
-  "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
-  enforceSso: Boolean!
-  "Automatically create users on first SSO login"
-  jitProvisioningEnabled: Boolean!
-  "Mapping of IdP groups to tenant roles"
-  groupRoleMapping: JSONString!
-  samlEntityId: String!
-  samlSsoUrl: String!
-  "Single Logout URL"
-  samlSloUrl: String!
-  samlNameIdFormat: SsoTenantSSOConnectionSamlNameIdFormatChoices!
-  samlWantAssertionsSigned: Boolean!
-  samlWantResponseSigned: Boolean!
-  "Mapping of SAML attributes to user fields"
-  samlAttributeMapping: JSONString!
-  oidcIssuer: String!
-  oidcClientId: String!
-  oidcAuthorizationEndpoint: String!
-  oidcTokenEndpoint: String!
-  oidcUserinfoEndpoint: String!
-  oidcJwksUri: String!
-  "Space-separated list of OAuth scopes"
-  oidcScopes: String!
-  "Mapping of OIDC claims to user fields"
-  oidcClaimMapping: JSONString!
-  lastLoginAt: DateTime
-  loginCount: Int!
-  isActive: Boolean
-  isSaml: Boolean
-  isOidc: Boolean
-  spMetadataUrl: String
-  spAcsUrl: String
-  spEntityId: String
-  oidcCallbackUrl: String
-  oidcLoginUrl: String
-}
-type SCIMTokenConnection {
-  "Pagination data for this connection."
-  pageInfo: PageInfo!
-  "Contains the nodes in this connection."
-  edges: [SCIMTokenEdge]!
-}
-"A Relay edge containing a `SCIMToken` and its cursor."
-type SCIMTokenEdge {
-  "The item at the end of the edge"
-  node: SCIMTokenType
-  "A cursor for use in pagination"
-  cursor: String!
-}
-"GraphQL type for SCIM tokens."
-type SCIMTokenType implements Node {
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  id: ID!
-  "Display name for this token"
-  name: String!
-  "First 8 chars of token for identification"
-  tokenPrefix: String!
-  isActive: Boolean!
-  expiresAt: DateTime
-  lastUsedAt: DateTime
-  lastUsedIp: String
-  requestCount: Int!
-  isValid: Boolean
-  isExpired: Boolean
-}
 type SSOAuditLogConnection {
   "Pagination data for this connection."
   pageInfo: PageInfo!
@@ -574,19 +480,6 @@ type UserDeviceType implements Node {
   lastIpAddress: String
   lastLocation: String!
   isBlocked: Boolean!
-}
-type SSODiscoveryResultType {
-  ssoAvailable: Boolean
-  requireSso: Boolean
-  connections: [SSODiscoveryConnectionType]
-}
-type SSODiscoveryConnectionType {
-  id: String
-  name: String
-  type: String
-  tenantId: String
-  tenantName: String
-  loginUrl: String
 }
 type OrganizationOnboardingProfileType {
   companyData: OnboardingCompanyType
@@ -1395,22 +1288,6 @@ type ApiMutation {
   syncTranslationKeys(input: SyncTranslationKeysMutationInput!): SyncTranslationKeysMutationPayload
   "Rollback to a previous translation version."
   rollbackTranslations(input: RollbackTranslationsMutationInput!): RollbackTranslationsMutationPayload
-  "Create a new SSO connection."
-  createSsoConnection(input: CreateSSOConnectionMutationInput!): CreateSSOConnectionMutationPayload
-  "Update an existing SSO connection."
-  updateSsoConnection(input: UpdateSSOConnectionMutationInput!): UpdateSSOConnectionMutationPayload
-  "Delete an SSO connection. Requires tenantId in input for tenant context."
-  deleteSsoConnection(input: DeleteSSOConnectionMutationInput!): DeleteSSOConnectionMutationPayload
-  "Activate an SSO connection."
-  activateSsoConnection(input: ActivateSSOConnectionMutationInput!): ActivateSSOConnectionMutationPayload
-  "Deactivate an SSO connection. Requires tenantId for tenant context."
-  deactivateSsoConnection(id: ID!, tenantId: ID!): DeactivateSSOConnectionMutation
-  "Test an SSO connection configuration. Requires tenantId for tenant context."
-  testSsoConnection(id: ID!, tenantId: ID!): TestSSOConnectionMutation
-  "Create a new SCIM token."
-  createScimToken(input: CreateSCIMTokenMutationInput!): CreateSCIMTokenMutationPayload
-  "Revoke a SCIM token. Requires tenantId for tenant context."
-  revokeScimToken(id: ID!, tenantId: ID!): RevokeSCIMTokenMutation
   "Revoke an SSO session."
   revokeSession(reason: String, sessionId: String!): RevokeSessionMutation
   "Revoke all SSO sessions for the current user except the current session."
@@ -1603,144 +1480,6 @@ type RollbackTranslationsMutationPayload {
   success: Boolean
   message: String
   clientMutationId: String
-}
-"Create a new SSO connection."
-type CreateSSOConnectionMutationPayload {
-  id: String
-  "Display name for this SSO connection"
-  name: String
-  connectionType: connection_type
-  status: status
-  "List of email domains allowed to use this SSO connection"
-  allowedDomains: JSONString
-  "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
-  enforceSso: Boolean
-  "Automatically create users on first SSO login"
-  jitProvisioningEnabled: Boolean
-  "Mapping of IdP groups to tenant roles"
-  groupRoleMapping: JSONString
-  samlEntityId: String
-  samlSsoUrl: String
-  "IdP X.509 certificate (PEM format) - for local development"
-  samlCertificate: String
-  "Single Logout URL"
-  samlSloUrl: String
-  samlNameIdFormat: saml_name_id_format
-  samlWantAssertionsSigned: Boolean
-  samlWantResponseSigned: Boolean
-  "Mapping of SAML attributes to user fields"
-  samlAttributeMapping: JSONString
-  oidcIssuer: String
-  oidcClientId: String
-  oidcAuthorizationEndpoint: String
-  oidcTokenEndpoint: String
-  oidcUserinfoEndpoint: String
-  oidcJwksUri: String
-  "Space-separated list of OAuth scopes"
-  oidcScopes: String
-  "Mapping of OIDC claims to user fields"
-  oidcClaimMapping: JSONString
-  spMetadataXml: String
-  metadataLastUpdated: DateTime
-  lastLoginAt: DateTime
-  loginCount: Int
-  createdAt: DateTime
-  updatedAt: DateTime
-  ssoConnection: SSOConnectionType
-  clientMutationId: String
-}
-"Update an existing SSO connection."
-type UpdateSSOConnectionMutationPayload {
-  id: String
-  "Display name for this SSO connection"
-  name: String
-  connectionType: connection_type
-  status: status
-  "List of email domains allowed to use this SSO connection"
-  allowedDomains: JSONString
-  "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
-  enforceSso: Boolean
-  "Automatically create users on first SSO login"
-  jitProvisioningEnabled: Boolean
-  "Mapping of IdP groups to tenant roles"
-  groupRoleMapping: JSONString
-  samlEntityId: String
-  samlSsoUrl: String
-  "IdP X.509 certificate (PEM format) - for local development"
-  samlCertificate: String
-  "Single Logout URL"
-  samlSloUrl: String
-  samlNameIdFormat: saml_name_id_format
-  samlWantAssertionsSigned: Boolean
-  samlWantResponseSigned: Boolean
-  "Mapping of SAML attributes to user fields"
-  samlAttributeMapping: JSONString
-  oidcIssuer: String
-  oidcClientId: String
-  oidcAuthorizationEndpoint: String
-  oidcTokenEndpoint: String
-  oidcUserinfoEndpoint: String
-  oidcJwksUri: String
-  "Space-separated list of OAuth scopes"
-  oidcScopes: String
-  "Mapping of OIDC claims to user fields"
-  oidcClaimMapping: JSONString
-  spMetadataXml: String
-  metadataLastUpdated: DateTime
-  lastLoginAt: DateTime
-  loginCount: Int
-  createdAt: DateTime
-  updatedAt: DateTime
-  ssoConnection: SSOConnectionType
-  clientMutationId: String
-}
-"Delete an SSO connection. Requires tenantId in input for tenant context."
-type DeleteSSOConnectionMutationPayload {
-  deletedIds: [ID]
-  clientMutationId: String
-}
-"Activate an SSO connection."
-type ActivateSSOConnectionMutationPayload {
-  id: String
-  tenantId: String
-  ssoConnection: SSOConnectionType
-  clientMutationId: String
-}
-"Deactivate an SSO connection. Requires tenantId for tenant context."
-type DeactivateSSOConnectionMutation {
-  ssoConnection: SSOConnectionType
-}
-"Test an SSO connection configuration. Requires tenantId for tenant context."
-type TestSSOConnectionMutation {
-  result: TestSSOConnectionPayload
-}
-type TestSSOConnectionPayload {
-  connectionId: String
-  connectionName: String
-  connectionType: String
-  overallStatus: String
-  checks: [TestSSOConnectionCheckType]
-  testedAt: String
-}
-type TestSSOConnectionCheckType {
-  name: String
-  status: String
-  message: String
-  details: GenericScalar
-}
-"Create a new SCIM token."
-type CreateSCIMTokenMutationPayload {
-  tenantId: String
-  name: String
-  ssoConnectionId: String
-  expiresInDays: Int
-  scimToken: SCIMTokenType
-  rawToken: String
-  clientMutationId: String
-}
-"Revoke a SCIM token. Requires tenantId for tenant context."
-type RevokeSCIMTokenMutation {
-  ok: Boolean
 }
 "Revoke an SSO session."
 type RevokeSessionMutation {
@@ -2247,35 +1986,6 @@ enum BackupRestoreRecordConflictStrategyChoices {
   UPDATE
   "Fail on conflicts"
   FAIL
-}
-"An enumeration."
-enum SsoTenantSSOConnectionConnectionTypeChoices {
-  "SAML 2.0"
-  SAML
-  "OpenID Connect"
-  OIDC
-}
-"An enumeration."
-enum SsoTenantSSOConnectionStatusChoices {
-  "Draft"
-  DRAFT
-  "Active"
-  ACTIVE
-  "Inactive"
-  INACTIVE
-  "Configuration Error"
-  ERROR
-}
-"An enumeration."
-enum SsoTenantSSOConnectionSamlNameIdFormatChoices {
-  "Email Address"
-  URN_OASIS_NAMES_TC_SAML_1_1_NAMEID_FORMAT_EMAILADDRESS
-  "Persistent"
-  URN_OASIS_NAMES_TC_SAML_2_0_NAMEID_FORMAT_PERSISTENT
-  "Transient"
-  URN_OASIS_NAMES_TC_SAML_2_0_NAMEID_FORMAT_TRANSIENT
-  "Unspecified"
-  URN_OASIS_NAMES_TC_SAML_1_1_NAMEID_FORMAT_UNSPECIFIED
 }
 "An enumeration."
 enum SsoSSOAuditLogEventTypeChoices {
@@ -2806,35 +2516,6 @@ enum ConflictStrategyEnum {
   FAIL
 }
 "An enumeration."
-enum connection_type {
-  "SAML 2.0"
-  SAML
-  "OpenID Connect"
-  OIDC
-}
-"An enumeration."
-enum status {
-  "Draft"
-  DRAFT
-  "Active"
-  ACTIVE
-  "Inactive"
-  INACTIVE
-  "Configuration Error"
-  ERROR
-}
-"An enumeration."
-enum saml_name_id_format {
-  "Email Address"
-  URN_OASIS_NAMES_TC_SAML_1_1_NAMEID_FORMAT_EMAILADDRESS
-  "Persistent"
-  URN_OASIS_NAMES_TC_SAML_2_0_NAMEID_FORMAT_PERSISTENT
-  "Transient"
-  URN_OASIS_NAMES_TC_SAML_2_0_NAMEID_FORMAT_TRANSIENT
-  "Unspecified"
-  URN_OASIS_NAMES_TC_SAML_1_1_NAMEID_FORMAT_UNSPECIFIED
-}
-"An enumeration."
 enum MultitenancyActionLogExportStatusChoices {
   "Pending"
   PENDING
@@ -2920,102 +2601,6 @@ input SyncTranslationKeysMutationInput {
 }
 input RollbackTranslationsMutationInput {
   versionId: ID!
-  clientMutationId: String
-}
-input CreateSSOConnectionMutationInput {
-  id: String
-  tenantId: String!
-  "Display name for this SSO connection"
-  name: String!
-  connectionType: connection_type
-  status: status
-  "List of email domains allowed to use this SSO connection"
-  allowedDomains: JSONString
-  "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
-  enforceSso: Boolean
-  "Automatically create users on first SSO login"
-  jitProvisioningEnabled: Boolean
-  "Mapping of IdP groups to tenant roles"
-  groupRoleMapping: JSONString
-  samlEntityId: String
-  samlSsoUrl: String
-  "IdP X.509 certificate (PEM format) - for local development"
-  samlCertificate: String
-  "Single Logout URL"
-  samlSloUrl: String
-  samlNameIdFormat: saml_name_id_format
-  samlWantAssertionsSigned: Boolean
-  samlWantResponseSigned: Boolean
-  "Mapping of SAML attributes to user fields"
-  samlAttributeMapping: JSONString
-  oidcIssuer: String
-  oidcClientId: String
-  oidcClientSecret: String
-  oidcAuthorizationEndpoint: String
-  oidcTokenEndpoint: String
-  oidcUserinfoEndpoint: String
-  oidcJwksUri: String
-  "Space-separated list of OAuth scopes"
-  oidcScopes: String
-  "Mapping of OIDC claims to user fields"
-  oidcClaimMapping: JSONString
-  clientMutationId: String
-}
-input UpdateSSOConnectionMutationInput {
-  id: String
-  tenantId: String
-  "Display name for this SSO connection"
-  name: String
-  connectionType: connection_type
-  status: status
-  "List of email domains allowed to use this SSO connection"
-  allowedDomains: JSONString
-  "When enabled, users from allowed domains must use SSO to access this tenant. Password login will not grant access."
-  enforceSso: Boolean
-  "Automatically create users on first SSO login"
-  jitProvisioningEnabled: Boolean
-  "Mapping of IdP groups to tenant roles"
-  groupRoleMapping: JSONString
-  samlEntityId: String
-  samlSsoUrl: String
-  "IdP X.509 certificate (PEM format) - for local development"
-  samlCertificate: String
-  "Single Logout URL"
-  samlSloUrl: String
-  samlNameIdFormat: saml_name_id_format
-  samlWantAssertionsSigned: Boolean
-  samlWantResponseSigned: Boolean
-  "Mapping of SAML attributes to user fields"
-  samlAttributeMapping: JSONString
-  oidcIssuer: String
-  oidcClientId: String
-  "OIDC client secret. Leave blank to keep existing. Only set when updating."
-  oidcClientSecret: String
-  oidcAuthorizationEndpoint: String
-  oidcTokenEndpoint: String
-  oidcUserinfoEndpoint: String
-  oidcJwksUri: String
-  "Space-separated list of OAuth scopes"
-  oidcScopes: String
-  "Mapping of OIDC claims to user fields"
-  oidcClaimMapping: JSONString
-  clientMutationId: String
-}
-input DeleteSSOConnectionMutationInput {
-  id: String
-  tenantId: String!
-  clientMutationId: String
-}
-input ActivateSSOConnectionMutationInput {
-  id: String!
-  tenantId: String!
-  clientMutationId: String
-}
-input CreateSCIMTokenMutationInput {
-  tenantId: String!
-  name: String!
-  ssoConnectionId: String
-  expiresInDays: Int
   clientMutationId: String
 }
 input DeletePasskeyMutationInput {

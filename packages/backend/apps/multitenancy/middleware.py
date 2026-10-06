@@ -31,8 +31,8 @@ def get_current_tenant_with_membership_check(tenant_id, user, request=None):
     in the tenant before returning it. This prevents unauthorized
     access to tenant data by manipulating tenant_id in requests.
 
-    When the request was authenticated via password, tenants that enforce SSO
-    for the user's domain are blocked (unless the user has break-glass permission).
+    Enterprise SSO enforcement is disabled; supported sessions use the same
+    accepted-membership checks regardless of stored identity provider settings.
 
     Args:
         tenant_id (str): The tenant ID (hashid).
@@ -70,14 +70,7 @@ def get_current_tenant_with_membership_check(tenant_id, user, request=None):
     elif request is not None:
         request.is_superuser_cross_tenant_access = False
 
-    # SECURITY: Block password sessions from accessing SSO-enforced tenants
-    if request is not None:
-        from apps.sso.enforcement import check_tenant_sso_enforcement
-
-        block_reason = check_tenant_sso_enforcement(request, tenant, user)
-        if block_reason:
-            logger.warning(f"Blocked tenant access: user={user.email} tenant={tenant.id} reason={block_reason}")
-            return None
+    # Enterprise SSO enforcement is disconnected; membership checks above still apply.
 
     return tenant
 

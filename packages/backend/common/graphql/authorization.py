@@ -5,6 +5,8 @@ from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from graphql_relay import from_global_id
 
+from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
+
 
 def get_user(info):
     context = info.context
@@ -80,7 +82,9 @@ def scope_queryset(queryset, info):
         return queryset
     if not user or not user.is_authenticated or not user.is_active:
         return queryset.none()
-    if label in {"content.demoitem", "multitenancy.permission"}:
+    if label == "multitenancy.permission":
+        return queryset.exclude(code__in=DISABLED_PERMISSION_CODES)
+    if label == "content.demoitem":
         return queryset
     if label.startswith("translations."):
         return queryset if user.is_superuser else queryset.none()

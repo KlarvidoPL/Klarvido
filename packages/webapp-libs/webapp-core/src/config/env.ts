@@ -13,9 +13,8 @@ export const ENV = {
   STRIPE_PUBLISHABLE_KEY: process.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '',
   GOOGLE_ANALYTICS_TRACKING_ID: process.env.VITE_GOOGLE_ANALYTICS_TRACKING_ID,
   
-  // Enterprise Authentication Feature Flags
-  // Set these in your environment to enable/disable enterprise auth features
-  ENABLE_SSO: process.env.VITE_ENABLE_SSO !== 'false', // Default: enabled
+  // Supported authentication feature flags
+  // Enterprise SSO is disabled in code and cannot be enabled through the environment.
   ENABLE_PASSKEYS: process.env.VITE_ENABLE_PASSKEYS !== 'false', // Default: enabled  
   ENABLE_SOCIAL_LOGIN: process.env.VITE_ENABLE_SOCIAL_LOGIN !== 'false', // Default: enabled
   ENABLE_PASSWORD_LOGIN: process.env.VITE_ENABLE_PASSWORD_LOGIN !== 'false', // Default: enabled

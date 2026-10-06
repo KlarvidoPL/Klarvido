@@ -358,7 +358,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "apps.users.authentication.JSONWebTokenCookieAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "apps.users.authentication.SupportedJWTAuthentication",
         # SessionAuthentication deliberately excluded: it authenticates any DRF/GraphQL
         # request off Django's own sessionid cookie, which is set independently by
         # the (unrelated) Django admin login. This meant an active admin session in

@@ -115,7 +115,6 @@ export type PermissionCode =
   | 'members.remove'
   // Security
   | 'security.view'
-  | 'security.sso.manage'
   | 'security.ksef.view'
   | 'security.ksef.manage'
   | 'security.logs.view'

@@ -3978,7 +3978,7 @@
     "defaultMessage": "Zarządzanie SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Wyświetlaj połączenia SSO, klucze dostępu i konfiguracje zabezpieczeń"
+    "defaultMessage": "Wyświetlanie konfiguracji zabezpieczeń"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Wyświetlanie ustawień zabezpieczeń"

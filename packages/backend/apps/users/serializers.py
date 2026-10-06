@@ -323,6 +323,9 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
         except (jwt_exceptions.InvalidToken, jwt_exceptions.TokenError):
             self.fail("invalid_token")
 
+        if refresh.get("auth_method") == "sso":
+            self.fail("invalid_token")
+
         # Only refresh tokens this database issued itself. A token signed with the
         # right key but never recorded as outstanding here was minted elsewhere -
         # typically before the database was wiped, when its user ID belonged to a

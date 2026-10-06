@@ -3,11 +3,11 @@ SSO Signals for event handling and notifications.
 """
 
 import logging
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .models import (
-    TenantSSOConnection,
+    # TenantSSOConnection,  # Enterprise SSO disabled.
     UserPasskey,
     SSOAuditLog,
 )
@@ -16,7 +16,7 @@ from .constants import SSOConnectionStatus, SSOAuditEventType, Notification
 logger = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender=TenantSSOConnection)
+# Enterprise SSO disabled: @receiver(post_save, sender=TenantSSOConnection)
 def on_sso_connection_saved(sender, instance, created, **kwargs):
     """Handle SSO connection creation/updates."""
     update_fields = kwargs.get('update_fields') or set()
@@ -56,7 +56,7 @@ def on_sso_connection_saved(sender, instance, created, **kwargs):
             _notify_sso_status_change(instance, activated=False)
 
 
-@receiver(pre_delete, sender=TenantSSOConnection)
+# Enterprise SSO disabled: @receiver(pre_delete, sender=TenantSSOConnection)
 def on_sso_connection_deleted(sender, instance, **kwargs):
     """Handle SSO connection deletion."""
     SSOAuditLog.log_event(

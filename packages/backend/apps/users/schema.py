@@ -11,7 +11,6 @@ from common.graphql import mutations
 from common.graphql import ratelimit
 from common.graphql.acl.decorators import permission_classes
 from apps.multitenancy.schema import TenantType
-from apps.sso.enforcement import filter_tenants_for_password_session
 from . import models
 from . import serializers
 from .services.default_organization import default_organization_id
@@ -345,10 +344,10 @@ class CurrentUserType(DjangoObjectType):
             # SUPERUSER BYPASS: owner-equivalent access to every tenant in the system,
             # without a real TenantMembership row - see apps.multitenancy.models.
             tenants = get_visible_tenants_for_user(user)
-            return filter_tenants_for_password_session(info.context, tenants)
+            return tenants
 
         tenants = user.tenants.all()
-        return filter_tenants_for_password_session(info.context, tenants)
+        return tenants
 
 
 class UserProfileType(DjangoObjectType):

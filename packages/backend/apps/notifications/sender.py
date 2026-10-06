@@ -3,6 +3,7 @@ from functools import lru_cache
 from django.conf import settings
 
 from . import strategies
+from .managers import DISABLED_NOTIFICATION_TYPES
 from .exceptions import NotificationStrategyException
 
 
@@ -23,6 +24,8 @@ def get_enabled_strategies():
 
 
 def send_notification(user: str, type: str, data: dict, issuer: str):
+    if type in DISABLED_NOTIFICATION_TYPES:
+        return
     for strategy in get_enabled_strategies():
         if strategy.should_send_notification(user, type):
             strategy.send_notification(user, type, data, issuer)

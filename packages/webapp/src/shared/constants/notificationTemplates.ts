@@ -6,8 +6,6 @@ import {
   ActionLogExportFailed,
   ActionLogExportReady,
   PasskeyRegistered,
-  SSOConnectionActivated,
-  SSOConnectionDeactivated,
   TenantDeleted,
   TenantInvitationAccepted,
   TenantInvitationCreated,
@@ -23,8 +21,6 @@ const templates: Record<NotificationTypes, ElementType> = {
   [NotificationTypes.TENANT_INVITATION_DECLINED]: TenantInvitationDeclined,
   [NotificationTypes.ACTION_LOG_EXPORT_READY]: ActionLogExportReady,
   [NotificationTypes.ACTION_LOG_EXPORT_FAILED]: ActionLogExportFailed,
-  [NotificationTypes.SSO_CONNECTION_ACTIVATED]: SSOConnectionActivated,
-  [NotificationTypes.SSO_CONNECTION_DEACTIVATED]: SSOConnectionDeactivated,
   [NotificationTypes.PASSKEY_REGISTERED]: PasskeyRegistered,
   [NotificationTypes.TENANT_DELETED]: TenantDeleted,
   // Backup notifications

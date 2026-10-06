@@ -19,7 +19,8 @@
           "commands": ["pnpm run graphql-codegen -w -c ./graphql/codegen.ts"]
         },
         "download-schema": {
-          "commands": ["node ./scripts/download-graphql-schema.js", "nx run webapp-api-client:graphql:generate-types"]
+          "commands": ["node ./scripts/download-graphql-schema.js", "nx run webapp-api-client:graphql:generate-types"],
+          "parallel": false
         }
       }
     }
