@@ -4577,6 +4577,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Rechazar"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Verifica tu dirección de correo electrónico antes de aceptar esta invitación."
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "Esta invitación ya no es válida."
   },

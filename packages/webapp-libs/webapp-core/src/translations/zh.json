@@ -4577,6 +4577,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "拒绝"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "请先验证你的电子邮箱地址，再接受此邀请。"
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "此邀请已失效。"
   },

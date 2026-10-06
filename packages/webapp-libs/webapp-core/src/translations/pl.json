@@ -4778,6 +4778,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Odrzuć"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Zweryfikuj swój adres e-mail, zanim zaakceptujesz to zaproszenie."
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "To zaproszenie jest już nieważne."
   },

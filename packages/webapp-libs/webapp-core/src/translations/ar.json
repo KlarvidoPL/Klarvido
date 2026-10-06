@@ -4577,6 +4577,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "رفض"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "تحقّق من عنوان بريدك الإلكتروني قبل قبول هذه الدعوة."
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "لم تعد هذه الدعوة صالحة."
   },

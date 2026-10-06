@@ -4577,6 +4577,9 @@
   "Tenant Invitation / Decline button": {
     "defaultMessage": "अस्वीकार करें"
   },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "यह आमंत्रण स्वीकार करने से पहले अपना ईमेल पता सत्यापित करें।"
+  },
   "Tenant Invitation / Error message": {
     "defaultMessage": "यह निमंत्रण अब मान्य नहीं है।"
   },
