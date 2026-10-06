@@ -9,6 +9,8 @@ from rest_framework_simplejwt.views import TokenViewBase
 from social_core.actions import do_complete
 from social_django.utils import psa
 
+from common.csrf import enforce_api_csrf
+
 from . import serializers, utils
 
 
@@ -24,6 +26,7 @@ class CookieTokenRefreshView(jwt_views.TokenRefreshView):
     serializer_class = serializers.CookieTokenRefreshSerializer
 
     def post(self, request, *args, **kwargs):
+        enforce_api_csrf(request, explicit_credential=bool(request.data.get("refresh")))
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid(raise_exception=False):
             response = Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
@@ -59,6 +62,7 @@ class LogoutView(TokenViewBase):
     serializer_class = serializers.LogoutSerializer
 
     def post(self, request, *args, **kwargs):
+        enforce_api_csrf(request, explicit_credential=bool(request.data.get("refresh")))
         serializer = self.get_serializer(data=request.data)
         # Always try to process logout - serializer is designed to be graceful
         if serializer.is_valid(raise_exception=False):

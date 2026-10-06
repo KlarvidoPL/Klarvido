@@ -2,6 +2,7 @@
  * WebAuthn hook for passkey registration and authentication.
  */
 
+import { csrfFetch } from '@sb/webapp-api-client/api/csrf';
 import { ENV } from '@sb/webapp-core/config/env';
 import { useState, useCallback } from 'react';
 
@@ -57,7 +58,8 @@ export function useWebAuthn() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isSupported = typeof window !== 'undefined' && !!window.PublicKeyCredential;
+  const isSupported =
+    typeof window !== 'undefined' && !!window.PublicKeyCredential;
 
   const registerPasskey = useCallback(
     async (name: string = 'My Passkey'): Promise<boolean> => {
@@ -71,11 +73,14 @@ export function useWebAuthn() {
 
       try {
         // Get registration options from server
-        const optionsResponse = await fetch(`${API_BASE}/passkeys/register/options`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
+        const optionsResponse = await csrfFetch(
+          `${API_BASE}/passkeys/register/options`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          },
+        );
 
         if (!optionsResponse.ok) {
           throw new Error('Failed to get registration options');
@@ -84,28 +89,34 @@ export function useWebAuthn() {
         const options: RegistrationOptions = await optionsResponse.json();
 
         // Convert base64url to ArrayBuffer
-        const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-          challenge: base64UrlToArrayBuffer(options.challenge),
-          rp: options.rp,
-          user: {
-            id: base64UrlToArrayBuffer(options.user.id),
-            name: options.user.name,
-            displayName: options.user.displayName,
-          },
-          pubKeyCredParams: options.pubKeyCredParams as PublicKeyCredentialParameters[],
-          timeout: options.timeout,
-          attestation: options.attestation as AttestationConveyancePreference,
-          authenticatorSelection: {
-            userVerification: options.authenticatorSelection.userVerification as UserVerificationRequirement,
-            residentKey: options.authenticatorSelection.residentKey as ResidentKeyRequirement,
-            requireResidentKey: options.authenticatorSelection.requireResidentKey,
-            authenticatorAttachment: options.authenticatorSelection.authenticatorAttachment as AuthenticatorAttachment | undefined,
-          },
-          excludeCredentials: options.excludeCredentials.map((cred) => ({
-            id: base64UrlToArrayBuffer(cred.id),
-            type: cred.type as PublicKeyCredentialType,
-          })),
-        };
+        const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions =
+          {
+            challenge: base64UrlToArrayBuffer(options.challenge),
+            rp: options.rp,
+            user: {
+              id: base64UrlToArrayBuffer(options.user.id),
+              name: options.user.name,
+              displayName: options.user.displayName,
+            },
+            pubKeyCredParams:
+              options.pubKeyCredParams as PublicKeyCredentialParameters[],
+            timeout: options.timeout,
+            attestation: options.attestation as AttestationConveyancePreference,
+            authenticatorSelection: {
+              userVerification: options.authenticatorSelection
+                .userVerification as UserVerificationRequirement,
+              residentKey: options.authenticatorSelection
+                .residentKey as ResidentKeyRequirement,
+              requireResidentKey:
+                options.authenticatorSelection.requireResidentKey,
+              authenticatorAttachment: options.authenticatorSelection
+                .authenticatorAttachment as AuthenticatorAttachment | undefined,
+            },
+            excludeCredentials: options.excludeCredentials.map((cred) => ({
+              id: base64UrlToArrayBuffer(cred.id),
+              type: cred.type as PublicKeyCredentialType,
+            })),
+          };
 
         // Create credential
         const credential = (await navigator.credentials.create({
@@ -116,23 +127,31 @@ export function useWebAuthn() {
           throw new Error('Failed to create credential');
         }
 
-        const response = credential.response as AuthenticatorAttestationResponse;
+        const response =
+          credential.response as AuthenticatorAttestationResponse;
 
         // Send to server for verification
-        const verifyResponse = await fetch(`${API_BASE}/passkeys/register/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            challenge: options.challenge,
-            credentialId: arrayBufferToBase64Url(credential.rawId),
-            publicKey: arrayBufferToBase64Url(response.getPublicKey?.() || new ArrayBuffer(0)),
-            attestationObject: arrayBufferToBase64Url(response.attestationObject),
-            clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
-            name,
-            transports: response.getTransports?.() || [],
-          }),
-        });
+        const verifyResponse = await csrfFetch(
+          `${API_BASE}/passkeys/register/verify`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              challenge: options.challenge,
+              credentialId: arrayBufferToBase64Url(credential.rawId),
+              publicKey: arrayBufferToBase64Url(
+                response.getPublicKey?.() || new ArrayBuffer(0),
+              ),
+              attestationObject: arrayBufferToBase64Url(
+                response.attestationObject,
+              ),
+              clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
+              name,
+              transports: response.getTransports?.() || [],
+            }),
+          },
+        );
 
         if (!verifyResponse.ok) {
           const errorData = await verifyResponse.json();
@@ -147,11 +166,13 @@ export function useWebAuthn() {
         setIsRegistering(false);
       }
     },
-    [isSupported]
+    [isSupported],
   );
 
   const authenticateWithPasskey = useCallback(
-    async (email?: string): Promise<{ access: string; refresh: string } | null> => {
+    async (
+      email?: string,
+    ): Promise<{ access: string; refresh: string } | null> => {
       if (!isSupported) {
         setError('WebAuthn is not supported in this browser');
         return null;
@@ -162,11 +183,14 @@ export function useWebAuthn() {
 
       try {
         // Get authentication options from server
-        const optionsResponse = await fetch(`${API_BASE}/passkeys/authenticate/options`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
+        const optionsResponse = await csrfFetch(
+          `${API_BASE}/passkeys/authenticate/options`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          },
+        );
 
         if (!optionsResponse.ok) {
           throw new Error('Failed to get authentication options');
@@ -175,17 +199,21 @@ export function useWebAuthn() {
         const options: AuthenticationOptions = await optionsResponse.json();
 
         // Convert base64url to ArrayBuffer
-        const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
-          challenge: base64UrlToArrayBuffer(options.challenge),
-          timeout: options.timeout,
-          rpId: options.rpId,
-          userVerification: options.userVerification as UserVerificationRequirement,
-          allowCredentials: options.allowCredentials?.map((cred) => ({
-            id: base64UrlToArrayBuffer(cred.id),
-            type: cred.type as PublicKeyCredentialType,
-            transports: cred.transports as AuthenticatorTransport[] | undefined,
-          })),
-        };
+        const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions =
+          {
+            challenge: base64UrlToArrayBuffer(options.challenge),
+            timeout: options.timeout,
+            rpId: options.rpId,
+            userVerification:
+              options.userVerification as UserVerificationRequirement,
+            allowCredentials: options.allowCredentials?.map((cred) => ({
+              id: base64UrlToArrayBuffer(cred.id),
+              type: cred.type as PublicKeyCredentialType,
+              transports: cred.transports as
+                | AuthenticatorTransport[]
+                | undefined,
+            })),
+          };
 
         // Get credential
         const credential = (await navigator.credentials.get({
@@ -199,20 +227,25 @@ export function useWebAuthn() {
         const response = credential.response as AuthenticatorAssertionResponse;
 
         // Send to server for verification
-        const verifyResponse = await fetch(`${API_BASE}/passkeys/authenticate/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            challenge: options.challenge,
-            credentialId: arrayBufferToBase64Url(credential.rawId),
-            authenticatorData: arrayBufferToBase64Url(response.authenticatorData),
-            clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
-            signature: arrayBufferToBase64Url(response.signature),
-            userHandle: response.userHandle
-              ? arrayBufferToBase64Url(response.userHandle)
-              : undefined,
-          }),
-        });
+        const verifyResponse = await csrfFetch(
+          `${API_BASE}/passkeys/authenticate/verify`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              challenge: options.challenge,
+              credentialId: arrayBufferToBase64Url(credential.rawId),
+              authenticatorData: arrayBufferToBase64Url(
+                response.authenticatorData,
+              ),
+              clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
+              signature: arrayBufferToBase64Url(response.signature),
+              userHandle: response.userHandle
+                ? arrayBufferToBase64Url(response.userHandle)
+                : undefined,
+            }),
+          },
+        );
 
         if (!verifyResponse.ok) {
           const errorData = await verifyResponse.json();
@@ -228,7 +261,7 @@ export function useWebAuthn() {
         setIsAuthenticating(false);
       }
     },
-    [isSupported]
+    [isSupported],
   );
 
   return {
@@ -240,4 +273,3 @@ export function useWebAuthn() {
     authenticateWithPasskey,
   };
 }
-

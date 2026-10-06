@@ -6,6 +6,8 @@ from rest_framework_simplejwt import authentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
+from common.csrf import enforce_api_csrf
+
 
 class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
     """
@@ -47,12 +49,16 @@ class JSONWebTokenCookieAuthentication(authentication.JWTAuthentication):
         and SSO options even if the user has expired cookies.
         """
         try:
-            return super().authenticate(request)
+            result = super().authenticate(request)
         except (InvalidToken, TokenError, AuthenticationFailed):
             # Token is expired, invalid, or no longer matches its account (user gone/inactive, password changed,
             # see CHECK_REVOKE_TOKEN) - treat as unauthenticated rather than raising a 401 error, so a valid
             # Authorization header can still authenticate the request
             return None
+
+        if result is not None:
+            enforce_api_csrf(request)
+        return result
 
 
 class JSONWebTokenChannelsAuthentication(authentication.JWTAuthentication):

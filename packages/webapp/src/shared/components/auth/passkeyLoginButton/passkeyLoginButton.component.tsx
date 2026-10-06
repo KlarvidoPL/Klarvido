@@ -1,4 +1,5 @@
 import { storeAuthTokens } from '@sb/webapp-api-client/api';
+import { csrfFetch } from '@sb/webapp-api-client/api/csrf';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { ENV } from '@sb/webapp-core/config/env';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
@@ -25,7 +26,7 @@ const base64UrlToUint8Array = (base64url: string): Uint8Array => {
   const base64 = base64url
     .replace(/-/g, '+')
     .replace(/_/g, '/')
-    .padEnd(base64url.length + (4 - (base64url.length % 4)) % 4, '=');
+    .padEnd(base64url.length + ((4 - (base64url.length % 4)) % 4), '=');
 
   const binaryString = atob(base64);
   const bytes = new Uint8Array(binaryString.length);
@@ -39,10 +40,7 @@ const base64UrlToUint8Array = (base64url: string): Uint8Array => {
 const uint8ArrayToBase64Url = (bytes: Uint8Array): string => {
   const binaryString = String.fromCharCode(...bytes);
   const base64 = btoa(binaryString);
-  return base64
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 };
 
 /**
@@ -115,7 +113,7 @@ export const PasskeyLoginButton = () => {
 
     try {
       // 1. Get authentication options from backend
-      const optionsResponse = await fetch(`${ENV.BASE_API_URL}/sso/passkeys/authenticate/options`, {
+      const optionsResponse = await csrfFetch(`${ENV.BASE_API_URL}/sso/passkeys/authenticate/options`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
@@ -134,17 +132,19 @@ export const PasskeyLoginButton = () => {
         timeout: options.timeout || 60000,
         rpId: options.rpId || window.location.hostname,
         userVerification: options.userVerification || 'preferred',
-        allowCredentials: options.allowCredentials?.map((cred: { id: string; type: string; transports?: string[] }) => ({
-          id: base64UrlToUint8Array(cred.id),
-          type: cred.type,
-          transports: cred.transports,
-        })),
+        allowCredentials: options.allowCredentials?.map(
+          (cred: { id: string; type: string; transports?: string[] }) => ({
+            id: base64UrlToUint8Array(cred.id),
+            type: cred.type,
+            transports: cred.transports,
+          })
+        ),
       };
 
       // 3. Get credential from browser
-      const credential = await navigator.credentials.get({
+      const credential = (await navigator.credentials.get({
         publicKey: publicKeyOptions,
-      }) as PublicKeyCredential;
+      })) as PublicKeyCredential;
 
       if (!credential) {
         throw new PasskeyLoginError('no_credential');
@@ -153,7 +153,7 @@ export const PasskeyLoginButton = () => {
       const response = credential.response as AuthenticatorAssertionResponse;
 
       // 4. Verify with backend (using base64url encoding)
-      const verifyResponse = await fetch(`${ENV.BASE_API_URL}/sso/passkeys/authenticate/verify`, {
+      const verifyResponse = await csrfFetch(`${ENV.BASE_API_URL}/sso/passkeys/authenticate/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -162,9 +162,7 @@ export const PasskeyLoginButton = () => {
           authenticatorData: uint8ArrayToBase64Url(new Uint8Array(response.authenticatorData)),
           clientDataJSON: uint8ArrayToBase64Url(new Uint8Array(response.clientDataJSON)),
           signature: uint8ArrayToBase64Url(new Uint8Array(response.signature)),
-          userHandle: response.userHandle
-            ? uint8ArrayToBase64Url(new Uint8Array(response.userHandle))
-            : null,
+          userHandle: response.userHandle ? uint8ArrayToBase64Url(new Uint8Array(response.userHandle)) : null,
         }),
         credentials: 'include',
       });
@@ -194,7 +192,6 @@ export const PasskeyLoginButton = () => {
 
       // Force a full page reload to reinitialize with new auth cookies
       window.location.href = redirect || defaultRedirect;
-
     } catch (err) {
       console.error('Passkey login error:', err);
       let code = 'verification_failed';
@@ -211,13 +208,7 @@ export const PasskeyLoginButton = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full"
-        onClick={handlePasskeyLogin}
-        disabled={loading}
-      >
+      <Button variant="outline" size="lg" className="w-full" onClick={handlePasskeyLogin} disabled={loading}>
         <Fingerprint className="mr-2 h-5 w-5" />
         {loading ? (
           <FormattedMessage defaultMessage="Authenticating..." id="Auth / Passkey / loading" />
@@ -225,10 +216,7 @@ export const PasskeyLoginButton = () => {
           <FormattedMessage defaultMessage="Sign in with Passkey" id="Auth / Passkey / button" />
         )}
       </Button>
-      {error && (
-        <p className="text-center text-sm text-destructive dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-center text-sm text-destructive dark:text-red-400">{error}</p>}
     </div>
   );
 };
-

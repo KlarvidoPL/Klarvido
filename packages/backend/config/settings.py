@@ -640,6 +640,8 @@ if TRACING_BACKEND == "xray":
     }
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+if IS_LOCAL_DEBUG:
+    CSRF_TRUSTED_ORIGINS += ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 # CORS Configuration for cross-origin deployments (e.g., Render.com)
 # When webapp and backend are on different domains, CORS must be enabled

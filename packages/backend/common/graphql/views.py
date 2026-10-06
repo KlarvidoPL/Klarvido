@@ -13,6 +13,7 @@ from rest_framework.settings import api_settings
 from sentry_sdk import start_transaction, capture_exception
 
 from common.acl import policies
+from common.csrf import enforce_api_csrf
 
 
 logger = logging.getLogger(__name__)
@@ -73,6 +74,7 @@ class DRFAuthenticatedGraphQLView(FileUploadGraphQLView):
         @permission_classes((policies.AnyoneFullAccess,))
         @throttle_classes(throttle_cls)
         def view(request, *args, **kwargs):
+            enforce_api_csrf(request)
             return graphene_view(request, *args, **kwargs)
 
         return view
