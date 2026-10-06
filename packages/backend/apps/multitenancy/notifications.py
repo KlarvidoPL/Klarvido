@@ -80,7 +80,6 @@ def send_tenant_invitation_notification(tenant_membership: models.TenantMembersh
             type=constants.Notification.TENANT_INVITATION_CREATED.value,
             data={
                 "id": membership_id,
-                "token": token,
                 "tenant_name": tenant_membership.tenant.name,
             },
             issuer=tenant_membership.creator,

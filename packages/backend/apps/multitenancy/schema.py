@@ -209,7 +209,7 @@ class TenantMembershipType(DjangoObjectType):
     @staticmethod
     def resolve_invitation_token(parent, info):
         user = get_user_from_resolver(info)
-        if parent.user and user == parent.user and not parent.is_accepted:
+        if parent.user and user == parent.user and user.is_confirmed and not parent.is_accepted:
             return tenant_invitation_token.make_token(user.email, parent)
         return None
 

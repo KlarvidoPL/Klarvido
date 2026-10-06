@@ -170,6 +170,12 @@ class AcceptTenantInvitationSerializer(TenantInvitationActionSerializer):
     Updates not accepted invitation membership object to be accepted one.
     """
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not self.context["request"].user.is_confirmed:
+            raise exceptions.ValidationError(_("Confirm your email before accepting an organization invitation."))
+        return attrs
+
     def create(self, validated_data):
         membership_id = validated_data["id"]
         user = self.context["request"].user

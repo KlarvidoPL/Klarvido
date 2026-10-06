@@ -119,6 +119,14 @@ def scope_queryset(queryset, info):
     return queryset.none()
 
 
+def model_queryset(model):
+    # The membership manager normally hides pending invitations. Ownership checks
+    # below explicitly allow the invitee to read their own pending record.
+    if model._meta.label_lower == "multitenancy.tenantmembership":
+        return model._default_manager.get_all()
+    return model._default_manager.all()
+
+
 class AuthorizedDjangoObjectType(DjangoObjectType):
     class Meta:
         abstract = True
@@ -136,7 +144,7 @@ class AuthorizedDjangoObjectType(DjangoObjectType):
             identifiers.append("id")
         for identifier in identifiers:
             try:
-                instance = cls.get_queryset(model._default_manager.filter(**{identifier: id}), info).first()
+                instance = cls.get_queryset(model_queryset(model).filter(**{identifier: id}), info).first()
             except (ValueError, TypeError, ValidationError):
                 continue
             if instance is not None:
@@ -169,23 +177,31 @@ class ObjectAuthorizationMiddleware:
                     "avatar",
                 }
             )
-            # Invitations need basic tenant identity, not billing or other private settings.
+            cache = authorization_cache(info)["objects"]
+            key = (graph_type, str(root.pk), info.path.prev)
+            if key not in cache:
+                cache[key] = scope_queryset(model_queryset(graph_type._meta.model).filter(pk=root.pk), info).exists()
+            # Keep pending invitations usable by the common tenant query without
+            # exposing settings or requiring access to the invited organization.
             pending_identity = False
             if (
-                graph_type._meta.model._meta.label_lower == "multitenancy.tenant"
+                not cache[key]
+                and graph_type._meta.model._meta.label_lower == "multitenancy.tenant"
                 and user
                 and user.is_authenticated
                 and user.is_active
             ):
                 from apps.multitenancy.models import TenantMembership
 
-                pending_identity = info.field_name in {"id", "name", "slug", "type", "membership"} and (
-                    TenantMembership.objects.get_all().filter(tenant=root, user=user, is_accepted=False).exists()
-                )
-            cache = authorization_cache(info)["objects"]
-            key = (graph_type, str(root.pk), info.path.prev)
-            if key not in cache:
-                cache[key] = scope_queryset(graph_type._meta.model._default_manager.filter(pk=root.pk), info).exists()
+                pending_key = (*key, "pending")
+                if pending_key not in cache:
+                    cache[pending_key] = (
+                        TenantMembership.objects.get_all().filter(tenant=root, user=user, is_accepted=False).exists()
+                    )
+                if cache[pending_key]:
+                    pending_identity = info.field_name in {"id", "name", "slug", "type", "membership", "__typename"}
+                    if not pending_identity:
+                        return False if info.field_name in {"onboardingRequired", "onboardingCompleted"} else None
             if not (cache[key] or pending_identity or (summary and user and user.is_authenticated and user.is_active)):
                 raise GraphQLError("permission_denied")
         return next(root, info, **args)
