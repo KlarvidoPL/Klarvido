@@ -27,7 +27,26 @@ export const ValidateOtpForm = () => {
   const generateLocalePath = useGenerateLocalePath();
   const { search } = useLocation();
 
+  const expiredLoginMessage = intl.formatMessage({
+    id: 'Auth / OTP / Login expired',
+    defaultMessage: 'Your sign-in session has expired. Please sign in again.',
+  });
+
   const form = useApiForm<ValidateOtpFormFields>({
+    errorMessages: {
+      nonFieldErrors: {
+        invalid_token: expiredLoginMessage,
+        "No valid token found in cookie 'otp_auth_token'": expiredLoginMessage,
+        'Verification token is invalid': intl.formatMessage({
+          id: 'Auth / OTP / Invalid code',
+          defaultMessage: 'The verification code is invalid.',
+        }),
+        'Too many incorrect codes. Try again in 15 minutes.': intl.formatMessage({
+          id: 'Auth / OTP / Attempt limit',
+          defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
+        }),
+      },
+    },
     defaultValues: {
       token: '',
     },

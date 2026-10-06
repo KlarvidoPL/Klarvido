@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "¿No tienes una cuenta?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Demasiados códigos incorrectos. Vuelve a intentarlo en 15 minutos."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "El código de verificación no es válido."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Tu sesión de inicio de sesión ha caducado. Vuelve a iniciar sesión."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Iniciar sesión con Passkey"
   },
@@ -4576,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Rechazar"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Verifica tu dirección de correo electrónico antes de aceptar esta invitación."
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "Esta invitación ya no es válida."

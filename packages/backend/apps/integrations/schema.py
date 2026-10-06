@@ -1,6 +1,7 @@
 import graphene
 from common.graphql import ratelimit
 from .openai import client
+from .openai.exceptions import OpenAIServiceUnavailable
 
 
 class GenerateSaasIdeasMutation(graphene.relay.ClientIDMutation):
@@ -15,8 +16,8 @@ class GenerateSaasIdeasMutation(graphene.relay.ClientIDMutation):
         # Get raw text response from OpenAI
         try:
             response_text = client.OpenAIClient.get_saas_ideas(keywords)
-        except client.OpenAIClientException as e:
-            raise Exception(str(e))
+        except client.OpenAIClientException:
+            raise OpenAIServiceUnavailable(client.OPEN_AI_API_ERROR_MSG)
 
         return cls(response=response_text)
 

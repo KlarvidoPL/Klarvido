@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "क्या आपका खाता नहीं है?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "बहुत अधिक गलत कोड। 15 मिनट बाद फिर से कोशिश करें।"
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "सत्यापन कोड अमान्य है।"
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "आपका साइन-इन सत्र समाप्त हो गया है। कृपया फिर से साइन इन करें।"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Passkey से साइन इन करें"
   },
@@ -4576,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "अस्वीकार करें"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "यह आमंत्रण स्वीकार करने से पहले अपना ईमेल पता सत्यापित करें।"
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "यह निमंत्रण अब मान्य नहीं है।"

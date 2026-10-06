@@ -3,11 +3,15 @@ Tests for multitenancy Celery tasks.
 """
 
 import pytest
+import csv
+import io
+import json
+import zipfile
 from unittest.mock import patch, MagicMock
 
 from apps.multitenancy.tasks import export_action_logs
 from apps.multitenancy.models import ActionLogExport, ActionLog
-from apps.multitenancy.constants import ActionType
+from apps.multitenancy.constants import ActionType, TenantUserRole
 from apps.notifications.models import Notification
 
 
@@ -22,7 +26,7 @@ class TestExportActionLogsTask:
 
     def test_skips_already_completed_export(self, tenant, user_factory, tenant_membership_factory):
         user = user_factory()
-        tenant_membership_factory(user=user, tenant=tenant, is_accepted=True)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
         export_job = ActionLogExport.objects.create(
             tenant=tenant,
             requested_by=user,
@@ -34,7 +38,7 @@ class TestExportActionLogsTask:
 
     def test_skips_already_failed_export(self, tenant, user_factory, tenant_membership_factory):
         user = user_factory()
-        tenant_membership_factory(user=user, tenant=tenant, is_accepted=True)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
         export_job = ActionLogExport.objects.create(
             tenant=tenant,
             requested_by=user,
@@ -45,15 +49,27 @@ class TestExportActionLogsTask:
         assert result["status"] == ActionLogExport.Status.FAILED
 
     @patch("apps.multitenancy.tasks.get_exports_storage")
-    def test_exports_logs_successfully(self, mock_get_storage, tenant, user_factory, tenant_membership_factory):
+    @pytest.mark.parametrize(
+        'name,csv_name',
+        [
+            ('Test Project', 'Test Project'),
+            ('=1+1', '\t=1+1'),
+            ('  \ufeff@SUM(1,2)', '\t  \ufeff@SUM(1,2)'),
+            ('=1+1,"other cell"\nnext row', '\t=1+1,"other cell"\nnext row'),
+            ('Normal,"quoted"\nnext row', 'Normal,"quoted"\nnext row'),
+        ],
+    )
+    def test_exports_logs_successfully(
+        self, mock_get_storage, tenant, user_factory, tenant_membership_factory, name, csv_name
+    ):
         user = user_factory()
-        tenant_membership_factory(user=user, tenant=tenant, is_accepted=True)
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
         ActionLog.objects.create(
             tenant=tenant,
             action_type=ActionType.CREATE,
             entity_type="project",
             entity_id="proj-1",
-            entity_name="Test Project",
+            entity_name=name,
             actor_email=user.email,
             changes={},
             metadata={},
@@ -74,6 +90,17 @@ class TestExportActionLogsTask:
         assert result["log_count"] == 1
         assert "file_path" in result
         assert mock_storage.save.called
+        uploaded = mock_storage.save.call_args.args[1]
+        with zipfile.ZipFile(io.BytesIO(uploaded.read())) as archive:
+            csv_text = archive.read('action_logs.csv').decode('utf-8')
+            rows = list(csv.DictReader(io.StringIO(csv_text)))
+            assert len(rows) == 1  # Quotes, commas and newlines cannot introduce extra rows or columns.
+            assert rows[0]['entity_name'] == csv_name
+            assert None not in rows[0]
+            assert csv_text.startswith('"id",')
+            json_export = json.loads(archive.read('action_logs.json'))
+            assert json_export['logs'][0]['entity_name'] == name
+        assert ActionLog.objects.get(tenant=tenant).entity_name == name
 
         export_job.refresh_from_db()
         assert export_job.status == ActionLogExport.Status.COMPLETED

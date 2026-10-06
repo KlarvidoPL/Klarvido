@@ -8,14 +8,16 @@ from apps.demo import models, serializers
 from common.acl import policies
 from common.graphql import acl as graphql_acl
 from common.graphql import mutations
+from common.graphql.acl.wrappers import wraps_object_type, PermissionNodeField
 
 pytestmark = pytest.mark.django_db
 
 
 def create_query_schema(query_class):
-    @graphql_acl.permission_classes(policies.IsAuthenticatedFullAccess)
     class Query(query_class, graphene.ObjectType):
-        node = graphene.relay.Node.Field()
+        node = PermissionNodeField(graphene.relay.Node)
+
+    wraps_object_type(Query, (policies.IsAuthenticatedFullAccess,), defaults=True)
 
     return graphene.Schema(query=Query)
 
@@ -24,9 +26,10 @@ def create_mutation_schema(mutation_class):
     class Query(graphene.ObjectType):
         node = graphene.relay.Node.Field()
 
-    @graphql_acl.permission_classes(policies.IsAuthenticatedFullAccess)
     class ApiMutation(mutation_class, graphene.ObjectType):
         pass
+
+    wraps_object_type(ApiMutation, (policies.IsAuthenticatedFullAccess,), defaults=True)
 
     return graphene.Schema(query=Query, mutation=ApiMutation)
 

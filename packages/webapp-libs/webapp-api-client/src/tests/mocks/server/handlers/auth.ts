@@ -11,3 +11,6 @@ export const mockLogout = (status = 200) =>
   rest.post<never, PathParams, any>(AUTH_URL.LOGOUT, (req, res, ctx) => {
     return res(ctx.status(status));
   });
+
+export const csrfTokenHandler = () =>
+  rest.get('/api/auth/csrf/', (req, res, ctx) => res(ctx.json({ csrfToken: 'test-csrf-proof' })));

@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 import graphene
 from config import settings
 from graphene import relay
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 
 from common.acl import policies
 from common.graphql import mutations

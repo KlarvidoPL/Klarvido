@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "还没有账户？"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "错误验证码次数过多。请在15分钟后重试。"
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "验证码无效。"
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "登录会话已过期。请重新登录。"
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "使用 Passkey 登录"
   },
@@ -4576,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "拒绝"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "请先验证你的电子邮箱地址，再接受此邀请。"
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "此邀请已失效。"

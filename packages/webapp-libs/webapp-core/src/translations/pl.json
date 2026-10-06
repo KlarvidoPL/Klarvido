@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "Nie masz konta?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Zbyt wiele nieprawidłowych kodów. Spróbuj ponownie za 15 minut."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "Kod weryfikacyjny jest nieprawidłowy."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Sesja logowania wygasła. Zaloguj się ponownie."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Zaloguj się za pomocą Passkey"
   },
@@ -4777,6 +4786,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Odrzuć"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Zweryfikuj swój adres e-mail, zanim zaakceptujesz to zaproszenie."
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "To zaproszenie jest już nieważne."

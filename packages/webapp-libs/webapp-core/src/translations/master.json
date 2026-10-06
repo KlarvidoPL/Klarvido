@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "Don't have an account?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Too many incorrect codes. Try again in 15 minutes."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "The verification code is invalid."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Your sign-in session has expired. Please sign in again."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Sign in with Passkey"
   },
@@ -4753,6 +4762,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Decline"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Verify your email address before accepting this invitation."
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "This invitation is no longer valid."

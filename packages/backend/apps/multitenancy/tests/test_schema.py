@@ -1424,6 +1424,8 @@ class TestAcceptTenantInvitationMutation:
     def test_accept_invitation_by_invitee(
         self, mocker, graphene_client, user, tenant_factory, tenant_membership_factory
     ):
+        user.is_confirmed = True
+        user.save(update_fields=["is_confirmed"])
         check_token = mocker.patch(
             "apps.multitenancy.tokens.TenantInvitationTokenGenerator.check_token", return_value=True
         )
@@ -1604,7 +1606,7 @@ class TestAllTenantsQuery:
             }
         }
         """
-        user = user_factory(has_avatar=True)
+        user = user_factory(has_avatar=True, is_confirmed=True)
         tenant_factory.create_batch(10)
         make_token = mocker.patch(
             "apps.multitenancy.tokens.TenantInvitationTokenGenerator.make_token", return_value="token"
@@ -1838,7 +1840,7 @@ class TestTenantQuery:
           }
         }
         """
-        user = user_factory(has_avatar=True)
+        user = user_factory(has_avatar=True, is_confirmed=True)
         tenant_factory.create_batch(10)
         make_token = mocker.patch(
             "apps.multitenancy.tokens.TenantInvitationTokenGenerator.make_token", return_value="token"

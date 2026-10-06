@@ -39,8 +39,7 @@ class RBACPermission(BasePermission):
             return False
 
         if not tenant:
-            # No tenant context - allow (other policies should handle this)
-            return True
+            return False
 
         if self.mode == "all":
             return all(user_has_permission(user, tenant, perm) for perm in self.permission_codes)
@@ -79,7 +78,7 @@ def requires(*permission_codes: str, mode: str = "any") -> Type[BasePermission]:
                 return False
 
             if not tenant:
-                return True
+                return False
 
             if mode == "all":
                 return all(user_has_permission(user, tenant, perm) for perm in codes)
@@ -221,9 +220,7 @@ def permission_required(permission_code: Union[str, List[str]], mode: str = "any
                     raise GraphQLError(PERMISSION_REQUIRED_MESSAGE)
 
                 if not tenant:
-                    # If no tenant context, check if user has permission in any of their tenants
-                    # For now, allow access (the access policy should handle tenant access)
-                    return obj(root, info, *args, **kwargs)
+                    raise GraphQLError(PERMISSION_REQUIRED_MESSAGE)
 
                 # Check permissions
                 if mode == "all":
@@ -250,6 +247,9 @@ def permission_required(permission_code: Union[str, List[str]], mode: str = "any
                     tenant = getattr(info.context, "tenant", None)
 
                     if not user or not user.is_authenticated:
+                        raise GraphQLError(PERMISSION_REQUIRED_MESSAGE)
+
+                    if not tenant:
                         raise GraphQLError(PERMISSION_REQUIRED_MESSAGE)
 
                     if tenant:

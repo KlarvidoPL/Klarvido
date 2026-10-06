@@ -1,31 +1,16 @@
+import { csrfFetch } from '@sb/webapp-api-client/api/csrf';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Input } from '@sb/webapp-core/components/forms';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@sb/webapp-core/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@sb/webapp-core/components/ui/dialog';
 import { Label } from '@sb/webapp-core/components/ui/label';
 import { ENV } from '@sb/webapp-core/config/env';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import {
-  CheckCircle2,
-  Fingerprint,
-  Key,
-  Loader2,
-  Plus,
-  Shield,
-  Smartphone,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
+import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
+import { CheckCircle2, Fingerprint, Key, Loader2, Plus, Shield, Smartphone, Trash2, XCircle } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-
-import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
 
 interface Passkey {
   id: string;
@@ -84,8 +69,7 @@ export const PasskeysForm = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const isSupported =
-    ENV.ENABLE_PASSKEYS && typeof window !== 'undefined' && !!window.PublicKeyCredential;
+  const isSupported = ENV.ENABLE_PASSKEYS && typeof window !== 'undefined' && !!window.PublicKeyCredential;
 
   const { passkeys, loading, refetch, deletePasskey } = useTenantPasskeys();
 
@@ -149,7 +133,7 @@ export const PasskeysForm = () => {
 
     try {
       // Step 1: Get registration options from the server
-      const optionsResponse = await fetch(`${ENV.BASE_API_URL}/sso/passkeys/register/options`, {
+      const optionsResponse = await csrfFetch(`${ENV.BASE_API_URL}/sso/passkeys/register/options`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -183,12 +167,10 @@ export const PasskeysForm = () => {
         timeout: options.timeout,
         attestation: options.attestation || 'none',
         authenticatorSelection: options.authenticatorSelection,
-        excludeCredentials: (options.excludeCredentials || []).map(
-          (cred: { id: string; type: string }) => ({
-            id: base64UrlToBuffer(cred.id),
-            type: cred.type,
-          })
-        ),
+        excludeCredentials: (options.excludeCredentials || []).map((cred: { id: string; type: string }) => ({
+          id: base64UrlToBuffer(cred.id),
+          type: cred.type,
+        })),
       };
 
       // Step 3: Create the credential using WebAuthn API
@@ -203,7 +185,7 @@ export const PasskeysForm = () => {
       const response = credential.response as AuthenticatorAttestationResponse;
 
       // Step 4: Send the credential to the server for verification
-      const verifyResponse = await fetch(`${ENV.BASE_API_URL}/sso/passkeys/register/verify`, {
+      const verifyResponse = await csrfFetch(`${ENV.BASE_API_URL}/sso/passkeys/register/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -329,10 +311,7 @@ export const PasskeysForm = () => {
           <>
             <div className="space-y-3">
               {passkeys.map((passkey) => (
-                <div
-                  key={passkey.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border bg-card p-4"
-                >
+                <div key={passkey.id} className="flex items-center justify-between gap-3 rounded-lg border bg-card p-4">
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                       {getAuthenticatorIcon(passkey.authenticatorType)}
@@ -346,10 +325,7 @@ export const PasskeysForm = () => {
                           {passkey.authenticatorType === 'platform' ? (
                             <FormattedMessage defaultMessage="This device" id="Passkeys / Platform" />
                           ) : (
-                            <FormattedMessage
-                              defaultMessage="Security key"
-                              id="Passkeys / Cross-platform"
-                            />
+                            <FormattedMessage defaultMessage="Security key" id="Passkeys / Cross-platform" />
                           )}
                         </Badge>
                       </div>
@@ -409,10 +385,7 @@ export const PasskeysForm = () => {
             <FormattedMessage defaultMessage="Register a Passkey" id="Add Passkey Modal / Title" />
           </DialogTitle>
           <DialogDescription id="passkey-dialog-description" className="sr-only">
-            <FormattedMessage
-              defaultMessage="Secure, passwordless sign-in"
-              id="Add Passkey Modal / Subtitle"
-            />
+            <FormattedMessage defaultMessage="Secure, passwordless sign-in" id="Add Passkey Modal / Subtitle" />
           </DialogDescription>
           <div className="-m-6 flex h-[85vh] max-h-[500px] flex-col overflow-hidden sm:rounded-lg">
             {/* Fixed Header */}
@@ -425,10 +398,7 @@ export const PasskeysForm = () => {
                   <FormattedMessage defaultMessage="Register a Passkey" id="Add Passkey Modal / Title" />
                 </h2>
                 <p className="text-sm text-muted-foreground" aria-hidden="true">
-                  <FormattedMessage
-                    defaultMessage="Secure, passwordless sign-in"
-                    id="Add Passkey Modal / Subtitle"
-                  />
+                  <FormattedMessage defaultMessage="Secure, passwordless sign-in" id="Add Passkey Modal / Subtitle" />
                 </p>
               </div>
             </div>
@@ -448,10 +418,7 @@ export const PasskeysForm = () => {
                     <div className="flex flex-col items-center rounded-lg bg-muted/30 p-3 text-center">
                       <Shield className="mb-2 h-6 w-6 text-primary" />
                       <span className="text-xs font-medium">
-                        <FormattedMessage
-                          defaultMessage="Phishing-Proof"
-                          id="Add Passkey Modal / Phishing Proof"
-                        />
+                        <FormattedMessage defaultMessage="Phishing-Proof" id="Add Passkey Modal / Phishing Proof" />
                       </span>
                     </div>
                     <div className="flex flex-col items-center rounded-lg bg-muted/30 p-3 text-center">
@@ -465,10 +432,7 @@ export const PasskeysForm = () => {
                   {/* Name Input */}
                   <div className="space-y-3">
                     <Label htmlFor="passkey-name" className="text-sm font-medium">
-                      <FormattedMessage
-                        defaultMessage="Give your passkey a name"
-                        id="Add Passkey Modal / Name Label"
-                      />
+                      <FormattedMessage defaultMessage="Give your passkey a name" id="Add Passkey Modal / Name Label" />
                     </Label>
                     <Input
                       id="passkey-name"
@@ -494,10 +458,7 @@ export const PasskeysForm = () => {
                       <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                       <div className="text-sm text-muted-foreground">
                         <p className="mb-1 font-medium text-foreground">
-                          <FormattedMessage
-                            defaultMessage="Works with"
-                            id="Add Passkey Modal / Works With"
-                          />
+                          <FormattedMessage defaultMessage="Works with" id="Add Passkey Modal / Works With" />
                         </p>
                         <FormattedMessage
                           defaultMessage="Touch ID, Face ID, Windows Hello, Android Fingerprint, and hardware security keys like YubiKey."
@@ -550,10 +511,7 @@ export const PasskeysForm = () => {
                   </div>
                   <div className="space-y-2 text-center">
                     <h3 className="text-lg font-semibold text-green-700 dark:text-green-300">
-                      <FormattedMessage
-                        defaultMessage="Passkey Registered!"
-                        id="Add Passkey Modal / Success Title"
-                      />
+                      <FormattedMessage defaultMessage="Passkey Registered!" id="Add Passkey Modal / Success Title" />
                     </h3>
                     <p className="max-w-[300px] text-sm text-muted-foreground">
                       <FormattedMessage
@@ -576,10 +534,7 @@ export const PasskeysForm = () => {
                   </div>
                   <div className="space-y-2 text-center">
                     <h3 className="text-lg font-semibold text-red-700 dark:text-red-300">
-                      <FormattedMessage
-                        defaultMessage="Registration Failed"
-                        id="Add Passkey Modal / Error Title"
-                      />
+                      <FormattedMessage defaultMessage="Registration Failed" id="Add Passkey Modal / Error Title" />
                     </h3>
                     <p className="max-w-[300px] text-sm text-muted-foreground">{errorMessage}</p>
                   </div>
@@ -594,12 +549,7 @@ export const PasskeysForm = () => {
                   <Button type="button" variant="outline" onClick={closeModal} className="flex-1">
                     <FormattedMessage defaultMessage="Cancel" id="Add Passkey Modal / Cancel Button" />
                   </Button>
-                  <Button
-                    type="button"
-                    onClick={handleContinue}
-                    className="flex-1"
-                    disabled={!passkeyName.trim()}
-                  >
+                  <Button type="button" onClick={handleContinue} className="flex-1" disabled={!passkeyName.trim()}>
                     <FormattedMessage defaultMessage="Continue" id="Add Passkey Modal / Continue Button" />
                   </Button>
                 </>
@@ -613,10 +563,7 @@ export const PasskeysForm = () => {
                   className="w-full"
                   disabled={isRegistering}
                 >
-                  <FormattedMessage
-                    defaultMessage="Cancel"
-                    id="Add Passkey Modal / Cancel Registration"
-                  />
+                  <FormattedMessage defaultMessage="Cancel" id="Add Passkey Modal / Cancel Registration" />
                 </Button>
               )}
 

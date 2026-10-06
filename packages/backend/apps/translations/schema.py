@@ -12,7 +12,7 @@ Provides mutations for (admin only):
 
 import graphene
 from graphene import relay
-from graphene_django import DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
 from graphql import GraphQLError
 
 from common.acl import policies

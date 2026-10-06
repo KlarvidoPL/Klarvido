@@ -88,8 +88,9 @@ def test_owner_can_save_and_read_onboarding_profile(graphene_client, user, tenan
     tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER)
     tenant_id = to_global_id('TenantType', tenant.pk)
     graphene_client.force_authenticate(user)
+    graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
 
-    saved = graphene_client.query(
+    saved = graphene_client.mutate(
         MUTATION,
         variable_values={'tenantId': tenant_id, 'step': 2, 'respondentRole': 'OWNER_MANAGEMENT', 'customerType': 'B2B'},
     )
@@ -112,6 +113,36 @@ def test_other_tenant_cannot_read_or_write(graphene_client, user, tenant_factory
     ]:
         result = graphene_client.query(query, variable_values=values)
         assert result.get('errors'), result
+
+
+@pytest.mark.parametrize('is_owner', [True, False])
+def test_onboarding_http_authorizes_the_explicit_organization(
+    api_client, user, tenant_factory, tenant_membership_factory, is_owner
+):
+    tenant = tenant_factory(type=TenantType.ORGANIZATION)
+    if is_owner:
+        tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER)
+    api_client.force_authenticate(user)
+    response = api_client.post(
+        '/api/graphql/',
+        {
+            'query': MUTATION,
+            'variables': {
+                'tenantId': to_global_id('TenantType', tenant.pk),
+                'step': 2,
+                'respondentRole': 'OWNER_MANAGEMENT',
+                'customerType': 'B2B',
+            },
+        },
+        format='json',
+    )
+    result = response.json()
+    if is_owner:
+        assert not result.get('errors'), result
+        assert result['data']['saveOrganizationOnboardingStep']['profile']['customerType'] == 'B2B'
+    else:
+        assert result.get('errors'), result
+        assert not OrganizationOnboardingProfile.objects.filter(tenant=tenant).exists()
 
 
 DRAFT_COMPANY = {

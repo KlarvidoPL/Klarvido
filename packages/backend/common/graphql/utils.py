@@ -1,22 +1,21 @@
 import graphene
 
 from . import acl as graphql_acl
+from .acl.wrappers import PermissionNodeField, wraps_object_type
 
 
 def graphql_query(queries):
-    @graphql_acl.permission_classes(*graphql_acl.get_default_permission_classes())
     class Query(*queries, graphene.ObjectType):
-        node = graphene.relay.Node.Field()
+        node = PermissionNodeField(graphene.relay.Node)
 
-    return Query
+    return wraps_object_type(Query, graphql_acl.get_default_permission_classes(), defaults=True)
 
 
 def graphql_mutation(mutations):
-    @graphql_acl.permission_classes(*graphql_acl.get_default_permission_classes())
     class ApiMutation(*mutations, graphene.ObjectType):
         pass
 
-    return ApiMutation
+    return wraps_object_type(ApiMutation, graphql_acl.get_default_permission_classes(), defaults=True)
 
 
 def graphql_subscription(subscriptions):

@@ -1706,7 +1706,7 @@ export type DeclineTenantInvitationMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
   /** Token */
-  token: Scalars['String']['input'];
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DeclineTenantInvitationMutationPayload = {
@@ -3862,6 +3862,12 @@ export enum SsoSsoAuditLogEventTypeChoices {
   IDP_CONFIG_DELETED = 'IDP_CONFIG_DELETED',
   /** IdP Configuration Updated */
   IDP_CONFIG_UPDATED = 'IDP_CONFIG_UPDATED',
+  /** KSeF Token Deleted */
+  KSEF_TOKEN_DELETED = 'KSEF_TOKEN_DELETED',
+  /** KSeF Token Saved */
+  KSEF_TOKEN_SAVED = 'KSEF_TOKEN_SAVED',
+  /** KSeF Token Tested */
+  KSEF_TOKEN_TESTED = 'KSEF_TOKEN_TESTED',
   /** Passkey Auth Failed */
   PASSKEY_AUTH_FAILED = 'PASSKEY_AUTH_FAILED',
   /** Passkey Auth Success */

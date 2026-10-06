@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "Du hast noch kein Konto?"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "Zu viele falsche Codes. Versuche es in 15 Minuten erneut."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "Der Bestätigungscode ist ungültig."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "Deine Anmeldesitzung ist abgelaufen. Bitte melde dich erneut an."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "Mit Passkey anmelden"
   },
@@ -4576,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "Ablehnen"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "Bestätige deine E-Mail-Adresse, bevor du diese Einladung annimmst."
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "Diese Einladung ist nicht mehr gültig."

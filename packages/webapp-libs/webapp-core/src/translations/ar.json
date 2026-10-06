@@ -932,6 +932,15 @@
   "Auth / Login / signup prompt": {
     "defaultMessage": "ليس لديك حساب؟"
   },
+  "Auth / OTP / Attempt limit": {
+    "defaultMessage": "عدد كبير جدًا من الرموز غير الصحيحة. حاول مرة أخرى بعد 15 دقيقة."
+  },
+  "Auth / OTP / Invalid code": {
+    "defaultMessage": "رمز التحقق غير صالح."
+  },
+  "Auth / OTP / Login expired": {
+    "defaultMessage": "انتهت صلاحية جلسة تسجيل الدخول. يُرجى تسجيل الدخول مرة أخرى."
+  },
   "Auth / Passkey / button": {
     "defaultMessage": "تسجيل الدخول باستخدام Passkey"
   },
@@ -4576,6 +4585,9 @@
   },
   "Tenant Invitation / Decline button": {
     "defaultMessage": "رفض"
+  },
+  "Tenant Invitation / Email verification required": {
+    "defaultMessage": "تحقّق من عنوان بريدك الإلكتروني قبل قبول هذه الدعوة."
   },
   "Tenant Invitation / Error message": {
     "defaultMessage": "لم تعد هذه الدعوة صالحة."
