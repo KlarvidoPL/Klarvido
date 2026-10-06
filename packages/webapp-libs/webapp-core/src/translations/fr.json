@@ -1,4 +1,262 @@
 {
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "Statut"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "Nombre d’entrées"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "Opération"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "Filtres"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "ID de configuration"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "ID de sauvegarde"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "Stratégie de conflit"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "Nombre d’enregistrements"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "Créés"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "Mis à jour"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "Ignorés"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "Échecs"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "Motif"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "Fin du jeton"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "Nom du jeton"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "Code d’erreur"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "E-mail de facturation"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "Identifiant URL"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "Type"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "Rôle"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "Rôles"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "Aucun"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "En attente"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "En cours"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "Terminé"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "Partiellement terminé"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "Valide"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "Invalide"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "Non vérifié"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "Politique de conservation"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "Paramètres de l’organisation modifiés"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "Nom"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "Description"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "Couleur"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "Autorisations"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "Activé"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "Intervalle de sauvegarde (heures)"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "Conservation (jours)"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "Destinataires des e-mails"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "Modules sélectionnés"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "Modèles sélectionnés"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "Modèles exclus"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "Journalisation des activités"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "Moyen de paiement par défaut"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "Formule d’abonnement"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "Invitation envoyée"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "Invitation renvoyée"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "Invitation acceptée"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "Invitation refusée"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "Paramètres de sauvegarde modifiés"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "Sauvegarde demandée"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "Sauvegarde supprimée"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "Sauvegarde téléchargée"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "Sauvegarde terminée"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "Échec de la sauvegarde"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "Restauration demandée"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "Restauration terminée"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "Restauration partiellement terminée"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "Échec de la restauration"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "Export du journal d’activité demandé"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "Export du journal d’activité terminé"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "Échec de l’export du journal d’activité"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "Journalisation des activités activée"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "Journalisation des activités désactivée"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "Moyen de paiement par défaut modifié"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "Formule d’abonnement modifiée"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "Invitation à l’organisation"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "Paramètres de sauvegarde"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "Sauvegarde"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "Restauration de sauvegarde"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "Export du journal d’activité"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "Élément CRUD"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "Utilisateur"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "Agent IA"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "Superadministrateur"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "Système (synchronisation)"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "Système (import)"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "Système (tâche en arrière-plan)"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "Système (migration)"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "Moyen de paiement"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "Abonnement"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "Jeton SCIM"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "Connexion SSO"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "Membre de l’organisation"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "Rôle dans l’organisation"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "Organisation"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "Accès aux sources de données"
   },
@@ -56,6 +314,27 @@
   "Access Denied / Title": {
     "defaultMessage": "Accès refusé"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "Création"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "Mise à jour"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "Suppression"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "Modification des paramètres"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "Importation"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "Synchronisation"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "Suppression groupée"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "Acteur"
   },
@@ -106,6 +385,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "Activé"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "Client"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "Projet"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "Personne"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "Rôle"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "Revenu"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "Coût"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "Taux de change"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "Affectation"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "Itération"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "Facture"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "Transaction"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "Paramètres"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "Paramètres de l’organisation"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "Jeton KSeF"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "ID de l’entité"
@@ -1484,11 +1805,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Paramètres de sauvegarde mis à jour avec succès"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "Effacer la date"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "Effacer"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "Terminé"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "Aller à aujourd'hui"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "Mois suivant"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "Année suivante"
+  },
   "Calendar / Now button": {
     "defaultMessage": "Maintenant"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "Heure"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "Choisir la date et l’heure"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "Année précédente"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "Mois précédent"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "Choisir la date"
   },
   "Calendar / Today button": {
     "defaultMessage": "Aujourd'hui"

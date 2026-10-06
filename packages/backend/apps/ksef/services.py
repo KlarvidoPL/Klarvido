@@ -13,7 +13,7 @@ from django.utils import timezone
 from apps.multitenancy.constants import ActionType, CompanyCountry
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog
-from common.action_logging.service import log_action
+from common.action_logging.service import get_request_actor, log_action
 
 from . import crypto
 from .client import verify_token
@@ -43,7 +43,7 @@ def get_credential(tenant) -> Optional[KsefCredential]:
     return KsefCredential.objects.filter(tenant=tenant).first()
 
 
-def _log(tenant, user, action_type: str, credential: Optional[KsefCredential], metadata: dict) -> None:
+def _log(tenant, user, action_type: str, credential: Optional[KsefCredential], metadata: dict, request=None) -> None:
     log_action(
         tenant_id=tenant.pk,
         action_type=action_type,
@@ -51,6 +51,7 @@ def _log(tenant, user, action_type: str, credential: Optional[KsefCredential], m
         entity_id=str(tenant.pk),
         entity_name="KSeF token",
         actor_user=user,
+        actor_type=get_request_actor(request),
         metadata=metadata,
     )
 
@@ -68,7 +69,7 @@ def _log_security_event(tenant, user, event_type: str, description: str, metadat
     )
 
 
-def save_token(tenant, user, token: str) -> CredentialResult:
+def save_token(tenant, user, token: str, request=None) -> CredentialResult:
     """Verify the token with KSeF and, unless KSeF rejected it, store it encrypted (replacing any previous token)."""
     error = _eligibility_error(tenant)
     if error:
@@ -107,6 +108,7 @@ def save_token(tenant, user, token: str) -> CredentialResult:
         ActionType.CREATE if created else ActionType.UPDATE,
         credential,
         {"operation": "set", "status": credential.status, "token_hint": credential.token_hint},
+        request=request,
     )
     _log_security_event(
         tenant,
@@ -124,7 +126,7 @@ def save_token(tenant, user, token: str) -> CredentialResult:
     return CredentialResult(credential, check.error_code)
 
 
-def retest_token(tenant, user) -> CredentialResult:
+def retest_token(tenant, user, request=None) -> CredentialResult:
     """Decrypt the stored token and check it with KSeF again."""
     credential = get_credential(tenant)
     if credential is None:
@@ -165,6 +167,7 @@ def retest_token(tenant, user) -> CredentialResult:
         ActionType.UPDATE,
         credential,
         {"operation": "test", "status": credential.status, "token_hint": credential.token_hint},
+        request=request,
     )
     _log_security_event(
         tenant,
@@ -177,14 +180,14 @@ def retest_token(tenant, user) -> CredentialResult:
     return CredentialResult(credential, check.error_code)
 
 
-def delete_token(tenant, user) -> bool:
+def delete_token(tenant, user, request=None) -> bool:
     credential = get_credential(tenant)
     if credential is None:
         return False
     hint = credential.token_hint
     name = credential.token_name
     credential.delete()
-    _log(tenant, user, ActionType.DELETE, None, {"operation": "delete", "token_hint": hint})
+    _log(tenant, user, ActionType.DELETE, None, {"operation": "delete", "token_hint": hint}, request=request)
     _log_security_event(
         tenant,
         user,

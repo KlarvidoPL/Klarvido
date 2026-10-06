@@ -1,4 +1,262 @@
 {
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "状态"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "日志数量"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "操作"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "筛选条件"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "配置 ID"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "备份 ID"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "冲突策略"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "记录数量"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "已创建"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "已更新"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "已跳过"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "失败"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "原因"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "令牌末尾"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "令牌名称"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "错误代码"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "账单邮箱"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "URL 标识"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "类型"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "角色"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "角色"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "无"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "待处理"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "处理中"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "已完成"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "部分完成"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "有效"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "无效"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "未验证"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "保留策略"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "已更改组织设置"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "名称"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "描述"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "颜色"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "权限"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "已启用"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "备份间隔（小时）"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "保留期限（天）"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "邮件收件人"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "选定模块"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "选定模型"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "排除的模型"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "活动记录"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "默认支付方式"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "订阅方案"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "已发送邀请"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "已重新发送邀请"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "已接受邀请"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "已拒绝邀请"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "已更改备份设置"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "已请求备份"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "已删除备份"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "已下载备份"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "备份已完成"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "备份失败"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "已请求恢复"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "恢复已完成"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "恢复部分完成"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "恢复失败"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "已请求导出活动日志"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "活动日志导出已完成"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "活动日志导出失败"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "已启用活动记录"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "已禁用活动记录"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "已更改默认支付方式"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "已更改订阅方案"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "组织邀请"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "备份设置"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "备份"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "备份恢复"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "活动日志导出"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "CRUD 项目"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "用户"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "AI 智能体"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "超级管理员"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "系统（同步）"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "系统（导入）"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "系统（后台任务）"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "系统（迁移）"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "支付方式"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "订阅"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "SCIM 令牌"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "SSO 连接"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "组织成员"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "组织角色"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "组织"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "正在访问数据源"
   },
@@ -56,6 +314,27 @@
   "Access Denied / Title": {
     "defaultMessage": "访问被拒绝"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "已创建"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "已更新"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "已删除"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "已更改设置"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "已导入"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "已同步"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "已批量删除"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "执行人"
   },
@@ -106,6 +385,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "已启用"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "客户"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "项目"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "人员"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "角色"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "收入"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "成本"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "汇率"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "分配"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "迭代"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "发票"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "交易"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "设置"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "组织设置"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "KSeF令牌"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "实体 ID"
@@ -1484,11 +1805,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "备份设置更新成功"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "清除日期"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "清除"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "完成"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "跳到今天"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "下个月"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "下一年"
+  },
   "Calendar / Now button": {
     "defaultMessage": "现在"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "时间"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "选择日期和时间"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "上一年"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "上个月"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "选择日期"
   },
   "Calendar / Today button": {
     "defaultMessage": "今天"

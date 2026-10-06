@@ -1,6 +1,11 @@
 from dataclasses import asdict
 
 from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
+import json
+
+from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.contenttypes.models import ContentType
+
 import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
@@ -16,7 +21,7 @@ from common.acl import policies
 from common.graphql import mutations, exceptions
 from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE, permission_classes, requires
 from common.action_logging.decorators import action_logged
-from common.action_logging.service import log_action, log_delete
+from common.action_logging.service import get_request_actor, log_action, log_delete
 from common.ratelimiting import graphql_ratelimit, RateLimitKey
 from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
@@ -588,6 +593,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
                 entity_type="tenant",
                 instance=tenant,
                 actor_user=info.context.user,
+                actor_type=get_request_actor(info.context),
             )
 
             try:
@@ -604,6 +610,22 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
                 logger = logging.getLogger(__name__)
                 logger.warning(f"Failed to cancel subscription for tenant {tenant.pk} during deletion: {e}")
 
+            LogEntry.objects.create(
+                user_id=info.context.user.pk,
+                content_type=ContentType.objects.get_for_model(models.Tenant),
+                object_id=tenant_pk,
+                object_repr=tenant_name[:200],
+                action_flag=DELETION,
+                change_message=json.dumps(
+                    {
+                        "operation": "organization_deleted",
+                        "organization_id": tenant_pk,
+                        "organization_name": tenant_name,
+                        "actor_email": deleter.email,
+                        "actor_type": get_request_actor(info.context),
+                    }
+                ),
+            )
             tenant.delete()
 
             # Only once the delete is committed: remove its files from storage and tell the members
@@ -730,6 +752,7 @@ class DeleteTenantMembershipMutation(mutations.DeleteModelMutation):
             entity_type="tenant_membership",
             instance=obj,
             actor_user=user,
+            actor_type=get_request_actor(info.context),
             name_field="invitee_email_address" if not obj.user else None,
         )
 
@@ -811,7 +834,7 @@ class UpdateTenantActionLoggingMutation(graphene.Mutation):
         from common.action_logging import log_action
         from .constants import ActionType
 
-        if tenant.action_logging_enabled:
+        if tenant.action_logging_enabled != enabled:
             log_action(
                 tenant_id=pk,
                 action_type=ActionType.SETTINGS_CHANGE,
@@ -819,14 +842,15 @@ class UpdateTenantActionLoggingMutation(graphene.Mutation):
                 entity_id=str(tenant.pk),
                 entity_name="Action Logging",
                 actor_user=user,
-                actor_type="USER",
+                actor_type=get_request_actor(info.context),
                 changes={
                     "action_logging_enabled": {
                         "old": tenant.action_logging_enabled,
                         "new": enabled,
                     },
                 },
-                force_log=True,  # Force log even if we're disabling
+                metadata={"operation": "logging_enabled" if enabled else "logging_disabled"},
+                force_log=True,  # Record both transitions even when logging was off
             )
 
         tenant.action_logging_enabled = enabled
@@ -912,6 +936,16 @@ class ExportActionLogsMutation(graphene.Mutation):
             tenant=tenant,
             requested_by=user,
             filters=filters,
+        )
+
+        log_action(
+            tenant_id=tenant.pk,
+            action_type=ActionType.CREATE,
+            entity_type="activity_log_export",
+            entity_id=str(export_job.pk),
+            actor_user=user,
+            actor_type=get_request_actor(info.context),
+            metadata={"operation": "export_requested", "filters": filters},
         )
 
         # Trigger async task
@@ -1008,7 +1042,13 @@ class CreateOrganizationRoleMutation(graphene.Mutation):
                 entity_id=str(role.pk),
                 entity_name=role.name,
                 actor_user=user,
-                changes={"name": {"new": name}},
+                actor_type=get_request_actor(info.context),
+                changes={
+                    "name": {"old": None, "new": name},
+                    "description": {"old": None, "new": role.description},
+                    "color": {"old": None, "new": role.color},
+                    "permissions": {"old": [], "new": list(role.permissions.values_list("code", flat=True))},
+                },
             )
 
         return cls(role=role, ok=True)
@@ -1126,6 +1166,7 @@ class UpdateOrganizationRoleMutation(graphene.Mutation):
                     entity_id=str(role.pk),
                     entity_name=role.name,
                     actor_user=user,
+                    actor_type=get_request_actor(info.context),
                     changes=changes,
                 )
 
@@ -1239,6 +1280,7 @@ class DeleteOrganizationRoleMutation(graphene.Mutation):
                     entity_type="organization_role",
                     instance=role,
                     actor_user=user,
+                    actor_type=get_request_actor(info.context),
                 )
 
                 role.delete()
@@ -1249,6 +1291,7 @@ class DeleteOrganizationRoleMutation(graphene.Mutation):
                 entity_type="organization_role",
                 instance=role,
                 actor_user=user,
+                actor_type=get_request_actor(info.context),
             )
             role.delete()
 
@@ -1396,6 +1439,7 @@ class AssignRolesToMemberMutation(graphene.Mutation):
                 entity_id=str(membership.pk),
                 entity_name=member_name,
                 actor_user=user,
+                actor_type=get_request_actor(info.context),
                 changes={"roles": {"old": old_roles, "new": new_role_names}},
             )
 
@@ -1502,6 +1546,7 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
             entity_id=str(membership.pk),
             entity_name=member_name,
             actor_user=user,
+            actor_type=get_request_actor(info.context),
             changes={"role_removed": {"old": role_name, "new": None}},
         )
 

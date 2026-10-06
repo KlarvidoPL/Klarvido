@@ -1,4 +1,262 @@
 {
+  "Activity Logs / Detail / status": {
+    "defaultMessage": "Status"
+  },
+  "Activity Logs / Detail / log_count": {
+    "defaultMessage": "Anzahl der Einträge"
+  },
+  "Activity Logs / Detail / operation": {
+    "defaultMessage": "Vorgang"
+  },
+  "Activity Logs / Detail / filters": {
+    "defaultMessage": "Filter"
+  },
+  "Activity Logs / Detail / config_id": {
+    "defaultMessage": "Konfigurations-ID"
+  },
+  "Activity Logs / Detail / backup_id": {
+    "defaultMessage": "Sicherungs-ID"
+  },
+  "Activity Logs / Detail / conflict_strategy": {
+    "defaultMessage": "Konfliktstrategie"
+  },
+  "Activity Logs / Detail / model_counts": {
+    "defaultMessage": "Datensatzanzahl"
+  },
+  "Activity Logs / Detail / created": {
+    "defaultMessage": "Erstellt"
+  },
+  "Activity Logs / Detail / updated": {
+    "defaultMessage": "Aktualisiert"
+  },
+  "Activity Logs / Detail / skipped": {
+    "defaultMessage": "Übersprungen"
+  },
+  "Activity Logs / Detail / failed": {
+    "defaultMessage": "Fehlgeschlagen"
+  },
+  "Activity Logs / Detail / reason": {
+    "defaultMessage": "Grund"
+  },
+  "Activity Logs / Detail / token_hint": {
+    "defaultMessage": "Token-Endung"
+  },
+  "Activity Logs / Detail / token_name": {
+    "defaultMessage": "Token-Name"
+  },
+  "Activity Logs / Detail / error_code": {
+    "defaultMessage": "Fehlercode"
+  },
+  "Activity Logs / Detail / billing_email": {
+    "defaultMessage": "Abrechnungs-E-Mail"
+  },
+  "Activity Logs / Detail / slug": {
+    "defaultMessage": "URL-Kennung"
+  },
+  "Activity Logs / Detail / type": {
+    "defaultMessage": "Typ"
+  },
+  "Activity Logs / Detail / role": {
+    "defaultMessage": "Rolle"
+  },
+  "Activity Logs / Detail / roles": {
+    "defaultMessage": "Rollen"
+  },
+  "Activity Logs / Detail / none": {
+    "defaultMessage": "Keine"
+  },
+  "Activity Logs / Detail / pending": {
+    "defaultMessage": "Ausstehend"
+  },
+  "Activity Logs / Detail / processing": {
+    "defaultMessage": "In Bearbeitung"
+  },
+  "Activity Logs / Detail / completed": {
+    "defaultMessage": "Abgeschlossen"
+  },
+  "Activity Logs / Detail / partially_completed": {
+    "defaultMessage": "Teilweise abgeschlossen"
+  },
+  "Activity Logs / Detail / valid": {
+    "defaultMessage": "Gültig"
+  },
+  "Activity Logs / Detail / invalid": {
+    "defaultMessage": "Ungültig"
+  },
+  "Activity Logs / Detail / unverified": {
+    "defaultMessage": "Ungeprüft"
+  },
+  "Activity Logs / Detail / retention": {
+    "defaultMessage": "Aufbewahrungsrichtlinie"
+  },
+  "Activity Logs / Detail / organization_settings_changed": {
+    "defaultMessage": "Organisationseinstellungen geändert"
+  },
+  "Activity Logs / Field / name": {
+    "defaultMessage": "Name"
+  },
+  "Activity Logs / Field / description": {
+    "defaultMessage": "Beschreibung"
+  },
+  "Activity Logs / Field / color": {
+    "defaultMessage": "Farbe"
+  },
+  "Activity Logs / Field / permissions": {
+    "defaultMessage": "Berechtigungen"
+  },
+  "Activity Logs / Field / enabled": {
+    "defaultMessage": "Aktiviert"
+  },
+  "Activity Logs / Field / backup_interval_hours": {
+    "defaultMessage": "Sicherungsintervall (Stunden)"
+  },
+  "Activity Logs / Field / retention_days": {
+    "defaultMessage": "Aufbewahrung (Tage)"
+  },
+  "Activity Logs / Field / email_recipients": {
+    "defaultMessage": "E-Mail-Empfänger"
+  },
+  "Activity Logs / Field / selected_modules": {
+    "defaultMessage": "Ausgewählte Module"
+  },
+  "Activity Logs / Field / selected_models": {
+    "defaultMessage": "Ausgewählte Modelle"
+  },
+  "Activity Logs / Field / excluded_models": {
+    "defaultMessage": "Ausgeschlossene Modelle"
+  },
+  "Activity Logs / Field / action_logging_enabled": {
+    "defaultMessage": "Aktivitätsprotokollierung"
+  },
+  "Activity Logs / Field / default_payment_method": {
+    "defaultMessage": "Standardzahlungsmethode"
+  },
+  "Activity Logs / Field / plan": {
+    "defaultMessage": "Abonnementplan"
+  },
+  "Activity Logs / Operation / invitation_sent": {
+    "defaultMessage": "Einladung gesendet"
+  },
+  "Activity Logs / Operation / invitation_resent": {
+    "defaultMessage": "Einladung erneut gesendet"
+  },
+  "Activity Logs / Operation / invitation_accepted": {
+    "defaultMessage": "Einladung angenommen"
+  },
+  "Activity Logs / Operation / invitation_declined": {
+    "defaultMessage": "Einladung abgelehnt"
+  },
+  "Activity Logs / Operation / backup_settings_changed": {
+    "defaultMessage": "Sicherungseinstellungen geändert"
+  },
+  "Activity Logs / Operation / backup_requested": {
+    "defaultMessage": "Sicherung angefordert"
+  },
+  "Activity Logs / Operation / backup_deleted": {
+    "defaultMessage": "Sicherung gelöscht"
+  },
+  "Activity Logs / Operation / backup_downloaded": {
+    "defaultMessage": "Sicherung heruntergeladen"
+  },
+  "Activity Logs / Operation / backup_completed": {
+    "defaultMessage": "Sicherung abgeschlossen"
+  },
+  "Activity Logs / Operation / backup_failed": {
+    "defaultMessage": "Sicherung fehlgeschlagen"
+  },
+  "Activity Logs / Operation / restore_requested": {
+    "defaultMessage": "Wiederherstellung angefordert"
+  },
+  "Activity Logs / Operation / restore_completed": {
+    "defaultMessage": "Wiederherstellung abgeschlossen"
+  },
+  "Activity Logs / Operation / restore_partial": {
+    "defaultMessage": "Wiederherstellung teilweise abgeschlossen"
+  },
+  "Activity Logs / Operation / restore_failed": {
+    "defaultMessage": "Wiederherstellung fehlgeschlagen"
+  },
+  "Activity Logs / Operation / export_requested": {
+    "defaultMessage": "Aktivitätsprotokollexport angefordert"
+  },
+  "Activity Logs / Operation / export_completed": {
+    "defaultMessage": "Aktivitätsprotokollexport abgeschlossen"
+  },
+  "Activity Logs / Operation / export_failed": {
+    "defaultMessage": "Aktivitätsprotokollexport fehlgeschlagen"
+  },
+  "Activity Logs / Operation / logging_enabled": {
+    "defaultMessage": "Aktivitätsprotokollierung aktiviert"
+  },
+  "Activity Logs / Operation / logging_disabled": {
+    "defaultMessage": "Aktivitätsprotokollierung deaktiviert"
+  },
+  "Activity Logs / Operation / default_payment_method_changed": {
+    "defaultMessage": "Standardzahlungsmethode geändert"
+  },
+  "Activity Logs / Operation / subscription_changed": {
+    "defaultMessage": "Abonnementplan geändert"
+  },
+  "Activity Logs / Entity / tenant_invitation": {
+    "defaultMessage": "Organisationseinladung"
+  },
+  "Activity Logs / Entity / backup_config": {
+    "defaultMessage": "Sicherungseinstellungen"
+  },
+  "Activity Logs / Entity / backup": {
+    "defaultMessage": "Sicherung"
+  },
+  "Activity Logs / Entity / backup_restore": {
+    "defaultMessage": "Wiederherstellung"
+  },
+  "Activity Logs / Entity / activity_log_export": {
+    "defaultMessage": "Aktivitätsprotokollexport"
+  },
+  "Activity Logs / Entity / crud_item": {
+    "defaultMessage": "CRUD-Eintrag"
+  },
+  "Activity Logs / Actor / USER": {
+    "defaultMessage": "Benutzer"
+  },
+  "Activity Logs / Actor / AI_AGENT": {
+    "defaultMessage": "KI-Agent"
+  },
+  "Activity Logs / Actor / SUPERUSER": {
+    "defaultMessage": "Superadministrator"
+  },
+  "Activity Logs / Actor / SYSTEM:sync": {
+    "defaultMessage": "System (Synchronisierung)"
+  },
+  "Activity Logs / Actor / SYSTEM:import": {
+    "defaultMessage": "System (Import)"
+  },
+  "Activity Logs / Actor / SYSTEM:scheduled_task": {
+    "defaultMessage": "System (Hintergrundaufgabe)"
+  },
+  "Activity Logs / Actor / SYSTEM:migration": {
+    "defaultMessage": "System (Migration)"
+  },
+  "Activity Logs / Entity / payment_method": {
+    "defaultMessage": "Zahlungsmethode"
+  },
+  "Activity Logs / Entity / subscription": {
+    "defaultMessage": "Abonnement"
+  },
+  "Activity Logs / Entity / scim_token": {
+    "defaultMessage": "SCIM-Token"
+  },
+  "Activity Logs / Entity / sso_connection": {
+    "defaultMessage": "SSO-Verbindung"
+  },
+  "Activity Logs / Entity / tenant_membership": {
+    "defaultMessage": "Organisationsmitglied"
+  },
+  "Activity Logs / Entity / organization_role": {
+    "defaultMessage": "Organisationsrolle"
+  },
+  "Activity Logs / Entity / tenant": {
+    "defaultMessage": "Organisation"
+  },
   "AI Assistant / Accessing data": {
     "defaultMessage": "Zugriff auf Datenquellen"
   },
@@ -56,6 +314,27 @@
   "Access Denied / Title": {
     "defaultMessage": "Zugriff verweigert"
   },
+  "Activity Logs / Action / CREATE": {
+    "defaultMessage": "Erstellt"
+  },
+  "Activity Logs / Action / UPDATE": {
+    "defaultMessage": "Aktualisiert"
+  },
+  "Activity Logs / Action / DELETE": {
+    "defaultMessage": "Gelöscht"
+  },
+  "Activity Logs / Action / SETTINGS_CHANGE": {
+    "defaultMessage": "Einstellungen geändert"
+  },
+  "Activity Logs / Action / IMPORT": {
+    "defaultMessage": "Importiert"
+  },
+  "Activity Logs / Action / SYNC": {
+    "defaultMessage": "Synchronisiert"
+  },
+  "Activity Logs / Action / BULK_DELETE": {
+    "defaultMessage": "Mehrere Einträge gelöscht"
+  },
   "Activity Logs / Actor": {
     "defaultMessage": "Akteur"
   },
@@ -106,6 +385,48 @@
   },
   "Activity Logs / Enabled badge": {
     "defaultMessage": "Aktiviert"
+  },
+  "Activity Logs / Entity / client": {
+    "defaultMessage": "Kunde"
+  },
+  "Activity Logs / Entity / project": {
+    "defaultMessage": "Projekt"
+  },
+  "Activity Logs / Entity / person": {
+    "defaultMessage": "Person"
+  },
+  "Activity Logs / Entity / role": {
+    "defaultMessage": "Rolle"
+  },
+  "Activity Logs / Entity / revenue_line": {
+    "defaultMessage": "Einnahme"
+  },
+  "Activity Logs / Entity / cost_line": {
+    "defaultMessage": "Kosten"
+  },
+  "Activity Logs / Entity / fx_rate": {
+    "defaultMessage": "Wechselkurs"
+  },
+  "Activity Logs / Entity / assignment": {
+    "defaultMessage": "Zuweisung"
+  },
+  "Activity Logs / Entity / iteration": {
+    "defaultMessage": "Iteration"
+  },
+  "Activity Logs / Entity / invoice": {
+    "defaultMessage": "Rechnung"
+  },
+  "Activity Logs / Entity / deal": {
+    "defaultMessage": "Geschäft"
+  },
+  "Activity Logs / Entity / settings": {
+    "defaultMessage": "Einstellungen"
+  },
+  "Activity Logs / Entity / tenant_settings": {
+    "defaultMessage": "Organisationseinstellungen"
+  },
+  "Activity Logs / Entity / ksef_credential": {
+    "defaultMessage": "KSeF-Token"
   },
   "Activity Logs / Entity ID": {
     "defaultMessage": "Entitäts-ID"
@@ -1484,11 +1805,41 @@
   "Backup Settings / Update Success": {
     "defaultMessage": "Sicherungseinstellungen erfolgreich aktualisiert"
   },
+  "Calendar / Clear date": {
+    "defaultMessage": "Datum löschen"
+  },
+  "Calendar / Clear button": {
+    "defaultMessage": "Löschen"
+  },
+  "Calendar / Done button": {
+    "defaultMessage": "Fertig"
+  },
   "Calendar / Jump to today": {
     "defaultMessage": "Zu heute springen"
   },
+  "Calendar / Next month": {
+    "defaultMessage": "Nächster Monat"
+  },
+  "Calendar / Next year": {
+    "defaultMessage": "Nächstes Jahr"
+  },
   "Calendar / Now button": {
     "defaultMessage": "Jetzt"
+  },
+  "Calendar / Time label": {
+    "defaultMessage": "Uhrzeit"
+  },
+  "Calendar / Select date and time": {
+    "defaultMessage": "Datum und Uhrzeit auswählen"
+  },
+  "Calendar / Previous year": {
+    "defaultMessage": "Vorheriges Jahr"
+  },
+  "Calendar / Previous month": {
+    "defaultMessage": "Vorheriger Monat"
+  },
+  "Calendar / Select date": {
+    "defaultMessage": "Datum auswählen"
   },
   "Calendar / Today button": {
     "defaultMessage": "Heute"

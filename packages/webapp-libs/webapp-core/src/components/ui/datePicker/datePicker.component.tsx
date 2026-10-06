@@ -1,17 +1,18 @@
 'use client';
 
+import { format, getHours, getMinutes, isValid, parse, parseISO, setHours, setMinutes, startOfDay } from 'date-fns';
+import { CalendarIcon, Clock, X } from 'lucide-react';
 import * as React from 'react';
-import { useState, useCallback, useRef, useMemo } from 'react';
-import { format, parse, parseISO, isValid, setHours, setMinutes, getHours, getMinutes, startOfDay } from 'date-fns';
-import { CalendarIcon, X, Clock } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../buttons';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { Calendar } from '../calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
-import { useDateFnsLocale } from '../../../lib/dateFnsLocale';
+import { Input } from '../input';
+import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
 
 export interface DatePickerProps {
   /** The selected date as ISO string (YYYY-MM-DD or YYYY-MM-DDTHH:mm) or Date object */
@@ -28,7 +29,7 @@ export interface DatePickerProps {
   align?: 'start' | 'center' | 'end';
   /** Whether to show the clear button */
   clearable?: boolean;
-  /** Date format for display (default: "dd MMM yyyy" or "dd MMM yyyy HH:mm" for datetime) */
+  /** Optional date-fns display format. Defaults to localized date and time formatting. */
   displayFormat?: string;
   /** Minimum selectable date */
   minDate?: Date;
@@ -40,7 +41,7 @@ export interface DatePickerProps {
   id?: string;
   /** Whether to include time picker (default: false) */
   showTime?: boolean;
-  /** Time step in minutes for the time picker (default: 5) */
+  /** Spacing between suggested minutes (default: 5). Typed times keep their exact minutes. */
   timeStep?: number;
 }
 
@@ -51,16 +52,16 @@ export interface DatePickerProps {
 function parseValue(value: string | Date | undefined): Date | undefined {
   if (!value) return undefined;
   if (value instanceof Date) return isValid(value) ? value : undefined;
-  
+
   // Use parseISO for ISO format strings (handles YYYY-MM-DD and YYYY-MM-DDTHH:mm correctly)
   // parseISO treats date-only strings as local time, not UTC
   const parsed = parseISO(value);
   if (isValid(parsed)) return parsed;
-  
+
   // Fallback: try parsing with date-fns parse
   const fallbackParsed = parse(value, 'yyyy-MM-dd', new Date());
   if (isValid(fallbackParsed)) return fallbackParsed;
-  
+
   return undefined;
 }
 
@@ -74,121 +75,124 @@ function formatOutput(date: Date, showTime: boolean): string {
   return format(date, 'yyyy-MM-dd');
 }
 
-/**
- * Format a number to 2 digits
- */
-function pad(num: number): string {
-  return num.toString().padStart(2, '0');
-}
-
-/**
- * Generate hours options
- */
-function generateHourOptions(): { value: string; label: string }[] {
-  return Array.from({ length: 24 }, (_, i) => ({
-    value: String(i),
-    label: pad(i),
-  }));
-}
-
-/**
- * Generate minutes options based on step
- */
-function generateMinuteOptions(step: number): { value: string; label: string }[] {
-  const options: { value: string; label: string }[] = [];
-  for (let i = 0; i < 60; i += step) {
-    options.push({ value: String(i), label: pad(i) });
+/** Parse pasted 24-hour times or the locale's 12-hour time, including localized digits. */
+export function parseTimeInput(value: string, locale: string): { hours: number; minutes: number } | undefined {
+  let text = value.trim().replace(/[\u200e\u200f\u061c]/g, '');
+  const numberFormat = new Intl.NumberFormat(locale, { useGrouping: false });
+  for (let digit = 0; digit < 10; digit++) {
+    text = text.split(numberFormat.format(digit)).join(String(digit));
   }
-  return options;
+  text = text.replace(/[٠-٩۰-۹०-९]/g, (digit) => {
+    const code = digit.charCodeAt(0);
+    return String(code - (code >= 0x0966 ? 0x0966 : code >= 0x06f0 ? 0x06f0 : 0x0660));
+  });
+  let period: 'am' | 'pm' | undefined;
+  for (const [hour, marker] of [
+    [9, 'am'],
+    [17, 'pm'],
+  ] as const) {
+    const date = new Date(2026, 0, 1, hour);
+    const localized = new Intl.DateTimeFormat(locale, { hour: 'numeric', hour12: true })
+      .formatToParts(date)
+      .find((part) => part.type === 'dayPeriod')?.value;
+    for (const label of [marker, localized].filter((item): item is string => !!item)) {
+      if (text.toLowerCase().includes(label.toLowerCase())) {
+        if (period) return undefined;
+        period = marker;
+        text = text.toLowerCase().replace(label.toLowerCase(), '').trim();
+        break;
+      }
+    }
+  }
+  const match = /^(\d{1,2})[:：.](\d{2})$/.exec(text);
+  if (!match) return undefined;
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (minutes > 59 || hours > 23 || (period && (hours < 1 || hours > 12))) return undefined;
+  if (period) hours = (hours % 12) + (period === 'pm' ? 12 : 0);
+  return { hours, minutes };
 }
 
-/**
- * Compact Time Picker using Select dropdowns
- */
 interface TimePickerProps {
   hours: number;
   minutes: number;
-  onHoursChange: (hours: number) => void;
-  onMinutesChange: (minutes: number) => void;
   onTimeChange: (hours: number, minutes: number) => void;
   minuteStep: number;
   disabled?: boolean;
 }
 
-function TimePicker({ hours, minutes, onHoursChange, onMinutesChange, onTimeChange, minuteStep, disabled }: TimePickerProps) {
-  const hourOptions = useMemo(() => generateHourOptions(), []);
-  const minuteOptions = useMemo(() => generateMinuteOptions(minuteStep), [minuteStep]);
-  
-  // Find the closest valid minute
-  const closestMinute = useMemo(() => {
-    const validMinutes = minuteOptions.map(o => parseInt(o.value));
-    return validMinutes.reduce((prev, curr) => 
-      Math.abs(curr - minutes) < Math.abs(prev - minutes) ? curr : prev
-    );
-  }, [minutes, minuteOptions]);
+function TimePicker({ hours, minutes, onTimeChange, minuteStep, disabled }: TimePickerProps) {
+  const intl = useIntl();
+  const formatTime = (hour: number, minute: number) =>
+    intl.formatTime(new Date(2026, 0, 1, hour, minute), { hour: 'numeric', minute: '2-digit' });
+  const formatted = formatTime(hours, minutes);
+  const [text, setText] = useState(formatted);
+  useEffect(() => setText(formatted), [formatted]);
+  const commitTime = () => {
+    const parsed = parseTimeInput(text, intl.locale);
+    if (parsed) onTimeChange(parsed.hours, parsed.minutes);
+    else setText(formatted);
+  };
+  const step = Number.isFinite(minuteStep) ? Math.max(1, Math.min(60, Math.floor(minuteStep))) : 5;
 
   return (
-    <div className={cn(
-      "flex items-center gap-2 px-3 py-2 border-t border-border",
-      disabled && "opacity-50 pointer-events-none"
-    )}>
-      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-      
-      <Select
-        value={String(hours)}
-        onValueChange={(val) => onHoursChange(parseInt(val))}
+    <div className="border-border flex flex-wrap items-center gap-2 border-t px-3 py-2">
+      <Clock className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
+      <Input
+        type="text"
+        value={text}
         disabled={disabled}
+        aria-label={intl.formatMessage({ id: 'Calendar / Time label', defaultMessage: 'Time' })}
+        className="h-8 w-32 text-sm"
+        onChange={(event) => setText(event.target.value)}
+        onBlur={commitTime}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            commitTime();
+          }
+        }}
+      />
+      <Select
+        value={`${hours}:${minutes}`}
+        disabled={disabled}
+        onValueChange={(value) => {
+          const [hour, minute] = value.split(':').map(Number);
+          setText(formatTime(hour, minute));
+          onTimeChange(hour, minute);
+        }}
       >
-        <SelectTrigger className="w-16 h-8 text-sm">
-          <SelectValue placeholder="HH" />
-        </SelectTrigger>
-        <SelectContent className="max-h-48">
-          {hourOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value} className="text-sm">
-              {option.label}
-            </SelectItem>
-          ))}
+        <SelectTrigger
+          className="h-8 w-9 justify-center px-2"
+          aria-label={intl.formatMessage({ id: 'Calendar / Time label', defaultMessage: 'Time' })}
+        />
+        <SelectContent>
+          {Array.from({ length: 24 }, (_, hour) =>
+            Array.from(new Set([minutes, ...Array.from({ length: Math.ceil(60 / step) }, (_, index) => index * step)]))
+              .sort((a, b) => a - b)
+              .map((minute) => (
+                <SelectItem key={`${hour}:${minute}`} value={`${hour}:${minute}`}>
+                  {formatTime(hour, minute)}
+                </SelectItem>
+              ))
+          )}
         </SelectContent>
       </Select>
-
-      <span className="text-sm font-medium text-muted-foreground">:</span>
-
-      <Select
-        value={String(closestMinute)}
-        onValueChange={(val) => onMinutesChange(parseInt(val))}
-        disabled={disabled}
-      >
-        <SelectTrigger className="w-16 h-8 text-sm">
-          <SelectValue placeholder="MM" />
-        </SelectTrigger>
-        <SelectContent className="max-h-48">
-          {minuteOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value} className="text-sm">
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Quick preset buttons - compact */}
-      <div className="flex items-center gap-1 ml-auto">
-        {[
-          { label: '9am', hours: 9, minutes: 0 },
-          { label: '12pm', hours: 12, minutes: 0 },
-          { label: '5pm', hours: 17, minutes: 0 },
-        ].map((preset) => (
+      <div className="ml-auto flex flex-wrap items-center gap-1">
+        {[9, 12, 17].map((hour) => (
           <button
-            key={preset.label}
+            key={hour}
             type="button"
-            onClick={() => onTimeChange(preset.hours, preset.minutes)}
+            disabled={disabled}
+            onClick={() => onTimeChange(hour, 0)}
             className={cn(
-              "px-2 py-1 text-xs rounded transition-colors",
-              hours === preset.hours && closestMinute === preset.minutes
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              'rounded px-2 py-1 text-xs transition-colors disabled:opacity-50',
+              hours === hour && minutes === 0
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
-            {preset.label}
+            {formatTime(hour, 0)}
           </button>
         ))}
       </div>
@@ -219,83 +223,82 @@ export function DatePicker({
   const intl = useIntl();
   const dateLocale = useDateFnsLocale();
   const [open, setOpen] = useState(false);
-  
+
   // Parse the value into a Date - memoized to prevent infinite loops
   const selectedDate = useMemo(() => parseValue(value), [value]);
-  
+
   // Track the month shown in the calendar - initialize once, update only when popover opens
   const [month, setMonth] = useState<Date>(() => selectedDate ?? new Date());
-  
+
   // Track if we need to sync month on open
   const lastSelectedDateRef = useRef<Date | undefined>(selectedDate);
-  
+
   // Derived default display format
-  const defaultDisplayFormat = showTime ? 'dd MMM yyyy HH:mm' : 'dd MMM yyyy';
-  const actualDisplayFormat = displayFormat ?? defaultDisplayFormat;
-  
+
   // Derived placeholder
-  const actualPlaceholder = placeholder ?? (showTime ? 'Select date and time' : 'Select date');
+  const actualPlaceholder =
+    placeholder ??
+    (showTime
+      ? intl.formatMessage({ id: 'Calendar / Select date and time', defaultMessage: 'Select date and time' })
+      : intl.formatMessage({ id: 'Calendar / Select date', defaultMessage: 'Select date' }));
 
   // Sync month when popover opens (not on every selectedDate change)
-  const handleOpenChange = useCallback((isOpen: boolean) => {
-    if (isOpen && selectedDate) {
-      // Only update month if the date actually changed
-      if (!lastSelectedDateRef.current || 
-          lastSelectedDateRef.current.getTime() !== selectedDate.getTime()) {
-        setMonth(selectedDate);
-        lastSelectedDateRef.current = selectedDate;
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
+      if (isOpen && selectedDate) {
+        // Only update month if the date actually changed
+        if (!lastSelectedDateRef.current || lastSelectedDateRef.current.getTime() !== selectedDate.getTime()) {
+          setMonth(selectedDate);
+          lastSelectedDateRef.current = selectedDate;
+        }
       }
-    }
-    setOpen(isOpen);
-  }, [selectedDate]);
+      setOpen(isOpen);
+    },
+    [selectedDate]
+  );
 
-  const handleSelect = useCallback((date: Date | undefined) => {
-    if (date) {
-      // Preserve time if in showTime mode and we have an existing selection
-      let finalDate = date;
-      if (showTime && selectedDate) {
-        finalDate = setHours(setMinutes(date, getMinutes(selectedDate)), getHours(selectedDate));
-      } else if (showTime) {
-        // Default to 9:00 AM for new selections in datetime mode
-        finalDate = setHours(setMinutes(date, 0), 9);
+  const handleSelect = useCallback(
+    (date: Date | undefined) => {
+      if (date) {
+        // Preserve time if in showTime mode and we have an existing selection
+        let finalDate = date;
+        if (showTime && selectedDate) {
+          finalDate = setHours(setMinutes(date, getMinutes(selectedDate)), getHours(selectedDate));
+        } else if (showTime) {
+          // Default to 9:00 AM for new selections in datetime mode
+          finalDate = setHours(setMinutes(date, 0), 9);
+        }
+
+        const outputValue = formatOutput(finalDate, showTime);
+        onChange?.(outputValue);
+
+        // Only close if not showing time (user might want to adjust time)
+        if (!showTime) {
+          setOpen(false);
+        }
       }
-      
-      const outputValue = formatOutput(finalDate, showTime);
+    },
+    [onChange, showTime, selectedDate]
+  );
+
+  const handleTimeChange = useCallback(
+    (hours: number, minutes: number) => {
+      // Use selectedDate if exists, otherwise use today
+      const baseDate = selectedDate ?? new Date();
+      const newDate = setHours(setMinutes(baseDate, minutes), hours);
+      const outputValue = formatOutput(newDate, true);
       onChange?.(outputValue);
-      
-      // Only close if not showing time (user might want to adjust time)
-      if (!showTime) {
-        setOpen(false);
-      }
-    }
-  }, [onChange, showTime, selectedDate]);
+    },
+    [onChange, selectedDate]
+  );
 
-  const handleHoursChange = useCallback((hours: number) => {
-    if (!selectedDate) return;
-    const newDate = setHours(selectedDate, hours);
-    const outputValue = formatOutput(newDate, true);
-    onChange?.(outputValue);
-  }, [onChange, selectedDate]);
-
-  const handleMinutesChange = useCallback((minutes: number) => {
-    if (!selectedDate) return;
-    const newDate = setMinutes(selectedDate, minutes);
-    const outputValue = formatOutput(newDate, true);
-    onChange?.(outputValue);
-  }, [onChange, selectedDate]);
-
-  const handleTimeChange = useCallback((hours: number, minutes: number) => {
-    // Use selectedDate if exists, otherwise use today
-    const baseDate = selectedDate ?? new Date();
-    const newDate = setHours(setMinutes(baseDate, minutes), hours);
-    const outputValue = formatOutput(newDate, true);
-    onChange?.(outputValue);
-  }, [onChange, selectedDate]);
-
-  const handleClear = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange?.(undefined);
-  }, [onChange]);
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onChange?.(undefined);
+    },
+    [onChange]
+  );
 
   const handleTodayClick = useCallback(() => {
     const today = new Date();
@@ -308,8 +311,15 @@ export function DatePicker({
     onChange?.(outputValue);
   }, [onChange, showTime]);
 
-  const displayText = selectedDate 
-    ? format(selectedDate, actualDisplayFormat, { locale: dateLocale }) 
+  const displayText = selectedDate
+    ? displayFormat
+      ? format(selectedDate, displayFormat, { locale: dateLocale })
+      : intl.formatDate(selectedDate, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          ...(showTime ? ({ hour: 'numeric', minute: '2-digit' } as const) : {}),
+        })
     : actualPlaceholder;
 
   const currentHours = selectedDate ? getHours(selectedDate) : 9;
@@ -327,18 +337,16 @@ export function DatePicker({
           aria-expanded={open}
           aria-haspopup="dialog"
           className={cn(
-            'group justify-between text-left font-normal gap-2 transition-colors duration-150 w-full',
+            'group w-full justify-between gap-2 text-left font-normal transition-colors duration-150',
             'hover:bg-neutral-100 dark:hover:bg-neutral-800',
             'focus-visible:ring-offset-0',
             !selectedDate && 'text-muted-foreground',
             className
           )}
         >
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <CalendarIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="truncate">
-              {displayText}
-            </span>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <CalendarIcon className="text-muted-foreground h-4 w-4 shrink-0" />
+            <span className="truncate">{displayText}</span>
           </div>
           {clearable && selectedDate && !disabled && (
             <span
@@ -351,25 +359,17 @@ export function DatePicker({
                   handleClear(e as unknown as React.MouseEvent);
                 }
               }}
-              className="p-0.5 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted cursor-pointer"
-              aria-label="Clear date"
+              className="hover:bg-muted cursor-pointer rounded-sm p-0.5 opacity-0 transition-opacity group-hover:opacity-100"
+              aria-label={intl.formatMessage({ id: 'Calendar / Clear date', defaultMessage: 'Clear date' })}
             >
-              <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+              <X className="text-muted-foreground hover:text-foreground h-3.5 w-3.5" />
             </span>
           )}
           {/* Hidden input for form submission */}
-          <input
-            type="hidden"
-            name={name}
-            value={selectedDate ? formatOutput(selectedDate, showTime) : ''}
-          />
+          <input type="hidden" name={name} value={selectedDate ? formatOutput(selectedDate, showTime) : ''} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-auto p-0 shadow-lg border-border/80"
-        align={align}
-        sideOffset={4}
-      >
+      <PopoverContent className="border-border/80 w-auto p-0 shadow-lg" align={align} sideOffset={4}>
         <Calendar
           mode="single"
           selected={selectedDate}
@@ -385,28 +385,26 @@ export function DatePicker({
           }}
           showYearNavigation
         />
-        
+
         {/* Compact Time Picker */}
         {showTime && (
           <TimePicker
             hours={currentHours}
             minutes={currentMinutes}
-            onHoursChange={handleHoursChange}
-            onMinutesChange={handleMinutesChange}
             onTimeChange={handleTimeChange}
             minuteStep={timeStep}
             disabled={!selectedDate}
           />
         )}
-        
+
         {/* Footer with Today/Now button */}
-        <div className="flex items-center justify-between gap-2 px-3 py-2 border-t border-border bg-neutral-50 dark:bg-neutral-900">
+        <div className="border-border flex items-center justify-between gap-2 border-t bg-neutral-50 px-3 py-2 dark:bg-neutral-900">
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={showTime ? handleNowClick : handleTodayClick}
-            className="text-xs h-7"
+            className="h-7 text-xs"
           >
             {showTime
               ? intl.formatMessage({ id: 'Calendar / Now button', defaultMessage: 'Now' })
@@ -422,9 +420,9 @@ export function DatePicker({
                   onChange?.(undefined);
                   setOpen(false);
                 }}
-                className="text-xs text-muted-foreground h-7"
+                className="text-muted-foreground h-7 text-xs"
               >
-                Clear
+                {intl.formatMessage({ id: 'Calendar / Clear button', defaultMessage: 'Clear' })}
               </Button>
             )}
             {showTime && (
@@ -433,10 +431,10 @@ export function DatePicker({
                 variant="default"
                 size="sm"
                 onClick={() => setOpen(false)}
-                className="text-xs h-7"
+                className="h-7 text-xs"
                 disabled={!selectedDate}
               >
-                Done
+                {intl.formatMessage({ id: 'Calendar / Done button', defaultMessage: 'Done' })}
               </Button>
             )}
           </div>

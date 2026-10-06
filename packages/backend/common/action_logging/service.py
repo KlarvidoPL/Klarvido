@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from django.db import models
 from django.conf import settings
+from apps.multitenancy.constants import ActionActorType
 
 # Lazy import to avoid circular imports
 ActionLog = None
@@ -28,6 +29,36 @@ def get_action_log_model():
 
 
 logger = logging.getLogger(__name__)
+
+
+SENSITIVE_FIELDS = {
+    "password",
+    "secret_key",
+    "api_key",
+    "token",
+    "token_hash",
+    "access_token",
+    "refresh_token",
+    "client_secret",
+    "oidc_client_secret",
+    "encrypted_token",
+    "private_key",
+}
+
+
+def get_request_actor(request):
+    """Resolve the actor after the organization's authorization context has been evaluated."""
+    _ = getattr(request, "tenant", None)
+    if getattr(request, "is_superuser_cross_tenant_access", False) is True:
+        return ActionActorType.SUPERUSER
+    if getattr(request, "is_ai_agent_request", False) is True:
+        return ActionActorType.AI_AGENT
+    return ActionActorType.USER
+
+
+def log_request_action(request, **kwargs):
+    """Log an authorized request without losing AI/superuser attribution."""
+    return log_action(actor_user=getattr(request, "user", None), actor_type=get_request_actor(request), **kwargs)
 
 
 def serialize_value(value: Any) -> Any:
@@ -86,7 +117,7 @@ def compute_changes(
 
     # Default fields to exclude (timestamps, internal fields)
     default_exclude = {"created_at", "updated_at", "id", "pk", "tenant", "tenant_id"}
-    exclude_set = default_exclude.union(set(exclude_fields or []))
+    exclude_set = default_exclude.union(SENSITIVE_FIELDS, set(exclude_fields or []))
 
     # Get model fields
     model_fields = new_instance._meta.get_fields()
@@ -185,15 +216,13 @@ def log_action(
         return None
 
     try:
-        from apps.multitenancy.constants import ActionActorType
-
         actor_email = ""
         if actor_user and hasattr(actor_user, "email"):
             actor_email = actor_user.email
 
         # Store actor_user for USER and AI_AGENT actions (the user who triggered the action)
         # For SYSTEM actions (sync, import, scheduled, migration), actor_user is typically None
-        should_store_user = actor_type in (ActionActorType.USER, ActionActorType.AI_AGENT, "USER", "AI_AGENT")
+        should_store_user = actor_type in (ActionActorType.USER, ActionActorType.AI_AGENT, ActionActorType.SUPERUSER)
 
         action_log = ActionLog.objects.create(
             tenant_id=tenant_id,
@@ -347,7 +376,7 @@ def log_delete(
     for field in instance._meta.get_fields():
         if field.is_relation and (field.one_to_many or field.many_to_many):
             continue
-        if field.name in {"created_at", "updated_at", "id", "pk", "tenant", "tenant_id"}:
+        if field.name in {"created_at", "updated_at", "id", "pk", "tenant", "tenant_id"} | SENSITIVE_FIELDS:
             continue
         try:
             value = getattr(instance, field.name, None)

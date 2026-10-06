@@ -756,7 +756,7 @@ export const AuditLogCard = () => {
                     key={log.id}
                     className={cn(
                       'group rounded-lg border transition-all',
-                      'hover:shadow-sm hover:border-primary/20',
+                      'hover:shadow-sm hover:border-t-primary/20 hover:border-r-primary/20 hover:border-b-primary/20',
                       log.success
                         ? 'border-l-2 border-l-emerald-500'
                         : 'border-l-2 border-l-destructive bg-destructive/5 dark:border-l-red-400 dark:bg-red-400/5'

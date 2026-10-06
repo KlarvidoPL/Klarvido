@@ -14,7 +14,7 @@ from stripe.error import InvalidRequestError
 from common.acl.policies import AnyoneFullAccess, IsTenantMemberAccess
 from common.graphql import mutations
 from common.graphql.acl import permission_classes, requires
-from common.action_logging.service import log_action
+from common.action_logging.service import get_request_actor, log_action
 from apps.multitenancy.constants import ActionType
 from . import constants
 from . import utils, serializers
@@ -203,6 +203,9 @@ class ChangeActiveSubscriptionMutation(mutations.UpdateTenantDependentModelMutat
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
+        old_schedule = subscriptions.get_schedule(tenant=info.context.tenant)
+        old_phase = subscriptions.get_current_schedule_phase(schedule=old_schedule)
+        old_prices = [item.get("price") for item in old_phase.get("items", [])]
         result = super().mutate_and_get_payload(root, info, **input)
 
         # Log the subscription change
@@ -213,7 +216,9 @@ class ChangeActiveSubscriptionMutation(mutations.UpdateTenantDependentModelMutat
             entity_id=str(info.context.tenant.pk),
             entity_name="Subscription Plan",
             actor_user=info.context.user,
-            changes={"plan": {"old": None, "new": input.get("price", "updated")}},
+            actor_type=get_request_actor(info.context),
+            changes={"plan": {"old": old_prices, "new": input.get("price", "updated")}},
+            metadata={"operation": "subscription_changed"},
         )
 
         return result
@@ -241,6 +246,7 @@ class CancelActiveSubscriptionMutation(mutations.UpdateTenantDependentModelMutat
             entity_id=str(info.context.tenant.pk),
             entity_name="Subscription",
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
             changes={"status": {"old": "active", "new": "cancelled"}},
         )
 
@@ -338,6 +344,7 @@ class DeletePaymentMethodMutation(PaymentMethodGetObjectMixin, mutations.DeleteT
             entity_id=str(pk),
             entity_name=f"Payment Method (*{card_last4 if card_last4 else 'N/A'})",
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
         )
 
         customers.remove_payment_method(payment_method=obj)

@@ -17,10 +17,23 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 
 from apps.backup.encryption import get_backup_encryption_service
+from common.action_logging.service import log_action
+from .constants import ActionActorType
 from common.storages import get_exports_storage
 from common.csv import spreadsheet_safe_cell
 
 logger = logging.getLogger(__name__)
+
+
+def log_export_result(export_job, operation):
+    return log_action(
+        tenant_id=export_job.tenant_id,
+        action_type="UPDATE",
+        entity_type="activity_log_export",
+        entity_id=str(export_job.pk),
+        actor_type=ActionActorType.SYSTEM_SCHEDULED,
+        metadata={"operation": operation, "status": export_job.status, "log_count": export_job.log_count},
+    )
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
@@ -67,6 +80,7 @@ def export_action_logs(self, export_id: str):
         export_job.error_message = "permission_denied"
         export_job.completed_at = timezone.now()
         export_job.save(update_fields=["status", "error_message", "completed_at"])
+        log_export_result(export_job, "export_failed")
         return {"error": "permission_denied"}
 
     # Recheck queued jobs: membership or permissions may have changed since enqueueing.
@@ -221,6 +235,8 @@ def export_action_logs(self, export_id: str):
             export_job.save(update_fields=["file_path"])
             return deny_export()
 
+        log_export_result(export_job, "export_completed")
+
         # Create notification for the user
         download_url = export_job.get_download_url()
         Notification.objects.create(
@@ -248,6 +264,7 @@ def export_action_logs(self, export_id: str):
         export_job.error_message = str(exc)
         export_job.completed_at = timezone.now()
         export_job.save()
+        log_export_result(export_job, "export_failed")
 
         # Notify user of failure
         Notification.objects.create(

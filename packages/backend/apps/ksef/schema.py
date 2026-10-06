@@ -79,7 +79,7 @@ class SetKsefTokenMutation(graphene.Mutation):
     @graphql_ratelimit(rate="5/min", key=RateLimitKey.USER)
     def mutate(cls, root, info, tenant_id, token):
         tenant = get_checked_tenant(info)
-        return _result(services.save_token(tenant, info.context.user, token))
+        return _result(services.save_token(tenant, info.context.user, token, request=info.context))
 
 
 class TestKsefTokenMutation(graphene.Mutation):
@@ -94,7 +94,7 @@ class TestKsefTokenMutation(graphene.Mutation):
     @graphql_ratelimit(rate="10/min", key=RateLimitKey.USER)
     def mutate(cls, root, info, tenant_id):
         tenant = get_checked_tenant(info)
-        return _result(services.retest_token(tenant, info.context.user))
+        return _result(services.retest_token(tenant, info.context.user, request=info.context))
 
 
 class DeleteKsefTokenMutation(graphene.Mutation):
@@ -107,7 +107,7 @@ class DeleteKsefTokenMutation(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, tenant_id):
         tenant = get_checked_tenant(info)
-        if not services.delete_token(tenant, info.context.user):
+        if not services.delete_token(tenant, info.context.user, request=info.context):
             return cls(ok=False, error_code=KsefErrorCode.NOT_CONFIGURED)
         return cls(ok=True)
 

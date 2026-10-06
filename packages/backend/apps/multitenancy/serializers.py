@@ -8,12 +8,34 @@ from django.db.models import Q
 from django.utils import timezone
 from graphql_relay import to_global_id, from_global_id
 
+from common.action_logging.service import log_request_action
 from common.graphql.field_conversions import TextChoicesFieldType
 from . import models, notifications
 from .constants import CompanyCountry, TenantType, TenantUserRole, SystemRoleType
 from .services.membership import create_tenant_membership
 from .tokens import tenant_invitation_token
 from .validators import normalize_tax_id, validate_regon, validate_tax_id
+
+
+def log_invitation(request, membership, operation, action_type="UPDATE"):
+    roles = [
+        {"name": assignment.role.name, "system_role_type": assignment.role.system_role_type}
+        for assignment in membership.membership_roles.select_related("role").order_by("role__name")
+    ]
+    if not roles:
+        roles = [{"name": membership.role, "system_role_type": membership.role}]
+    log_request_action(
+        request,
+        tenant_id=membership.tenant_id,
+        action_type=action_type,
+        entity_type="tenant_invitation",
+        entity_id=str(membership.pk),
+        entity_name=membership.user.email if membership.user else membership.invitee_email_address,
+        metadata={
+            "operation": operation,
+            "roles": roles,
+        },
+    )
 
 
 def decode_role_id(role_id: str) -> str:
@@ -185,6 +207,7 @@ class AcceptTenantInvitationSerializer(TenantInvitationActionSerializer):
             models.TenantMembership.objects.get_not_accepted().filter(pk=membership_id, user=user).update(
                 is_accepted=True, invitation_accepted_at=timezone.now()
             )
+            log_invitation(self.context["request"], membership, "invitation_accepted")
             notifications.send_accepted_tenant_invitation_notification(
                 membership, to_global_id("TenantMembershipType", membership_id)
             )
@@ -204,6 +227,7 @@ class DeclineTenantInvitationSerializer(TenantInvitationActionSerializer):
         user = self.context["request"].user
         membership = models.TenantMembership.objects.get_not_accepted().filter(pk=membership_id, user=user).first()
         if membership:
+            log_invitation(self.context["request"], membership, "invitation_declined", "DELETE")
             membership.delete()
             notifications.send_declined_tenant_invitation_notification(
                 membership, to_global_id("TenantMembershipType", membership_id)
@@ -394,6 +418,8 @@ class CreateTenantInvitationSerializer(serializers.Serializer):
                     membership=membership, role=org_role, defaults={"assigned_by": creator}
                 )
 
+        log_invitation(request, membership, "invitation_sent", "CREATE")
+
         # Return only the response fields (ok is read_only)
         return {"ok": True}
 
@@ -440,6 +466,7 @@ class ResendTenantInvitationSerializer(serializers.Serializer):
         if membership.user:
             send_tenant_invitation_notification(membership, global_tenant_membership_id, token)
 
+        log_invitation(self.context["request"], membership, "invitation_resent")
         return {"ok": True}
 
 

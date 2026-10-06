@@ -14,7 +14,7 @@ from common.acl import policies
 from common.graphql import mutations
 from common.graphql.acl.decorators import permission_classes, requires
 from common.action_logging.decorators import action_logged
-from common.action_logging.service import log_action, log_delete
+from common.action_logging.service import get_request_actor, log_action, log_delete
 from apps.multitenancy.constants import ActionType
 from apps.users.services.users import get_user_from_resolver
 from . import models
@@ -401,6 +401,7 @@ class DeleteSSOConnectionMutation(mutations.DeleteModelMutation):
             entity_type="sso_connection",
             instance=obj,
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
         )
 
         obj.delete()
@@ -436,6 +437,7 @@ class ActivateSSOConnectionMutation(mutations.SerializerMutation):
             entity_id=str(connection.pk),
             entity_name=connection.name,
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
             changes={"status": {"old": "inactive", "new": "active"}},
         )
 
@@ -474,6 +476,7 @@ class DeactivateSSOConnectionMutation(graphene.Mutation):
             entity_id=str(connection.pk),
             entity_name=connection.name,
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
             changes={"status": {"old": old_status, "new": "inactive"}},
         )
 
@@ -564,6 +567,7 @@ class CreateSCIMTokenMutation(mutations.SerializerMutation):
             entity_id=str(token_instance.pk),
             entity_name=token_instance.name,
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
         )
 
         return cls(scim_token=token_instance, raw_token=raw_token)
@@ -601,6 +605,7 @@ class RevokeSCIMTokenMutation(graphene.Mutation):
             entity_id=str(token.pk),
             entity_name=token.name,
             actor_user=info.context.user,
+            actor_type=get_request_actor(info.context),
             changes={"is_active": {"old": True, "new": False}},
         )
 
