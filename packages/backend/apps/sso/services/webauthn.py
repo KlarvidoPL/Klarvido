@@ -232,17 +232,6 @@ class WebAuthnService:
         Raises:
             ValueError: If verification fails
         """
-        # Check if signature verification should be skipped (for backwards compatibility)
-        # SECURITY: This should be False in production once all passkeys are re-registered
-        skip_verification = getattr(settings, "WEBAUTHN_SKIP_SIGNATURE_VERIFICATION", False)
-        if skip_verification:
-            logger.warning(
-                "SECURITY: Skipping WebAuthn signature verification "
-                "(WEBAUTHN_SKIP_SIGNATURE_VERIFICATION=True). "
-                "This should be disabled in production!"
-            )
-            return True
-
         # The signed data is authenticator_data || client_data_hash
         signed_data = authenticator_data + client_data_hash
 

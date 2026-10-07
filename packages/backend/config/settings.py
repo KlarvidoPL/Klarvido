@@ -696,9 +696,7 @@ WEB_APP_URL = env("WEB_APP_URL", default="http://localhost:3000")
 API_URL = env("API_URL", default="http://localhost:5001")
 
 # WebAuthn/Passkey Settings
-# SECURITY: Set to True to temporarily skip signature verification for backwards compatibility
-# This should be False in production once all passkeys have been re-registered
-WEBAUTHN_SKIP_SIGNATURE_VERIFICATION = env.bool("WEBAUTHN_SKIP_SIGNATURE_VERIFICATION", default=True)
+# Signature verification is mandatory; no compatibility bypass is supported.
 # Allow origin mismatch during development only
 WEBAUTHN_ALLOW_ORIGIN_MISMATCH = env.bool("WEBAUTHN_ALLOW_ORIGIN_MISMATCH", default=IS_LOCAL_DEBUG)
 # Strict sign count verification (detects cloned authenticators)
