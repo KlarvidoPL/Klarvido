@@ -127,6 +127,7 @@ def test_enrollment_stores_verified_cose_key_and_can_login(user, enrollment, leg
             'authenticatorData': encode(auth_data),
             'clientDataJSON': encode(client_data),
             'signature': encode(signature),
+            'userHandle': WebAuthnService(user)._encode_user_id(user),
         },
         format='json',
     )

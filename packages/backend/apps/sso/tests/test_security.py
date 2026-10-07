@@ -3,6 +3,7 @@
 import pytest
 import base64
 import json
+import hashlib
 from unittest.mock import patch
 from django.test import override_settings
 
@@ -91,7 +92,7 @@ class TestWebAuthnSignCountEnforcement:
         with patch.object(service, '_verify_webauthn_signature', return_value=True):
             with patch.object(service, '_verify_origin', return_value=True):
                 # Create mock auth data with sign count of 5 (less than stored 10)
-                auth_data = b'\x00' * 33 + (5).to_bytes(4, 'big')  # Sign count at bytes 33-36
+                auth_data = hashlib.sha256(service.rp_id.encode()).digest() + b'\x05' + (5).to_bytes(4, 'big')
                 client_data = json.dumps(
                     {
                         'type': 'webauthn.get',

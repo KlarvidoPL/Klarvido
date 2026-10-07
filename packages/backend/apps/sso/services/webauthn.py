@@ -24,7 +24,7 @@ from cryptography.exceptions import InvalidSignature
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from webauthn import verify_registration_response
-from webauthn.helpers import base64url_to_bytes, bytes_to_base64url
+from webauthn.helpers import base64url_to_bytes, bytes_to_base64url, parse_authenticator_data, parse_backup_flags
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 
 from apps.users.models import User
@@ -465,23 +465,27 @@ class WebAuthnService:
 
     def create_authentication_options(
         self,
-        user_verification: str = "preferred",
+        user_verification: str = "required",
     ) -> Tuple[Dict[str, Any], str]:
         """
         Create authentication options for passkey login.
 
         Args:
-            user_verification: 'required', 'preferred', or 'discouraged'
+            user_verification: Legacy client preference; passwordless login always requires verification
 
         Returns:
             Tuple of (authentication_options, challenge)
         """
+        # Passwordless login policy belongs to the server, not the client.
+        user_verification = "required"
         # Create challenge
         challenge_record = WebAuthnChallenge.create_challenge(
             user=self.user,  # May be None for discoverable credentials
             challenge_type="authentication",
             ttl_seconds=self.CHALLENGE_TTL,
         )
+        challenge_record.user_verification = user_verification
+        challenge_record.save(update_fields=["user_verification"])
 
         options = {
             "challenge": challenge_record.challenge,
@@ -569,10 +573,31 @@ class WebAuthnService:
         if not challenge_record.is_valid:
             raise ValueError("Challenge expired or already used")
 
+        if challenge_record.user_id is not None and challenge_record.user_id != user.pk:
+            raise ValueError("Credential owner does not match challenge")
+        if self.user is not None and self.user.pk != user.pk:
+            raise ValueError("Credential owner does not match user")
+
+        # Discoverable credentials must identify their owner; identified-user flows
+        # may omit the handle, but any supplied handle must still match the owner.
+        if challenge_record.user_id is None and self.user is None and user_handle is None:
+            raise ValueError("User handle is required")
+        if user_handle is not None:
+            try:
+                handle_bytes = base64.b64decode(
+                    user_handle + "=" * (-len(user_handle) % 4), altchars=b"-_", validate=True
+                )
+            except (ValueError, TypeError) as e:
+                raise ValueError("Invalid user handle") from e
+            if handle_bytes != str(user.pk).encode("utf-8"):
+                raise ValueError("User handle does not match credential owner")
+
         # Decode client data
         try:
             client_data_bytes = base64.urlsafe_b64decode(client_data_json + "=" * (-len(client_data_json) % 4))
             client_data = json.loads(client_data_bytes)
+            if not isinstance(client_data, dict):
+                raise ValueError("Client data must be an object")
         except Exception as e:
             raise ValueError(f"Invalid client data: {e}")
 
@@ -587,13 +612,25 @@ class WebAuthnService:
         # Verify type
         if client_data.get("type") != "webauthn.get":
             raise ValueError("Invalid client data type")
+        if client_data.get("crossOrigin", False) is not False:
+            raise ValueError("Cross-origin authentication is not supported")
 
         # Decode authenticator data and signature
         try:
             auth_data_bytes = base64.urlsafe_b64decode(authenticator_data + "=" * (-len(authenticator_data) % 4))
             signature_bytes = base64.urlsafe_b64decode(signature + "=" * (-len(signature) % 4))
+            parsed_auth_data = parse_authenticator_data(auth_data_bytes)
+            parse_backup_flags(parsed_auth_data.flags)
         except Exception as e:
-            raise ValueError(f"Invalid authenticator data or signature: {e}")
+            raise ValueError("Invalid authenticator data or signature") from e
+
+        if parsed_auth_data.rp_id_hash != hashlib.sha256(self.rp_id.encode("utf-8")).digest():
+            raise ValueError("RP ID hash mismatch")
+        if not parsed_auth_data.flags.up:
+            raise ValueError("User presence is required")
+        # Enforce the server policy even for challenges issued before this change.
+        if not parsed_auth_data.flags.uv:
+            raise ValueError("User verification is required")
 
         # SECURITY: Verify the cryptographic signature
         # Signature is over: authenticator_data || SHA256(client_data_json)
@@ -623,12 +660,7 @@ class WebAuthnService:
             )
             raise ValueError("Authentication failed: signature verification failed")
 
-        # Parse sign count from authenticator data (bytes 33-36, big-endian uint32)
-        try:
-            new_sign_count = int.from_bytes(auth_data_bytes[33:37], "big")
-        except Exception:
-            logger.warning("Failed to parse sign count from authenticator data")
-            new_sign_count = passkey.sign_count + 1
+        new_sign_count = parsed_auth_data.sign_count
 
         # SECURITY: Verify sign count (protection against cloned authenticators)
         strict_sign_count = getattr(settings, "WEBAUTHN_STRICT_SIGN_COUNT", True)

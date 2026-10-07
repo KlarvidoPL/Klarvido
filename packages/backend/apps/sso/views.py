@@ -744,7 +744,7 @@ class PasskeyAuthenticationOptionsView(APIView):
         webauthn_service = WebAuthnService(user)
 
         options, challenge = webauthn_service.create_authentication_options(
-            user_verification=request.data.get("userVerification", "preferred"),
+            user_verification="required",
         )
 
         return Response(options)

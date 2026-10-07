@@ -96,6 +96,12 @@ Do not re-enable signature bypasses or convert unverified legacy keys to restore
 3. User authenticates with biometric/PIN
 4. User is signed in
 
+Passwordless login requires authenticator user presence and user verification (for example,
+biometrics or a device PIN). The backend enforces both flags and the RP ID hash, regardless
+of a client's requested verification preference. Email-based challenges accept only that
+user's credentials. Username-less assertions must include the credential owner's user handle;
+any supplied handle is checked against the owner. Cross-origin assertions are rejected.
+
 ## Implementation Details
 
 ### Registration Flow
