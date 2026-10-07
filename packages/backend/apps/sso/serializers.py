@@ -380,7 +380,6 @@ class RegisterPasskeySerializer(serializers.Serializer):
 
     name = serializers.CharField(max_length=255)
     credential_id = serializers.CharField()
-    public_key = serializers.CharField()
     attestation_object = serializers.CharField()
     client_data_json = serializers.CharField()
     transports = serializers.ListField(child=serializers.CharField(), required=False, default=list)

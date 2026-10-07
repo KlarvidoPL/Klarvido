@@ -14,6 +14,7 @@ import hashlib
 import json
 import logging
 from typing import Dict, Any, Tuple, List
+from urllib.parse import urlparse
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -21,6 +22,10 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.exceptions import InvalidSignature
 
 from django.conf import settings
+from django.db import IntegrityError, transaction
+from webauthn import verify_registration_response
+from webauthn.helpers import base64url_to_bytes, bytes_to_base64url
+from webauthn.helpers.cose import COSEAlgorithmIdentifier
 
 from apps.users.models import User
 from apps.sso.models import UserPasskey, WebAuthnChallenge, SSOAuditLog
@@ -66,8 +71,6 @@ class WebAuthnService:
         """Get the Relying Party ID (domain)."""
         # Use the web app URL to determine the RP ID
         web_app_url = getattr(settings, "WEB_APP_URL", "http://localhost:3000")
-        from urllib.parse import urlparse
-
         parsed = urlparse(web_app_url)
         return parsed.hostname or "localhost"
 
@@ -284,6 +287,8 @@ class WebAuthnService:
         """
         if not self.user:
             raise ValueError("User is required for registration")
+        if user_verification not in {"required", "preferred", "discouraged"}:
+            raise ValueError("Invalid user verification policy")
 
         # Create challenge
         challenge_record = WebAuthnChallenge.create_challenge(
@@ -291,6 +296,8 @@ class WebAuthnService:
             challenge_type="registration",
             ttl_seconds=self.CHALLENGE_TTL,
         )
+        challenge_record.user_verification = user_verification
+        challenge_record.save(update_fields=["user_verification"])
 
         # Get existing credentials to exclude
         existing_credentials = UserPasskey.objects.filter(
@@ -320,7 +327,6 @@ class WebAuthnService:
             },
             "pubKeyCredParams": [
                 {"type": "public-key", "alg": -7},  # ES256
-                {"type": "public-key", "alg": -257},  # RS256
             ],
             "timeout": self.CHALLENGE_TTL * 1000,  # milliseconds
             "attestation": "none",  # We don't need attestation for most use cases
@@ -337,16 +343,17 @@ class WebAuthnService:
 
         return options, challenge_record.challenge
 
+    @transaction.atomic
     def verify_registration(
         self,
         challenge: str,
         credential_id: str,
-        public_key: str,
         attestation_object: str,
         client_data_json: str,
         name: str = "My Passkey",
         transports: List[str] = None,
         ip_address: str = None,
+        public_key: str = None,
     ) -> UserPasskey:
         """
         Verify a registration response and create the passkey.
@@ -354,7 +361,7 @@ class WebAuthnService:
         Args:
             challenge: The original challenge
             credential_id: Base64url-encoded credential ID
-            public_key: Base64url-encoded public key (COSE format)
+            public_key: Ignored legacy client field; keys are extracted from authenticator data
             attestation_object: Base64url-encoded attestation object
             client_data_json: Base64url-encoded client data JSON
             name: User-provided name for the passkey
@@ -371,11 +378,15 @@ class WebAuthnService:
             raise ValueError("User is required for registration")
 
         # Find and validate challenge
-        challenge_record = WebAuthnChallenge.objects.filter(
-            user=self.user,
-            challenge=challenge,
-            challenge_type="registration",
-        ).first()
+        challenge_record = (
+            WebAuthnChallenge.objects.select_for_update()
+            .filter(
+                user=self.user,
+                challenge=challenge,
+                challenge_type="registration",
+            )
+            .first()
+        )
 
         if not challenge_record:
             raise ValueError("Challenge not found")
@@ -383,61 +394,59 @@ class WebAuthnService:
         if not challenge_record.is_valid:
             raise ValueError("Challenge expired or already used")
 
-        # Verify client data
+        # Browser getPublicKey() returns SPKI, not COSE. Never trust that separate field.
+        # The verifier checks challenge, origin, RP hash, flags, credential ID and algorithm,
+        # and extracts the actual COSE credential key from the attestation object's authData.
         try:
-            client_data_bytes = base64.urlsafe_b64decode(client_data_json + "=" * (-len(client_data_json) % 4))
-            client_data = json.loads(client_data_bytes)
+            client_data = json.loads(base64url_to_bytes(client_data_json))
+            if client_data.get("crossOrigin", False) is not False:
+                raise ValueError("Cross-origin registration is not supported")
+            verification = verify_registration_response(
+                credential={
+                    "id": credential_id,
+                    "rawId": credential_id,
+                    "type": "public-key",
+                    "response": {
+                        "attestationObject": attestation_object,
+                        "clientDataJSON": client_data_json,
+                    },
+                },
+                expected_challenge=base64url_to_bytes(challenge_record.challenge),
+                expected_rp_id=self.rp_id,
+                expected_origin=self._get_allowed_origins(),
+                require_user_presence=True,
+                require_user_verification=challenge_record.user_verification == "required",
+                supported_pub_key_algs=[COSEAlgorithmIdentifier.ECDSA_SHA_256],
+            )
+            if verification.credential_id != base64url_to_bytes(credential_id):
+                raise ValueError("Credential ID mismatch")
+            cose_key = self._parse_cose_key(verification.credential_public_key)
+            if cose_key.get(1) != COSE_KTY_EC2 or cose_key.get(-1) != 1:
+                raise ValueError("Unsupported credential curve")
+            ec.EllipticCurvePublicNumbers(
+                int.from_bytes(cose_key[-2], "big"), int.from_bytes(cose_key[-3], "big"), ec.SECP256R1()
+            ).public_key()
         except Exception as e:
-            raise ValueError(f"Invalid client data: {e}")
-
-        # Verify challenge in client data
-        client_challenge = client_data.get("challenge", "")
-        # Client challenge is base64url encoded
-        if client_challenge != challenge:
-            raise ValueError("Challenge mismatch")
-
-        # SECURITY: Always verify origin (use explicit setting for dev override, NOT DEBUG)
-        actual_origin = client_data.get("origin", "")
-        self._verify_origin(actual_origin)
-
-        # Verify type
-        if client_data.get("type") != "webauthn.create":
-            raise ValueError("Invalid client data type")
-
-        # Parse attestation object to extract AAGUID
-        aaguid = ""
-        try:
-            import cbor2
-
-            attestation_bytes = base64.urlsafe_b64decode(attestation_object + "=" * (-len(attestation_object) % 4))
-            attestation = cbor2.loads(attestation_bytes)
-            auth_data = attestation.get("authData", b"")
-
-            # Extract AAGUID from authenticator data (bytes 37-52 if flags indicate attested credential)
-            if len(auth_data) >= 55:
-                flags = auth_data[32]
-                # Check if attested credential data is present (bit 6)
-                if flags & 0x40:
-                    aaguid_bytes = auth_data[37:53]
-                    aaguid = aaguid_bytes.hex()
-        except Exception as e:
-            logger.warning(f"Failed to extract AAGUID from attestation: {e}")
-
-        # Mark challenge as used
-        challenge_record.mark_used()
+            raise ValueError("Passkey registration verification failed") from e
 
         # Create passkey
-        passkey = UserPasskey.objects.create(
-            user=self.user,
-            credential_id=credential_id,
-            name=name,
-            public_key=public_key,
-            sign_count=0,
-            aaguid=aaguid,
-            transports=transports or [],
-            authenticator_type="platform" if "internal" in (transports or []) else "cross-platform",
-            registered_from_ip=ip_address,
-        )
+        try:
+            with transaction.atomic():
+                passkey = UserPasskey.objects.create(
+                    user=self.user,
+                    credential_id=bytes_to_base64url(verification.credential_id),
+                    name=name,
+                    public_key=bytes_to_base64url(verification.credential_public_key),
+                    sign_count=verification.sign_count,
+                    aaguid=verification.aaguid,
+                    transports=transports or [],
+                    authenticator_type="platform" if "internal" in (transports or []) else "cross-platform",
+                    registered_from_ip=ip_address,
+                )
+        except IntegrityError as e:
+            raise ValueError("Passkey is already registered") from e
+
+        challenge_record.mark_used()
 
         # Log event
         SSOAuditLog.log_event(

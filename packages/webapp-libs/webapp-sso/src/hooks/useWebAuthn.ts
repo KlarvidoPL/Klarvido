@@ -140,9 +140,6 @@ export function useWebAuthn() {
             body: JSON.stringify({
               challenge: options.challenge,
               credentialId: arrayBufferToBase64Url(credential.rawId),
-              publicKey: arrayBufferToBase64Url(
-                response.getPublicKey?.() || new ArrayBuffer(0),
-              ),
               attestationObject: arrayBufferToBase64Url(
                 response.attestationObject,
               ),

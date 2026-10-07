@@ -682,11 +682,14 @@ class PasskeyRegistrationOptionsView(APIView):
     def post(self, request):
         webauthn_service = WebAuthnService(request.user)
 
-        options, challenge = webauthn_service.create_registration_options(
-            user_verification=request.data.get("userVerification", "preferred"),
-            authenticator_attachment=request.data.get("authenticatorAttachment"),
-            require_resident_key=request.data.get("requireResidentKey", True),
-        )
+        try:
+            options, challenge = webauthn_service.create_registration_options(
+                user_verification=request.data.get("userVerification", "preferred"),
+                authenticator_attachment=request.data.get("authenticatorAttachment"),
+                require_resident_key=request.data.get("requireResidentKey", True),
+            )
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(options)
 
@@ -703,7 +706,6 @@ class PasskeyRegistrationVerifyView(APIView):
             passkey = webauthn_service.verify_registration(
                 challenge=request.data.get("challenge"),
                 credential_id=request.data.get("credentialId"),
-                public_key=request.data.get("publicKey"),
                 attestation_object=request.data.get("attestationObject"),
                 client_data_json=request.data.get("clientDataJSON"),
                 name=request.data.get("name", "My Passkey"),

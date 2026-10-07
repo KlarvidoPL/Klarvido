@@ -79,6 +79,16 @@ Passkeys are user-level authentication, not organization-level. Unlike SSO (whic
 4. Browser prompts for biometric/PIN
 5. Passkey is registered and stored
 
+Registration validates the authenticator response on the backend and extracts its COSE public key.
+The separate browser `getPublicKey()` value is not used. New registrations use ES256 (P-256),
+the algorithm supported by the login verifier.
+
+Passkeys enrolled with the earlier SPKI key format cannot be repaired automatically because
+their original authenticator data was not retained. Sign in using another supported method,
+remove the old passkey from **Profile → Passkeys**, and add a new one. If no alternative login
+method is available, use the normal account recovery process before removing credentials.
+Do not re-enable signature bypasses or convert unverified legacy keys to restore access.
+
 ### 2. User Signs In with Passkey
 
 1. User clicks "Sign in with Passkey" on the login page
@@ -253,4 +263,3 @@ This warning indicates a potential cloned authenticator. Investigate if:
 
 - [Configure SSO connections](./)
 - [Set up SCIM provisioning](./scim-setup)
-
