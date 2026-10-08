@@ -3,6 +3,8 @@
 import base64
 import hashlib
 import json
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 
 import cbor2
 import pytest
@@ -10,11 +12,12 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from django.conf import settings
 from django.core.cache import cache
+from django.db import connections
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 
 from apps.sso.constants import SSOAuditEventType
-from apps.sso.models import SSOAuditLog, SSOSession, WebAuthnChallenge
+from apps.sso.models import SSOAuditLog, SSOSession, UserPasskey, WebAuthnChallenge
 from apps.sso.services.webauthn import WebAuthnService
 from apps.sso.tests.factories import UserPasskeyFactory
 
@@ -35,7 +38,7 @@ def assertion(user):
     passkey = UserPasskeyFactory(user=user, public_key=encode(public_key))
     client = APIClient()
 
-    def build(mode='identified', change=None):
+    def build(mode='identified', change=None, sign_count=1):
         options = client.post(
             '/api/sso/passkeys/authenticate/options',
             {'email': user.email, 'userVerification': 'discouraged'} if mode == 'identified' else {},
@@ -60,7 +63,7 @@ def assertion(user):
             client_data[change] = 'invalid'
         elif change == 'cross-origin':
             client_data['crossOrigin'] = True
-        auth_data = rp_hash + bytes([flags]) + (1).to_bytes(4, 'big')
+        auth_data = rp_hash + bytes([flags]) + sign_count.to_bytes(4, 'big')
         if change == 'short-auth-data':
             auth_data = auth_data[:10]
         elif change == 'trailing-auth-data':
@@ -171,3 +174,101 @@ def test_service_bound_to_another_user_rejects_credential(user_factory, assertio
             signature=payload['signature'],
             user_handle=payload['userHandle'],
         )
+
+
+def authenticate(payload):
+    return WebAuthnService().verify_authentication(
+        challenge=payload['challenge'],
+        credential_id=payload['credentialId'],
+        authenticator_data=payload['authenticatorData'],
+        client_data_json=payload['clientDataJSON'],
+        signature=payload['signature'],
+        user_handle=payload.get('userHandle'),
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize('same_challenge', [True, False])
+def test_concurrent_assertions_are_serialized(assertion, same_challenge, settings):
+    settings.WEBAUTHN_STRICT_SIGN_COUNT = True
+    _, passkey, build = assertion
+    first, challenge = build()
+    second, other_challenge = (first, challenge) if same_challenge else build()
+    barrier = Barrier(2)
+
+    def attempt(payload):
+        try:
+            barrier.wait(timeout=10)
+            authenticate(payload)
+            return 'success'
+        except ValueError as exc:
+            return str(exc)
+        finally:
+            connections.close_all()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(attempt, [first, second]))
+    assert results.count('success') == 1
+    passkey.refresh_from_db()
+    assert passkey.sign_count == 1
+    assert passkey.use_count == 1
+    assert SSOAuditLog.objects.filter(event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS).count() == 1
+    if same_challenge:
+        assert 'Challenge expired or already used' in results
+        assert passkey.is_active
+    else:
+        assert any('security anomaly' in result for result in results)
+        assert not passkey.is_active
+        assert SSOAuditLog.objects.filter(event_type=SSOAuditEventType.PASSKEY_CLONE_DETECTED).exists()
+    challenge.refresh_from_db()
+    other_challenge.refresh_from_db()
+    assert sum(item.used_at is not None for item in {challenge, other_challenge}) == 1
+
+
+@pytest.mark.parametrize('failure', ['counter', 'audit'])
+def test_success_write_failure_rolls_back_challenge_and_counter(assertion, monkeypatch, failure):
+    _, passkey, build = assertion
+    payload, challenge = build()
+
+    def fail(*args, **kwargs):
+        raise ValueError('simulated storage failure')
+
+    if failure == 'counter':
+        monkeypatch.setattr(UserPasskey, 'record_use', fail)
+    else:
+        monkeypatch.setattr(SSOAuditLog, 'log_event', fail)
+    with pytest.raises(ValueError, match='simulated storage failure'):
+        authenticate(payload)
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.sign_count == 0 and passkey.use_count == 0
+    assert passkey.last_used_at is None
+    assert not SSOAuditLog.objects.filter(event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS).exists()
+    monkeypatch.undo()
+    authenticate(payload)
+    challenge.refresh_from_db()
+    assert challenge.used_at is not None
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_zero_counter_assertions_preserve_usage_count(assertion):
+    _, passkey, build = assertion
+    payloads = [build(sign_count=0)[0] for _ in range(2)]
+    barrier = Barrier(2)
+
+    def attempt(payload):
+        try:
+            barrier.wait(timeout=10)
+            authenticate(payload)
+        finally:
+            connections.close_all()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(attempt, payloads))
+    passkey.refresh_from_db()
+    assert passkey.is_active
+    assert passkey.sign_count == 0
+    assert passkey.use_count == 2
+    assert WebAuthnChallenge.objects.filter(used_at__isnull=False).count() == 2
+    assert SSOAuditLog.objects.filter(event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS).count() == 2

@@ -547,29 +547,72 @@ class WebAuthnService:
         Raises:
             ValueError: If verification fails
         """
-        # Find passkey by credential ID
+        # Commit deliberate rejection effects (audit/deactivation) before raising.
+        # Unexpected failures still roll back challenge consumption and counter writes.
+        error = None
+        with transaction.atomic():
+            try:
+                result = self._verify_authentication_locked(
+                    challenge,
+                    credential_id,
+                    authenticator_data,
+                    client_data_json,
+                    signature,
+                    user_handle,
+                    ip_address,
+                    challenge_type,
+                )
+            except ValueError as exc:
+                error = exc
+            else:
+                user, passkey, challenge_record, new_sign_count = result
+                challenge_record.mark_used()
+                passkey.record_use(new_sign_count)
+                SSOAuditLog.log_event(
+                    event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS,
+                    user=user,
+                    description=f'Authenticated with passkey "{passkey.name}"',
+                    ip_address=ip_address,
+                )
+        if error is not None:
+            raise error
+        return user, passkey
+
+    def _verify_authentication_locked(
+        self,
+        challenge,
+        credential_id,
+        authenticator_data,
+        client_data_json,
+        signature,
+        user_handle,
+        ip_address,
+        challenge_type,
+    ):
+        # Match the management flow's lock order: challenge, then credential.
+        challenge_record = (
+            WebAuthnChallenge.objects.select_for_update()
+            .filter(
+                challenge=challenge,
+                challenge_type=challenge_type,
+            )
+            .first()
+        )
+        if not challenge_record:
+            raise ValueError("Challenge not found")
+
         passkey = (
-            UserPasskey.objects.filter(
+            UserPasskey.objects.select_for_update(of=("self",))
+            .filter(
                 credential_id=credential_id,
                 is_active=True,
             )
             .select_related("user")
             .first()
         )
-
         if not passkey:
             raise ValueError("Passkey not found")
-
         user = passkey.user
-
-        # Find and validate challenge
-        challenge_record = WebAuthnChallenge.objects.filter(
-            challenge=challenge,
-            challenge_type=challenge_type,
-        ).first()
-
-        if not challenge_record:
-            raise ValueError("Challenge not found")
 
         if not challenge_record.is_valid:
             raise ValueError("Challenge expired or already used")
@@ -701,21 +744,7 @@ class WebAuthnService:
                     "This is not recommended for production use."
                 )
 
-        # Mark challenge as used (before successful completion)
-        challenge_record.mark_used()
-
-        # Update passkey with new sign count
-        passkey.record_use(new_sign_count)
-
-        # Log successful authentication
-        SSOAuditLog.log_event(
-            event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS,
-            user=user,
-            description=f'Authenticated with passkey "{passkey.name}"',
-            ip_address=ip_address,
-        )
-
-        return user, passkey
+        return user, passkey, challenge_record, new_sign_count
 
     # ==================
     # Management
