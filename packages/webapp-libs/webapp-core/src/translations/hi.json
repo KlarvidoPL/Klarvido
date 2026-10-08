@@ -5757,7 +5757,7 @@
     "defaultMessage": "खाते का पासवर्ड"
   },
   "Passkeys / Two-factor code": {
-    "defaultMessage": "दो-कारक कोड (यदि सक्षम है)"
+    "defaultMessage": "दो-कारक कोड"
   },
   "Passkeys / Verify password": {
     "defaultMessage": "पासवर्ड से सत्यापित करें"

@@ -1,3 +1,8 @@
+import { getFragmentData } from '@sb/webapp-api-client/graphql';
+import {
+  commonQueryCurrentUserFragment,
+  useCommonQuery,
+} from '@sb/webapp-api-client/providers';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -48,6 +53,10 @@ interface Passkey {
 
 export function PasskeysManager() {
   const intl = useIntl();
+  const { data: commonData } = useCommonQuery();
+  const otpEnabled =
+    getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser)
+      ?.otpEnabled === true;
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newPasskeyName, setNewPasskeyName] = useState('');
@@ -167,7 +176,7 @@ export function PasskeysManager() {
         pendingChange.action,
         pendingChange.passkeyId,
         usePassword ? password : undefined,
-        usePassword ? otpToken : undefined,
+        usePassword && otpEnabled ? otpToken : undefined,
       );
       if (pendingChange.action === 'register')
         await handleRegister(authorization);
@@ -275,21 +284,29 @@ export function PasskeysManager() {
             })}
             onChange={(event) => setPassword(event.target.value)}
           />
-          <Input
-            autoComplete="one-time-code"
-            inputMode="numeric"
-            value={otpToken}
-            disabled={isAuthorizing}
-            aria-label={intl.formatMessage({
-              defaultMessage: 'Two-factor code (if enabled)',
-              id: 'Passkeys / Two-factor code',
-            })}
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Two-factor code (if enabled)',
-              id: 'Passkeys / Two-factor code',
-            })}
-            onChange={(event) => setOtpToken(event.target.value)}
-          />
+          {otpEnabled && (
+            <Input
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              pattern="[0-9]{6}"
+              spellCheck={false}
+              value={otpToken}
+              disabled={isAuthorizing}
+              aria-label={intl.formatMessage({
+                defaultMessage: 'Two-factor code',
+                id: 'Passkeys / Two-factor code',
+              })}
+              placeholder={intl.formatMessage({
+                defaultMessage: 'Two-factor code',
+                id: 'Passkeys / Two-factor code',
+              })}
+              onChange={(event) =>
+                setOtpToken(
+                  event.target.value.replace(/[^0-9]/g, '').slice(0, 6),
+                )
+              }
+            />
+          )}
           <DialogFooter>
             <Button
               variant="outline"
@@ -300,7 +317,11 @@ export function PasskeysManager() {
             </Button>
             <Button
               onClick={() => confirmChange(true)}
-              disabled={isAuthorizing || !password}
+              disabled={
+                isAuthorizing ||
+                !password ||
+                (otpEnabled && otpToken.length !== 6)
+              }
             >
               <FormattedMessage
                 defaultMessage="Verify with password"

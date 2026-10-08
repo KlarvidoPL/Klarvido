@@ -5757,7 +5757,7 @@
     "defaultMessage": "كلمة مرور الحساب"
   },
   "Passkeys / Two-factor code": {
-    "defaultMessage": "رمز المصادقة الثنائية (إذا كانت مفعّلة)"
+    "defaultMessage": "رمز المصادقة الثنائية"
   },
   "Passkeys / Verify password": {
     "defaultMessage": "التحقق بكلمة المرور"

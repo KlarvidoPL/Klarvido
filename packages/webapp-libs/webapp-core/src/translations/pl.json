@@ -5757,7 +5757,7 @@
     "defaultMessage": "Hasło do konta"
   },
   "Passkeys / Two-factor code": {
-    "defaultMessage": "Kod dwuskładnikowy (jeśli włączony)"
+    "defaultMessage": "Kod dwuskładnikowy"
   },
   "Passkeys / Verify password": {
     "defaultMessage": "Potwierdź hasłem"

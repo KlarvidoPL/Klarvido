@@ -66,6 +66,7 @@
       "@sb/webapp-notifications/*": [
         "packages/webapp-libs/webapp-notifications/src/*"
       ],
+      "@sb/webapp-sso/*": ["packages/webapp-libs/webapp-sso/src/*"],
       "@sb/webapp-tenants": [
         "packages/webapp-libs/webapp-tenants/src/index.ts"
       ],

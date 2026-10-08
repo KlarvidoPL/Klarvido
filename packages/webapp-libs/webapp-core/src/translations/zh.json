@@ -5757,7 +5757,7 @@
     "defaultMessage": "账户密码"
   },
   "Passkeys / Two-factor code": {
-    "defaultMessage": "双重验证代码（如已启用）"
+    "defaultMessage": "双重验证代码"
   },
   "Passkeys / Verify password": {
     "defaultMessage": "使用密码验证"
