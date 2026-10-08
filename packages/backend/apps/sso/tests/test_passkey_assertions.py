@@ -298,3 +298,56 @@ def test_otp_enabled_account_cannot_login_with_unverified_passkey(user, assertio
     passkey.refresh_from_db()
     assert challenge.used_at is None
     assert passkey.use_count == 0
+
+
+@pytest.mark.parametrize('mode', ['identified', 'discoverable'])
+@pytest.mark.parametrize('otp_enabled', [False, True])
+def test_disabled_account_cannot_login_with_active_passkey(user, assertion, mode, otp_enabled):
+    client, passkey, build = assertion
+    payload, challenge = build(mode)
+    # Disable after issuing the challenge: outstanding ceremonies must also fail.
+    user.is_active = False
+    user.otp_enabled = otp_enabled
+    user.otp_verified = otp_enabled
+    user.save(update_fields=['is_active', 'otp_enabled', 'otp_verified'])
+    tokens_before = OutstandingToken.objects.count()
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 400
+    assert response.data == {'error': 'Authentication failed', 'code': 'verification_failed'}
+    assert not any(
+        name in response.cookies
+        for name in (settings.ACCESS_TOKEN_COOKIE, settings.REFRESH_TOKEN_COOKIE, settings.SESSION_ID_COOKIE)
+    )
+    assert OutstandingToken.objects.count() == tokens_before
+    assert not SSOSession.objects.filter(user=user).exists()
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.sign_count == 0 and passkey.use_count == 0
+    assert passkey.last_used_at is None
+    assert passkey.is_active
+    assert not SSOAuditLog.objects.filter(user=user, event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS).exists()
+    assert SSOAuditLog.objects.filter(
+        user=user, event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED, success=False
+    ).exists()
+
+
+def test_service_rejects_disabled_owner_even_with_stale_active_user(user, assertion):
+    _, passkey, build = assertion
+    payload, challenge = build()
+    # The service can be constructed with an old active user instance.
+    type(user).objects.filter(pk=user.pk).update(is_active=False)
+    assert user.is_active
+    with pytest.raises(ValueError, match='Authentication failed'):
+        WebAuthnService(user).verify_authentication(
+            challenge=payload['challenge'],
+            credential_id=payload['credentialId'],
+            authenticator_data=payload['authenticatorData'],
+            client_data_json=payload['clientDataJSON'],
+            signature=payload['signature'],
+            user_handle=payload['userHandle'],
+        )
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.use_count == 0

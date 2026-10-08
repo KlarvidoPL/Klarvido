@@ -613,6 +613,17 @@ class WebAuthnService:
         if not passkey:
             raise ValueError("Passkey not found")
         user = passkey.user
+        # An active credential must never authenticate a disabled account.
+        # Read the owner from the database rather than trusting self.user.
+        if not user.is_active:
+            SSOAuditLog.log_event(
+                event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED,
+                user=user,
+                description="Passkey authentication rejected: account inactive",
+                ip_address=ip_address,
+                success=False,
+            )
+            raise ValueError("Authentication failed")
 
         if not challenge_record.is_valid:
             raise ValueError("Challenge expired or already used")

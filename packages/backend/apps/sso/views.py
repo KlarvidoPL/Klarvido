@@ -817,6 +817,7 @@ class PasskeyAuthenticationOptionsView(APIView):
 # interpolate the underlying library exception, e.g. "Invalid client data: {e}") fall
 # back to a generic code - their raw text is never shown to the user, only logged.
 PASSKEY_AUTH_ERROR_CODES = {
+    "Authentication failed": "verification_failed",
     "Passkey not found": "passkey_not_found",
     "Challenge not found": "challenge_not_found",
     "Challenge expired or already used": "challenge_expired",
