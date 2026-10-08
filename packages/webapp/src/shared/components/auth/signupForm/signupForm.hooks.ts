@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react';
-import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { UseApiFormArgs, useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
@@ -49,14 +49,7 @@ export const useSignupForm = (args?: UseApiFormArgs<SignupFormFields>) => {
 
   const { handleSubmit, setApolloGraphQLResponseErrors } = form;
   const [commitSignupMutation, { loading }] = useMutation(authSingupMutation, {
-    onCompleted: async ({ signUp }) => {
-      // Unlike login/OTP/passkey/SSO, signup relied solely on the auth cookie the
-      // backend sets on this response - with no Authorization-header fallback, the
-      // immediate refetch below can fail in any cross-site/cookie-blocked setup.
-      if (signUp?.access) {
-        storeAuthTokens(signUp.access, signUp.refresh ?? undefined);
-      }
-
+    onCompleted: async () => {
       trackEvent('auth', 'sign-up');
 
       // Await the refetch so AuthRoute sees a fresh isLoggedIn state before we

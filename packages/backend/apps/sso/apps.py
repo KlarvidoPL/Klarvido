@@ -8,3 +8,7 @@ class SsoConfig(AppConfig):
 
     def ready(self):
         from . import signals  # noqa: F401
+        from . import checks  # noqa: F401
+        from .passkey_security import validate_configuration
+
+        validate_configuration()

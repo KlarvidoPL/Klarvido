@@ -135,15 +135,15 @@ type Documents = {
     "\n  query ActiveSessionsQuery {\n    mySessions(first: 50) {\n      edges {\n        node {\n          id\n          sessionId\n          deviceName\n          deviceType\n          browser\n          operatingSystem\n          ipAddress\n          location\n          isActive\n          isCurrent\n          lastActivityAt\n          expiresAt\n          createdAt\n        }\n      }\n    }\n  }\n": typeof types.ActiveSessionsQueryDocument,
     "\n  mutation RevokeSessionMutation($sessionId: String!, $reason: String) {\n    revokeSession(sessionId: $sessionId, reason: $reason) {\n      ok\n    }\n  }\n": typeof types.RevokeSessionMutationDocument,
     "\n  mutation RevokeAllSessionsMutation {\n    revokeAllSessions {\n      ok\n      revokedCount\n    }\n  }\n": typeof types.RevokeAllSessionsMutationDocument,
-    "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      access\n      refresh\n    }\n  }\n": typeof types.AuthChangePasswordMutationDocument,
+    "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n": typeof types.AuthChangePasswordMutationDocument,
     "\n  mutation authUpdateUserProfileMutation($input: UpdateCurrentUserMutationInput!) {\n    updateCurrentUser(input: $input) {\n      userProfile {\n        id\n        user {\n          ...commonQueryCurrentUserFragment\n        }\n      }\n    }\n  }\n": typeof types.AuthUpdateUserProfileMutationDocument,
-    "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      access\n      refresh\n      otpAuthToken\n    }\n  }\n": typeof types.LoginFormMutationDocument,
+    "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n": typeof types.LoginFormMutationDocument,
     "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n": typeof types.AuthRequestPasswordResetConfirmMutationDocument,
     "\n  mutation authRequestPasswordResetMutation($input: PasswordResetMutationInput!) {\n    passwordReset(input: $input) {\n      ok\n    }\n  }\n": typeof types.AuthRequestPasswordResetMutationDocument,
-    "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      access\n      refresh\n    }\n  }\n": typeof types.AuthSignupMutationDocument,
+    "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      authenticated\n    }\n  }\n": typeof types.AuthSignupMutationDocument,
     "\n  mutation generateOtp($input: GenerateOTPMutationInput!) {\n    generateOtp(input: $input) {\n      base32\n      otpauthUrl\n    }\n  }\n": typeof types.GenerateOtpDocument,
     "\n  mutation verifyOtp($input: VerifyOTPMutationInput!) {\n    verifyOtp(input: $input) {\n      otpVerified\n    }\n  }\n": typeof types.VerifyOtpDocument,
-    "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      access\n      refresh\n    }\n  }\n": typeof types.ValidateOtpDocument,
+    "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      authenticated\n    }\n  }\n": typeof types.ValidateOtpDocument,
     "\n  mutation disableOtp($input: DisableOTPMutationInput!) {\n    disableOtp(input: $input) {\n      ok\n    }\n  }\n": typeof types.DisableOtpDocument,
     "\n  mutation welcomeModalMarkSeenMutation($input: MarkWelcomeModalSeenMutationInput!) {\n    markWelcomeModalSeen(input: $input) {\n      ok\n    }\n  }\n": typeof types.WelcomeModalMarkSeenMutationDocument,
 };
@@ -269,15 +269,15 @@ const documents: Documents = {
     "\n  query ActiveSessionsQuery {\n    mySessions(first: 50) {\n      edges {\n        node {\n          id\n          sessionId\n          deviceName\n          deviceType\n          browser\n          operatingSystem\n          ipAddress\n          location\n          isActive\n          isCurrent\n          lastActivityAt\n          expiresAt\n          createdAt\n        }\n      }\n    }\n  }\n": types.ActiveSessionsQueryDocument,
     "\n  mutation RevokeSessionMutation($sessionId: String!, $reason: String) {\n    revokeSession(sessionId: $sessionId, reason: $reason) {\n      ok\n    }\n  }\n": types.RevokeSessionMutationDocument,
     "\n  mutation RevokeAllSessionsMutation {\n    revokeAllSessions {\n      ok\n      revokedCount\n    }\n  }\n": types.RevokeAllSessionsMutationDocument,
-    "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      access\n      refresh\n    }\n  }\n": types.AuthChangePasswordMutationDocument,
+    "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n": types.AuthChangePasswordMutationDocument,
     "\n  mutation authUpdateUserProfileMutation($input: UpdateCurrentUserMutationInput!) {\n    updateCurrentUser(input: $input) {\n      userProfile {\n        id\n        user {\n          ...commonQueryCurrentUserFragment\n        }\n      }\n    }\n  }\n": types.AuthUpdateUserProfileMutationDocument,
-    "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      access\n      refresh\n      otpAuthToken\n    }\n  }\n": types.LoginFormMutationDocument,
+    "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n": types.LoginFormMutationDocument,
     "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n": types.AuthRequestPasswordResetConfirmMutationDocument,
     "\n  mutation authRequestPasswordResetMutation($input: PasswordResetMutationInput!) {\n    passwordReset(input: $input) {\n      ok\n    }\n  }\n": types.AuthRequestPasswordResetMutationDocument,
-    "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      access\n      refresh\n    }\n  }\n": types.AuthSignupMutationDocument,
+    "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      authenticated\n    }\n  }\n": types.AuthSignupMutationDocument,
     "\n  mutation generateOtp($input: GenerateOTPMutationInput!) {\n    generateOtp(input: $input) {\n      base32\n      otpauthUrl\n    }\n  }\n": types.GenerateOtpDocument,
     "\n  mutation verifyOtp($input: VerifyOTPMutationInput!) {\n    verifyOtp(input: $input) {\n      otpVerified\n    }\n  }\n": types.VerifyOtpDocument,
-    "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      access\n      refresh\n    }\n  }\n": types.ValidateOtpDocument,
+    "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      authenticated\n    }\n  }\n": types.ValidateOtpDocument,
     "\n  mutation disableOtp($input: DisableOTPMutationInput!) {\n    disableOtp(input: $input) {\n      ok\n    }\n  }\n": types.DisableOtpDocument,
     "\n  mutation welcomeModalMarkSeenMutation($input: MarkWelcomeModalSeenMutationInput!) {\n    markWelcomeModalSeen(input: $input) {\n      ok\n    }\n  }\n": types.WelcomeModalMarkSeenMutationDocument,
 };
@@ -783,7 +783,7 @@ export function gql(source: "\n  mutation RevokeAllSessionsMutation {\n    revok
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      access\n      refresh\n    }\n  }\n"): (typeof documents)["\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      access\n      refresh\n    }\n  }\n"];
+export function gql(source: "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n"): (typeof documents)["\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -791,7 +791,7 @@ export function gql(source: "\n  mutation authUpdateUserProfileMutation($input: 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      access\n      refresh\n      otpAuthToken\n    }\n  }\n"): (typeof documents)["\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      access\n      refresh\n      otpAuthToken\n    }\n  }\n"];
+export function gql(source: "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n"): (typeof documents)["\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -803,7 +803,7 @@ export function gql(source: "\n  mutation authRequestPasswordResetMutation($inpu
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      access\n      refresh\n    }\n  }\n"): (typeof documents)["\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      access\n      refresh\n    }\n  }\n"];
+export function gql(source: "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      authenticated\n    }\n  }\n"): (typeof documents)["\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      authenticated\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -815,7 +815,7 @@ export function gql(source: "\n  mutation verifyOtp($input: VerifyOTPMutationInp
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      access\n      refresh\n    }\n  }\n"): (typeof documents)["\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      access\n      refresh\n    }\n  }\n"];
+export function gql(source: "\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      authenticated\n    }\n  }\n"): (typeof documents)["\n  mutation validateOtp($input: ValidateOTPMutationInput!) {\n    validateOtp(input: $input) {\n      authenticated\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

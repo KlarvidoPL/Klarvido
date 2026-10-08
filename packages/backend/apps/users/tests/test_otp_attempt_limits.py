@@ -87,7 +87,7 @@ def test_locked_setup_cannot_enable_otp(user_factory):
 
 
 def test_http_login_new_tokens_cannot_reset_limit_or_issue_login_cookies(account, api_client):
-    query = 'mutation($input: ValidateOTPMutationInput!) { validateOtp(input: $input) { access refresh } }'
+    query = 'mutation($input: ValidateOTPMutationInput!) { validateOtp(input: $input) { authenticated } }'
     for attempt in range(6):
         otp_token = pyotp.TOTP(account.otp_base32).now() if attempt == 5 else 'invalid'
         response = api_client.post(
@@ -107,7 +107,7 @@ def test_http_login_new_tokens_cannot_reset_limit_or_issue_login_cookies(account
     assert response.json()['errors'][0]['message'] == 'Too many incorrect codes. Try again in 15 minutes.'
 
 
-@pytest.mark.django_db(transaction=True, serialized_rollback=True)
+@pytest.mark.django_db(transaction=True)
 def test_concurrent_guesses_share_account_limit(account):
     def attempt(_):
         close_old_connections()

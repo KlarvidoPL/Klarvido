@@ -53,6 +53,14 @@ function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
+function managementHeaders(authorization?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (authorization) headers['X-Passkey-Authorization'] = authorization;
+  return headers;
+}
+
 export function useWebAuthn() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -62,7 +70,10 @@ export function useWebAuthn() {
     typeof window !== 'undefined' && !!window.PublicKeyCredential;
 
   const registerPasskey = useCallback(
-    async (name: string = 'My Passkey'): Promise<boolean> => {
+    async (
+      name: string = 'My Passkey',
+      authorization?: string,
+    ): Promise<boolean> => {
       if (!isSupported) {
         setError('WebAuthn is not supported in this browser');
         return false;
@@ -77,7 +88,7 @@ export function useWebAuthn() {
           `${API_BASE}/passkeys/register/options`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: managementHeaders(authorization),
             credentials: 'include',
           },
         );
@@ -135,14 +146,11 @@ export function useWebAuthn() {
           `${API_BASE}/passkeys/register/verify`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: managementHeaders(authorization),
             credentials: 'include',
             body: JSON.stringify({
               challenge: options.challenge,
               credentialId: arrayBufferToBase64Url(credential.rawId),
-              publicKey: arrayBufferToBase64Url(
-                response.getPublicKey?.() || new ArrayBuffer(0),
-              ),
               attestationObject: arrayBufferToBase64Url(
                 response.attestationObject,
               ),
@@ -169,99 +177,173 @@ export function useWebAuthn() {
     [isSupported],
   );
 
-  const authenticateWithPasskey = useCallback(
-    async (
-      email?: string,
-    ): Promise<{ access: string; refresh: string } | null> => {
-      if (!isSupported) {
-        setError('WebAuthn is not supported in this browser');
-        return null;
+  const authenticateWithPasskey = useCallback(async (): Promise<{
+    success: boolean;
+  } | null> => {
+    if (!isSupported) {
+      setError('WebAuthn is not supported in this browser');
+      return null;
+    }
+
+    setIsAuthenticating(true);
+    setError(null);
+
+    try {
+      // Get authentication options from server
+      const optionsResponse = await csrfFetch(
+        `${API_BASE}/passkeys/authenticate/options`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        },
+      );
+
+      if (!optionsResponse.ok) {
+        throw new Error('Failed to get authentication options');
       }
 
-      setIsAuthenticating(true);
-      setError(null);
+      const options: AuthenticationOptions = await optionsResponse.json();
 
-      try {
-        // Get authentication options from server
+      // Convert base64url to ArrayBuffer
+      const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions =
+        {
+          challenge: base64UrlToArrayBuffer(options.challenge),
+          timeout: options.timeout,
+          rpId: options.rpId,
+          userVerification:
+            options.userVerification as UserVerificationRequirement,
+          allowCredentials: options.allowCredentials?.map((cred) => ({
+            id: base64UrlToArrayBuffer(cred.id),
+            type: cred.type as PublicKeyCredentialType,
+            transports: cred.transports as AuthenticatorTransport[] | undefined,
+          })),
+        };
+
+      // Get credential
+      const credential = (await navigator.credentials.get({
+        publicKey: publicKeyCredentialRequestOptions,
+      })) as PublicKeyCredential | null;
+
+      if (!credential) {
+        throw new Error('Failed to get credential');
+      }
+
+      const response = credential.response as AuthenticatorAssertionResponse;
+
+      // Send to server for verification
+      const verifyResponse = await csrfFetch(
+        `${API_BASE}/passkeys/authenticate/verify`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            challenge: options.challenge,
+            credentialId: arrayBufferToBase64Url(credential.rawId),
+            authenticatorData: arrayBufferToBase64Url(
+              response.authenticatorData,
+            ),
+            clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
+            signature: arrayBufferToBase64Url(response.signature),
+            userHandle: response.userHandle
+              ? arrayBufferToBase64Url(response.userHandle)
+              : undefined,
+          }),
+        },
+      );
+
+      if (!verifyResponse.ok) {
+        const errorData = await verifyResponse.json();
+        throw new Error(errorData.error || 'Authentication failed');
+      }
+
+      const result = await verifyResponse.json();
+      if (result.success !== true) throw new Error('Authentication failed');
+      return { success: true };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication failed');
+      return null;
+    } finally {
+      setIsAuthenticating(false);
+    }
+  }, [isSupported]);
+
+  const authorizePasskeyChange = useCallback(
+    async (
+      action: 'register' | 'delete',
+      passkeyId?: string,
+      password?: string,
+      otpToken?: string,
+    ): Promise<string> => {
+      const target = { action, passkeyId };
+      let proof: Record<string, unknown> = { ...target, password, otpToken };
+      if (password === undefined) {
         const optionsResponse = await csrfFetch(
-          `${API_BASE}/passkeys/authenticate/options`,
+          `${API_BASE}/passkeys/reauthenticate/options`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
+            credentials: 'include',
+            headers: managementHeaders(),
+            body: JSON.stringify(target),
           },
         );
-
         if (!optionsResponse.ok) {
-          throw new Error('Failed to get authentication options');
+          throw Object.assign(new Error('Fresh authentication failed'), {
+            code: optionsResponse.status === 429 ? 'rate_limited' : undefined,
+          });
         }
-
         const options: AuthenticationOptions = await optionsResponse.json();
-
-        // Convert base64url to ArrayBuffer
-        const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions =
-          {
+        const credential = (await navigator.credentials.get({
+          publicKey: {
             challenge: base64UrlToArrayBuffer(options.challenge),
-            timeout: options.timeout,
             rpId: options.rpId,
-            userVerification:
-              options.userVerification as UserVerificationRequirement,
+            timeout: options.timeout,
+            userVerification: 'required',
             allowCredentials: options.allowCredentials?.map((cred) => ({
               id: base64UrlToArrayBuffer(cred.id),
-              type: cred.type as PublicKeyCredentialType,
+              type: 'public-key',
               transports: cred.transports as
                 | AuthenticatorTransport[]
                 | undefined,
             })),
-          };
-
-        // Get credential
-        const credential = (await navigator.credentials.get({
-          publicKey: publicKeyCredentialRequestOptions,
-        })) as PublicKeyCredential | null;
-
-        if (!credential) {
-          throw new Error('Failed to get credential');
-        }
-
-        const response = credential.response as AuthenticatorAssertionResponse;
-
-        // Send to server for verification
-        const verifyResponse = await csrfFetch(
-          `${API_BASE}/passkeys/authenticate/verify`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              challenge: options.challenge,
-              credentialId: arrayBufferToBase64Url(credential.rawId),
-              authenticatorData: arrayBufferToBase64Url(
-                response.authenticatorData,
-              ),
-              clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
-              signature: arrayBufferToBase64Url(response.signature),
-              userHandle: response.userHandle
-                ? arrayBufferToBase64Url(response.userHandle)
-                : undefined,
-            }),
           },
-        );
-
-        if (!verifyResponse.ok) {
-          const errorData = await verifyResponse.json();
-          throw new Error(errorData.error || 'Authentication failed');
-        }
-
-        const tokens = await verifyResponse.json();
-        return tokens;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Authentication failed');
-        return null;
-      } finally {
-        setIsAuthenticating(false);
+        })) as PublicKeyCredential | null;
+        if (!credential) throw new Error('Fresh authentication failed');
+        const response = credential.response as AuthenticatorAssertionResponse;
+        proof = {
+          challenge: options.challenge,
+          credentialId: arrayBufferToBase64Url(credential.rawId),
+          authenticatorData: arrayBufferToBase64Url(response.authenticatorData),
+          clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
+          signature: arrayBufferToBase64Url(response.signature),
+          userHandle: response.userHandle
+            ? arrayBufferToBase64Url(response.userHandle)
+            : undefined,
+        };
       }
+      const response = await csrfFetch(
+        `${API_BASE}/passkeys/reauthenticate/verify`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: managementHeaders(),
+          body: JSON.stringify(proof),
+        },
+      );
+      if (!response.ok) {
+        const failure = await response.json().catch(() => ({}));
+        throw Object.assign(new Error('Fresh authentication failed'), {
+          code: response.status === 429 ? 'rate_limited' : failure.code,
+        });
+      }
+      const data = await response.json();
+      if (typeof data.authorization !== 'string' || !data.authorization)
+        throw new Error('Fresh authentication failed');
+      return data.authorization;
     },
-    [isSupported],
+    [],
   );
 
   return {
@@ -270,6 +352,7 @@ export function useWebAuthn() {
     isAuthenticating,
     error,
     registerPasskey,
+    authorizePasskeyChange,
     authenticateWithPasskey,
   };
 }

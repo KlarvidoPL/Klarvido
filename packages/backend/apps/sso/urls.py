@@ -20,7 +20,18 @@ urlpatterns = [
     # path("scim/v2/Users/<str:user_id>", views.SCIMUserDetailView.as_view(), name="scim-user-detail"),
     # path("scim/v2/Groups", views.SCIMGroupsView.as_view(), name="scim-groups"),
     # path("scim/v2/Groups/<str:group_id>", views.SCIMGroupDetailView.as_view(), name="scim-group-detail"),
+    path("passkeys/history", views.PersonalPasskeyHistoryView.as_view(), name="passkey-history"),
     # WebAuthn/Passkey endpoints
+    path(
+        "passkeys/reauthenticate/options",
+        views.PasskeyReauthenticationOptionsView.as_view(),
+        name="passkey-reauth-options",
+    ),
+    path(
+        "passkeys/reauthenticate/verify",
+        views.PasskeyReauthenticationVerifyView.as_view(),
+        name="passkey-reauth-verify",
+    ),
     path("passkeys/register/options", views.PasskeyRegistrationOptionsView.as_view(), name="passkey-register-options"),
     path("passkeys/register/verify", views.PasskeyRegistrationVerifyView.as_view(), name="passkey-register-verify"),
     path(

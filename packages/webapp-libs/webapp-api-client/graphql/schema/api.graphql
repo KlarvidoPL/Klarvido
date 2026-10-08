@@ -1757,6 +1757,7 @@ type StripeSetupIntentType implements Node {
 type ChangePasswordMutationPayload {
   refresh: String
   access: String
+  authenticated: Boolean!
   clientMutationId: String
 }
 type UpdateCurrentUserMutationPayload {
@@ -1814,6 +1815,8 @@ type ObtainTokenMutationPayload {
   access: String
   refresh: String
   otpAuthToken: String
+  authenticated: Boolean!
+  otpRequired: Boolean!
   clientMutationId: String
 }
 type SingUpMutationPayload {
@@ -1821,6 +1824,7 @@ type SingUpMutationPayload {
   email: String
   access: String
   refresh: String
+  authenticated: Boolean!
   clientMutationId: String
 }
 type ConfirmEmailMutationPayload {
@@ -1838,6 +1842,7 @@ type PasswordResetConfirmationMutationPayload {
 type ValidateOTPMutationPayload {
   access: String
   refresh: String
+  authenticated: Boolean!
   clientMutationId: String
 }
 type UpdateNotificationMutationPayload {
@@ -2043,6 +2048,10 @@ enum SsoSSOAuditLogEventTypeChoices {
   PASSKEY_AUTH_SUCCESS
   "Passkey Auth Failed"
   PASSKEY_AUTH_FAILED
+  "Passkey Management Authentication Success"
+  PASSKEY_REAUTH_SUCCESS
+  "Passkey Management Authentication Failed"
+  PASSKEY_REAUTH_FAILED
   "Passkey Clone Detected"
   PASSKEY_CLONE_DETECTED
   "Security Anomaly Detected"

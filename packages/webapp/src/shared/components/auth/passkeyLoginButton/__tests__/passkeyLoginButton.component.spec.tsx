@@ -1,3 +1,4 @@
+import * as authRequests from '@sb/webapp-api-client/api/auth/auth.requests';
 import { ENV } from '@sb/webapp-core/config/env';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { act, screen, waitFor } from '@testing-library/react';
@@ -34,6 +35,9 @@ jest.mock('react-router-dom', () => ({
 }));
 
 beforeEach(() => {
+  // These UI tests start signed out. Keep bootstrap recovery from consuming
+  // the fetch responses reserved for the WebAuthn ceremony below.
+  jest.spyOn(authRequests, 'coordinatedRefreshToken').mockRejectedValue(new Error('No refresh cookie'));
   mockFetch.mockReset();
   mockCredentialsGet.mockReset();
   mockUseLocation.mockReturnValue({ search: '' });
@@ -53,6 +57,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.restoreAllMocks();
   global.fetch = originalFetch;
   (global as any).PublicKeyCredential = originalPublicKeyCredential;
   (window as any).PublicKeyCredential = originalPublicKeyCredential;
@@ -225,7 +230,7 @@ describe('PasskeyLoginButton: Component', () => {
               rpId: 'localhost',
             }),
         })
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: true }) });
       mockCredentialsGet.mockResolvedValue(mockPublicKeyCredential());
 
       render(<PasskeyLoginButton />);
@@ -236,10 +241,18 @@ describe('PasskeyLoginButton: Component', () => {
         expect(trackEvent).toHaveBeenCalledWith('auth', 'passkey-login');
       });
       expect(window.location.href).toBe('/en/');
+      expect(localStorage.getItem('token')).toBeNull();
+      expect(localStorage.getItem('refresh_token')).toBeNull();
     });
 
-    it('should redirect to custom path when redirect param is present', async () => {
-      mockUseLocation.mockReturnValue({ search: '?redirect=%2Fen%2Fprofile' });
+    it.each([
+      '/en/profile',
+      'https://evil.example/phish',
+      '//evil.example',
+      'javascript:alert(1)',
+      '/%252fevil.example',
+    ])('validates the post-login redirect %s', async (redirect) => {
+      mockUseLocation.mockReturnValue({ search: `?redirect=${encodeURIComponent(redirect)}` });
 
       mockFetch
         .mockResolvedValueOnce({
@@ -251,7 +264,7 @@ describe('PasskeyLoginButton: Component', () => {
               rpId: 'localhost',
             }),
         })
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: true }) });
       mockCredentialsGet.mockResolvedValue(mockPublicKeyCredential());
 
       render(<PasskeyLoginButton />);
@@ -259,7 +272,7 @@ describe('PasskeyLoginButton: Component', () => {
       await userEvent.click(await screen.findByRole('button', { name: /sign in with passkey/i }));
 
       await waitFor(() => {
-        expect(window.location.href).toBe('/en/profile');
+        expect(window.location.href).toBe(redirect === '/en/profile' ? '/en/profile' : '/en/');
       });
     });
   });

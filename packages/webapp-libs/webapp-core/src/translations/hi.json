@@ -5743,5 +5743,44 @@
   },
   "Companies / Empty title": {
     "defaultMessage": "आपके पास अभी कोई संगठन नहीं है"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "अपनी पहचान सत्यापित करें"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "पासकी जोड़ने या हटाने के लिए मौजूदा पासकी सत्यापित करें या अपने खाते का पासवर्ड और दो-कारक कोड दर्ज करें, यदि सक्षम है। यदि आप केवल सोशल लॉगिन का उपयोग करते हैं, तो पहले पासवर्ड रीसेट से खाते का पासवर्ड सेट करें।"
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "मौजूदा पासकी से सत्यापित करें"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "खाते का पासवर्ड"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "दो-कारक कोड"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "पासवर्ड से सत्यापित करें"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "सत्यापन विफल हुआ। अपना पासवर्ड और दो-कारक कोड जाँचें या मौजूदा पासकी से फिर प्रयास करें।"
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "पासकी प्रबंधन का सत्यापन सफल हुआ"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "पासकी प्रबंधन का सत्यापन विफल हुआ"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "या"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "साइन इन करते समय आपके फ़िंगरप्रिंट, चेहरे या डिवाइस PIN से सत्यापित पासकी, ऑथेंटिकेटर कोड की जगह लेती है। दो-चरणीय प्रमाणीकरण चालू होने पर पासवर्ड या सोशल खाते से साइन इन करने के लिए अब भी कोड आवश्यक है।"
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "खाते का पासवर्ड गलत है।"
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "सत्यापन के बहुत अधिक प्रयास हुए हैं। कृपया कुछ देर प्रतीक्षा करें और फिर कोशिश करें।"
   }
 }

@@ -2,6 +2,7 @@ import asyncio
 
 import graphene
 import pytest
+from django.conf import settings
 from django.db import OperationalError
 from graphql import GraphQLError
 from promise import Promise
@@ -178,7 +179,7 @@ def test_production_login_and_otp_challenge_remain_compatible(api_client, user_f
         {
             'query': (
                 'mutation($input: ObtainTokenMutationInput!) {'
-                ' tokenAuth(input: $input) { access refresh otpAuthToken } }'
+                ' tokenAuth(input: $input) { authenticated otpRequired access refresh otpAuthToken } }'
             ),
             'variables': {
                 'input': {
@@ -192,8 +193,15 @@ def test_production_login_and_otp_challenge_remain_compatible(api_client, user_f
     result = response.json()
     if valid_password:
         assert not result.get('errors'), result
-        assert bool(result['data']['tokenAuth']['otpAuthToken']) == otp
-        assert bool(result['data']['tokenAuth']['access']) != otp
+        payload = result['data']['tokenAuth']
+        assert payload['otpRequired'] == otp
+        assert payload['authenticated'] != otp
+        assert payload['access'] is None
+        assert payload['refresh'] is None
+        assert payload['otpAuthToken'] is None
+        cookie = settings.OTP_AUTH_TOKEN_COOKIE if otp else settings.ACCESS_TOKEN_COOKIE
+        assert response.cookies[cookie].value
+        assert response.cookies[cookie]['httponly']
     else:
         assert result['errors'][0]['message'] != GENERIC_ERROR
         assert 'no_active_account' in str(result['errors'])

@@ -5743,5 +5743,44 @@
   },
   "Roles / Error / Color reserved for owner": {
     "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "Verify your identity"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "To add or remove a passkey, verify an existing passkey or enter your account password and two-factor code if enabled. If you only use social login, set an account password using password reset first."
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "Account password"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "Two-factor code"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "Verify with password"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "Verification failed. Check your password and two-factor code, or try your existing passkey again."
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "Passkey management verification succeeded"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "Passkey management verification failed"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "or"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "A passkey verified with your fingerprint, face, or device PIN replaces the authenticator code when signing in. Password and social sign-ins still require a code when two-factor authentication is enabled."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "The account password is incorrect."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Too many verification attempts. Please wait a moment and try again."
   }
 }

@@ -2,13 +2,14 @@ import hashid_field
 import secrets
 from datetime import timedelta
 
-from django.db import models
+from django.db import models, transaction, connection
 from django.conf import settings
 from django.utils import timezone
 
 from common.models import TimestampedMixin
 from apps.multitenancy.models import Tenant
 from apps.multitenancy.constants import TenantUserRole
+from .exceptions import PasskeyChallengeCapacityExceeded
 from . import constants
 from . import managers
 
@@ -442,11 +443,16 @@ class SSOSession(TimestampedMixin, models.Model):
         device it belongs to would stay able to mint new access tokens
         indefinitely via /refresh.
         """
-        self.is_active = False
-        self.revoked_at = timezone.now()
-        self.revoked_reason = reason
-        self.save(update_fields=["is_active", "revoked_at", "revoked_reason"])
-        self.blacklist_refresh_token()
+        # Serialize with refresh rotation and reload its current token linkage;
+        # callers may hold an instance loaded before that rotation.
+        with transaction.atomic():
+            locked = type(self).objects.select_for_update().get(pk=self.pk)
+            self.refresh_token_jti = locked.refresh_token_jti
+            self.is_active = False
+            self.revoked_at = timezone.now()
+            self.revoked_reason = reason
+            self.save(update_fields=["is_active", "revoked_at", "revoked_reason"])
+            self.blacklist_refresh_token()
 
     def extend(self, refresh_token_jti: str):
         """
@@ -603,6 +609,7 @@ class WebAuthnChallenge(TimestampedMixin, models.Model):
     )
 
     challenge = models.CharField(max_length=128, unique=True)
+    browser_binding = models.CharField(max_length=64, blank=True, default="")
     challenge_type = models.CharField(max_length=20)  # 'registration' or 'authentication'
 
     # Additional data needed for verification
@@ -614,6 +621,7 @@ class WebAuthnChallenge(TimestampedMixin, models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [models.Index(fields=["expires_at"], name="sso_challenge_expiry_idx")]
 
     def __str__(self):
         return f"{self.challenge_type} challenge for {self.user or 'anonymous'}"
@@ -624,8 +632,24 @@ class WebAuthnChallenge(TimestampedMixin, models.Model):
         return secrets.token_urlsafe(32)
 
     @classmethod
+    @transaction.atomic
     def create_challenge(cls, user=None, challenge_type="registration", ttl_seconds=300):
         """Create a new challenge."""
+        # PostgreSQL transaction lock makes capacity checks exact across workers.
+        # Every deployment target uses PostgreSQL; never rely on per-process locks.
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT pg_advisory_xact_lock(%s)", [83640127])
+        now = timezone.now()
+        stale = list(cls.objects.filter(expires_at__lt=now).values_list('pk', flat=True)[:1000])
+        cls.objects.filter(pk__in=stale).delete()
+        if cls.objects.count() >= settings.PASSKEY_MAX_CHALLENGES:
+            raise PasskeyChallengeCapacityExceeded
+        if (
+            user
+            and cls.objects.filter(user=user, used_at__isnull=True, expires_at__gt=now).count()
+            >= settings.PASSKEY_MAX_USER_CHALLENGES
+        ):
+            raise PasskeyChallengeCapacityExceeded
         return cls.objects.create(
             user=user,
             challenge=cls.generate_challenge(),
@@ -645,6 +669,30 @@ class WebAuthnChallenge(TimestampedMixin, models.Model):
         """Mark this challenge as used."""
         self.used_at = timezone.now()
         self.save(update_fields=["used_at"])
+
+
+class PasskeyManagementGrant(TimestampedMixin, models.Model):
+    """One-use, action-bound proof of fresh authentication. Only its hash is stored."""
+
+    id = hashid_field.HashidAutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    action = models.CharField(max_length=10, choices=[("register", "Register"), ("delete", "Delete")])
+    passkey = models.ForeignKey(UserPasskey, on_delete=models.CASCADE, null=True, blank=True)
+    token_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    authentication_challenge = models.OneToOneField(
+        WebAuthnChallenge, on_delete=models.CASCADE, null=True, blank=True, related_name="management_grant"
+    )
+    registration_challenge = models.OneToOneField(
+        WebAuthnChallenge, on_delete=models.CASCADE, null=True, blank=True, related_name="registration_grant"
+    )
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["expires_at"], name="sso_grant_expiry_idx")]
+
+    def __str__(self):
+        return f"Passkey management grant {self.pk} ({self.action})"
 
 
 class SSOAuditLog(TimestampedMixin, models.Model):

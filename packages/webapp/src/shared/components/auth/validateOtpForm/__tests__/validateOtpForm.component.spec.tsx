@@ -23,7 +23,7 @@ jest.mock('react-router-dom', () => {
 
 const Component = () => <ValidateOtpForm />;
 
-const tokensMock = { access: 'access-token', refresh: 'refresh-token' };
+const tokensMock = { authenticated: true };
 const user = currentUserFactory();
 
 describe('ValidateOtpForm: Component', () => {
@@ -44,7 +44,7 @@ describe('ValidateOtpForm: Component', () => {
       apolloMocks: (mocks) => mocks.concat(requestMock, refreshQueryMock),
     });
 
-    const input = await screen.findByPlaceholderText(/000000/i);
+    const input = await screen.findByRole('textbox', { name: 'Authentication Code' });
     const submitButton = screen.getByRole('button', { name: /verify code/i });
 
     await userEvent.type(input, token);
@@ -67,7 +67,7 @@ describe('ValidateOtpForm: Component', () => {
 
       render(<Component />, { apolloMocks: append(requestMock) });
 
-      const input = await screen.findByPlaceholderText(/000000/i);
+      const input = await screen.findByRole('textbox', { name: 'Authentication Code' });
       const submitButton = screen.getByRole('button', { name: /verify code/i });
 
       await userEvent.type(input, token);
@@ -96,9 +96,26 @@ describe('ValidateOtpForm: Component', () => {
       ],
     });
     render(<Component />, { apolloMocks: append(requestMock) });
-    await userEvent.type(await screen.findByPlaceholderText(/000000/i), token);
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Authentication Code' }), token);
     await userEvent.click(screen.getByRole('button', { name: /verify code/i }));
     expect(await screen.findByText('Your sign-in session has expired. Please sign in again.')).toBeInTheDocument();
     expect(screen.queryByText(technicalMessage)).not.toBeInTheDocument();
   });
+});
+
+it('offers a link back to sign in', async () => {
+  render(<Component />);
+  expect(await screen.findByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/en/auth/login');
+});
+
+it('rejects an incomplete code without submitting it', async () => {
+  const requestMock = composeMockedQueryResult(validateOtpMutation, {
+    variables: { input: { otpToken: '123' } },
+    data: { validateOtp: tokensMock },
+  });
+  render(<Component />, { apolloMocks: append(requestMock) });
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Authentication Code' }), 'a123');
+  await userEvent.click(screen.getByRole('button', { name: /verify code/i }));
+  expect(await screen.findByText('The code must be 6 digits')).toBeInTheDocument();
+  expect(requestMock.result).not.toHaveBeenCalled();
 });

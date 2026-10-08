@@ -5,13 +5,14 @@ GraphQL schema for Enterprise SSO management.
 import graphene
 from graphene import relay
 from graphene.types.generic import GenericScalar
-from graphene_django import DjangoObjectType
 from graphql_relay import to_global_id, from_global_id
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from rest_framework.exceptions import PermissionDenied
 
 from common.acl import policies
 from common.graphql import mutations
+from common.graphql.authorization import AuthorizedDjangoObjectType
 from common.graphql.acl.decorators import permission_classes, requires
 from common.action_logging.decorators import action_logged
 from common.action_logging.service import get_request_actor, log_action, log_delete
@@ -20,6 +21,8 @@ from apps.users.services.users import get_user_from_resolver
 from . import models
 from . import serializers
 from . import constants
+from .services import passkey_management
+from .services.webauthn import WebAuthnService
 
 
 def _resolve_tenant(info, tenant_id=None):
@@ -49,7 +52,7 @@ def _resolve_tenant(info, tenant_id=None):
 # ==================
 
 
-class SSOConnectionType(DjangoObjectType):
+class SSOConnectionType(AuthorizedDjangoObjectType):
     """GraphQL type for SSO connections."""
 
     id = graphene.ID(required=True)
@@ -127,7 +130,7 @@ class SSOConnectionConnection(graphene.Connection):
         node = SSOConnectionType
 
 
-class SCIMTokenType(DjangoObjectType):
+class SCIMTokenType(AuthorizedDjangoObjectType):
     """GraphQL type for SCIM tokens."""
 
     id = graphene.ID(required=True)
@@ -159,7 +162,7 @@ class SCIMTokenConnection(graphene.Connection):
         node = SCIMTokenType
 
 
-class SSOSessionType(DjangoObjectType):
+class SSOSessionType(AuthorizedDjangoObjectType):
     """GraphQL type for SSO sessions."""
 
     id = graphene.ID(required=True)
@@ -203,7 +206,7 @@ class SSOSessionConnection(graphene.Connection):
         node = SSOSessionType
 
 
-class UserDeviceType(DjangoObjectType):
+class UserDeviceType(AuthorizedDjangoObjectType):
     """GraphQL type for user devices."""
 
     id = graphene.ID(required=True)
@@ -235,7 +238,7 @@ class UserDeviceConnection(graphene.Connection):
         node = UserDeviceType
 
 
-class PasskeyType(DjangoObjectType):
+class PasskeyType(AuthorizedDjangoObjectType):
     """GraphQL type for passkeys."""
 
     id = graphene.ID(required=True)
@@ -264,7 +267,7 @@ class PasskeyConnection(graphene.Connection):
         node = PasskeyType
 
 
-class SSOAuditLogType(DjangoObjectType):
+class SSOAuditLogType(AuthorizedDjangoObjectType):
     """GraphQL type for SSO audit logs."""
 
     id = graphene.ID(required=True)
@@ -762,6 +765,7 @@ class DeletePasskeyMutation(mutations.DeleteModelMutation):
         model = models.UserPasskey
 
     @classmethod
+    @transaction.atomic
     def mutate_and_get_payload(cls, root, info, id, **kwargs):
         _, pk = from_global_id(id)
         user = get_user_from_resolver(info)
@@ -770,7 +774,9 @@ class DeletePasskeyMutation(mutations.DeleteModelMutation):
             pk=pk,
             user=user,
         )
-        passkey.deactivate()
+        grant = passkey_management.require_grant(info.context, user, "delete", passkey=passkey)
+        WebAuthnService(user).delete_passkey(str(passkey.pk), ip_address=info.context.META.get("REMOTE_ADDR"))
+        passkey_management.consume_grant(grant)
 
         return cls(deleted_ids=[id])
 

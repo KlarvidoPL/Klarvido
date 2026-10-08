@@ -5743,5 +5743,44 @@
   },
   "Companies / Empty title": {
     "defaultMessage": "您还没有任何组织"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "验证您的身份"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "要添加或删除通行密钥，请验证现有通行密钥，或输入账户密码及双重验证代码（如已启用）。如果您仅使用社交账号登录，请先通过重置密码设置账户密码。"
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "使用现有通行密钥验证"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "账户密码"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "双重验证代码"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "使用密码验证"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "验证失败。请检查密码和双重验证代码，或再次尝试使用现有通行密钥。"
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "通行密钥管理验证成功"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "通行密钥管理验证失败"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "或"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "登录时，通过指纹、面部识别或设备 PIN 验证的通行密钥可替代身份验证器验证码。启用双重身份验证后，使用密码或社交账号登录仍需输入验证码。"
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "账户密码不正确。"
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "验证尝试次数过多。请稍候再试。"
   }
 }

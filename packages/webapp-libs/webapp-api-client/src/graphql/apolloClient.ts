@@ -1,5 +1,4 @@
 import { ApolloClient, FetchResult, HttpLink, InMemoryCache, Observable, from, split } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 import { getMainDefinition, relayStylePagination } from '@apollo/client/utilities';
@@ -133,31 +132,6 @@ const httpApiLink = new UploadHttpLink({
   uri: apiURL('/graphql/'),
   credentials: 'include', // Required for cookie-based authentication
   fetch: csrfFetch,
-});
-
-/**
- * Auth link that adds Authorization header from localStorage as fallback.
- *
- * This is essential for Safari and mobile browsers that block third-party cookies
- * due to Intelligent Tracking Prevention (ITP). When cookies are blocked,
- * we fall back to sending the access token via Authorization header.
- *
- * The backend accepts both:
- * 1. Cookie-based auth (via JSONWebTokenCookieAuthentication)
- * 2. Header-based auth (via JWTAuthentication with Authorization: Bearer token)
- */
-const authLink = setContext((_, { headers }) => {
-  // Get token from localStorage (set by login, SSO callback, etc.)
-  const token = localStorage.getItem('token');
-
-  // Return headers with Authorization if token exists
-  // Cookies are still sent via credentials: 'include', so this is additive
-  return {
-    headers: {
-      ...headers,
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-  };
 });
 
 // Helper function to check if an error is a 401
@@ -303,8 +277,8 @@ const httpContentfulLink = new HttpLink({
   uri: `https://graphql.contentful.com/content/v1/spaces/${ENV.CONTENTFUL_SPACE}/environments/${ENV.CONTENTFUL_ENV}?access_token=${ENV.CONTENTFUL_TOKEN}`,
 });
 
-// Chain: refreshTokenLink -> authLink (adds Authorization header) -> httpApiLink
-const apiLinkChain = from([refreshTokenLink, authLink, httpApiLink]);
+// Browser authentication uses HttpOnly cookies.
+const apiLinkChain = from([refreshTokenLink, httpApiLink]);
 const splitHttpLink = split(
   (operation) => {
     const { schemaType = SchemaType.API } = operation.getContext();

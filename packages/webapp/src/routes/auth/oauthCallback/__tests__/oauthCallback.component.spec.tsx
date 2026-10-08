@@ -39,7 +39,7 @@ afterEach(() => {
 
 describe('OAuthCallback: Component', () => {
   it('should refresh tokens and redirect to next when the token refresh succeeds', async () => {
-    mockRefreshToken.mockResolvedValue({ access: 'access-token', refresh: 'refresh-token' });
+    mockRefreshToken.mockResolvedValue({ success: true });
     mockUseSearchParams.mockReturnValue([new URLSearchParams('?next=%2Fen%2Fprofile')]);
 
     render(<OAuthCallback />, {
@@ -53,7 +53,7 @@ describe('OAuthCallback: Component', () => {
   });
 
   it('should ignore a cross-origin next and redirect to "/" instead (open-redirect guard)', async () => {
-    mockRefreshToken.mockResolvedValue({ access: 'access-token', refresh: 'refresh-token' });
+    mockRefreshToken.mockResolvedValue({ success: true });
     mockUseSearchParams.mockReturnValue([new URLSearchParams('?next=https%3A%2F%2Fevil.example.com%2Fphish')]);
 
     render(<OAuthCallback />, {
@@ -72,7 +72,7 @@ describe('OAuthCallback: Component', () => {
       routerProps: createMockRouterProps(`auth/oauth/callback`, {}),
     });
 
-    expect(await screen.findByText(/missing authentication tokens/i)).toBeInTheDocument();
+    expect(await screen.findByText(/unable to confirm your session/i)).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: /return to login/i })).toBeInTheDocument();
   });
 

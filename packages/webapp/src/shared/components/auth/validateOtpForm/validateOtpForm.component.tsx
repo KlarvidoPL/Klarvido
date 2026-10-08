@@ -1,18 +1,19 @@
 import { useMutation } from '@apollo/client/react';
-import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sb/webapp-core/components/forms';
+import { Form, FormField, FormItem, FormMessage } from '@sb/webapp-core/components/forms';
 import { Alert, AlertDescription } from '@sb/webapp-core/components/ui/alert';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
-import { Input } from '@sb/webapp-core/components/ui/input';
+import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../app/config/routes';
+import { getSafeAuthRedirect } from '../../../utils/authRedirect';
 import { AuthLogo } from '../authLogo';
 import { FloatingThemeToggle } from '../floatingThemeToggle';
 import { validateOtpMutation } from '../twoFactorAuthForm/twoFactorAuthForm.graphql';
@@ -51,12 +52,7 @@ export const ValidateOtpForm = () => {
       token: '',
     },
   });
-  const {
-    handleSubmit,
-    genericError,
-    setApolloGraphQLResponseErrors,
-    form: { register },
-  } = form;
+  const { handleSubmit, genericError, setApolloGraphQLResponseErrors } = form;
   const { reload: reloadCommonQuery } = useCommonQuery();
 
   const [commitValidateOtpMutation, { loading }] = useMutation(validateOtpMutation, {
@@ -74,9 +70,7 @@ export const ValidateOtpForm = () => {
   const handleFormSubmit = async (values: { token: string }) => {
     try {
       const { data } = await commitValidateOtpMutation({ variables: { input: { otpToken: values.token } } });
-      if (data?.validateOtp?.access) {
-        storeAuthTokens(data.validateOtp.access, data.validateOtp.refresh ?? undefined);
-
+      if (data?.validateOtp?.authenticated) {
         // Reload the common query to get fresh user data
         await reloadCommonQuery();
 
@@ -85,7 +79,7 @@ export const ValidateOtpForm = () => {
         const redirect = searchParams.get('redirect');
 
         // Navigate to the redirect URL or home page
-        navigate(redirect ?? generateLocalePath(RoutesConfig.home));
+        navigate(getSafeAuthRedirect(redirect, generateLocalePath(RoutesConfig.home)));
       }
     } catch (error) {
       // Error is handled by onError callback
@@ -114,44 +108,35 @@ export const ValidateOtpForm = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <Form {...form.form}>
-              <form className="flex w-full flex-col gap-6" onSubmit={handleSubmit(handleFormSubmit)}>
+              <form noValidate className="flex w-full flex-col gap-6" onSubmit={handleSubmit(handleFormSubmit)}>
                 <FormField
                   control={form.form.control}
                   name="token"
+                  rules={{
+                    required: intl.formatMessage({
+                      defaultMessage: 'Please enter the authentication code',
+                      id: 'Auth / Validate OTP / Auth code required',
+                    }),
+                    pattern: {
+                      value: /^[0-9]{6}$/,
+                      message: intl.formatMessage({
+                        defaultMessage: 'The code must be 6 digits',
+                        id: 'Auth / Validate OTP / Password too short',
+                      }),
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        <FormattedMessage defaultMessage="Authentication Code" id="Auth / Validate OTP / Code label" />
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          {...register('token', {
-                            required: {
-                              value: true,
-                              message: intl.formatMessage({
-                                defaultMessage: 'Please enter the authentication code',
-                                id: 'Auth / Validate OTP / Auth code required',
-                              }),
-                            },
-                            minLength: {
-                              value: 6,
-                              message: intl.formatMessage({
-                                defaultMessage: 'The code must be 6 digits',
-                                id: 'Auth / Validate OTP / Password too short',
-                              }),
-                            },
-                          })}
-                          pattern="[0-9]*"
-                          inputMode="numeric"
-                          placeholder="000000"
-                          maxLength={6}
-                          autoFocus
-                          autoComplete="one-time-code"
-                          disabled={loading}
-                          className="text-center text-2xl tracking-widest"
-                        />
-                      </FormControl>
+                      <OtpInput
+                        autoFocus
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        label={intl.formatMessage({
+                          defaultMessage: 'Authentication Code',
+                          id: 'Auth / Validate OTP / Code label',
+                        })}
+                        disabled={loading}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -169,6 +154,14 @@ export const ValidateOtpForm = () => {
                   ) : (
                     <FormattedMessage defaultMessage="Verify code" id="Auth / Validate OTP / Submit button" />
                   )}
+                </Button>
+                <Button type="button" variant="ghost" asChild>
+                  <Link to={`${generateLocalePath(RoutesConfig.login)}${search}`}>
+                    <FormattedMessage
+                      defaultMessage="Back to sign in"
+                      id="Auth / Confirm reset password / login link"
+                    />
+                  </Link>
                 </Button>
               </form>
             </Form>

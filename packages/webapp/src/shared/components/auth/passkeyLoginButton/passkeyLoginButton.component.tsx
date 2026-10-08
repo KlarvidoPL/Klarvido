@@ -1,4 +1,3 @@
-import { storeAuthTokens } from '@sb/webapp-api-client/api';
 import { csrfFetch } from '@sb/webapp-api-client/api/csrf';
 import { Button } from '@sb/webapp-core/components/ui/button';
 import { ENV } from '@sb/webapp-core/config/env';
@@ -7,6 +6,8 @@ import { Fingerprint } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useLocation } from 'react-router-dom';
+
+import { getSafeAuthRedirect } from '../../../utils/authRedirect';
 
 // Carries a stable error code through the catch block instead of a raw English
 // message, so the UI can always show a translated string - the backend's own
@@ -131,7 +132,7 @@ export const PasskeyLoginButton = () => {
         challenge: base64UrlToUint8Array(options.challenge) as BufferSource,
         timeout: options.timeout || 60000,
         rpId: options.rpId || window.location.hostname,
-        userVerification: options.userVerification || 'preferred',
+        userVerification: 'required',
         allowCredentials: options.allowCredentials?.map(
           (cred: { id: string; type: string; transports?: string[] }) => ({
             id: base64UrlToUint8Array(cred.id),
@@ -172,12 +173,8 @@ export const PasskeyLoginButton = () => {
         throw new PasskeyLoginError(errorData.code || 'verification_failed');
       }
 
-      const verifyData = await verifyResponse.json();
-
-      // Store tokens in localStorage (same as user/pass login) for Safari/mobile fallback
-      if (verifyData?.access) {
-        storeAuthTokens(verifyData.access, verifyData.refresh);
-      }
+      const result = await verifyResponse.json();
+      if (result.success !== true) throw new PasskeyLoginError('verification_failed');
 
       trackEvent('auth', 'passkey-login');
 
@@ -191,7 +188,7 @@ export const PasskeyLoginButton = () => {
       const defaultRedirect = `/${locale}/`;
 
       // Force a full page reload to reinitialize with new auth cookies
-      window.location.href = redirect || defaultRedirect;
+      window.location.href = getSafeAuthRedirect(redirect, defaultRedirect);
     } catch (err) {
       console.error('Passkey login error:', err);
       let code = 'verification_failed';

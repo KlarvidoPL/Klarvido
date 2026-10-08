@@ -5743,5 +5743,44 @@
   },
   "Companies / Empty title": {
     "defaultMessage": "Sie haben noch keine Organisationen"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "Identität bestätigen"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "Um einen Passkey hinzuzufügen oder zu entfernen, bestätigen Sie einen vorhandenen Passkey oder geben Sie Ihr Kontopasswort und gegebenenfalls den Zwei-Faktor-Code ein. Wenn Sie nur die Anmeldung über soziale Netzwerke verwenden, legen Sie zuerst über die Passwortzurücksetzung ein Kontopasswort fest."
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "Mit vorhandenem Passkey bestätigen"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "Kontopasswort"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "Zwei-Faktor-Code"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "Mit Passwort bestätigen"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "Bestätigung fehlgeschlagen. Prüfen Sie Ihr Passwort und Ihren Zwei-Faktor-Code oder versuchen Sie Ihren vorhandenen Passkey erneut."
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "Bestätigung für die Passkey-Verwaltung erfolgreich"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "Bestätigung für die Passkey-Verwaltung fehlgeschlagen"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "oder"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "Ein mit Fingerabdruck, Gesichtserkennung oder Geräte-PIN bestätigter Passkey ersetzt beim Anmelden den Code der Authenticator-App. Bei aktivierter Zwei-Faktor-Authentifizierung ist für die Anmeldung mit Passwort oder über ein soziales Konto weiterhin ein Code erforderlich."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "Das Kontopasswort ist falsch."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Zu viele Verifizierungsversuche. Bitte warten Sie einen Moment und versuchen Sie es erneut."
   }
 }

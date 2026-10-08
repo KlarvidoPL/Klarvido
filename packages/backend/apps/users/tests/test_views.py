@@ -1,12 +1,25 @@
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
+from datetime import timedelta
+
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.db import DatabaseError, connections
 from django.conf import settings
 from django.http import HttpResponse, SimpleCookie
 from django.urls import reverse
+from django.utils import timezone
+from rest_framework.test import APIRequestFactory, APIClient
+from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from apps.sso.models import SSOSession
+from apps.users.serializers import CookieTokenRefreshSerializer
 from rest_framework import status
 from rest_framework_simplejwt.settings import api_settings as jwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken, BlacklistedToken, AccessToken
+
+from apps.sso.tests.factories import SSOSessionFactory
 
 from .. import models
 
@@ -46,6 +59,7 @@ class TestTokenRefresh:
 
     def test_refresh_cookie_auth(self, api_client, user: models.User):
         refresh = RefreshToken.for_user(user)
+        SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
         api_client.cookies = SimpleCookie(
             {
                 settings.ACCESS_TOKEN_COOKIE: str(refresh.access_token),
@@ -64,15 +78,74 @@ class TestTokenRefresh:
 
     def test_refresh_sent_in_payload(self, api_client, user: models.User):
         refresh = RefreshToken.for_user(user)
+        SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
 
         response = api_client.post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)})
 
         assert response.status_code == status.HTTP_200_OK
-        new_access_token_raw = response.json().get('access')
-        new_refresh_token_raw = response.json().get('refresh')
+        new_access_token_raw = response.cookies[settings.ACCESS_TOKEN_COOKIE].value
+        new_refresh_token_raw = response.cookies[settings.REFRESH_TOKEN_COOKIE].value
         assert AccessToken(new_access_token_raw), new_access_token_raw
         assert RefreshToken(new_refresh_token_raw), new_refresh_token_raw
         assert BlacklistedToken.objects.filter(token__jti=refresh['jti']).exists()
+
+    @pytest.mark.parametrize('state', ['missing', 'expired', 'wrong-owner'])
+    def test_refresh_requires_valid_owned_session(self, api_client, user, user_factory, state):
+        refresh = RefreshToken.for_user(user)
+        if state != 'missing':
+            SSOSessionFactory(
+                user=user_factory() if state == 'wrong-owner' else user,
+                refresh_token_jti=refresh['jti'],
+                expires_at=timezone.now() - timedelta(seconds=1)
+                if state == 'expired'
+                else timezone.now() + timedelta(days=1),
+            )
+        before = OutstandingToken.objects.count()
+        response = api_client.post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)})
+        assert response.status_code == 401
+        assert response.cookies[settings.ACCESS_TOKEN_COOKIE].value == ''
+        assert response.cookies[settings.REFRESH_TOKEN_COOKIE].value == ''
+        assert OutstandingToken.objects.count() == before
+
+    def test_session_rotation_failure_rolls_back_new_token_and_blacklist(self, user):
+        refresh = RefreshToken.for_user(user)
+        session = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+        request = APIRequestFactory().post('/')
+        serializer = CookieTokenRefreshSerializer(data={'refresh': str(refresh)}, context={'request': request})
+        before = OutstandingToken.objects.count()
+        with patch.object(SSOSession, 'extend', side_effect=RuntimeError('storage failure')), pytest.raises(
+            RuntimeError
+        ):
+            serializer.is_valid(raise_exception=True)
+        session.refresh_from_db()
+        assert session.refresh_token_jti == refresh['jti']
+        assert OutstandingToken.objects.count() == before
+        assert not BlacklistedToken.objects.filter(token__jti=refresh['jti']).exists()
+        assert RefreshToken(str(refresh))
+
+    def test_refresh_database_failure_returns_no_cookies(self, api_client, user):
+        refresh = RefreshToken.for_user(user)
+        session = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+        before = OutstandingToken.objects.count()
+        with patch.object(SSOSession, 'extend', side_effect=DatabaseError('private database detail')):
+            response = api_client.post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)})
+        assert response.status_code == 503
+        assert b'private database detail' not in response.content
+        assert settings.ACCESS_TOKEN_COOKIE not in response.cookies
+        assert settings.REFRESH_TOKEN_COOKIE not in response.cookies
+        session.refresh_from_db()
+        assert session.refresh_token_jti == refresh['jti']
+        assert OutstandingToken.objects.count() == before
+        assert RefreshToken(str(refresh))
+
+    def test_revocation_uses_current_token_even_with_stale_session_instance(self, api_client, user):
+        refresh = RefreshToken.for_user(user)
+        stale = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+        response = api_client.post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)})
+        assert response.status_code == 200
+        rotated = response.cookies[settings.REFRESH_TOKEN_COOKIE].value
+        stale.revoke(reason='User requested')
+        assert api_client.post(reverse('jwt_token_refresh'), data={'refresh': rotated}).status_code == 401
 
     def test_refresh_rejected_for_revoked_session(self, api_client, user: models.User):
         """A device whose session was revoked (e.g. "Sign out" from Active Sessions
@@ -240,6 +313,19 @@ class TestSocialAuthCreatesSession:
         session = SSOSession.objects.get(user=user)
         mock_backend.strategy.set_session_id.assert_called_once_with(session.session_id)
 
+    def test_oauth_session_failure_does_not_publish_tokens(self, api_client, user_factory):
+        user = user_factory(otp_enabled=False)
+        do_login = self._get_do_login_callback(api_client)
+        backend = MagicMock()
+        before = OutstandingToken.objects.count()
+        with patch(
+            'apps.sso.services.SessionService.create_session', side_effect=RuntimeError('private detail')
+        ), pytest.raises(ValidationError, match='Unable to establish a session'):
+            do_login(backend, user, social_user=None)
+        backend.strategy.set_jwt.assert_not_called()
+        backend.strategy.set_session_id.assert_not_called()
+        assert OutstandingToken.objects.count() == before
+
     def test_do_login_does_not_create_session_when_otp_step_is_pending(self, api_client, user_factory):
         from apps.sso.models import SSOSession
 
@@ -282,3 +368,38 @@ class TestSocialAuthSetsAuthMethodClaim:
         token = mock_backend.strategy.set_jwt.call_args.args[0]
         assert token['auth_method'] == 'oauth'
         assert token.access_token['auth_method'] == 'oauth'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_refresh_and_revocation_cannot_leave_a_usable_refresh_token(user):
+    refresh = RefreshToken.for_user(user)
+    stale = SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+    barrier = Barrier(2)
+
+    def rotate():
+        try:
+            barrier.wait(timeout=10)
+            response = APIClient().post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)})
+            return response.status_code, response.cookies.get(settings.REFRESH_TOKEN_COOKIE)
+        finally:
+            connections.close_all()
+
+    def revoke():
+        try:
+            barrier.wait(timeout=10)
+            stale.revoke(reason='Concurrent user revocation')
+        finally:
+            connections.close_all()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        rotation = pool.submit(rotate)
+        revocation = pool.submit(revoke)
+        code, cookie = rotation.result(timeout=20)
+        revocation.result(timeout=20)
+    stale.refresh_from_db()
+    assert not stale.is_active
+    assert BlacklistedToken.objects.filter(token__jti=stale.refresh_token_jti).exists()
+    assert APIClient().post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)}).status_code == 401
+    assert code in (200, 401)
+    if code == 200:
+        assert APIClient().post(reverse('jwt_token_refresh'), data={'refresh': cookie.value}).status_code == 401

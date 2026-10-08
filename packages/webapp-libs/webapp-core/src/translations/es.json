@@ -5743,5 +5743,44 @@
   },
   "Companies / Empty title": {
     "defaultMessage": "Todavía no tienes ninguna organización"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "Verifica tu identidad"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "Para añadir o eliminar una clave de acceso, verifica una clave existente o introduce la contraseña de tu cuenta y el código de dos factores si está activado. Si solo usas el inicio de sesión social, primero establece una contraseña mediante el restablecimiento de contraseña."
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "Verificar con una clave de acceso existente"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "Contraseña de la cuenta"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "Código de dos factores"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "Verificar con contraseña"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "La verificación ha fallado. Comprueba tu contraseña y código de dos factores, o vuelve a intentarlo con tu clave de acceso existente."
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "Verificación de gestión de claves de acceso completada"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "Error en la verificación de gestión de claves de acceso"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "o"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "Una clave de acceso verificada con tu huella, rostro o PIN del dispositivo sustituye el código de la aplicación de autenticación al iniciar sesión. El inicio de sesión con contraseña o cuenta social sigue requiriendo un código cuando la autenticación de dos factores está activada."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "La contraseña de la cuenta es incorrecta."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Demasiados intentos de verificación. Espera un momento e inténtalo de nuevo."
   }
 }

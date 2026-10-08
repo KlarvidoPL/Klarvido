@@ -1,7 +1,6 @@
 import { client } from '../client';
 import { apiURLs } from '../helpers';
 import { LogoutApiResponseData } from './auth.types';
-import { storeAuthTokens } from './auth.utils';
 
 export const AUTH_URL = apiURLs('/auth/', {
   REFRESH_TOKEN: '/token-refresh/',
@@ -12,30 +11,11 @@ export const AUTH_URL = apiURLs('/auth/', {
 });
 
 export interface RefreshTokenResponse {
-  access?: string;
-  refresh?: string;
+  success: boolean;
 }
 
 export const refreshToken = async () => {
-  // For Safari/mobile: pass refresh token from localStorage in request body
-  // because Safari blocks third-party cookies (ITP)
-  // Backend accepts refresh token from either cookie or request body
-  let refreshTokenValue: string | null = null;
-  try {
-    refreshTokenValue = localStorage.getItem('refresh_token');
-  } catch {
-    // Ignore storage errors
-  }
-
-  const res = await client.post<RefreshTokenResponse>(
-    AUTH_URL.REFRESH_TOKEN,
-    refreshTokenValue ? { refresh: refreshTokenValue } : undefined
-  );
-
-  if (res.data?.access) {
-    storeAuthTokens(res.data.access, res.data.refresh);
-  }
-
+  const res = await client.post<RefreshTokenResponse>(AUTH_URL.REFRESH_TOKEN);
   return res.data;
 };
 
@@ -46,7 +26,7 @@ export const refreshToken = async () => {
 // interceptor each 401 independently on their own in-flight requests, so a
 // per-module "already refreshing" flag isn't enough - both call this shared
 // coordinator instead, which also dedupes across browser tabs (they share
-// the same cookies/localStorage refresh token and would otherwise race it
+// the same cookie refresh token and would otherwise race it
 // the same way).
 const CROSS_TAB_LOCK_KEY = 'auth_refresh_lock';
 const CROSS_TAB_LOCK_TTL_MS = 15000;
@@ -78,7 +58,7 @@ const releaseCrossTabLock = () => {
 
 // Waits until another tab's refresh finishes (lock cleared) or its TTL
 // expires, so this tab can safely retry the original request with the
-// tokens that tab already stored.
+// cookies that tab already updated.
 const waitForOtherTabRefresh = (): Promise<void> =>
   new Promise((resolve) => {
     let settled = false;
@@ -118,7 +98,7 @@ export const coordinatedRefreshToken = async (): Promise<RefreshTokenResponse | 
     if (!acquireCrossTabLock()) {
       await waitForOtherTabRefresh();
       // Another tab already refreshed - tokens are already updated in the
-      // shared cookies/localStorage, nothing more to do here.
+      // shared cookies, nothing more to do here.
       return undefined;
     }
 
@@ -137,19 +117,6 @@ export const coordinatedRefreshToken = async (): Promise<RefreshTokenResponse | 
 };
 
 export const logout = async () => {
-  // For Safari/mobile: pass refresh token from localStorage in request body
-  // because Safari blocks third-party cookies (ITP)
-  // Backend accepts refresh token from either cookie or request body
-  let refreshTokenValue: string | null = null;
-  try {
-    refreshTokenValue = localStorage.getItem('refresh_token');
-  } catch {
-    // Ignore storage errors
-  }
-  
-  const res = await client.post<LogoutApiResponseData>(
-    AUTH_URL.LOGOUT,
-    refreshTokenValue ? { refresh: refreshTokenValue } : undefined
-  );
+  const res = await client.post<LogoutApiResponseData>(AUTH_URL.LOGOUT);
   return res.data;
 };

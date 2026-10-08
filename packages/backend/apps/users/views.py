@@ -1,8 +1,13 @@
+import logging
+
+from django.db import DatabaseError, transaction
+from apps.sso.services import SessionService
 from config import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt import views as jwt_views, tokens as jwt_tokens
 from rest_framework_simplejwt.views import TokenViewBase
@@ -11,7 +16,10 @@ from social_django.utils import psa
 
 from common.csrf import enforce_api_csrf
 
+from .jwt import get_jti_from_refresh_token
 from . import serializers, utils
+
+logger = logging.getLogger(__name__)
 
 
 class CookieTokenRefreshView(jwt_views.TokenRefreshView):
@@ -28,12 +36,20 @@ class CookieTokenRefreshView(jwt_views.TokenRefreshView):
     def post(self, request, *args, **kwargs):
         enforce_api_csrf(request, explicit_credential=bool(request.data.get("refresh")))
         serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid(raise_exception=False):
+        try:
+            valid = serializer.is_valid(raise_exception=False)
+        except DatabaseError:
+            logger.error("Authentication session refresh failed")
+            return Response(
+                {"error": "Unable to refresh the session. Please try again."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        if not valid:
             response = Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
             utils.reset_auth_cookie(response)
             return response
 
-        response = Response(serializer.data, status=status.HTTP_200_OK)
+        response = Response({"success": True}, status=status.HTTP_200_OK)
 
         utils.set_auth_cookie(
             response,
@@ -87,30 +103,25 @@ def complete(request, backend, *args, **kwargs):
             otp_auth_token = utils.generate_otp_auth_token(user)
             backend.strategy.set_otp_auth_token(otp_auth_token)
         else:
-            token = jwt_tokens.RefreshToken.for_user(user)
-            # Without this, get_auth_method_from_token() defaults missing claims
-            # to 'password', which would misclassify this session to
-            # should_enforce_sso_for_session() (apps/sso/enforcement.py) -
-            # harmless there (still enforced) but wrong for any future check
-            # that treats 'password' and 'oauth' differently.
-            token['auth_method'] = 'oauth'
-            token.access_token['auth_method'] = 'oauth'
+            with transaction.atomic():
+                token = jwt_tokens.RefreshToken.for_user(user)
+                # Without this, get_auth_method_from_token() defaults missing claims
+                # to 'password', which would misclassify this session to
+                # should_enforce_sso_for_session() (apps/sso/enforcement.py) -
+                # harmless there (still enforced) but wrong for any future check
+                # that treats 'password' and 'oauth' differently.
+                token['auth_method'] = 'oauth'
+                token.access_token['auth_method'] = 'oauth'
+
+                try:
+                    _, session_id = SessionService(user).create_session(
+                        request, refresh_token_jti=get_jti_from_refresh_token(str(token))
+                    )
+                except Exception:
+                    logger.error("OAuth authentication session creation failed")
+                    raise ValidationError("Unable to establish a session. Please try again.")
+            backend.strategy.set_session_id(session_id)
             backend.strategy.set_jwt(token)
-
-            try:
-                from apps.sso.services import SessionService
-
-                from .jwt import get_jti_from_refresh_token
-
-                session_service = SessionService(user)
-                _, session_id = session_service.create_session(
-                    request, refresh_token_jti=get_jti_from_refresh_token(str(token))
-                )
-                backend.strategy.set_session_id(session_id)
-            except Exception:
-                # Don't fail login if session creation fails (mirrors
-                # apps/users/schema.py::_create_session_for_user).
-                pass
 
             # do_complete() sets this in-memory attribute (not persisted) on the
             # very first signup, before calling this callback - used to show the

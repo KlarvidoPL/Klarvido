@@ -188,22 +188,10 @@ export class WebAppCloudFrontDistribution extends Construct {
       return null;
     }
 
-    const originRequestPolicy = new cloudfront.OriginRequestPolicy(
-      this,
-      'WSRequestPolicy',
-      {
-        queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.all(),
-        cookieBehavior: cloudfront.OriginRequestCookieBehavior.all(),
-        headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList(
-          'Host',
-          'Sec-WebSocket-Key',
-          'Sec-WebSocket-Version',
-          'Sec-WebSocket-Protocol',
-          'Sec-WebSocket-Accept',
-          'Sec-WebSocket-Extensions',
-        ),
-      },
-    );
+    // Forward cookies and CSRF/Origin/Content-Type headers for cookie-only browser
+    // sessions. The origin Host must remain the API host; cache is disabled below.
+    const originRequestPolicy =
+      cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER;
 
     return {
       '/api/*': {

@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { Label } from '@sb/webapp-core/components/ui/label';
+import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
+import { getFragmentData } from '@sb/webapp-api-client/graphql';
+import {
+  commonQueryCurrentUserFragment,
+  useCommonQuery,
+} from '@sb/webapp-api-client/providers';
+import { useId, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { 
-  Fingerprint, 
-  Plus, 
-  Trash2, 
+import {
+  Fingerprint,
+  Plus,
+  Trash2,
   Pencil,
   Smartphone,
   Key,
@@ -11,7 +18,13 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@sb/webapp-core/components/buttons';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@sb/webapp-core/components/ui/card';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Input } from '@sb/webapp-core/components/forms';
 import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
@@ -28,6 +41,7 @@ import {
 
 import { usePasskeys } from '../../hooks/usePasskeys';
 import { useWebAuthn } from '../../hooks/useWebAuthn';
+import { getPasskeyAuthorizationErrorMessage } from '../../hooks/passkeyAuthorizationError';
 
 interface Passkey {
   id: string;
@@ -42,19 +56,38 @@ interface Passkey {
 
 export function PasskeysManager() {
   const intl = useIntl();
+  const passwordInputId = useId();
+  const { data: commonData } = useCommonQuery();
+  const otpEnabled =
+    getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser)
+      ?.otpEnabled === true;
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newPasskeyName, setNewPasskeyName] = useState('');
   const [editingPasskey, setEditingPasskey] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [pendingChange, setPendingChange] = useState<{
+    action: 'register' | 'delete';
+    passkeyId?: string;
+  } | null>(null);
+  const [password, setPassword] = useState('');
+  const [otpToken, setOtpToken] = useState('');
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
 
-  const { passkeys, loading, refetch, renamePasskey, deletePasskey } = usePasskeys();
-  const { isSupported, isRegistering, error: webAuthnError, registerPasskey } = useWebAuthn();
+  const { passkeys, loading, refetch, renamePasskey, deletePasskey } =
+    usePasskeys();
+  const {
+    isSupported,
+    isRegistering,
+    error: webAuthnError,
+    registerPasskey,
+    authorizePasskeyChange,
+  } = useWebAuthn();
 
-  const handleRegister = async () => {
+  const handleRegister = async (authorization: string) => {
     const name = newPasskeyName.trim() || 'My Passkey';
-    const success = await registerPasskey(name);
-    
+    const success = await registerPasskey(name, authorization);
+
     if (success) {
       toast({
         description: intl.formatMessage({
@@ -68,10 +101,12 @@ export function PasskeysManager() {
       refetch();
     } else {
       toast({
-        description: webAuthnError || intl.formatMessage({
-          defaultMessage: 'Failed to register passkey',
-          id: 'Passkeys / Register failed',
-        }),
+        description:
+          webAuthnError ||
+          intl.formatMessage({
+            defaultMessage: 'Failed to register passkey',
+            id: 'Passkeys / Register failed',
+          }),
         variant: 'destructive',
       });
     }
@@ -105,12 +140,13 @@ export function PasskeysManager() {
     }
   };
 
-  const handleDelete = async (passkeyId: string) => {
+  const handleDelete = async (passkeyId: string, authorization: string) => {
     try {
       await deletePasskey({
         variables: {
           input: { id: passkeyId },
         },
+        context: { headers: { 'X-Passkey-Authorization': authorization } },
       });
       toast({
         description: intl.formatMessage({
@@ -130,6 +166,40 @@ export function PasskeysManager() {
     }
   };
 
+  const closeAuthorization = () => {
+    setPendingChange(null);
+    setPassword('');
+    setOtpToken('');
+  };
+
+  const confirmChange = async (usePassword: boolean) => {
+    if (!pendingChange || isAuthorizing) return;
+    setIsAuthorizing(true);
+    try {
+      const authorization = await authorizePasskeyChange(
+        pendingChange.action,
+        pendingChange.passkeyId,
+        usePassword ? password : undefined,
+        usePassword && otpEnabled ? otpToken : undefined,
+      );
+      if (pendingChange.action === 'register')
+        await handleRegister(authorization);
+      else await handleDelete(pendingChange.passkeyId!, authorization);
+      closeAuthorization();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        description: intl.formatMessage(
+          getPasskeyAuthorizationErrorMessage(error),
+        ),
+      });
+      setPassword('');
+      setOtpToken('');
+    } finally {
+      setIsAuthorizing(false);
+    }
+  };
+
   const getAuthenticatorIcon = (type: string, transports: string[]) => {
     if (transports.includes('internal') || type === 'platform') {
       return <Smartphone className="h-5 w-5" />;
@@ -143,7 +213,10 @@ export function PasskeysManager() {
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Fingerprint className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">
-            <FormattedMessage defaultMessage="Passkeys not supported" id="Passkeys / Not supported title" />
+            <FormattedMessage
+              defaultMessage="Passkeys not supported"
+              id="Passkeys / Not supported title"
+            />
           </h3>
           <p className="text-muted-foreground text-center max-w-md">
             <FormattedMessage
@@ -166,6 +239,96 @@ export function PasskeysManager() {
 
   return (
     <div className="space-y-6">
+      <Dialog
+        open={pendingChange !== null}
+        onOpenChange={(open) => {
+          if (!open && !isAuthorizing) closeAuthorization();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <FormattedMessage
+                defaultMessage="Verify your identity"
+                id="Passkeys / Reauthentication title"
+              />
+            </DialogTitle>
+            <DialogDescription>
+              <FormattedMessage
+                defaultMessage="To add or remove a passkey, verify an existing passkey or enter your account password and two-factor code if enabled. If you only use social login, set an account password using password reset first."
+                id="Passkeys / Reauthentication description"
+              />
+            </DialogDescription>
+          </DialogHeader>
+          {passkeys.length > 0 && (
+            <Button
+              onClick={() => confirmChange(false)}
+              disabled={isAuthorizing}
+            >
+              <FormattedMessage
+                defaultMessage="Verify with an existing passkey"
+                id="Passkeys / Verify existing passkey"
+              />
+            </Button>
+          )}
+          {passkeys.length > 0 && (
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+              <FormattedMessage defaultMessage="or" id="Passkeys / Or" />
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          )}
+          <div className="space-y-3">
+            <Label htmlFor={passwordInputId}>
+              <FormattedMessage
+                defaultMessage="Account password"
+                id="Passkeys / Account password"
+              />
+            </Label>
+            <Input
+              id={passwordInputId}
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              disabled={isAuthorizing}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
+          {otpEnabled && (
+            <OtpInput
+              value={otpToken}
+              onValueChange={setOtpToken}
+              disabled={isAuthorizing}
+              label={intl.formatMessage({
+                defaultMessage: 'Two-factor code',
+                id: 'Passkeys / Two-factor code',
+              })}
+            />
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={closeAuthorization}
+              disabled={isAuthorizing}
+            >
+              <FormattedMessage defaultMessage="Cancel" id="Common / Cancel" />
+            </Button>
+            <Button
+              onClick={() => confirmChange(true)}
+              disabled={
+                isAuthorizing ||
+                !password ||
+                (otpEnabled && otpToken.length !== 6)
+              }
+            >
+              <FormattedMessage
+                defaultMessage="Verify with password"
+                id="Passkeys / Verify password"
+              />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
@@ -182,13 +345,19 @@ export function PasskeysManager() {
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              <FormattedMessage defaultMessage="Add Passkey" id="Passkeys / Add passkey" />
+              <FormattedMessage
+                defaultMessage="Add Passkey"
+                id="Passkeys / Add passkey"
+              />
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                <FormattedMessage defaultMessage="Register a new passkey" id="Passkeys / Register title" />
+                <FormattedMessage
+                  defaultMessage="Register a new passkey"
+                  id="Passkeys / Register title"
+                />
               </DialogTitle>
               <DialogDescription>
                 <FormattedMessage
@@ -209,15 +378,30 @@ export function PasskeysManager() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                <FormattedMessage defaultMessage="Cancel" id="Common / Cancel" />
+                <FormattedMessage
+                  defaultMessage="Cancel"
+                  id="Common / Cancel"
+                />
               </Button>
-              <Button onClick={handleRegister} disabled={isRegistering}>
+              <Button
+                onClick={() => {
+                  setIsDialogOpen(false);
+                  setPendingChange({ action: 'register' });
+                }}
+                disabled={isRegistering}
+              >
                 {isRegistering ? (
-                  <FormattedMessage defaultMessage="Registering..." id="Passkeys / Registering" />
+                  <FormattedMessage
+                    defaultMessage="Registering..."
+                    id="Passkeys / Registering"
+                  />
                 ) : (
                   <>
                     <Fingerprint className="mr-2 h-4 w-4" />
-                    <FormattedMessage defaultMessage="Register" id="Passkeys / Register" />
+                    <FormattedMessage
+                      defaultMessage="Register"
+                      id="Passkeys / Register"
+                    />
                   </>
                 )}
               </Button>
@@ -231,7 +415,10 @@ export function PasskeysManager() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Fingerprint className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">
-              <FormattedMessage defaultMessage="No passkeys registered" id="Passkeys / No passkeys title" />
+              <FormattedMessage
+                defaultMessage="No passkeys registered"
+                id="Passkeys / No passkeys title"
+              />
             </h3>
             <p className="text-muted-foreground text-center max-w-md mb-4">
               <FormattedMessage
@@ -241,7 +428,10 @@ export function PasskeysManager() {
             </p>
             <Button onClick={() => setIsDialogOpen(true)}>
               <Fingerprint className="mr-2 h-4 w-4" />
-              <FormattedMessage defaultMessage="Register Your First Passkey" id="Passkeys / Register first" />
+              <FormattedMessage
+                defaultMessage="Register Your First Passkey"
+                id="Passkeys / Register first"
+              />
             </Button>
           </CardContent>
         </Card>
@@ -253,7 +443,10 @@ export function PasskeysManager() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary">
-                      {getAuthenticatorIcon(passkey.authenticatorType, passkey.transports)}
+                      {getAuthenticatorIcon(
+                        passkey.authenticatorType,
+                        passkey.transports,
+                      )}
                     </div>
                     <div>
                       {editingPasskey === passkey.id ? (
@@ -291,16 +484,27 @@ export function PasskeysManager() {
                       <CardDescription className="flex items-center gap-2 mt-1">
                         <Badge variant="outline">
                           {passkey.authenticatorType === 'platform' ? (
-                            <FormattedMessage defaultMessage="Built-in" id="Passkeys / Type platform" />
+                            <FormattedMessage
+                              defaultMessage="Built-in"
+                              id="Passkeys / Type platform"
+                            />
                           ) : (
-                            <FormattedMessage defaultMessage="Security key" id="Passkeys / Type cross-platform" />
+                            <FormattedMessage
+                              defaultMessage="Security key"
+                              id="Passkeys / Type cross-platform"
+                            />
                           )}
                         </Badge>
                       </CardDescription>
                     </div>
                   </div>
                   <ConfirmDialog
-                    onContinue={() => handleDelete(passkey.id)}
+                    onContinue={() =>
+                      setPendingChange({
+                        action: 'delete',
+                        passkeyId: passkey.id,
+                      })
+                    }
                     variant="destructive"
                     title={
                       <FormattedMessage
@@ -315,7 +519,11 @@ export function PasskeysManager() {
                       />
                     }
                   >
-                    <Button variant="ghost" size="icon" className="text-destructive">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </ConfirmDialog>
@@ -325,7 +533,10 @@ export function PasskeysManager() {
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">
-                      <FormattedMessage defaultMessage="Created" id="Passkeys / Created label" />
+                      <FormattedMessage
+                        defaultMessage="Created"
+                        id="Passkeys / Created label"
+                      />
                     </p>
                     <p className="font-medium">
                       {new Date(passkey.createdAt).toLocaleDateString()}
@@ -333,17 +544,26 @@ export function PasskeysManager() {
                   </div>
                   <div>
                     <p className="text-muted-foreground">
-                      <FormattedMessage defaultMessage="Last used" id="Passkeys / Last used label" />
+                      <FormattedMessage
+                        defaultMessage="Last used"
+                        id="Passkeys / Last used label"
+                      />
                     </p>
                     <p className="font-medium">
                       {passkey.lastUsedAt
                         ? new Date(passkey.lastUsedAt).toLocaleDateString()
-                        : intl.formatMessage({ defaultMessage: 'Never', id: 'Common / Never' })}
+                        : intl.formatMessage({
+                            defaultMessage: 'Never',
+                            id: 'Common / Never',
+                          })}
                     </p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">
-                      <FormattedMessage defaultMessage="Times used" id="Passkeys / Use count label" />
+                      <FormattedMessage
+                        defaultMessage="Times used"
+                        id="Passkeys / Use count label"
+                      />
                     </p>
                     <p className="font-medium">{passkey.useCount}</p>
                   </div>
@@ -356,4 +576,3 @@ export function PasskeysManager() {
     </div>
   );
 }
-

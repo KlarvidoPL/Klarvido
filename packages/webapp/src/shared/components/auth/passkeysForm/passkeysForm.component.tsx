@@ -1,15 +1,25 @@
-import { csrfFetch } from '@sb/webapp-api-client/api/csrf';
+import { getFragmentData } from '@sb/webapp-api-client/graphql';
+import { commonQueryCurrentUserFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Input } from '@sb/webapp-core/components/forms';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@sb/webapp-core/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@sb/webapp-core/components/ui/dialog';
 import { Label } from '@sb/webapp-core/components/ui/label';
+import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
 import { ENV } from '@sb/webapp-core/config/env';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
+import { getPasskeyAuthorizationErrorMessage, useWebAuthn } from '@sb/webapp-sso/hooks';
 import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
 import { CheckCircle2, Fingerprint, Key, Loader2, Plus, Shield, Smartphone, Trash2, XCircle } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 interface Passkey {
@@ -22,29 +32,6 @@ interface Passkey {
 }
 
 type RegistrationStep = 'name' | 'register' | 'success' | 'error';
-
-// Helper to convert base64url to ArrayBuffer
-const base64UrlToBuffer = (base64url: string): ArrayBuffer => {
-  const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-  const padding = '='.repeat((4 - (base64.length % 4)) % 4);
-  const binary = atob(base64 + padding);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes.buffer;
-};
-
-// Helper to convert ArrayBuffer to base64url
-const bufferToBase64Url = (buffer: ArrayBuffer): string => {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  const base64 = btoa(binary);
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-};
 
 const getAuthenticatorIcon = (type: string) => {
   switch (type) {
@@ -59,10 +46,20 @@ const getAuthenticatorIcon = (type: string) => {
 
 export const PasskeysForm = () => {
   const intl = useIntl();
+  const passwordInputId = useId();
+  const { data: commonData } = useCommonQuery();
+  const otpEnabled = getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser)?.otpEnabled === true;
   const { toast } = useToast();
   const { isOpen: isModalOpen, setIsOpen: setIsModalOpen } = useOpenState(false);
 
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingChange, setPendingChange] = useState<{ action: 'register' | 'delete'; passkeyId?: string } | null>(
+    null
+  );
+  const [password, setPassword] = useState('');
+  const [otpToken, setOtpToken] = useState('');
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
+  const { authorizePasskeyChange, registerPasskey } = useWebAuthn();
 
   const [passkeyName, setPasskeyName] = useState('');
   const [step, setStep] = useState<RegistrationStep>('name');
@@ -73,10 +70,13 @@ export const PasskeysForm = () => {
 
   const { passkeys, loading, refetch, deletePasskey } = useTenantPasskeys();
 
-  const handleDeletePasskey = async (passkeyId: string) => {
+  const handleDeletePasskey = async (passkeyId: string, authorization: string) => {
     setDeleting(passkeyId);
     try {
-      await deletePasskey({ variables: { input: { id: passkeyId } } });
+      await deletePasskey({
+        variables: { input: { id: passkeyId } },
+        context: { headers: { 'X-Passkey-Authorization': authorization } },
+      });
       toast({
         description: intl.formatMessage({
           defaultMessage: 'Passkey deleted.',
@@ -110,151 +110,119 @@ export const PasskeysForm = () => {
 
   const handleContinue = () => {
     if (!passkeyName.trim()) return;
-    setStep('register');
-    // Auto-start registration after a short delay
-    setTimeout(() => handleRegister(), 500);
+    setIsModalOpen(false);
+    setPendingChange({ action: 'register' });
   };
 
-  const handleRegister = useCallback(async () => {
-    // Check if WebAuthn is supported
-    if (!window.PublicKeyCredential) {
-      setStep('error');
-      setErrorMessage(
-        intl.formatMessage({
-          defaultMessage: 'Your browser does not support passkeys (WebAuthn).',
-          id: 'Add Passkey Modal / Not Supported',
-        })
-      );
-      return;
-    }
-
-    setIsRegistering(true);
-    setErrorMessage('');
-
-    try {
-      // Step 1: Get registration options from the server
-      const optionsResponse = await csrfFetch(`${ENV.BASE_API_URL}/sso/passkeys/register/options`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          userVerification: 'preferred',
-          requireResidentKey: true,
-        }),
-      });
-
-      if (!optionsResponse.ok) {
-        throw new Error('Failed to get registration options from server');
+  const handleRegister = useCallback(
+    async (authorization: string) => {
+      // Check if WebAuthn is supported
+      if (!window.PublicKeyCredential) {
+        setStep('error');
+        setErrorMessage(
+          intl.formatMessage({
+            defaultMessage: 'Your browser does not support passkeys (WebAuthn).',
+            id: 'Add Passkey Modal / Not Supported',
+          })
+        );
+        return;
       }
 
-      const options = await optionsResponse.json();
+      setIsRegistering(true);
+      setErrorMessage('');
 
-      // Step 2: Convert server options to WebAuthn format
-      const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-        challenge: base64UrlToBuffer(options.challenge),
-        rp: {
-          name: options.rp.name,
-          id: options.rp.id,
-        },
-        user: {
-          id: base64UrlToBuffer(options.user.id),
-          name: options.user.name,
-          displayName: options.user.displayName,
-        },
-        pubKeyCredParams: options.pubKeyCredParams,
-        timeout: options.timeout,
-        attestation: options.attestation || 'none',
-        authenticatorSelection: options.authenticatorSelection,
-        excludeCredentials: (options.excludeCredentials || []).map((cred: { id: string; type: string }) => ({
-          id: base64UrlToBuffer(cred.id),
-          type: cred.type,
-        })),
-      };
-
-      // Step 3: Create the credential using WebAuthn API
-      const credential = (await navigator.credentials.create({
-        publicKey: publicKeyCredentialCreationOptions,
-      })) as PublicKeyCredential;
-
-      if (!credential) {
-        throw new Error('Credential creation returned null');
-      }
-
-      const response = credential.response as AuthenticatorAttestationResponse;
-
-      // Step 4: Send the credential to the server for verification
-      const verifyResponse = await csrfFetch(`${ENV.BASE_API_URL}/sso/passkeys/register/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          challenge: options.challenge,
-          credentialId: bufferToBase64Url(credential.rawId),
-          publicKey: bufferToBase64Url(response.getPublicKey?.() || new ArrayBuffer(0)),
-          attestationObject: bufferToBase64Url(response.attestationObject),
-          clientDataJSON: bufferToBase64Url(response.clientDataJSON),
-          name: passkeyName,
-          transports: response.getTransports?.() || [],
-        }),
-      });
-
-      if (!verifyResponse.ok) {
-        const error = await verifyResponse.json();
-        throw new Error(error.error || 'Failed to verify registration');
-      }
-
-      // Success!
-      setStep('success');
-      toast({
-        description: intl.formatMessage({
-          defaultMessage: 'Passkey registered successfully!',
-          id: 'Add Passkey Modal / Success',
-        }),
-        variant: 'success',
-      });
-
-      // Refresh passkeys list and close modal after a delay
-      setTimeout(() => {
-        refetch();
-        closeModal();
-      }, 1500);
-    } catch (error) {
-      console.error('Passkey registration error:', error);
-      setStep('error');
-
-      let message = intl.formatMessage({
-        defaultMessage: 'Failed to register passkey. Please try again.',
-        id: 'Add Passkey Modal / Error Generic',
-      });
-
-      if (error instanceof Error) {
-        if (error.name === 'NotAllowedError') {
-          message = intl.formatMessage({
-            defaultMessage: 'Registration was cancelled or timed out. Please try again.',
-            id: 'Add Passkey Modal / Error Cancelled',
-          });
-        } else if (error.name === 'InvalidStateError') {
-          message = intl.formatMessage({
-            defaultMessage: 'This authenticator is already registered.',
-            id: 'Add Passkey Modal / Error Already Registered',
-          });
-        } else if (error.name === 'NotSupportedError') {
-          message = intl.formatMessage({
-            defaultMessage: 'This authenticator type is not supported.',
-            id: 'Add Passkey Modal / Error Not Supported',
-          });
+      try {
+        if (!(await registerPasskey(passkeyName, authorization))) {
+          throw new Error('Registration failed');
         }
-      }
 
-      setErrorMessage(message);
+        // Success!
+        setStep('success');
+        toast({
+          description: intl.formatMessage({
+            defaultMessage: 'Passkey registered successfully!',
+            id: 'Add Passkey Modal / Success',
+          }),
+          variant: 'success',
+        });
+
+        // Refresh passkeys list and close modal after a delay
+        setTimeout(() => {
+          refetch();
+          closeModal();
+        }, 1500);
+      } catch (error) {
+        console.error('Passkey registration error:', error);
+        setStep('error');
+
+        let message = intl.formatMessage({
+          defaultMessage: 'Failed to register passkey. Please try again.',
+          id: 'Add Passkey Modal / Error Generic',
+        });
+
+        if (error instanceof Error) {
+          if (error.name === 'NotAllowedError') {
+            message = intl.formatMessage({
+              defaultMessage: 'Registration was cancelled or timed out. Please try again.',
+              id: 'Add Passkey Modal / Error Cancelled',
+            });
+          } else if (error.name === 'InvalidStateError') {
+            message = intl.formatMessage({
+              defaultMessage: 'This authenticator is already registered.',
+              id: 'Add Passkey Modal / Error Already Registered',
+            });
+          } else if (error.name === 'NotSupportedError') {
+            message = intl.formatMessage({
+              defaultMessage: 'This authenticator type is not supported.',
+              id: 'Add Passkey Modal / Error Not Supported',
+            });
+          }
+        }
+
+        setErrorMessage(message);
+      } finally {
+        setIsRegistering(false);
+      }
+    },
+    [passkeyName, intl, toast, refetch, closeModal, registerPasskey]
+  );
+
+  const closeAuthorization = () => {
+    setPendingChange(null);
+    setPassword('');
+    setOtpToken('');
+  };
+
+  const confirmChange = async (usePassword: boolean) => {
+    if (!pendingChange || isAuthorizing) return;
+    setIsAuthorizing(true);
+    try {
+      const authorization = await authorizePasskeyChange(
+        pendingChange.action,
+        pendingChange.passkeyId,
+        usePassword ? password : undefined,
+        usePassword && otpEnabled ? otpToken : undefined
+      );
+      const change = pendingChange;
+      closeAuthorization();
+      if (change.action === 'register') {
+        setStep('register');
+        setIsModalOpen(true);
+        await handleRegister(authorization);
+      } else {
+        await handleDeletePasskey(change.passkeyId!, authorization);
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        description: intl.formatMessage(getPasskeyAuthorizationErrorMessage(error)),
+      });
+      setPassword('');
+      setOtpToken('');
     } finally {
-      setIsRegistering(false);
+      setIsAuthorizing(false);
     }
-  }, [passkeyName, intl, toast, refetch, closeModal]);
+  };
 
   const handleRetry = () => {
     setStep('name');
@@ -285,6 +253,73 @@ export const PasskeysForm = () => {
 
   return (
     <>
+      <Dialog
+        open={pendingChange !== null}
+        onOpenChange={(open) => {
+          if (!open && !isAuthorizing) closeAuthorization();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <FormattedMessage defaultMessage="Verify your identity" id="Passkeys / Reauthentication title" />
+            </DialogTitle>
+            <DialogDescription>
+              <FormattedMessage
+                defaultMessage="To add or remove a passkey, verify an existing passkey or enter your account password and two-factor code if enabled. If you only use social login, set an account password using password reset first."
+                id="Passkeys / Reauthentication description"
+              />
+            </DialogDescription>
+          </DialogHeader>
+          {passkeys.length > 0 && (
+            <Button onClick={() => confirmChange(false)} disabled={isAuthorizing}>
+              <FormattedMessage
+                defaultMessage="Verify with an existing passkey"
+                id="Passkeys / Verify existing passkey"
+              />
+            </Button>
+          )}
+          {passkeys.length > 0 && (
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+              <FormattedMessage defaultMessage="or" id="Passkeys / Or" />
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          )}
+          <div className="space-y-3">
+            <Label htmlFor={passwordInputId}>
+              <FormattedMessage defaultMessage="Account password" id="Passkeys / Account password" />
+            </Label>
+            <Input
+              id={passwordInputId}
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              disabled={isAuthorizing}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
+          {otpEnabled && (
+            <OtpInput
+              value={otpToken}
+              onValueChange={setOtpToken}
+              disabled={isAuthorizing}
+              label={intl.formatMessage({ defaultMessage: 'Two-factor code', id: 'Passkeys / Two-factor code' })}
+            />
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={closeAuthorization} disabled={isAuthorizing}>
+              <FormattedMessage defaultMessage="Cancel" id="Common / Cancel" />
+            </Button>
+            <Button
+              onClick={() => confirmChange(true)}
+              disabled={isAuthorizing || !password || (otpEnabled && otpToken.length !== 6)}
+            >
+              <FormattedMessage defaultMessage="Verify with password" id="Passkeys / Verify password" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
           <FormattedMessage
@@ -355,8 +390,12 @@ export const PasskeysForm = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDeletePasskey(passkey.id)}
-                    disabled={deleting === passkey.id}
+                    aria-label={intl.formatMessage({
+                      defaultMessage: 'Remove passkey?',
+                      id: 'Passkeys / Delete confirm title',
+                    })}
+                    onClick={() => setPendingChange({ action: 'delete', passkeyId: passkey.id })}
+                    disabled={deleting === passkey.id || isAuthorizing}
                     className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
                   >
                     {deleting === passkey.id ? (

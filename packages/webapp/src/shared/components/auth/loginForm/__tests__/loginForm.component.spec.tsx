@@ -51,9 +51,8 @@ describe('LoginForm: Component', () => {
       variables: mockCredentials,
       data: {
         tokenAuth: {
-          access: 'access-token',
-          refresh: 'refresh-token',
-          otpAuthToken: 'otpAuthToken',
+          authenticated: true,
+          otpRequired: true,
         },
       },
     });
@@ -79,9 +78,8 @@ describe('LoginForm: Component', () => {
       variables: mockCredentials,
       data: {
         tokenAuth: {
-          access: 'access-token',
-          refresh: 'refresh-token',
-          otpAuthToken: null,
+          authenticated: true,
+          otpRequired: false,
         },
       },
     });
