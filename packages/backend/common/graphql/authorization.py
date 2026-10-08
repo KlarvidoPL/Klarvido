@@ -91,6 +91,9 @@ def scope_queryset(queryset, info):
     owner_fields = {
         "users.user": "pk",
         "users.userprofile": "user_id",
+        "sso.userpasskey": "user_id",
+        "sso.ssosession": "user_id",
+        "sso.userdevice": "user_id",
         "notifications.notification": "user_id",
         "demo.documentdemoitem": "created_by_id",
         "demo.contentfuldemoitemfavorite": "user_id",
@@ -110,6 +113,7 @@ def scope_queryset(queryset, info):
         "demo.cruddemoitem": "features.crud.view",
         "multitenancy.organizationrole": "org.roles.view",
         "multitenancy.actionlog": "security.logs.view",
+        "sso.ssoauditlog": "security.view",
         "multitenancy.actionlogexport": "security.logs.export",
         "backup.backupconfig": "backup.view",
         "backup.backuprecord": "backup.view",
@@ -161,12 +165,7 @@ class ObjectAuthorizationMiddleware:
 
     def resolve(self, next, root, info, **args):
         graph_type = getattr(info.parent_type, "graphene_type", None)
-        if (
-            root is not None
-            and graph_type
-            and issubclass(graph_type, DjangoObjectType)
-            and graph_type._meta.model._meta.app_label != "sso"
-        ):
+        if root is not None and graph_type and issubclass(graph_type, DjangoObjectType):
             user = get_user(info)
             # These deliberately small user summaries are used for notification issuers.
             summary = (
