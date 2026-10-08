@@ -1,8 +1,9 @@
 import { useQuery } from '@apollo/client/react';
 import { setUserId } from '@sb/webapp-core/services/analytics';
-import { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { extractGraphQLErrors } from '../../api/apolloError.types';
+import { coordinatedRefreshToken } from '../../api/auth/auth.requests';
 import { CurrentUserType } from '../../graphql';
 import commonDataContext from './commonQuery.context';
 import { commonQueryCurrentUserQuery } from './commonQuery.graphql';
@@ -17,6 +18,32 @@ import { commonQueryCurrentUserQuery } from './commonQuery.graphql';
 export const CommonQuery = ({ children }: PropsWithChildren) => {
   const { loading, data, error, refetch } = useQuery(commonQueryCurrentUserQuery, { nextFetchPolicy: 'network-only' });
   const redirectAttempted = useRef(false);
+  const recoveryAttempted = useRef(false);
+  const [recoveryFinished, setRecoveryFinished] = useState(false);
+  const restoringSession = !loading && !error && data?.currentUser === null && !recoveryFinished;
+
+  useEffect(() => {
+    if (!restoringSession || recoveryAttempted.current) {
+      return;
+    }
+    recoveryAttempted.current = true;
+
+    // An expired access cookie produces a successful anonymous query, so the
+    // error interceptor cannot restore this session. Try the HttpOnly refresh
+    // cookie before route guards see an anonymous user. Guests simply remain
+    // anonymous when no valid refresh cookie exists.
+    void (async () => {
+      try {
+        await coordinatedRefreshToken();
+        await refetch();
+      } catch {
+        // Leave the anonymous result intact; do not revoke a session on a
+        // transient refresh failure or refresh repeatedly for signed-out users.
+      } finally {
+        setRecoveryFinished(true);
+      }
+    })();
+  }, [restoringSession, refetch]);
 
   const reload = useCallback(async () => {
     try {
@@ -80,7 +107,7 @@ export const CommonQuery = ({ children }: PropsWithChildren) => {
   }, [error, data, loading]);
 
   // Show loading state while fetching
-  if (loading) {
+  if (loading || restoringSession) {
     return null;
   }
 
