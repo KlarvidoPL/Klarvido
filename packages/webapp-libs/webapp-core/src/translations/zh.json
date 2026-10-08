@@ -5926,5 +5926,14 @@
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "禁用"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "要禁用双重验证吗？"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "这将移除您账户的额外安全层——您可以随时重新启用它。"
   }
 }

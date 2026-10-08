@@ -5926,5 +5926,14 @@
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "تعطيل"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "هل تريد تعطيل المصادقة الثنائية؟"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "سيؤدي هذا إلى إزالة طبقة الأمان الإضافية من حسابك - يمكنك إعادة تفعيلها في أي وقت."
   }
 }

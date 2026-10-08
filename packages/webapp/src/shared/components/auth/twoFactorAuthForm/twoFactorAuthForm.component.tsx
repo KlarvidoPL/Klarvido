@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client/react';
 import { getFragmentData } from '@sb/webapp-api-client/graphql';
 import { commonQueryCurrentUserFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
-import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@sb/webapp-core/components/ui/dialog';
 import { useOpenState } from '@sb/webapp-core/hooks';
@@ -109,33 +108,15 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
                   </p>
                 </div>
               </div>
-              <ConfirmDialog
-                onContinue={() => {
-                  setPendingReauth('otp_disable');
-                }}
-                variant="destructive"
-                title={
-                  <FormattedMessage
-                    defaultMessage="Disable two-factor authentication?"
-                    id="Auth / Two-factor / Disable confirm title"
-                  />
-                }
-                description={
-                  <FormattedMessage
-                    defaultMessage="This will remove the extra layer of security from your account. You can re-enable it at any time."
-                    id="Auth / Two-factor / Disable confirm description"
-                  />
-                }
+              <Button
+                variant="ghost"
+                size="sm"
+                className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
+                onClick={() => setPendingReauth('otp_disable')}
               >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
-                >
-                  <ShieldOff className="mr-2 h-4 w-4" />
-                  <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Disable button" />
-                </Button>
-              </ConfirmDialog>
+                <ShieldOff className="mr-2 h-4 w-4" />
+                <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Disable button" />
+              </Button>
             </div>
           </div>
         ) : (

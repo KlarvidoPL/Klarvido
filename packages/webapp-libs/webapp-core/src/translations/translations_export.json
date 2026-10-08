@@ -2034,7 +2034,10 @@
       "Email / OTP Enabled / Subject": "Two-factor authentication was enabled on your account",
       "Email / OTP Enabled / Text": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support.",
       "Email / OTP Enabled / Title": "Two-factor authentication was enabled",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "Disable",
+      "Auth / Two-factor / Reauth disable title": "Disable two-factor authentication?",
+      "Auth / Two-factor / Reauth disable warning": "This removes the extra layer of security from your account - you can re-enable it at any time."
     },
     "pl": {
       "Tenant invitation form / Email invalid": "Wprowadź poprawny adres e-mail",
@@ -4012,7 +4015,10 @@
       "Email / OTP Enabled / Subject": "Uwierzytelnianie dwuskładnikowe zostało włączone na Twoim koncie",
       "Email / OTP Enabled / Text": "Uwierzytelnianie dwuskładnikowe teraz chroni Twoje konto - podczas logowania będzie wymagany kod weryfikacyjny oprócz hasła. Jeśli to Ty dokonałeś tej zmiany, nie musisz nic więcej robić. Jeśli to nie Ty, natychmiast sprawdź zabezpieczenia konta i skontaktuj się z pomocą techniczną.",
       "Email / OTP Enabled / Title": "Uwierzytelnianie dwuskładnikowe zostało włączone",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "Wyłącz",
+      "Auth / Two-factor / Reauth disable title": "Wyłączyć uwierzytelnianie dwuskładnikowe?",
+      "Auth / Two-factor / Reauth disable warning": "Spowoduje to usunięcie dodatkowej warstwy zabezpieczeń z Twojego konta - możesz włączyć ją ponownie w dowolnym momencie."
     },
     "de": {
       "Tenant invitation form / Email invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
@@ -5990,7 +5996,10 @@
       "Email / OTP Enabled / Subject": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto aktiviert",
       "Email / OTP Enabled / Text": "Die Zwei-Faktor-Authentifizierung schützt jetzt Ihr Konto - beim Anmelden wird zusätzlich zu Ihrem Passwort ein Bestätigungscode benötigt. Wenn Sie diese Änderung vorgenommen haben, ist keine weitere Aktion erforderlich. Wenn nicht, überprüfen Sie sofort die Sicherheit Ihres Kontos und kontaktieren Sie den Support.",
       "Email / OTP Enabled / Title": "Die Zwei-Faktor-Authentifizierung wurde aktiviert",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "Deaktivieren",
+      "Auth / Two-factor / Reauth disable title": "Zwei-Faktor-Authentifizierung deaktivieren?",
+      "Auth / Two-factor / Reauth disable warning": "Dadurch wird die zusätzliche Sicherheitsebene von Ihrem Konto entfernt - Sie können sie jederzeit wieder aktivieren."
     },
     "es": {
       "Tenant invitation form / Email invalid": "Introduce una dirección de correo electrónico válida",
@@ -7968,7 +7977,10 @@
       "Email / OTP Enabled / Subject": "La autenticación de dos factores se ha activado en tu cuenta",
       "Email / OTP Enabled / Text": "La autenticación de dos factores ahora protege tu cuenta - se requerirá un código de verificación además de tu contraseña al iniciar sesión. Si realizaste este cambio, no se requiere ninguna otra acción. Si no fuiste tú, revisa la seguridad de tu cuenta de inmediato y contacta con soporte.",
       "Email / OTP Enabled / Title": "La autenticación de dos factores se ha activado",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "Desactivar",
+      "Auth / Two-factor / Reauth disable title": "¿Desactivar la autenticación de dos factores?",
+      "Auth / Two-factor / Reauth disable warning": "Esto eliminará la capa adicional de seguridad de tu cuenta - puedes volver a activarla en cualquier momento."
     },
     "zh": {
       "Tenant invitation form / Email invalid": "请输入有效的电子邮件地址",
@@ -9946,7 +9958,10 @@
       "Email / OTP Enabled / Subject": "您账户的双重验证已启用",
       "Email / OTP Enabled / Text": "双重验证现已保护您的账户——登录时除密码外还需要验证码。如果是您本人进行了此更改，则无需采取进一步操作。如果不是您，请立即查看账户安全并联系支持团队。",
       "Email / OTP Enabled / Title": "双重验证已启用",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "禁用",
+      "Auth / Two-factor / Reauth disable title": "要禁用双重验证吗？",
+      "Auth / Two-factor / Reauth disable warning": "这将移除您账户的额外安全层——您可以随时重新启用它。"
     },
     "hi": {
       "Tenant invitation form / Email invalid": "कृपया एक मान्य ईमेल पता दर्ज करें",
@@ -11924,7 +11939,10 @@
       "Email / OTP Enabled / Subject": "आपके खाते पर टू-फैक्टर प्रमाणीकरण सक्षम कर दिया गया है",
       "Email / OTP Enabled / Text": "टू-फैक्टर प्रमाणीकरण अब आपके खाते की सुरक्षा कर रहा है - साइन इन करते समय आपके पासवर्ड के अतिरिक्त एक सत्यापन कोड आवश्यक होगा। यदि आपने यह बदलाव किया है, तो आगे कोई कार्रवाई करने की आवश्यकता नहीं है। यदि यह आप नहीं थे, तो तुरंत अपने खाते की सुरक्षा की समीक्षा करें और सहायता टीम से संपर्क करें।",
       "Email / OTP Enabled / Title": "टू-फैक्टर प्रमाणीकरण सक्षम कर दिया गया है",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "अक्षम करें",
+      "Auth / Two-factor / Reauth disable title": "क्या टू-फैक्टर प्रमाणीकरण अक्षम करें?",
+      "Auth / Two-factor / Reauth disable warning": "इससे आपके खाते से सुरक्षा की अतिरिक्त परत हट जाएगी - आप इसे किसी भी समय फिर से सक्षम कर सकते हैं।"
     },
     "ar": {
       "Tenant invitation form / Email invalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
@@ -13902,7 +13920,10 @@
       "Email / OTP Enabled / Subject": "تم تفعيل المصادقة الثنائية على حسابك",
       "Email / OTP Enabled / Text": "تحمي المصادقة الثنائية الآن حسابك - سيُطلب رمز تحقق بالإضافة إلى كلمة المرور عند تسجيل الدخول. إذا كنت قد قمت بهذا التغيير، فلا حاجة لاتخاذ أي إجراء إضافي. إذا لم يكن ذلك أنت، فراجع أمان حسابك فورًا وتواصل مع الدعم.",
       "Email / OTP Enabled / Title": "تم تفعيل المصادقة الثنائية",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "تعطيل",
+      "Auth / Two-factor / Reauth disable title": "هل تريد تعطيل المصادقة الثنائية؟",
+      "Auth / Two-factor / Reauth disable warning": "سيؤدي هذا إلى إزالة طبقة الأمان الإضافية من حسابك - يمكنك إعادة تفعيلها في أي وقت."
     },
     "fr": {
       "Tenant invitation form / Email invalid": "Veuillez saisir une adresse e-mail valide",
@@ -15880,7 +15901,10 @@
       "Email / OTP Enabled / Subject": "L'authentification à deux facteurs a été activée sur votre compte",
       "Email / OTP Enabled / Text": "L'authentification à deux facteurs protège désormais votre compte - un code de vérification sera requis en plus de votre mot de passe lors de la connexion. Si vous avez effectué ce changement, aucune action supplémentaire n'est nécessaire. Si ce n'était pas vous, vérifiez immédiatement la sécurité de votre compte et contactez le support.",
       "Email / OTP Enabled / Title": "L'authentification à deux facteurs a été activée",
-      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey"
+      "Passkeys / Reauthenticate passkey": "Verify with an existing passkey",
+      "Auth / Two-factor / Reauth disable button": "Désactiver",
+      "Auth / Two-factor / Reauth disable title": "Désactiver l'authentification à deux facteurs ?",
+      "Auth / Two-factor / Reauth disable warning": "Cela supprimera la couche de sécurité supplémentaire de votre compte - vous pouvez la réactiver à tout moment."
     }
   }
 }

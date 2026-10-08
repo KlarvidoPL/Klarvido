@@ -5926,5 +5926,14 @@
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "Wyłącz"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "Wyłączyć uwierzytelnianie dwuskładnikowe?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "Spowoduje to usunięcie dodatkowej warstwy zabezpieczeń z Twojego konta - możesz włączyć ją ponownie w dowolnym momencie."
   }
 }

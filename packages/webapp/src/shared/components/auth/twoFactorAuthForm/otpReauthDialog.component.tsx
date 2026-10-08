@@ -81,33 +81,52 @@ export const OtpReauthDialog = ({ open, action, onClose, onAuthorized }: OtpReau
     }
   };
 
+  const isDisabling = action === 'otp_disable';
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && close()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <FormattedMessage defaultMessage="Verify your identity" id="Auth / Two-factor / Reauth title" />
-          </DialogTitle>
-          <DialogDescription>
-            {canReauthenticate ? (
+            {isDisabling ? (
               <FormattedMessage
-                defaultMessage="Verify an existing passkey or enter your account password{otp} to continue."
-                id="Auth / Two-factor / Reauth description"
-                values={{
-                  otp: otpEnabled
-                    ? intl.formatMessage({
-                        defaultMessage: ' and two-factor code',
-                        id: 'Auth / Two-factor / Reauth description and code',
-                      })
-                    : '',
-                }}
+                defaultMessage="Disable two-factor authentication?"
+                id="Auth / Two-factor / Reauth disable title"
               />
             ) : (
-              <FormattedMessage
-                defaultMessage="Enter your current two-factor code to continue."
-                id="Auth / Two-factor / Reauth otp-only description"
-              />
+              <FormattedMessage defaultMessage="Verify your identity" id="Auth / Two-factor / Reauth title" />
             )}
+          </DialogTitle>
+          <DialogDescription className="space-y-1">
+            {isDisabling && (
+              <span className="block">
+                <FormattedMessage
+                  defaultMessage="This removes the extra layer of security from your account - you can re-enable it at any time."
+                  id="Auth / Two-factor / Reauth disable warning"
+                />
+              </span>
+            )}
+            <span className="block">
+              {canReauthenticate ? (
+                <FormattedMessage
+                  defaultMessage="Verify an existing passkey or enter your account password{otp} to continue."
+                  id="Auth / Two-factor / Reauth description"
+                  values={{
+                    otp: otpEnabled
+                      ? intl.formatMessage({
+                          defaultMessage: ' and two-factor code',
+                          id: 'Auth / Two-factor / Reauth description and code',
+                        })
+                      : '',
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Enter your current two-factor code to continue."
+                  id="Auth / Two-factor / Reauth otp-only description"
+                />
+              )}
+            </span>
           </DialogDescription>
         </DialogHeader>
         {canReauthenticate ? (
@@ -156,10 +175,18 @@ export const OtpReauthDialog = ({ open, action, onClose, onAuthorized }: OtpReau
                 <FormattedMessage defaultMessage="Cancel" id="Common / Cancel" />
               </Button>
               <Button
+                variant={isDisabling ? 'destructive' : 'default'}
                 onClick={() => submit(false)}
                 disabled={isAuthorizing || !password || (otpEnabled && otpToken.length !== 6)}
               >
-                <FormattedMessage defaultMessage="Verify with password" id="Auth / Two-factor / Reauth verify password" />
+                {isDisabling ? (
+                  <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Reauth disable button" />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Verify with password"
+                    id="Auth / Two-factor / Reauth verify password"
+                  />
+                )}
               </Button>
             </DialogFooter>
           </>
@@ -178,8 +205,16 @@ export const OtpReauthDialog = ({ open, action, onClose, onAuthorized }: OtpReau
               <Button variant="outline" onClick={close} disabled={isAuthorizing}>
                 <FormattedMessage defaultMessage="Cancel" id="Common / Cancel" />
               </Button>
-              <Button onClick={() => submit(false)} disabled={isAuthorizing || otpToken.length !== 6}>
-                <FormattedMessage defaultMessage="Verify" id="Auth / Two-factor / Reauth verify otp only" />
+              <Button
+                variant={isDisabling ? 'destructive' : 'default'}
+                onClick={() => submit(false)}
+                disabled={isAuthorizing || otpToken.length !== 6}
+              >
+                {isDisabling ? (
+                  <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Reauth disable button" />
+                ) : (
+                  <FormattedMessage defaultMessage="Verify" id="Auth / Two-factor / Reauth verify otp only" />
+                )}
               </Button>
             </DialogFooter>
           </>

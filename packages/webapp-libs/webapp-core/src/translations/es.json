@@ -5926,5 +5926,14 @@
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "Desactivar"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "¿Desactivar la autenticación de dos factores?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "Esto eliminará la capa adicional de seguridad de tu cuenta - puedes volver a activarla en cualquier momento."
   }
 }

@@ -5926,5 +5926,14 @@
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "अक्षम करें"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "क्या टू-फैक्टर प्रमाणीकरण अक्षम करें?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "इससे आपके खाते से सुरक्षा की अतिरिक्त परत हट जाएगी - आप इसे किसी भी समय फिर से सक्षम कर सकते हैं।"
   }
 }
