@@ -1,5 +1,9 @@
 import copy
 
+from django.db import transaction
+from django.utils import timezone
+from apps.sso.models import SSOSession
+
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.conf import settings
@@ -311,6 +315,7 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
         "invalid_token": _("No valid token found in cookie 'refresh_token' or field 'refresh'"),
     }
 
+    @transaction.atomic
     def validate(self, attrs):
         request = self.context["request"]
         raw_token = request.COOKIES.get(settings.REFRESH_TOKEN_COOKIE) or attrs.get("refresh")
@@ -347,14 +352,18 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
         if refresh.get(jwt_api_settings.REVOKE_TOKEN_CLAIM) != get_md5_hash_password(user.password):
             self.fail("invalid_token")
 
+        # Missing, expired, foreign, and revoked sessions cannot refresh. Lock
+        # the row so rotation and revocation cannot leave an untracked token.
         # Reject the refresh if the session it belongs to has been revoked
         # (e.g. via "Sign out" on another device in Active Sessions). Without
         # this check, revoking a session only hides it from the session list
         # - the device itself would keep minting new access tokens forever.
-        from apps.sso.models import SSOSession
-
-        session = SSOSession.objects.filter(refresh_token_jti=old_jti).first() if old_jti else None
-        if session and not session.is_active:
+        session = (
+            SSOSession.objects.select_for_update()
+            .filter(refresh_token_jti=old_jti, user=user, is_active=True, expires_at__gt=timezone.now())
+            .first()
+        )
+        if not session:
             self.fail("invalid_token")
 
         if jwt_api_settings.ROTATE_REFRESH_TOKENS:
@@ -372,8 +381,7 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
             # Rotation mints a brand new refresh token (new jti) - re-point the
             # session's link so it stays revocable after this refresh too, and
             # extend its expiry / last activity along with it.
-            if session:
-                session.extend(new_refresh.get("jti"))
+            session.extend(new_refresh.get("jti"))
 
             return {"access": str(new_refresh.access_token), "refresh": str(new_refresh)}
 

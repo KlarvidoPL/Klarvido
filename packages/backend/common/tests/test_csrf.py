@@ -2,6 +2,8 @@
 
 import json
 
+from apps.sso.tests.factories import SSOSessionFactory
+
 import pytest
 from django.conf import settings
 from rest_framework.test import APIClient
@@ -25,6 +27,7 @@ def client_for(user=None, refresh=False):
         token = RefreshToken.for_user(user)
         client.cookies[settings.ACCESS_TOKEN_COOKIE] = str(token.access_token)
         if refresh:
+            SSOSessionFactory(user=user, refresh_token_jti=token['jti'])
             client.cookies[settings.REFRESH_TOKEN_COOKIE] = str(token)
     return client
 
@@ -95,7 +98,9 @@ def test_cookie_refresh_logout_require_csrf(path, valid, user_factory):
 def test_explicit_refresh_token_without_cookies_remains_supported(path, user_factory):
     user = user_factory()
     client = client_for()
-    response = client.post(path, {'refresh': str(RefreshToken.for_user(user))}, format='json')
+    refresh = RefreshToken.for_user(user)
+    SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+    response = client.post(path, {'refresh': str(refresh)}, format='json')
     assert response.status_code == 200, response.content
 
 

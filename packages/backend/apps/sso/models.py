@@ -2,7 +2,7 @@ import hashid_field
 import secrets
 from datetime import timedelta
 
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.utils import timezone
 
@@ -442,11 +442,16 @@ class SSOSession(TimestampedMixin, models.Model):
         device it belongs to would stay able to mint new access tokens
         indefinitely via /refresh.
         """
-        self.is_active = False
-        self.revoked_at = timezone.now()
-        self.revoked_reason = reason
-        self.save(update_fields=["is_active", "revoked_at", "revoked_reason"])
-        self.blacklist_refresh_token()
+        # Serialize with refresh rotation and reload its current token linkage;
+        # callers may hold an instance loaded before that rotation.
+        with transaction.atomic():
+            locked = type(self).objects.select_for_update().get(pk=self.pk)
+            self.refresh_token_jti = locked.refresh_token_jti
+            self.is_active = False
+            self.revoked_at = timezone.now()
+            self.revoked_reason = reason
+            self.save(update_fields=["is_active", "revoked_at", "revoked_reason"])
+            self.blacklist_refresh_token()
 
     def extend(self, refresh_token_jti: str):
         """

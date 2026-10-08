@@ -1,3 +1,7 @@
+import logging
+
+from django.db import transaction
+from apps.sso.services import SessionService
 from rest_framework.exceptions import ValidationError
 
 import graphene
@@ -11,28 +15,27 @@ from common.graphql import mutations
 from common.graphql import ratelimit
 from common.graphql.acl.decorators import permission_classes
 from apps.multitenancy.schema import TenantType
+from .jwt import get_jti_from_refresh_token
 from . import models
 from . import serializers
 from .services.default_organization import default_organization_id
 from .services.users import get_user_from_resolver, get_role_names, get_user_avatar_url
 
 
-def _create_session_for_user(user, request, refresh_token: str = None):
-    """
-    Create an SSOSession for the user and return the session_id.
-    Returns None if session creation fails.
-    """
-    try:
-        from apps.sso.services import SessionService
-        from .jwt import get_jti_from_refresh_token
+logger = logging.getLogger(__name__)
 
-        session_service = SessionService(user)
-        refresh_token_jti = get_jti_from_refresh_token(refresh_token) if refresh_token else None
-        session, session_id = session_service.create_session(request, refresh_token_jti=refresh_token_jti)
+
+def _create_session_for_user(user, request, refresh_token: str):
+    """Authentication must have a durable, revocable session before setting cookies."""
+    try:
+        jti = get_jti_from_refresh_token(refresh_token)
+        if not user or not jti:
+            raise ValueError("Missing session owner or refresh token")
+        _, session_id = SessionService(user).create_session(request, refresh_token_jti=jti)
         return session_id
     except Exception:
-        # Don't fail login if session creation fails
-        return None
+        logger.error("Authentication session creation failed")
+        raise ValidationError("Unable to establish a session. Please try again.")
 
 
 class CookieAuthenticationMutation(mutations.SerializerMutation):
@@ -73,42 +76,42 @@ class ObtainTokenMutation(CookieAuthenticationMutation):
     @classmethod
     @ratelimit.ratelimit(key="ip", rate="30/min")
     def mutate_and_get_payload(cls, root, info, **input):
-        mutation = super().mutate_and_get_payload(root, info, **input)
+        with transaction.atomic():
+            mutation = super().mutate_and_get_payload(root, info, **input)
 
-        if mutation.otp_auth_token:
-            info.context._request.set_cookies = {
-                settings.OTP_AUTH_TOKEN_COOKIE: mutation.otp_auth_token,
-            }
-        else:
-            # Create session for tracking
-            user = getattr(mutation, "_user", None)
-            if not user:
-                # Try to get user from serializer
-                serializer = cls._meta.serializer_class
-                if hasattr(serializer, "user"):
-                    user = serializer.user
+            if mutation.otp_auth_token:
+                otp_cookies = {
+                    settings.OTP_AUTH_TOKEN_COOKIE: mutation.otp_auth_token,
+                }
+            else:
+                # Create session for tracking
+                user = getattr(mutation, "_user", None)
+                if not user:
+                    # Try to get user from serializer
+                    serializer = cls._meta.serializer_class
+                    if hasattr(serializer, "user"):
+                        user = serializer.user
 
-            # Get user from validated data - need to look it up by email
-            email = input.get("email")
-            if email and not user:
-                try:
-                    user = models.User.objects.get(email__iexact=email)
-                except models.User.DoesNotExist:
-                    user = None
+                # Get user from validated data - need to look it up by email
+                email = input.get("email")
+                if email and not user:
+                    try:
+                        user = models.User.objects.get(email__iexact=email)
+                    except models.User.DoesNotExist:
+                        user = None
 
-            session_id = None
-            if user:
                 session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
 
-            auth_cookies = {
-                settings.ACCESS_TOKEN_COOKIE: mutation.access,
-                settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
-            }
+                auth_cookies = {
+                    settings.ACCESS_TOKEN_COOKIE: mutation.access,
+                    settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
+                }
 
-            # Add session_id cookie if session was created
-            if session_id:
                 auth_cookies[settings.SESSION_ID_COOKIE] = session_id
 
+        if mutation.otp_auth_token:
+            info.context._request.set_cookies = otp_cookies
+        else:
             info.context._request.set_auth_cookie = auth_cookies
 
         return mutation
@@ -121,19 +124,18 @@ class SingUpMutation(CookieAuthenticationMutation):
     @classmethod
     @ratelimit.ratelimit(key="ip", rate="10/min")
     def mutate_and_get_payload(cls, root, info, **input):
-        mutation = super().mutate_and_get_payload(root, info, **input)
+        with transaction.atomic():
+            mutation = super().mutate_and_get_payload(root, info, **input)
 
-        # Create session for the new user
-        email = input.get("email")
-        user = None
-        if email:
-            try:
-                user = models.User.objects.get(email__iexact=email)
-            except models.User.DoesNotExist:
-                pass
+            # Create session for the new user
+            email = input.get("email")
+            user = None
+            if email:
+                try:
+                    user = models.User.objects.get(email__iexact=email)
+                except models.User.DoesNotExist:
+                    pass
 
-        session_id = None
-        if user:
             session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
 
         auth_cookies = {
@@ -141,8 +143,7 @@ class SingUpMutation(CookieAuthenticationMutation):
             settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
         }
 
-        if session_id:
-            auth_cookies[settings.SESSION_ID_COOKIE] = session_id
+        auth_cookies[settings.SESSION_ID_COOKIE] = session_id
 
         info.context._request.set_auth_cookie = auth_cookies
 
@@ -188,16 +189,15 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
     @classmethod
     @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate)
     def mutate_and_get_payload(cls, root, info, **input):
-        try:
-            mutation = super().mutate_and_get_payload(root, info, **input)
-        except ValidationError as error:
-            cls._delete_otp_auth_token_cookie(info)
-            raise error
+        with transaction.atomic():
+            try:
+                mutation = super().mutate_and_get_payload(root, info, **input)
+            except ValidationError as error:
+                cls._delete_otp_auth_token_cookie(info)
+                raise error
 
-        # Try to get user from OTP auth token to create session
-        user = cls._get_user_from_otp_token(info, input)
-        session_id = None
-        if user:
+            # Try to get user from OTP auth token to create session
+            user = cls._get_user_from_otp_token(info, input)
             session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
 
         auth_cookies = {
@@ -205,8 +205,7 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
             settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
         }
 
-        if session_id:
-            auth_cookies[settings.SESSION_ID_COOKIE] = session_id
+        auth_cookies[settings.SESSION_ID_COOKIE] = session_id
 
         info.context._request.set_auth_cookie = auth_cookies
         cls._delete_otp_auth_token_cookie(info)
@@ -438,8 +437,11 @@ class ChangePasswordMutation(CookieAuthenticationMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        mutation = super().mutate_and_get_payload(root, info, **input)
+        with transaction.atomic():
+            mutation = super().mutate_and_get_payload(root, info, **input)
+            session_id = _create_session_for_user(info.context.user, info.context._request, mutation.refresh)
         info.context._request.set_auth_cookie = {
+            settings.SESSION_ID_COOKIE: session_id,
             settings.ACCESS_TOKEN_COOKIE: mutation.access,
             settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
         }

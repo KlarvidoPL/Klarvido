@@ -26,12 +26,15 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
 from django.db import models, transaction
 from graphql_relay import from_global_id
 
 from common.csrf import browser_csrf_binding
+
+from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
+from apps.users.utils import set_auth_cookie
 
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
@@ -39,7 +42,7 @@ from apps.multitenancy.constants import TenantUserRole
 from .models import TenantSSOConnection, SCIMToken, SSOAuditLog, UserPasskey, WebAuthnChallenge
 from .renderers import SCIMRenderer, SCIMParser
 from .constants import SSOConnectionStatus, SSOAuditEventType
-from .services import SAMLService, OIDCService, SCIMService, WebAuthnService
+from .services import SAMLService, OIDCService, SCIMService, WebAuthnService, SessionService
 from .services.scim import SCIMError
 from .services import passkey_management
 from .services.provisioning import JITProvisioningService
@@ -226,10 +229,6 @@ class SAMLACSView(View):
             )
 
             # Create session and set auth cookies (same as regular login)
-            from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
-            from apps.users.utils import set_auth_cookie
-            from .services import SessionService
-
             tokens = create_jwt_tokens(user, auth_method='sso')
 
             # Create SSOSession for tracking, linked to the issued refresh token
@@ -421,10 +420,6 @@ class OIDCCallbackView(View):
             )
 
             # Create session and set auth cookies (same as regular login)
-            from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
-            from apps.users.utils import set_auth_cookie
-            from .services import SessionService
-
             tokens = create_jwt_tokens(user, auth_method='sso')
 
             # Create SSOSession for tracking, linked to the issued refresh token
@@ -829,6 +824,7 @@ class PasskeyAuthenticationVerifyView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [PasskeyAuthThrottle]
 
+    @transaction.atomic
     def post(self, request):
         browser_binding = browser_csrf_binding(request)
         webauthn_service = WebAuthnService()
@@ -846,10 +842,6 @@ class PasskeyAuthenticationVerifyView(APIView):
             )
 
             # Create JWT tokens and set auth cookies (same as regular login)
-            from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
-            from apps.users.utils import set_auth_cookie
-            from .services import SessionService
-
             # Policy: server-verified passkeys with mandatory UV replace the OTP
             # step, including for OTP-enabled accounts. Never issue tokens before
             # verify_authentication has checked the signed UV flag.
@@ -862,7 +854,10 @@ class PasskeyAuthenticationVerifyView(APIView):
                     request, refresh_token_jti=get_jti_from_refresh_token(tokens["refresh"])
                 )
             except Exception:
-                session_id = None
+                logger.error("Passkey authentication session creation failed")
+                error = APIException("Unable to establish a session. Please try again.")
+                error.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+                raise error
 
             # Browser sessions are delivered only through HttpOnly cookies.
             response = Response({'success': True})

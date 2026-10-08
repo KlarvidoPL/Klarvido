@@ -490,3 +490,28 @@ def test_public_login_options_do_not_disclose_accounts_or_credentials(user, asse
     challenge = WebAuthnChallenge.objects.get(challenge=response.data['challenge'])
     assert challenge.user_id is None
     assert 'allowCredentials' not in response.data
+
+
+def test_passkey_session_failure_rolls_back_authentication(assertion, monkeypatch):
+    client, passkey, build = assertion
+    payload, challenge = build()
+    before = OutstandingToken.objects.count()
+
+    def fail(*args, **kwargs):
+        raise RuntimeError('private database detail')
+
+    monkeypatch.setattr('apps.sso.services.SessionService.create_session', fail)
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 503
+    assert b'private database detail' not in response.content
+    assert settings.ACCESS_TOKEN_COOKIE not in response.cookies
+    assert settings.REFRESH_TOKEN_COOKIE not in response.cookies
+    assert OutstandingToken.objects.count() == before
+    assert not SSOSession.objects.filter(user=passkey.user).exists()
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.sign_count == 0
+    # The same valid assertion can be retried after session storage recovers.
+    monkeypatch.undo()
+    assert client.post('/api/sso/passkeys/authenticate/verify', payload, format='json').status_code == 200
