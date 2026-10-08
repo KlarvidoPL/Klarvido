@@ -135,6 +135,7 @@ services:
     environment:
       - DJANGO_DEBUG=False
       - ENVIRONMENT_NAME=production
+      - WEB_APP_URL=https://${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
@@ -312,6 +313,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      backend-migrations:
+        condition: service_completed_successfully
     environment:
       # Same environment as backend
       - STORAGE_BACKEND=${STORAGE_BACKEND:-local}
@@ -320,6 +323,7 @@ services:
       - TRACING_BACKEND=none
       - DJANGO_DEBUG=False
       - ENVIRONMENT_NAME=production
+      - WEB_APP_URL=https://${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
@@ -370,11 +374,14 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      backend-migrations:
+        condition: service_completed_successfully
     environment:
       - TASK_BACKEND=celery
       - TRACING_BACKEND=none
       - DJANGO_DEBUG=False
       - ENVIRONMENT_NAME=production
+      - WEB_APP_URL=https://${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
