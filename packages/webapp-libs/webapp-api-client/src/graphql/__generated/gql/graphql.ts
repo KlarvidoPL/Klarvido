@@ -3534,6 +3534,10 @@ export enum SsoSsoAuditLogEventTypeChoices {
   PASSKEY_AUTH_SUCCESS = 'PASSKEY_AUTH_SUCCESS',
   /** Passkey Clone Detected */
   PASSKEY_CLONE_DETECTED = 'PASSKEY_CLONE_DETECTED',
+  /** Passkey Management Authentication Failed */
+  PASSKEY_REAUTH_FAILED = 'PASSKEY_REAUTH_FAILED',
+  /** Passkey Management Authentication Success */
+  PASSKEY_REAUTH_SUCCESS = 'PASSKEY_REAUTH_SUCCESS',
   /** Passkey Registered */
   PASSKEY_REGISTERED = 'PASSKEY_REGISTERED',
   /** Passkey Removed */

@@ -5743,5 +5743,32 @@
   },
   "Companies / Clear search": {
     "defaultMessage": "Wyczyść wyszukiwanie"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "Potwierdź swoją tożsamość"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "Aby dodać lub usunąć klucz dostępu, potwierdź istniejący klucz lub wpisz hasło do konta i kod uwierzytelniania dwuskładnikowego, jeśli jest włączone. Jeśli korzystasz tylko z logowania społecznościowego, najpierw ustaw hasło przez resetowanie hasła."
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "Potwierdź istniejącym kluczem dostępu"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "Hasło do konta"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "Kod dwuskładnikowy (jeśli włączony)"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "Potwierdź hasłem"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "Weryfikacja nie powiodła się. Sprawdź hasło i kod dwuskładnikowy lub ponownie użyj istniejącego klucza dostępu."
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "Weryfikacja zarządzania kluczami dostępu powiodła się"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "Weryfikacja zarządzania kluczami dostępu nie powiodła się"
   }
 }

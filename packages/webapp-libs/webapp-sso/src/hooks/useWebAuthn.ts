@@ -53,6 +53,21 @@ function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
+function managementHeaders(authorization?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (authorization) headers['X-Passkey-Authorization'] = authorization;
+  // Match the API client's explicit-token fallback when Safari blocks API cookies.
+  try {
+    const access = localStorage.getItem('token');
+    if (access) headers.Authorization = `Bearer ${access}`;
+  } catch {
+    /* Cookie authentication is available when storage is blocked. */
+  }
+  return headers;
+}
+
 export function useWebAuthn() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -62,7 +77,10 @@ export function useWebAuthn() {
     typeof window !== 'undefined' && !!window.PublicKeyCredential;
 
   const registerPasskey = useCallback(
-    async (name: string = 'My Passkey'): Promise<boolean> => {
+    async (
+      name: string = 'My Passkey',
+      authorization?: string,
+    ): Promise<boolean> => {
       if (!isSupported) {
         setError('WebAuthn is not supported in this browser');
         return false;
@@ -77,7 +95,7 @@ export function useWebAuthn() {
           `${API_BASE}/passkeys/register/options`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: managementHeaders(authorization),
             credentials: 'include',
           },
         );
@@ -135,7 +153,7 @@ export function useWebAuthn() {
           `${API_BASE}/passkeys/register/verify`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: managementHeaders(authorization),
             credentials: 'include',
             body: JSON.stringify({
               challenge: options.challenge,
@@ -261,12 +279,80 @@ export function useWebAuthn() {
     [isSupported],
   );
 
+  const authorizePasskeyChange = useCallback(
+    async (
+      action: 'register' | 'delete',
+      passkeyId?: string,
+      password?: string,
+      otpToken?: string,
+    ): Promise<string> => {
+      const target = { action, passkeyId };
+      let proof: Record<string, unknown> = { ...target, password, otpToken };
+      if (password === undefined) {
+        const optionsResponse = await csrfFetch(
+          `${API_BASE}/passkeys/reauthenticate/options`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: managementHeaders(),
+            body: JSON.stringify(target),
+          },
+        );
+        if (!optionsResponse.ok) throw new Error('Fresh authentication failed');
+        const options: AuthenticationOptions = await optionsResponse.json();
+        const credential = (await navigator.credentials.get({
+          publicKey: {
+            challenge: base64UrlToArrayBuffer(options.challenge),
+            rpId: options.rpId,
+            timeout: options.timeout,
+            userVerification: 'required',
+            allowCredentials: options.allowCredentials?.map((cred) => ({
+              id: base64UrlToArrayBuffer(cred.id),
+              type: 'public-key',
+              transports: cred.transports as
+                | AuthenticatorTransport[]
+                | undefined,
+            })),
+          },
+        })) as PublicKeyCredential | null;
+        if (!credential) throw new Error('Fresh authentication failed');
+        const response = credential.response as AuthenticatorAssertionResponse;
+        proof = {
+          challenge: options.challenge,
+          credentialId: arrayBufferToBase64Url(credential.rawId),
+          authenticatorData: arrayBufferToBase64Url(response.authenticatorData),
+          clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
+          signature: arrayBufferToBase64Url(response.signature),
+          userHandle: response.userHandle
+            ? arrayBufferToBase64Url(response.userHandle)
+            : undefined,
+        };
+      }
+      const response = await csrfFetch(
+        `${API_BASE}/passkeys/reauthenticate/verify`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: managementHeaders(),
+          body: JSON.stringify(proof),
+        },
+      );
+      if (!response.ok) throw new Error('Fresh authentication failed');
+      const data = await response.json();
+      if (typeof data.authorization !== 'string' || !data.authorization)
+        throw new Error('Fresh authentication failed');
+      return data.authorization;
+    },
+    [],
+  );
+
   return {
     isSupported,
     isRegistering,
     isAuthenticating,
     error,
     registerPasskey,
+    authorizePasskeyChange,
     authenticateWithPasskey,
   };
 }

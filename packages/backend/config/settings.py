@@ -654,6 +654,7 @@ WEBSOCKET_ALLOWED_ORIGINS = env.list(
 )
 CORS_ALLOW_CREDENTIALS = True  # Required for cookie-based authentication
 CORS_ALLOW_HEADERS = [
+    "x-passkey-authorization",
     "accept",
     "accept-encoding",
     "authorization",

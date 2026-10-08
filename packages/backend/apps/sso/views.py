@@ -26,18 +26,20 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from django.db import models
+from django.db import models, transaction
 from graphql_relay import from_global_id
 
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
 
-from .models import TenantSSOConnection, SCIMToken, SSOAuditLog
+from .models import TenantSSOConnection, SCIMToken, SSOAuditLog, UserPasskey, WebAuthnChallenge
 from .renderers import SCIMRenderer, SCIMParser
 from .constants import SSOConnectionStatus, SSOAuditEventType
 from .services import SAMLService, OIDCService, SCIMService, WebAuthnService
 from .services.scim import SCIMError
+from .services import passkey_management
 from .services.provisioning import JITProvisioningService
 from .security import (
     build_safe_redirect_url,
@@ -674,12 +676,65 @@ class SCIMGroupDetailView(APIView):
 # ==================
 
 
+class PasskeyManagementThrottle(UserRateThrottle):
+    scope = "passkey_management"
+    rate = "10/minute"
+
+
+class PasskeyReauthenticationOptionsView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [PasskeyManagementThrottle]
+
+    def post(self, request):
+        try:
+            return Response(passkey_management.passkey_options(request.user, request.data))
+        except ValueError:
+            return Response({"error": "Fresh authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasskeyReauthenticationVerifyView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [PasskeyManagementThrottle]
+
+    def post(self, request):
+        try:
+            if not isinstance(request.data, dict):
+                raise ValidationError("Invalid authentication request")
+            if request.data.get("challenge"):
+                token = passkey_management.passkey_grant(request.user, request.data, get_client_ip(request))
+            else:
+                token = passkey_management.password_grant(request.user, request.data)
+        except (ValueError, PermissionDenied, ValidationError):
+            SSOAuditLog.log_event(
+                event_type=SSOAuditEventType.PASSKEY_REAUTH_FAILED,
+                user=request.user,
+                ip_address=get_client_ip(request),
+                success=False,
+                description="Passkey management authentication failed",
+            )
+            raise PermissionDenied("Fresh authentication failed")
+        SSOAuditLog.log_event(
+            event_type=SSOAuditEventType.PASSKEY_REAUTH_SUCCESS,
+            user=request.user,
+            ip_address=get_client_ip(request),
+            description="Passkey management authentication succeeded",
+            metadata={"method": "passkey" if request.data.get("challenge") else "password"},
+        )
+        response = Response({"authorization": token})
+        response["Cache-Control"] = "no-store"
+        return response
+
+
 class PasskeyRegistrationOptionsView(APIView):
     """Get options for passkey registration."""
 
     permission_classes = [IsAuthenticated]
 
+    @transaction.atomic
     def post(self, request):
+        grant = passkey_management.require_grant(request, request.user, "register")
+        if grant.registration_challenge_id is not None:
+            raise PermissionDenied("Fresh authentication required")
         webauthn_service = WebAuthnService(request.user)
 
         try:
@@ -691,6 +746,8 @@ class PasskeyRegistrationOptionsView(APIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        grant.registration_challenge = WebAuthnChallenge.objects.get(challenge=challenge)
+        grant.save(update_fields=["registration_challenge"])
         return Response(options)
 
 
@@ -699,7 +756,11 @@ class PasskeyRegistrationVerifyView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @transaction.atomic
     def post(self, request):
+        grant = passkey_management.require_grant(
+            request, request.user, "register", challenge=request.data.get("challenge") or ""
+        )
         webauthn_service = WebAuthnService(request.user)
 
         try:
@@ -713,6 +774,7 @@ class PasskeyRegistrationVerifyView(APIView):
                 ip_address=get_client_ip(request),
             )
 
+            passkey_management.consume_grant(grant)
             return Response(
                 {
                     "id": str(passkey.id),
@@ -853,7 +915,12 @@ class PasskeyDeleteView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @transaction.atomic
     def delete(self, request, passkey_id):
+        passkey = UserPasskey.objects.filter(pk=passkey_id, user=request.user, is_active=True).first()
+        if passkey is None:
+            return Response({"error": "Passkey not found"}, status=status.HTTP_404_NOT_FOUND)
+        grant = passkey_management.require_grant(request, request.user, "delete", passkey=passkey)
         webauthn_service = WebAuthnService(request.user)
 
         try:
@@ -861,6 +928,7 @@ class PasskeyDeleteView(APIView):
                 passkey_id,
                 ip_address=get_client_ip(request),
             )
+            passkey_management.consume_grant(grant)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

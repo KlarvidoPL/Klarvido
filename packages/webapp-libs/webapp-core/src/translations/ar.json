@@ -5743,5 +5743,32 @@
   },
   "Companies / Empty title": {
     "defaultMessage": "ليس لديك أي مؤسسة بعد"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "تحقق من هويتك"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "لإضافة مفتاح مرور أو حذفه، تحقق باستخدام مفتاح مرور موجود أو أدخل كلمة مرور حسابك ورمز المصادقة الثنائية إذا كانت مفعّلة. إذا كنت تستخدم تسجيل الدخول الاجتماعي فقط، فعيّن كلمة مرور للحساب عبر إعادة تعيين كلمة المرور أولاً."
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "التحقق باستخدام مفتاح مرور موجود"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "كلمة مرور الحساب"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "رمز المصادقة الثنائية (إذا كانت مفعّلة)"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "التحقق بكلمة المرور"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "فشل التحقق. راجع كلمة المرور ورمز المصادقة الثنائية، أو حاول مجدداً باستخدام مفتاح المرور الموجود."
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "نجح التحقق لإدارة مفاتيح المرور"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "فشل التحقق لإدارة مفاتيح المرور"
   }
 }

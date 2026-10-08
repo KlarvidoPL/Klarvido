@@ -2043,6 +2043,10 @@ enum SsoSSOAuditLogEventTypeChoices {
   PASSKEY_AUTH_SUCCESS
   "Passkey Auth Failed"
   PASSKEY_AUTH_FAILED
+  "Passkey Management Authentication Success"
+  PASSKEY_REAUTH_SUCCESS
+  "Passkey Management Authentication Failed"
+  PASSKEY_REAUTH_FAILED
   "Passkey Clone Detected"
   PASSKEY_CLONE_DETECTED
   "Security Anomaly Detected"

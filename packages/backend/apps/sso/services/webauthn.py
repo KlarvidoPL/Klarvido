@@ -521,6 +521,7 @@ class WebAuthnService:
         signature: str,
         user_handle: str = None,
         ip_address: str = None,
+        challenge_type: str = "authentication",
     ) -> Tuple[User, UserPasskey]:
         """
         Verify an authentication response with full cryptographic validation.
@@ -564,7 +565,7 @@ class WebAuthnService:
         # Find and validate challenge
         challenge_record = WebAuthnChallenge.objects.filter(
             challenge=challenge,
-            challenge_type="authentication",
+            challenge_type=challenge_type,
         ).first()
 
         if not challenge_record:

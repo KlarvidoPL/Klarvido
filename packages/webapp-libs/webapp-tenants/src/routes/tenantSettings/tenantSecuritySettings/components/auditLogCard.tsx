@@ -125,6 +125,8 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
   passkey_removed: <Fingerprint className="h-4 w-4" />,
   passkey_auth_success: <Fingerprint className="h-4 w-4" />,
   passkey_auth_failed: <Fingerprint className="h-4 w-4" />,
+  passkey_reauth_success: <Fingerprint className="h-4 w-4" />,
+  passkey_reauth_failed: <Fingerprint className="h-4 w-4" />,
 
   // Enforcement events
   sso_enforce_bypass: <Shield className="h-4 w-4" />,
@@ -136,6 +138,14 @@ const getEventIcon = (eventType: string) => {
 
 // Labels for event types that are translated in the frontend. Other types fall back to the label sent by the backend.
 const EVENT_TYPE_MESSAGES = defineMessages({
+  passkey_reauth_success: {
+    id: 'Audit / Event / Passkey reauthentication succeeded',
+    defaultMessage: 'Passkey management verification succeeded',
+  },
+  passkey_reauth_failed: {
+    id: 'Audit / Event / Passkey reauthentication failed',
+    defaultMessage: 'Passkey management verification failed',
+  },
   ksef_token_saved: { id: 'Audit / Event / KSeF token saved', defaultMessage: 'KSeF token saved' },
   ksef_token_tested: { id: 'Audit / Event / KSeF token tested', defaultMessage: 'KSeF token tested' },
   ksef_token_deleted: { id: 'Audit / Event / KSeF token removed', defaultMessage: 'KSeF token removed' },

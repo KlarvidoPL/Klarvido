@@ -33,6 +33,18 @@ def enrollment(user):
     cache.clear()
     client = APIClient()
     client.force_authenticate(user)
+    user.set_password('Enrollment-password-42!')
+    user.save(update_fields=['password'])
+    proof = client.post(
+        '/api/sso/passkeys/reauthenticate/verify',
+        {
+            'action': 'register',
+            'password': 'Enrollment-password-42!',
+        },
+        format='json',
+    )
+    assert proof.status_code == 200
+    client.credentials(HTTP_X_PASSKEY_AUTHORIZATION=proof.data['authorization'])
     response = client.post('/api/sso/passkeys/register/options', {'userVerification': 'required'}, format='json')
     assert response.status_code == 200
     assert response.data['pubKeyCredParams'] == [{'type': 'public-key', 'alg': -7}]
@@ -203,6 +215,17 @@ def test_invalid_registration_policy_is_rejected_before_creating_challenge(user)
     cache.clear()
     client = APIClient()
     client.force_authenticate(user)
+    user.set_password('Enrollment-password-42!')
+    user.save(update_fields=['password'])
+    proof = client.post(
+        '/api/sso/passkeys/reauthenticate/verify',
+        {
+            'action': 'register',
+            'password': 'Enrollment-password-42!',
+        },
+        format='json',
+    )
+    client.credentials(HTTP_X_PASSKEY_AUTHORIZATION=proof.data['authorization'])
     response = client.post('/api/sso/passkeys/register/options', {'userVerification': 'invalid'}, format='json')
     assert response.status_code == 400
     assert not WebAuthnChallenge.objects.filter(user=user).exists()

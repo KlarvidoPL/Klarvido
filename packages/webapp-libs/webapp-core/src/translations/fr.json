@@ -5743,5 +5743,32 @@
   },
   "Companies / Empty title": {
     "defaultMessage": "Vous n’avez encore aucune organisation"
+  },
+  "Passkeys / Reauthentication title": {
+    "defaultMessage": "Vérifiez votre identité"
+  },
+  "Passkeys / Reauthentication description": {
+    "defaultMessage": "Pour ajouter ou supprimer une clé d’accès, vérifiez une clé existante ou saisissez le mot de passe de votre compte et le code à deux facteurs si activé. Si vous utilisez uniquement la connexion sociale, définissez d’abord un mot de passe via la réinitialisation."
+  },
+  "Passkeys / Verify existing passkey": {
+    "defaultMessage": "Vérifier avec une clé d’accès existante"
+  },
+  "Passkeys / Account password": {
+    "defaultMessage": "Mot de passe du compte"
+  },
+  "Passkeys / Two-factor code": {
+    "defaultMessage": "Code à deux facteurs (si activé)"
+  },
+  "Passkeys / Verify password": {
+    "defaultMessage": "Vérifier avec le mot de passe"
+  },
+  "Passkeys / Reauthentication failed": {
+    "defaultMessage": "La vérification a échoué. Vérifiez votre mot de passe et votre code à deux facteurs, ou réessayez avec votre clé d’accès existante."
+  },
+  "Audit / Event / Passkey reauthentication succeeded": {
+    "defaultMessage": "Vérification de gestion des clés d’accès réussie"
+  },
+  "Audit / Event / Passkey reauthentication failed": {
+    "defaultMessage": "Échec de la vérification de gestion des clés d’accès"
   }
 }

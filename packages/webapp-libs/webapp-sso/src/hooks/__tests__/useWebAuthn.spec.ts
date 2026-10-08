@@ -54,7 +54,9 @@ describe('useWebAuthn', () => {
     try {
       const { result } = renderHook(() => useWebAuthn());
       await act(async () => {
-        expect(await result.current.registerPasskey('Phone')).toBe(true);
+        expect(
+          await result.current.registerPasskey('Phone', 'one-use-proof'),
+        ).toBe(true);
       });
       const sent = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
       expect(sent).toEqual({
@@ -66,12 +68,103 @@ describe('useWebAuthn', () => {
         transports: [],
       });
       expect(sent).not.toHaveProperty('publicKey');
+      for (const [, init] of fetchMock.mock.calls) {
+        expect(new Headers(init?.headers).get('X-Passkey-Authorization')).toBe(
+          'one-use-proof',
+        );
+      }
     } finally {
       if (supportDescriptor)
         Object.defineProperty(window, 'PublicKeyCredential', supportDescriptor);
       else Reflect.deleteProperty(window, 'PublicKeyCredential');
       if (credentialsDescriptor)
         Object.defineProperty(navigator, 'credentials', credentialsDescriptor);
+      else Reflect.deleteProperty(navigator, 'credentials');
+      fetchMock.mockReset();
+    }
+  });
+  it('authorizes a specific deletion with password and OTP', async () => {
+    const fetchMock = jest.mocked(csrfFetch);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ authorization: 'single-use' }),
+    } as Response);
+    const { result } = renderHook(() => useWebAuthn());
+    expect(
+      await result.current.authorizePasskeyChange(
+        'delete',
+        'passkey-id',
+        'password',
+        '123456',
+      ),
+    ).toBe('single-use');
+    expect(JSON.parse(fetchMock.mock.calls[0][1]?.body as string)).toEqual({
+      action: 'delete',
+      passkeyId: 'passkey-id',
+      password: 'password',
+      otpToken: '123456',
+    });
+    fetchMock.mockReset();
+  });
+  it('does not return authorization when fresh verification fails', async () => {
+    const fetchMock = jest.mocked(csrfFetch);
+    fetchMock.mockResolvedValueOnce({ ok: false } as Response);
+    const { result } = renderHook(() => useWebAuthn());
+    await expect(
+      result.current.authorizePasskeyChange('register', undefined, 'wrong'),
+    ).rejects.toThrow();
+    fetchMock.mockReset();
+  });
+  it('verifies an existing passkey with user verification required before returning proof', async () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      navigator,
+      'credentials',
+    );
+    const get = jest.fn().mockResolvedValue({
+      rawId: new Uint8Array([1]).buffer,
+      response: {
+        authenticatorData: new Uint8Array([2]).buffer,
+        clientDataJSON: new Uint8Array([3]).buffer,
+        signature: new Uint8Array([4]).buffer,
+        userHandle: new Uint8Array([5]).buffer,
+      },
+    });
+    Object.defineProperty(navigator, 'credentials', {
+      configurable: true,
+      value: { get },
+    });
+    const fetchMock = jest.mocked(csrfFetch);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          challenge: 'AQ',
+          rpId: 'localhost',
+          timeout: 60000,
+          allowCredentials: [{ id: 'AQ', transports: ['internal'] }],
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ authorization: 'single-use' }),
+      } as Response);
+    try {
+      const { result } = renderHook(() => useWebAuthn());
+      expect(await result.current.authorizePasskeyChange('register')).toBe(
+        'single-use',
+      );
+      expect(get.mock.calls[0][0].publicKey.userVerification).toBe('required');
+      expect(JSON.parse(fetchMock.mock.calls[1][1]?.body as string)).toEqual({
+        challenge: 'AQ',
+        credentialId: 'AQ',
+        authenticatorData: 'Ag',
+        clientDataJSON: 'Aw',
+        signature: 'BA',
+        userHandle: 'BQ',
+      });
+    } finally {
+      if (descriptor)
+        Object.defineProperty(navigator, 'credentials', descriptor);
       else Reflect.deleteProperty(navigator, 'credentials');
       fetchMock.mockReset();
     }

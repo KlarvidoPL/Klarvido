@@ -647,6 +647,24 @@ class WebAuthnChallenge(TimestampedMixin, models.Model):
         self.save(update_fields=["used_at"])
 
 
+class PasskeyManagementGrant(TimestampedMixin, models.Model):
+    """One-use, action-bound proof of fresh authentication. Only its hash is stored."""
+
+    id = hashid_field.HashidAutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    action = models.CharField(max_length=10, choices=[("register", "Register"), ("delete", "Delete")])
+    passkey = models.ForeignKey(UserPasskey, on_delete=models.CASCADE, null=True, blank=True)
+    token_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    authentication_challenge = models.OneToOneField(
+        WebAuthnChallenge, on_delete=models.CASCADE, null=True, blank=True, related_name="management_grant"
+    )
+    registration_challenge = models.OneToOneField(
+        WebAuthnChallenge, on_delete=models.CASCADE, null=True, blank=True, related_name="registration_grant"
+    )
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+
+
 class SSOAuditLog(TimestampedMixin, models.Model):
     """
     Comprehensive audit log for all SSO-related events.

@@ -269,3 +269,33 @@ This warning indicates a potential cloned authenticator. Investigate if:
 
 - [Configure SSO connections](./)
 - [Set up SCIM provisioning](./scim-setup)
+
+
+### Fresh authentication for passkey changes
+
+Adding or removing a passkey requires a new verification with an already enrolled
+passkey (including user verification), or the account password and a two-factor
+code when two-factor authentication is enabled. An existing signed-in session or
+a normal login challenge does not authorize these changes. Users with only social
+login and no existing passkey must first set an account password through password
+reset.
+
+The settings screen performs this verification before each change. API clients
+must use `/api/sso/passkeys/reauthenticate/options` and
+`/api/sso/passkeys/reauthenticate/verify` for an existing passkey, or send the account
+password and optional `otpToken` directly to the verification endpoint. Password
+requests include `action` (`register` or `delete`), and deletion includes
+`passkeyId` (the raw ID or GraphQL `PasskeyType` ID). Passkey options requests include
+the same action and target; verification uses the returned challenge and signed
+assertion. The action and target are retained on the server.
+
+The returned `authorization` belongs only in the `X-Passkey-Authorization` header
+for that change. It expires after five minutes and can be used once. Registration
+requires the header on both the options and verification requests, and the proof
+is bound to the registration challenge. GraphQL `deletePasskey` and REST deletion
+apply the same check. Do not persist or log the authorization. The server stores
+only its hash, and does not issue login tokens or cookies during reauthentication.
+
+Deploy both database migrations before enabling these endpoints. Clients using
+the old registration or deletion flow will receive a fresh-authentication error
+until they adopt the verification step.
