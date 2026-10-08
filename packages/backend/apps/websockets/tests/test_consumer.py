@@ -12,9 +12,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.notifications.schema import NotificationCreatedSubscription
 from config.asgi import application
 
-# The consumer runs in its own thread: use transaction=True. Serialized rollback restores migration seed rows
-# (permissions, groups) after each test flush.
-pytestmark = pytest.mark.django_db(transaction=True, serialized_rollback=True)
+# The consumer runs in its own thread, so committed fixtures are required. These tests create their own data;
+# serialized rollback conflicts with content types recreated by earlier transaction tests' database flushes.
+pytestmark = pytest.mark.django_db(transaction=True)
 
 TRUSTED_ORIGIN = 'https://klarvido.example'
 
