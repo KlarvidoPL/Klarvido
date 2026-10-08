@@ -9,7 +9,7 @@ import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { Copy, KeyRound, QrCode, ShieldCheck, Smartphone } from 'lucide-react';
 import * as QRCode from 'qrcode';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { generateOtpMutation, verifyOtpMutation } from '../twoFactorAuthForm/twoFactorAuthForm.graphql';
@@ -25,7 +25,13 @@ export type AddTwoFactorAuthProps = {
 };
 
 export const AddTwoFactorAuth = ({ closeModal, authorization }: AddTwoFactorAuthProps) => {
-  const mutationContext = authorization ? { headers: { 'X-Passkey-Authorization': authorization } } : undefined;
+  // Memoized so it's stable across renders when `authorization` doesn't change -
+  // otherwise it would be a new object every render, and including it as an effect
+  // dependency below would re-run that effect (and re-call generateOtp) every render.
+  const mutationContext = useMemo(
+    () => (authorization ? { headers: { 'X-Passkey-Authorization': authorization } } : undefined),
+    [authorization]
+  );
   const intl = useIntl();
   const { toast } = useToast();
   const { reload } = useCommonQuery();
@@ -157,7 +163,7 @@ export const AddTwoFactorAuth = ({ closeModal, authorization }: AddTwoFactorAuth
     return () => {
       isMounted = false;
     };
-  }, [commitGenerateOtpMutation]);
+  }, [commitGenerateOtpMutation, mutationContext]);
 
   return (
     <form
