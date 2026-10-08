@@ -5829,7 +5829,7 @@
     "defaultMessage": "إلغاء ربط تسجيل الدخول الاجتماعي"
   },
   "Social accounts / Description": {
-    "defaultMessage": "إدارة تسجيل الدخول باستخدام Google وFacebook لحسابك."
+    "defaultMessage": "إدارة تسجيل الدخول عبر Google لحسابك."
   },
   "Social accounts / Disconnect": {
     "defaultMessage": "إلغاء الربط"

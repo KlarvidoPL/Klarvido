@@ -249,7 +249,7 @@ export const Profile = () => {
             <CardDescription>
               <FormattedMessage
                 id="Social accounts / Description"
-                defaultMessage="Manage Google and Facebook sign-in for your account."
+                defaultMessage="Manage Google sign-in for your account."
               />
             </CardDescription>
           </CardHeader>

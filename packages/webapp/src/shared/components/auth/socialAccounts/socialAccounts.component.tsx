@@ -19,10 +19,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../app/config/routes';
+import { GoogleIcon } from '../../../../images/icons';
 
 type SocialAccount = { id: string; provider: string; canUnlink: boolean };
 type SocialAccountState = { accounts: SocialAccount[]; hasPasskey: boolean; hasPassword: boolean; otpEnabled: boolean };
 const providers: Record<string, string> = { 'google-oauth2': 'Google', facebook: 'Facebook' };
+const providerIcons: Record<string, typeof GoogleIcon> = { 'google-oauth2': GoogleIcon };
 
 export const SocialAccounts = () => {
   const intl = useIntl();
@@ -109,14 +111,20 @@ export const SocialAccounts = () => {
           <FormattedMessage id="Social accounts / Empty" defaultMessage="No social sign-in accounts are connected." />
         </p>
       )}
-      {data.accounts.map((account) => (
-        <div key={account.id} className="flex items-center justify-between gap-4 rounded-lg border p-4">
-          <span>{providers[account.provider] ?? account.provider}</span>
-          <Button variant="outline" disabled={!account.canUnlink} onClick={() => setSelected(account)}>
-            <FormattedMessage id="Social accounts / Disconnect" defaultMessage="Disconnect" />
-          </Button>
-        </div>
-      ))}
+      {data.accounts.map((account) => {
+        const ProviderIcon = providerIcons[account.provider];
+        return (
+          <div key={account.id} className="flex items-center justify-between gap-4 rounded-lg border p-4">
+            <span className="flex items-center gap-2">
+              {ProviderIcon && <ProviderIcon size={18} className="h-[18px] w-[18px]" />}
+              {providers[account.provider] ?? account.provider}
+            </span>
+            <Button variant="outline" disabled={!account.canUnlink} onClick={() => setSelected(account)}>
+              <FormattedMessage id="Social accounts / Disconnect" defaultMessage="Disconnect" />
+            </Button>
+          </div>
+        );
+      })}
       {data.accounts.some((account) => !account.canUnlink) && (
         <p className="text-sm text-muted-foreground">
           <FormattedMessage

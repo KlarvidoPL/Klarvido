@@ -5829,7 +5829,7 @@
     "defaultMessage": "Disconnect social sign-in"
   },
   "Social accounts / Description": {
-    "defaultMessage": "Manage Google and Facebook sign-in for your account."
+    "defaultMessage": "Manage Google sign-in for your account."
   },
   "Social accounts / Disconnect": {
     "defaultMessage": "Disconnect"
