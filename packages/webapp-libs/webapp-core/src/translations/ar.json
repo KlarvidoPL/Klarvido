@@ -5770,5 +5770,8 @@
   },
   "Audit / Event / Passkey reauthentication failed": {
     "defaultMessage": "فشل التحقق لإدارة مفاتيح المرور"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "أو"
   }
 }

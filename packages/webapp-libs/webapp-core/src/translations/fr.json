@@ -5770,5 +5770,8 @@
   },
   "Audit / Event / Passkey reauthentication failed": {
     "defaultMessage": "Échec de la vérification de gestion des clés d’accès"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "ou"
   }
 }

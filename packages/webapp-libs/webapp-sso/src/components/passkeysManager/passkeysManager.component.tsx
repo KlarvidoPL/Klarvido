@@ -1,9 +1,11 @@
+import { Label } from '@sb/webapp-core/components/ui/label';
+import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
 import { getFragmentData } from '@sb/webapp-api-client/graphql';
 import {
   commonQueryCurrentUserFragment,
   useCommonQuery,
 } from '@sb/webapp-api-client/providers';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Fingerprint,
@@ -53,6 +55,7 @@ interface Passkey {
 
 export function PasskeysManager() {
   const intl = useIntl();
+  const passwordInputId = useId();
   const { data: commonData } = useCommonQuery();
   const otpEnabled =
     getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser)
@@ -269,42 +272,38 @@ export function PasskeysManager() {
               />
             </Button>
           )}
-          <Input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            disabled={isAuthorizing}
-            aria-label={intl.formatMessage({
-              defaultMessage: 'Account password',
-              id: 'Passkeys / Account password',
-            })}
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Account password',
-              id: 'Passkeys / Account password',
-            })}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-          {otpEnabled && (
+          {passkeys.length > 0 && (
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+              <FormattedMessage defaultMessage="or" id="Passkeys / Or" />
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          )}
+          <div className="space-y-3">
+            <Label htmlFor={passwordInputId}>
+              <FormattedMessage
+                defaultMessage="Account password"
+                id="Passkeys / Account password"
+              />
+            </Label>
             <Input
-              autoComplete="one-time-code"
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              spellCheck={false}
-              value={otpToken}
+              id={passwordInputId}
+              type="password"
+              autoComplete="current-password"
+              value={password}
               disabled={isAuthorizing}
-              aria-label={intl.formatMessage({
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
+          {otpEnabled && (
+            <OtpInput
+              value={otpToken}
+              onValueChange={setOtpToken}
+              disabled={isAuthorizing}
+              label={intl.formatMessage({
                 defaultMessage: 'Two-factor code',
                 id: 'Passkeys / Two-factor code',
               })}
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Two-factor code',
-                id: 'Passkeys / Two-factor code',
-              })}
-              onChange={(event) =>
-                setOtpToken(
-                  event.target.value.replace(/[^0-9]/g, '').slice(0, 6),
-                )
-              }
             />
           )}
           <DialogFooter>

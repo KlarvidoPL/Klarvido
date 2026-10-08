@@ -5770,5 +5770,8 @@
   },
   "Audit / Event / Passkey reauthentication failed": {
     "defaultMessage": "通行密钥管理验证失败"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "或"
   }
 }

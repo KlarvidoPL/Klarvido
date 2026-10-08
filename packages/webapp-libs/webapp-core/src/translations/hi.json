@@ -5770,5 +5770,8 @@
   },
   "Audit / Event / Passkey reauthentication failed": {
     "defaultMessage": "पासकी प्रबंधन का सत्यापन विफल हुआ"
+  },
+  "Passkeys / Or": {
+    "defaultMessage": "या"
   }
 }
