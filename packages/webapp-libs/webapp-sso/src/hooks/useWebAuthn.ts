@@ -202,6 +202,7 @@ export function useWebAuthn() {
           `${API_BASE}/passkeys/authenticate/options`,
           {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
           },
@@ -246,6 +247,7 @@ export function useWebAuthn() {
           `${API_BASE}/passkeys/authenticate/verify`,
           {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               challenge: options.challenge,

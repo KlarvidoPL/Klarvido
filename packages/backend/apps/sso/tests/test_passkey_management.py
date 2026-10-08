@@ -8,7 +8,6 @@ import pyotp
 import pytest
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
-from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 from graphql_relay import to_global_id
@@ -203,6 +202,8 @@ def test_existing_passkey_can_authorize_change_only_with_valid_proof(enrollment,
         'clientDataJSON': encode(client_data),
         'signature': encode(signature),
     }
+    token = client.get('/api/auth/csrf/').json()['csrfToken']
+    client.credentials(HTTP_X_CSRFTOKEN=token)
     # Management challenges cannot be used for the ordinary login endpoint.
     assert client.post('/api/sso/passkeys/authenticate/verify', payload, format='json').status_code == 400
     response = client.post(VERIFY, payload, format='json')

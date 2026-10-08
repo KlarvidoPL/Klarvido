@@ -603,6 +603,7 @@ class WebAuthnChallenge(TimestampedMixin, models.Model):
     )
 
     challenge = models.CharField(max_length=128, unique=True)
+    browser_binding = models.CharField(max_length=64, blank=True, default="")
     challenge_type = models.CharField(max_length=20)  # 'registration' or 'authentication'
 
     # Additional data needed for verification

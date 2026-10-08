@@ -31,6 +31,8 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from graphql_relay import from_global_id
 
+from common.csrf import browser_csrf_binding
+
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
 
@@ -794,6 +796,7 @@ class PasskeyAuthenticationOptionsView(APIView):
     throttle_classes = [PasskeyAuthThrottle]
 
     def post(self, request):
+        browser_binding = browser_csrf_binding(request)
         # For discoverable credentials, user may not be known yet
         email = request.data.get("email")
         user = None
@@ -807,6 +810,7 @@ class PasskeyAuthenticationOptionsView(APIView):
 
         options, challenge = webauthn_service.create_authentication_options(
             user_verification="required",
+            browser_binding=browser_binding,
         )
 
         return Response(options)
@@ -833,6 +837,7 @@ class PasskeyAuthenticationVerifyView(APIView):
     throttle_classes = [PasskeyAuthThrottle]
 
     def post(self, request):
+        browser_binding = browser_csrf_binding(request)
         webauthn_service = WebAuthnService()
 
         try:
@@ -844,6 +849,7 @@ class PasskeyAuthenticationVerifyView(APIView):
                 signature=request.data.get("signature"),
                 user_handle=request.data.get("userHandle"),
                 ip_address=get_client_ip(request),
+                browser_binding=browser_binding,
             )
 
             # Create JWT tokens and set auth cookies (same as regular login)

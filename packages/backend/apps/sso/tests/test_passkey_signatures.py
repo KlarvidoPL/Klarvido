@@ -97,6 +97,8 @@ def test_invalid_signature_is_rejected(signature_policy, public_key_cose, signed
 def test_login_requires_valid_signature(signature_policy, user, public_key_cose, signed_assertion, valid_signature):
     cache.clear()
     client = APIClient()
+    token = client.get('/api/auth/csrf/').json()['csrfToken']
+    client.credentials(HTTP_X_CSRFTOKEN=token)
     passkey = UserPasskeyFactory(user=user, public_key=encode(public_key_cose))
     options = client.post('/api/sso/passkeys/authenticate/options', {'email': user.email}, format='json')
     assert options.status_code == 200

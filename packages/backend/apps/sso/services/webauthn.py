@@ -13,6 +13,7 @@ import base64
 import hashlib
 import json
 import logging
+import secrets
 from typing import Dict, Any, Tuple, List
 from urllib.parse import urlparse
 
@@ -466,6 +467,7 @@ class WebAuthnService:
     def create_authentication_options(
         self,
         user_verification: str = "required",
+        browser_binding: str = "",
     ) -> Tuple[Dict[str, Any], str]:
         """
         Create authentication options for passkey login.
@@ -485,7 +487,8 @@ class WebAuthnService:
             ttl_seconds=self.CHALLENGE_TTL,
         )
         challenge_record.user_verification = user_verification
-        challenge_record.save(update_fields=["user_verification"])
+        challenge_record.browser_binding = browser_binding
+        challenge_record.save(update_fields=["user_verification", "browser_binding"])
 
         options = {
             "challenge": challenge_record.challenge,
@@ -522,6 +525,7 @@ class WebAuthnService:
         user_handle: str = None,
         ip_address: str = None,
         challenge_type: str = "authentication",
+        browser_binding: str = None,
     ) -> Tuple[User, UserPasskey]:
         """
         Verify an authentication response with full cryptographic validation.
@@ -561,6 +565,7 @@ class WebAuthnService:
                     user_handle,
                     ip_address,
                     challenge_type,
+                    browser_binding,
                 )
             except ValueError as exc:
                 error = exc
@@ -588,6 +593,7 @@ class WebAuthnService:
         user_handle,
         ip_address,
         challenge_type,
+        browser_binding,
     ):
         # Match the management flow's lock order: challenge, then credential.
         challenge_record = (
@@ -632,6 +638,22 @@ class WebAuthnService:
             raise ValueError("Credential owner does not match challenge")
         if self.user is not None and self.user.pk != user.pk:
             raise ValueError("Credential owner does not match user")
+
+        # HTTP login requires a binding, including for challenges issued before
+        # this protection existed. Bound challenges cannot be used by direct callers.
+        if (browser_binding is not None or challenge_record.browser_binding) and (
+            not browser_binding
+            or not challenge_record.browser_binding
+            or not secrets.compare_digest(browser_binding, challenge_record.browser_binding)
+        ):
+            SSOAuditLog.log_event(
+                event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED,
+                user=user,
+                description="Passkey authentication rejected: browser binding mismatch",
+                ip_address=ip_address,
+                success=False,
+            )
+            raise ValueError("Authentication failed")
 
         # Discoverable credentials must identify their owner; identified-user flows
         # may omit the handle, but any supplied handle must still match the owner.

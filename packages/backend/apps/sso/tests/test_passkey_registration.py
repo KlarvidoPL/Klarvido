@@ -124,6 +124,8 @@ def test_enrollment_stores_verified_cose_key_and_can_login(user, enrollment, leg
     assert SSOAuditLog.objects.filter(user=user, event_type=SSOAuditEventType.PASSKEY_REGISTERED).exists()
 
     anonymous_client = APIClient()
+    token = anonymous_client.get('/api/auth/csrf/').json()['csrfToken']
+    anonymous_client.credentials(HTTP_X_CSRFTOKEN=token)
     options = anonymous_client.post('/api/sso/passkeys/authenticate/options', {}, format='json')
     assert options.status_code == 200
     auth_data = hashlib.sha256(WebAuthnService().rp_id.encode()).digest() + b'\x05' + (10).to_bytes(4, 'big')

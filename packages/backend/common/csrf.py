@@ -1,9 +1,16 @@
 """CSRF protection for cookie-authenticated APIs and browser authentication flows."""
 
+import hashlib
 from urllib.parse import urlsplit
 
 from django.conf import settings
-from django.middleware.csrf import get_token
+from django.middleware.csrf import (
+    CSRF_TOKEN_LENGTH,
+    InvalidTokenFormat,
+    _check_token_format,
+    _unmask_cipher_token,
+    get_token,
+)
 from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
@@ -29,14 +36,14 @@ def trusted_origin(request):
     return origin in [own_origin, *settings.CSRF_TRUSTED_ORIGINS]
 
 
-def enforce_api_csrf(request, explicit_credential=False):
+def enforce_api_csrf(request, explicit_credential=False, allow_bearer=True):
     if request.method in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
         return
     has_auth_cookie = any(
         request.COOKIES.get(name) for name in (settings.ACCESS_TOKEN_COOKIE, settings.REFRESH_TOKEN_COOKIE)
     )
     if not has_auth_cookie:
-        if request.headers.get('Authorization', '').startswith('Bearer '):
+        if allow_bearer and request.headers.get('Authorization', '').startswith('Bearer '):
             return  # Explicit credentials cannot be attached by a cross-site HTML form.
         if (
             explicit_credential
@@ -58,3 +65,20 @@ def enforce_api_csrf(request, explicit_credential=False):
     reason = check.process_view(request, None, (), {})
     if reason:
         raise PermissionDenied('CSRF verification failed.', code='csrf_failed')
+
+
+def browser_csrf_binding(request):
+    """Require browser CSRF proof and bind a ceremony to its underlying secret.
+
+    Masked bootstrap tokens may change while their cookie secret stays the same.
+    The cookie-blocked fallback still requires a trusted Origin and custom header.
+    """
+    enforce_api_csrf(request, allow_bearer=False)
+    token = request.headers.get('X-CSRFToken', '')
+    try:
+        _check_token_format(token)
+    except InvalidTokenFormat:
+        raise PermissionDenied('CSRF verification failed.', code='csrf_failed')
+    if len(token) == CSRF_TOKEN_LENGTH:
+        token = _unmask_cipher_token(token)
+    return hashlib.sha256(token.encode()).hexdigest()

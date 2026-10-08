@@ -15,7 +15,7 @@ from django.core.cache import cache
 from django.db import connections
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog, SSOSession, UserPasskey, WebAuthnChallenge
@@ -37,7 +37,9 @@ def assertion(user):
     numbers = private_key.public_key().public_numbers()
     public_key = cbor2.dumps({1: 2, 3: -7, -1: 1, -2: numbers.x.to_bytes(32, 'big'), -3: numbers.y.to_bytes(32, 'big')})
     passkey = UserPasskeyFactory(user=user, public_key=encode(public_key))
-    client = APIClient()
+    client = APIClient(enforce_csrf_checks=True)
+    token = client.get('/api/auth/csrf/').json()['csrfToken']
+    client.credentials(HTTP_X_CSRFTOKEN=token)
 
     def build(mode='identified', change=None, sign_count=1):
         options = client.post(
@@ -191,6 +193,7 @@ def authenticate(payload):
         client_data_json=payload['clientDataJSON'],
         signature=payload['signature'],
         user_handle=payload.get('userHandle'),
+        browser_binding=WebAuthnChallenge.objects.get(challenge=payload['challenge']).browser_binding,
     )
 
 
@@ -351,3 +354,109 @@ def test_service_rejects_disabled_owner_even_with_stale_active_user(user, assert
     passkey.refresh_from_db()
     assert challenge.used_at is None
     assert passkey.use_count == 0
+
+
+@pytest.mark.parametrize('endpoint', ['options', 'verify'])
+@pytest.mark.parametrize('proof', ['missing', 'wrong', 'foreign-origin', 'malformed', 'bearer-only'])
+def test_passkey_login_requires_browser_csrf_before_side_effects(user, assertion, endpoint, proof, settings):
+    settings.CSRF_TRUSTED_ORIGINS = [settings.WEB_APP_URL]
+    _, passkey, build = assertion
+    payload, challenge = build()
+    client = APIClient(enforce_csrf_checks=True)
+    token = client.get('/api/auth/csrf/').json()['csrfToken']
+    headers = {'HTTP_ORIGIN': settings.WEB_APP_URL}
+    if proof == 'wrong':
+        headers['HTTP_X_CSRFTOKEN'] = 'a' * 32
+    elif proof == 'foreign-origin':
+        headers.update(HTTP_X_CSRFTOKEN=token, HTTP_ORIGIN='https://attacker.example')
+    elif proof == 'malformed':
+        client.cookies.clear()
+        headers['HTTP_X_CSRFTOKEN'] = 'invalid'
+    elif proof == 'bearer-only':
+        client.cookies.clear()
+        headers['HTTP_AUTHORIZATION'] = f'Bearer {RefreshToken.for_user(user).access_token}'
+    tokens_before = OutstandingToken.objects.count()
+    challenges_before = WebAuthnChallenge.objects.count()
+    response = client.post(
+        f'/api/sso/passkeys/authenticate/{endpoint}',
+        {'email': user.email} if endpoint == 'options' else payload,
+        format='json',
+        **headers,
+    )
+    assert response.status_code == 403
+    assert response.json()['code'] == 'csrf_failed'
+    assert OutstandingToken.objects.count() == tokens_before
+    assert WebAuthnChallenge.objects.count() == challenges_before
+    assert not SSOSession.objects.filter(user=user).exists()
+    assert not any(
+        name in response.cookies
+        for name in (settings.ACCESS_TOKEN_COOKIE, settings.REFRESH_TOKEN_COOKIE, settings.SESSION_ID_COOKIE)
+    )
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.use_count == 0
+
+
+@pytest.mark.parametrize('cookies_blocked', [False, True])
+def test_valid_assertion_from_another_browser_is_rejected(assertion, settings, cookies_blocked):
+    settings.CSRF_TRUSTED_ORIGINS = [settings.WEB_APP_URL]
+    client, passkey, build = assertion
+    payload, challenge = build()
+    other = APIClient(enforce_csrf_checks=True)
+    token = other.get('/api/auth/csrf/').json()['csrfToken']
+    if cookies_blocked:
+        other.cookies.clear()
+    tokens_before = OutstandingToken.objects.count()
+    response = other.post(
+        '/api/sso/passkeys/authenticate/verify',
+        payload,
+        format='json',
+        HTTP_ORIGIN=settings.WEB_APP_URL,
+        HTTP_X_CSRFTOKEN=token,
+    )
+    assert response.status_code == 400
+    assert response.data == {'error': 'Authentication failed', 'code': 'verification_failed'}
+    assert OutstandingToken.objects.count() == tokens_before
+    assert not SSOSession.objects.filter(user=passkey.user).exists()
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.use_count == 0 and passkey.is_active
+    assert SSOAuditLog.objects.filter(
+        user=passkey.user, event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED, success=False
+    ).exists()
+    # A failed cross-browser attempt does not consume the original browser's challenge.
+    assert client.post('/api/sso/passkeys/authenticate/verify', payload, format='json').status_code == 200
+
+
+@pytest.mark.parametrize('cookies_blocked', [False, True])
+def test_browser_bound_login_supports_cookie_and_cookie_blocked_flows(assertion, settings, cookies_blocked):
+    settings.CSRF_TRUSTED_ORIGINS = [settings.WEB_APP_URL]
+    client, _, build = assertion
+    token = client.get('/api/auth/csrf/').json()['csrfToken']
+    client.credentials(HTTP_ORIGIN=settings.WEB_APP_URL, HTTP_X_CSRFTOKEN=token)
+    if cookies_blocked:
+        client.cookies.clear()
+    payload, challenge = build()
+    assert len(challenge.browser_binding) == 64
+    assert challenge.browser_binding != token
+    if not cookies_blocked:
+        # Django issues a new mask each time; the underlying browser secret is unchanged.
+        refreshed = client.get('/api/auth/csrf/').json()['csrfToken']
+        assert refreshed != token
+        client.credentials(HTTP_ORIGIN=settings.WEB_APP_URL, HTTP_X_CSRFTOKEN=refreshed)
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 200
+    assert response.data['access'] and response.data['refresh']
+
+
+def test_legacy_unbound_challenge_cannot_login_over_http(assertion):
+    client, _, build = assertion
+    payload, challenge = build()
+    challenge.browser_binding = ''
+    challenge.save(update_fields=['browser_binding'])
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 400
+    challenge.refresh_from_db()
+    assert challenge.used_at is None

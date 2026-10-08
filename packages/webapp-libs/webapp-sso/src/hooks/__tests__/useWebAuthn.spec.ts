@@ -212,3 +212,69 @@ describe('useWebAuthn', () => {
     });
   });
 });
+
+it('includes API cookies for both browser-bound login requests', async () => {
+  const support = Object.getOwnPropertyDescriptor(
+    window,
+    'PublicKeyCredential',
+  );
+  const credentials = Object.getOwnPropertyDescriptor(navigator, 'credentials');
+  Object.defineProperty(window, 'PublicKeyCredential', {
+    configurable: true,
+    value: jest.fn(),
+  });
+  Object.defineProperty(navigator, 'credentials', {
+    configurable: true,
+    value: {
+      get: jest.fn().mockResolvedValue({
+        rawId: new Uint8Array([1]).buffer,
+        response: {
+          authenticatorData: new Uint8Array([2]).buffer,
+          clientDataJSON: new Uint8Array([3]).buffer,
+          signature: new Uint8Array([4]).buffer,
+          userHandle: new Uint8Array([5]).buffer,
+        },
+      }),
+    },
+  });
+  const fetchMock = jest.mocked(csrfFetch);
+  fetchMock
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        challenge: 'AQ',
+        rpId: 'localhost',
+        timeout: 60000,
+        userVerification: 'required',
+      }),
+    } as Response)
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ access: 'access', refresh: 'refresh' }),
+    } as Response);
+  try {
+    const { result } = renderHook(() => useWebAuthn());
+    await act(async () => {
+      expect(await result.current.authenticateWithPasskey()).toEqual({
+        access: 'access',
+        refresh: 'refresh',
+      });
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toEqual(
+      expect.stringContaining('/authenticate/options'),
+    );
+    expect(fetchMock.mock.calls[1][0]).toEqual(
+      expect.stringContaining('/authenticate/verify'),
+    );
+    for (const [, init] of fetchMock.mock.calls)
+      expect(init?.credentials).toBe('include');
+  } finally {
+    if (support) Object.defineProperty(window, 'PublicKeyCredential', support);
+    else Reflect.deleteProperty(window, 'PublicKeyCredential');
+    if (credentials)
+      Object.defineProperty(navigator, 'credentials', credentials);
+    else Reflect.deleteProperty(navigator, 'credentials');
+    fetchMock.mockReset();
+  }
+});
