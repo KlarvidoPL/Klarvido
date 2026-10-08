@@ -51,7 +51,8 @@ class WebAuthnService:
 
     Security Configuration (settings.py):
     - WEBAUTHN_ALLOW_ORIGIN_MISMATCH: Allow origin mismatch for local development (default: False)
-    - WEBAUTHN_STRICT_SIGN_COUNT: Reject authentications with sign count anomalies (default: True)
+    - WEBAUTHN_STRICT_SIGN_COUNT: Reject sign-count anomalies when enabled (default: False).
+      Synced passkeys may use zero counters.
     """
 
     # Challenge TTL in seconds
@@ -111,15 +112,11 @@ class WebAuthnService:
         # Check for explicit development override (NOT based on DEBUG setting)
         allow_mismatch = getattr(settings, "WEBAUTHN_ALLOW_ORIGIN_MISMATCH", False)
 
-        if allow_mismatch:
-            logger.warning(
-                f"SECURITY: Origin mismatch allowed (WEBAUTHN_ALLOW_ORIGIN_MISMATCH=True): "
-                f"expected one of {allowed_origins}, got {actual_origin}. "
-                f"This should NEVER be enabled in production!"
-            )
+        if allow_mismatch and settings.DEBUG and getattr(settings, "ENVIRONMENT_NAME", "") == "local":
+            logger.warning("WebAuthn development origin override used")
             return True
 
-        logger.error(f"WebAuthn origin verification failed: expected one of {allowed_origins}, got {actual_origin}")
+        logger.warning("WebAuthn origin rejected")
         raise ValueError("Origin verification failed")
 
     def _parse_cose_key(self, cose_key_bytes: bytes) -> Dict[str, Any]:
@@ -455,7 +452,7 @@ class WebAuthnService:
             user=self.user,
             description=f'Passkey "{name}" registered',
             ip_address=ip_address,
-            metadata={"credential_id_prefix": credential_id[:8]},
+            metadata={"passkey_id": str(passkey.pk)},
         )
 
         return passkey
@@ -464,6 +461,7 @@ class WebAuthnService:
     # Authentication Flow
     # ==================
 
+    @transaction.atomic
     def create_authentication_options(
         self,
         user_verification: str = "required",
@@ -568,6 +566,18 @@ class WebAuthnService:
                     browser_binding,
                 )
             except ValueError as exc:
+                owner = self.user
+                if owner is None and isinstance(credential_id, str) and len(credential_id) <= 2048:
+                    credential = UserPasskey.objects.select_related('user').filter(credential_id=credential_id).first()
+                    owner = credential.user if credential else None
+                SSOAuditLog.log_event(
+                    event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED,
+                    user=owner,
+                    description="Passkey assertion rejected",
+                    ip_address=ip_address,
+                    success=False,
+                    metadata={"operation": "authentication", "reason": "assertion_rejected"},
+                )
                 error = exc
             else:
                 user, passkey, challenge_record, new_sign_count = result
@@ -622,13 +632,6 @@ class WebAuthnService:
         # An active credential must never authenticate a disabled account.
         # Read the owner from the database rather than trusting self.user.
         if not user.is_active:
-            SSOAuditLog.log_event(
-                event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED,
-                user=user,
-                description="Passkey authentication rejected: account inactive",
-                ip_address=ip_address,
-                success=False,
-            )
             raise ValueError("Authentication failed")
 
         if not challenge_record.is_valid:
@@ -646,13 +649,6 @@ class WebAuthnService:
             or not challenge_record.browser_binding
             or not secrets.compare_digest(browser_binding, challenge_record.browser_binding)
         ):
-            SSOAuditLog.log_event(
-                event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED,
-                user=user,
-                description="Passkey authentication rejected: browser binding mismatch",
-                ip_address=ip_address,
-                success=False,
-            )
             raise ValueError("Authentication failed")
 
         # Discoverable credentials must identify their owner; identified-user flows
@@ -727,14 +723,6 @@ class WebAuthnService:
             logger.debug(f"WebAuthn signature verification successful for user {user.email}")
         except ValueError:
             # Log the authentication failure
-            SSOAuditLog.log_event(
-                event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED,
-                user=user,
-                description="Passkey authentication failed: signature verification failed",
-                ip_address=ip_address,
-                success=False,
-                metadata={"credential_id_prefix": credential_id[:8] if credential_id else "unknown"},
-            )
             raise ValueError("Authentication failed: signature verification failed")
 
         new_sign_count = parsed_auth_data.sign_count

@@ -375,23 +375,68 @@ class UserPasskeySerializer(serializers.ModelSerializer):
         ]
 
 
-class RegisterPasskeySerializer(serializers.Serializer):
-    """Serializer for passkey registration."""
+class PasskeyTextField(serializers.CharField):
+    """Reject coercion of numbers/containers and bound strings before decoding."""
 
-    name = serializers.CharField(max_length=255)
-    credential_id = serializers.CharField()
-    attestation_object = serializers.CharField()
-    client_data_json = serializers.CharField()
-    transports = serializers.ListField(child=serializers.CharField(), required=False, default=list)
+    def to_internal_value(self, data):
+        if not isinstance(data, str):
+            self.fail("invalid")
+        return super().to_internal_value(data)
+
+
+class PasskeyBooleanField(serializers.BooleanField):
+    def to_internal_value(self, data):
+        if not isinstance(data, bool):
+            self.fail("invalid")
+        return super().to_internal_value(data)
+
+
+class PasskeyRegistrationOptionsSerializer(serializers.Serializer):
+    userVerification = serializers.ChoiceField(choices=['required', 'preferred', 'discouraged'], default='required')
+    authenticatorAttachment = serializers.ChoiceField(
+        choices=['platform', 'cross-platform'], required=False, allow_null=True
+    )
+    requireResidentKey = PasskeyBooleanField(default=True)
+
+    def validate_requireResidentKey(self, value):
+        if not value:
+            raise serializers.ValidationError("Discoverable credentials are required")
+        return value
+
+
+class RegisterPasskeySerializer(serializers.Serializer):
+    challenge = PasskeyTextField(max_length=128, trim_whitespace=False)
+    name = PasskeyTextField(max_length=255, default='My Passkey')
+    credentialId = PasskeyTextField(max_length=2048, trim_whitespace=False)
+    attestationObject = PasskeyTextField(max_length=65536, trim_whitespace=False)
+    clientDataJSON = PasskeyTextField(max_length=8192, trim_whitespace=False)
+    transports = serializers.ListField(
+        child=serializers.ChoiceField(choices=['usb', 'nfc', 'ble', 'internal', 'hybrid', 'smart-card']),
+        max_length=6,
+        required=False,
+        default=list,
+    )
 
 
 class VerifyPasskeySerializer(serializers.Serializer):
-    """Serializer for passkey verification during authentication."""
+    challenge = PasskeyTextField(max_length=128, trim_whitespace=False)
+    credentialId = PasskeyTextField(max_length=2048, trim_whitespace=False)
+    authenticatorData = PasskeyTextField(max_length=32768, trim_whitespace=False)
+    clientDataJSON = PasskeyTextField(max_length=8192, trim_whitespace=False)
+    signature = PasskeyTextField(max_length=2048, trim_whitespace=False)
+    userHandle = PasskeyTextField(
+        max_length=128, required=False, allow_null=True, allow_blank=True, trim_whitespace=False
+    )
 
-    credential_id = serializers.CharField()
-    authenticator_data = serializers.CharField()
-    client_data_json = serializers.CharField()
-    signature = serializers.CharField()
+
+class PasskeyManagementOptionsSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=['register', 'delete'])
+    passkeyId = PasskeyTextField(max_length=255, required=False)
+
+
+class PasskeyPasswordProofSerializer(PasskeyManagementOptionsSerializer):
+    password = PasskeyTextField(max_length=4096, trim_whitespace=False)
+    otpToken = PasskeyTextField(max_length=16, required=False, allow_blank=True, trim_whitespace=False)
 
 
 class SSOAuditLogSerializer(serializers.ModelSerializer):

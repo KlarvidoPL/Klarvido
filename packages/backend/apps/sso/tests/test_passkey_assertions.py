@@ -515,3 +515,38 @@ def test_passkey_session_failure_rolls_back_authentication(assertion, monkeypatc
     # The same valid assertion can be retried after session storage recovers.
     monkeypatch.undo()
     assert client.post('/api/sso/passkeys/authenticate/verify', payload, format='json').status_code == 200
+
+
+@pytest.mark.parametrize('change', ['origin', 'challenge', 'type', 'rp-hash', 'missing-up', 'missing-uv'])
+def test_rejected_assertion_has_private_structured_failure_audit(assertion, change):
+    client, passkey, build = assertion
+    payload, challenge = build(change=change)
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 400
+    assert response.data['error'] == 'Authentication failed'
+    events = SSOAuditLog.objects.filter(user=passkey.user, event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED)
+    assert events.count() == 1
+    event = events.get()
+    assert not event.success
+    assert event.metadata == {'operation': 'authentication', 'reason': 'assertion_rejected'}
+    assert payload['signature'] not in response.content.decode()
+    assert payload['credentialId'] not in str(event.metadata)
+    challenge.refresh_from_db()
+    assert challenge.used_at is None
+
+
+def test_internal_verification_error_is_not_exposed(assertion, monkeypatch):
+    client, passkey, build = assertion
+    payload, _ = build()
+
+    def reject(*args, **kwargs):
+        raise ValueError('Internal parser detail: PRIVATE-ASSERTION')
+
+    monkeypatch.setattr(WebAuthnService, '_verify_authentication_locked', reject)
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 400
+    assert response.data == {'error': 'Authentication failed', 'code': 'verification_failed'}
+    assert b'PRIVATE-ASSERTION' not in response.content
+    event = SSOAuditLog.objects.get(user=passkey.user, event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED)
+    assert 'PRIVATE-ASSERTION' not in str(event.metadata)
+    assert not event.error_message

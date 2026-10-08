@@ -26,7 +26,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework import status
-from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError, ParseError, Throttled
 
 from django.db import models, transaction
 from graphql_relay import from_global_id
@@ -39,6 +39,16 @@ from apps.users.utils import set_auth_cookie
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
 
+from .exceptions import PasskeyChallengeCapacityExceeded
+from . import serializers as passkey_serializers
+from .passkey_security import (
+    PasskeyJSONParser,
+    PasskeyIPThrottle,
+    PasskeyAccountThrottle,
+    validate_request,
+    audit_failure,
+    client_ip,
+)
 from .models import TenantSSOConnection, SCIMToken, SSOAuditLog, UserPasskey, WebAuthnChallenge
 from .renderers import SCIMRenderer, SCIMParser
 from .constants import SSOConnectionStatus, SSOAuditEventType
@@ -73,10 +83,8 @@ class SSODiscoveryThrottle(AnonRateThrottle):
     rate = "60/minute"
 
 
-class PasskeyAuthThrottle(AnonRateThrottle):
-    """Rate limit for passkey authentication attempts."""
-
-    rate = "10/minute"
+class PasskeyAuthThrottle(PasskeyIPThrottle):
+    """Use the central auth.passkey limit for every requesting IP."""
 
 
 class SCIMApiThrottle(UserRateThrottle):
@@ -673,39 +681,59 @@ class SCIMGroupDetailView(APIView):
 # ==================
 
 
-class PasskeyManagementThrottle(UserRateThrottle):
-    scope = "passkey_management"
-    rate = "10/minute"
+class PasskeyManagementThrottle(PasskeyAccountThrottle):
+    """Share account limits across authentication and management."""
 
 
-class PasskeyReauthenticationOptionsView(APIView):
+class PasskeyAPIView(APIView):
+    # Keep the global throttles in addition to the passkey-specific limits.
+    throttle_classes = [PasskeyAuthThrottle, PasskeyAccountThrottle, *APIView.throttle_classes]
+    parser_classes = [PasskeyJSONParser]
+    operation = 'authentication'
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        length = request.META.get('CONTENT_LENGTH', '')
+        if length and (not length.isdecimal() or int(length) > 131072):
+            raise ValidationError({'non_field_errors': ['Invalid passkey request']})
+
+    def handle_exception(self, exc):
+        if isinstance(exc, PasskeyChallengeCapacityExceeded):
+            exc = Throttled(wait=300, detail="Passkey challenge capacity reached")
+        if isinstance(exc, ParseError):
+            exc = ParseError("Invalid passkey request")
+        if isinstance(exc, (ValidationError, ParseError)):
+            audit_failure(self.request, self.operation)
+        return super().handle_exception(exc)
+
+
+class PasskeyReauthenticationOptionsView(PasskeyAPIView):
     permission_classes = [IsAuthenticated]
-    throttle_classes = [PasskeyManagementThrottle]
 
     def post(self, request):
         try:
-            return Response(passkey_management.passkey_options(request.user, request.data))
+            data = validate_request(passkey_serializers.PasskeyManagementOptionsSerializer, request)
+            return Response(passkey_management.passkey_options(request.user, data))
         except ValueError:
             return Response({"error": "Fresh authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PasskeyReauthenticationVerifyView(APIView):
+class PasskeyReauthenticationVerifyView(PasskeyAPIView):
     permission_classes = [IsAuthenticated]
-    throttle_classes = [PasskeyManagementThrottle]
 
     def post(self, request):
         try:
-            if not isinstance(request.data, dict):
-                raise ValidationError("Invalid authentication request")
-            if request.data.get("challenge"):
-                token = passkey_management.passkey_grant(request.user, request.data, get_client_ip(request))
+            if isinstance(request.data, dict) and request.data.get("challenge"):
+                data = validate_request(passkey_serializers.VerifyPasskeySerializer, request)
+                token = passkey_management.passkey_grant(request.user, data, client_ip(request))
             else:
-                token = passkey_management.password_grant(request.user, request.data)
+                data = validate_request(passkey_serializers.PasskeyPasswordProofSerializer, request)
+                token = passkey_management.password_grant(request.user, data)
         except (ValueError, PermissionDenied, ValidationError):
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.PASSKEY_REAUTH_FAILED,
                 user=request.user,
-                ip_address=get_client_ip(request),
+                ip_address=client_ip(request),
                 success=False,
                 description="Passkey management authentication failed",
             )
@@ -713,7 +741,7 @@ class PasskeyReauthenticationVerifyView(APIView):
         SSOAuditLog.log_event(
             event_type=SSOAuditEventType.PASSKEY_REAUTH_SUCCESS,
             user=request.user,
-            ip_address=get_client_ip(request),
+            ip_address=client_ip(request),
             description="Passkey management authentication succeeded",
             metadata={"method": "passkey" if request.data.get("challenge") else "password"},
         )
@@ -722,13 +750,16 @@ class PasskeyReauthenticationVerifyView(APIView):
         return response
 
 
-class PasskeyRegistrationOptionsView(APIView):
+class PasskeyRegistrationOptionsView(PasskeyAPIView):
     """Get options for passkey registration."""
+
+    operation = "registration"
 
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic
     def post(self, request):
+        data = validate_request(passkey_serializers.PasskeyRegistrationOptionsSerializer, request)
         grant = passkey_management.require_grant(request, request.user, "register")
         if grant.registration_challenge_id is not None:
             raise PermissionDenied("Fresh authentication required")
@@ -736,39 +767,46 @@ class PasskeyRegistrationOptionsView(APIView):
 
         try:
             options, challenge = webauthn_service.create_registration_options(
-                user_verification=request.data.get("userVerification", "preferred"),
-                authenticator_attachment=request.data.get("authenticatorAttachment"),
-                require_resident_key=request.data.get("requireResidentKey", True),
+                user_verification=data["userVerification"],
+                authenticator_attachment=data.get("authenticatorAttachment"),
+                require_resident_key=data["requireResidentKey"],
             )
-        except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            audit_failure(request, "registration", "invalid_options")
+            return Response({"error": "Invalid passkey options"}, status=status.HTTP_400_BAD_REQUEST)
 
         grant.registration_challenge = WebAuthnChallenge.objects.get(challenge=challenge)
         grant.save(update_fields=["registration_challenge"])
         return Response(options)
 
 
-class PasskeyRegistrationVerifyView(APIView):
+class PasskeyRegistrationVerifyView(PasskeyAPIView):
     """Verify passkey registration."""
+
+    operation = "registration"
 
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic
     def post(self, request):
         grant = passkey_management.require_grant(
-            request, request.user, "register", challenge=request.data.get("challenge") or ""
+            request,
+            request.user,
+            "register",
+            challenge=request.data.get("challenge") if isinstance(request.data, dict) else "",
         )
+        data = validate_request(passkey_serializers.RegisterPasskeySerializer, request)
         webauthn_service = WebAuthnService(request.user)
 
         try:
             passkey = webauthn_service.verify_registration(
-                challenge=request.data.get("challenge"),
-                credential_id=request.data.get("credentialId"),
-                attestation_object=request.data.get("attestationObject"),
-                client_data_json=request.data.get("clientDataJSON"),
-                name=request.data.get("name", "My Passkey"),
-                transports=request.data.get("transports", []),
-                ip_address=get_client_ip(request),
+                challenge=data.get("challenge"),
+                credential_id=data.get("credentialId"),
+                attestation_object=data.get("attestationObject"),
+                client_data_json=data.get("clientDataJSON"),
+                name=data.get("name", "My Passkey"),
+                transports=data.get("transports", []),
+                ip_address=client_ip(request),
             )
 
             passkey_management.consume_grant(grant)
@@ -781,17 +819,24 @@ class PasskeyRegistrationVerifyView(APIView):
             )
 
         except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            audit_failure(request, "registration", "verification_failed")
+            message = (
+                "Passkey is already registered"
+                if str(e) == "Passkey is already registered"
+                else "Passkey registration verification failed"
+            )
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PasskeyAuthenticationOptionsView(APIView):
+class PasskeyAuthenticationOptionsView(PasskeyAPIView):
     """Get options for passkey authentication with rate limiting."""
 
     permission_classes = [AllowAny]
-    throttle_classes = [PasskeyAuthThrottle]
 
     def post(self, request):
         browser_binding = browser_csrf_binding(request)
+        if not isinstance(request.data, dict):
+            raise ValidationError({"non_field_errors": ["Invalid passkey request"]})
         # Public login is always discoverable: never resolve emails or disclose
         # credential IDs, transports, or whether an account exists.
         webauthn_service = WebAuthnService()
@@ -818,26 +863,26 @@ PASSKEY_AUTH_ERROR_CODES = {
 }
 
 
-class PasskeyAuthenticationVerifyView(APIView):
+class PasskeyAuthenticationVerifyView(PasskeyAPIView):
     """Verify passkey authentication with rate limiting."""
 
     permission_classes = [AllowAny]
-    throttle_classes = [PasskeyAuthThrottle]
 
     @transaction.atomic
     def post(self, request):
         browser_binding = browser_csrf_binding(request)
+        data = validate_request(passkey_serializers.VerifyPasskeySerializer, request)
         webauthn_service = WebAuthnService()
 
         try:
             user, passkey = webauthn_service.verify_authentication(
-                challenge=request.data.get("challenge"),
-                credential_id=request.data.get("credentialId"),
-                authenticator_data=request.data.get("authenticatorData"),
-                client_data_json=request.data.get("clientDataJSON"),
-                signature=request.data.get("signature"),
-                user_handle=request.data.get("userHandle"),
-                ip_address=get_client_ip(request),
+                challenge=data.get("challenge"),
+                credential_id=data.get("credentialId"),
+                authenticator_data=data.get("authenticatorData"),
+                client_data_json=data.get("clientDataJSON"),
+                signature=data.get("signature"),
+                user_handle=data.get("userHandle"),
+                ip_address=client_ip(request),
                 browser_binding=browser_binding,
             )
 
@@ -874,8 +919,8 @@ class PasskeyAuthenticationVerifyView(APIView):
             message = str(e)
             code = PASSKEY_AUTH_ERROR_CODES.get(message, "verification_failed")
             if code == "verification_failed":
-                logger.warning("Unrecognized passkey verification error: %s", message)
-            return Response({"error": message, "code": code}, status=status.HTTP_400_BAD_REQUEST)
+                logger.warning("Passkey verification rejected")
+            return Response({"error": "Authentication failed", "code": code}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasskeyListView(APIView):
@@ -918,7 +963,7 @@ class PasskeyDeleteView(APIView):
         try:
             webauthn_service.delete_passkey(
                 passkey_id,
-                ip_address=get_client_ip(request),
+                ip_address=client_ip(request),
             )
             passkey_management.consume_grant(grant)
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -1339,3 +1384,26 @@ class SCIMTokenDetailView(APIView):
         )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PersonalPasskeyHistoryView(APIView):
+    """Personal security history never inherits tenant visibility or returns proofs."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        events = SSOAuditLog.objects.filter(user=request.user, event_type__startswith='passkey_').order_by(
+            '-created_at'
+        )[:100]
+        response = Response(
+            [
+                {
+                    'eventType': event.event_type,
+                    'createdAt': event.created_at.isoformat(),
+                    'success': event.success,
+                }
+                for event in events
+            ]
+        )
+        response['Cache-Control'] = 'no-store'
+        return response

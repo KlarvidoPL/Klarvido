@@ -16,7 +16,7 @@ Passkeys are a passwordless authentication method based on the WebAuthn standard
 - **Device PIN**: As a fallback
 
 :::info
-Passkeys are resistant to phishing attacks because they're bound to specific domains and can't be stolen or reused.
+Passkeys resist phishing because the browser binds authentication to the relying party domain.
 :::
 
 ## Prerequisites
@@ -98,8 +98,8 @@ Do not re-enable signature bypasses or convert unverified legacy keys to restore
 
 Passwordless login requires authenticator user presence and user verification (for example,
 biometrics or a device PIN). The backend enforces both flags and the RP ID hash, regardless
-of a client's requested verification preference. Email-based challenges accept only that
-user's credentials. Username-less assertions must include the credential owner's user handle;
+of a client's requested verification preference. Public login always uses discoverable
+credentials and never looks up an email or exposes credential IDs. Assertions must include the credential owner's user handle;
 any supplied handle is checked against the owner. Cross-origin assertions are rejected.
 
 ## Implementation Details
@@ -110,10 +110,13 @@ any supplied handle is checked against the owner. Cross-origin assertions are re
 import { useWebAuthn } from '@sb/webapp-sso/hooks';
 
 function RegisterPasskey() {
-  const { isSupported, isRegistering, registerPasskey, error } = useWebAuthn();
+  const { isSupported, isRegistering, registerPasskey, authorizePasskeyChange, error } = useWebAuthn();
 
   const handleRegister = async () => {
-    const success = await registerPasskey('My MacBook');
+    // Verify an existing passkey before adding another one. For a first passkey,
+    // use PasskeysManager, which also supports password/OTP verification.
+    const authorization = await authorizePasskeyChange('register');
+    const success = await registerPasskey('My MacBook', authorization);
     if (success) {
       // Passkey registered successfully
     }
@@ -140,10 +143,9 @@ function PasskeyLogin() {
   const { authenticateWithPasskey, isAuthenticating, error } = useWebAuthn();
 
   const handleLogin = async () => {
-    const tokens = await authenticateWithPasskey();
-    if (tokens) {
-      // Store tokens and redirect
-      localStorage.setItem('access_token', tokens.access);
+    const result = await authenticateWithPasskey();
+    if (result?.success) {
+      // The server has set HttpOnly authentication cookies.
       window.location.href = '/dashboard';
     }
   };
@@ -160,7 +162,7 @@ function PasskeyLogin() {
 
 ### Credential Storage
 
-- Private keys never leave the device
+- The app never receives private keys; authenticators/passkey providers manage them
 - Only public keys are stored on the server
 - Credentials are bound to your domain
 
@@ -225,8 +227,10 @@ mutation DeletePasskey($input: DeletePasskeyMutationInput!) {
 | `/api/sso/passkeys/register/verify` | POST | Verify registration |
 | `/api/sso/passkeys/authenticate/options` | POST | Get auth options |
 | `/api/sso/passkeys/authenticate/verify` | POST | Verify auth |
-| `/api/sso/passkeys/` | GET | List user's passkeys |
-| `/api/sso/passkeys/{id}` | DELETE | Delete user's passkey |
+| `/api/sso/passkeys/history` | GET | Last 100 personal passkey security events |
+
+List, rename and delete passkeys through the authenticated GraphQL operations above.
+Deletion requires the one-use `X-Passkey-Authorization` proof described below.
 
 ## Browser Support
 
@@ -299,3 +303,63 @@ only its hash, and does not issue login tokens or cookies during reauthenticatio
 Deploy both database migrations before enabling these endpoints. Clients using
 the old registration or deletion flow will receive a fresh-authentication error
 until they adopt the verification step.
+
+
+## Passkey security operations
+
+Deploy migrations `0011_webauthnchallenge_sso_challenge_expiry_idx` and
+`0012_passkeymanagementgrant_sso_grant_expiry_idx` with this release.
+They index challenge and fresh-authentication grant expiry for bounded cleanup. No credential or public-key migration is needed.
+
+- Requests are limited to 128 KiB, with strict string types and per-field bounds before cryptographic parsing.
+  Registration requires a discoverable credential; names and transports are bounded and validated.
+- Public errors contain fixed messages and stable error codes. Parser details, credentials, assertions,
+  authentication cookies, and fresh-authentication proofs must never be logged or returned as diagnostics.
+- Login requires a tracked, revocable session and returns only `success`; access and refresh tokens use
+  HttpOnly cookies. Frontend and API must use same-site HTTPS domains or a same-origin API proxy.
+- Passkey login always requires signed user verification and replaces the OTP login step for OTP-enabled
+  accounts. Managing passkeys still requires a new action-bound proof before every addition or removal.
+- Production startup rejects the origin-mismatch override, insecure/noncanonical frontend origins,
+  extra passkey origins, insecure cookies, and a non-shared cache. The RP ID is the frontend hostname.
+  The origin override is available only with `DJANGO_DEBUG=True` and `ENVIRONMENT_NAME=local`.
+- `WEBAUTHN_STRICT_SIGN_COUNT` remains optional: synced passkeys can legitimately use zero counters.
+  Counter anomalies generate audit events; enabling strict enforcement additionally deactivates the credential.
+
+### Rate limits and proxy addresses
+
+`RATE_LIMIT_AUTH_PASSKEY` (default `10/min`) controls atomic Redis fixed-window limits per requesting IP
+and per known account. Signed-in users are also limited, and global API limits remain active.
+Account limits are shared across login and management endpoints and across devices/IPs.
+The Redis cache must be shared by every API worker; cache failures block passkey requests.
+Fixed windows can allow a burst across a window boundary; ingress limits are still needed for traffic floods.
+
+`PASSKEY_TRUSTED_PROXY_COUNT` defaults to `0`, so untrusted `X-Forwarded-For` headers cannot bypass limits.
+Before deploying behind a reverse proxy, set it to the verified number of trusted, appended proxy hops.
+The backend takes that address from the right of the forwarded chain. Confirm this with real ingress
+requests: a forged leftmost header must not change the selected client address. Trust forwarded headers
+only when ingress sanitizes/appends them and direct routes cannot bypass the assumed proxy chain.
+A wrong count can group clients under a proxy's address or permit spoofing. Never guess the value across
+VPS, Render, and CloudFront/ALB, whose chains can differ.
+
+### Challenge retention and capacity
+
+Celery Beat schedules `apps.sso.tasks.cleanup_passkey_challenges` every five minutes.
+Run the existing Beat and worker services on every deployment target, including AWS.
+Expired challenges and their associated unusable grants are removed in batches, with at most 10,000
+challenges and 10,000 expired grants processed per run. Cleanup never removes an unexpired challenge.
+Challenge issuance also reclaims up to 1,000 expired records opportunistically.
+
+`PASSKEY_MAX_CHALLENGES` (default `100000`) caps stored challenges across the deployment;
+`PASSKEY_MAX_USER_CHALLENGES` (default `100`) caps an account's unconsumed, unexpired challenges.
+PostgreSQL transaction locking makes capacity checks exact across workers. A full capacity returns 429
+without creating another challenge. Monitor repeated 429/503 responses and verify cleanup/Redis health.
+
+### Personal security history
+
+`GET /api/sso/passkeys/history` requires the account's authenticated session and returns only its latest
+100 passkey event types, timestamps, and success flags. It excludes credential IDs, signatures, proofs,
+parser errors, IP addresses, names, and tenant data. The response is not cached.
+Organization administrators cannot use this endpoint to view another account's history.
+Registration failures and all assertion failures create structured rejection events; successful registration,
+login, fresh authentication, and removal keep their existing security events. GraphQL removal uses the
+same audited service as REST removal. Tenant-scoped audit views remain scoped to the organization.

@@ -700,6 +700,11 @@ API_URL = env("API_URL", default="http://localhost:5001")
 # Signature verification is mandatory; no compatibility bypass is supported.
 # Allow origin mismatch during development only
 WEBAUTHN_ALLOW_ORIGIN_MISMATCH = env.bool("WEBAUTHN_ALLOW_ORIGIN_MISMATCH", default=IS_LOCAL_DEBUG)
+# Trust forwarded client IPs only when ingress sanitizes X-Forwarded-For.
+# Zero ignores forwarded headers; set the known number of trusted proxy hops.
+PASSKEY_TRUSTED_PROXY_COUNT = env.int("PASSKEY_TRUSTED_PROXY_COUNT", default=0)
+PASSKEY_MAX_CHALLENGES = env.int("PASSKEY_MAX_CHALLENGES", default=100000)
+PASSKEY_MAX_USER_CHALLENGES = env.int("PASSKEY_MAX_USER_CHALLENGES", default=100)
 # Strict sign count verification (detects cloned authenticators)
 WEBAUTHN_STRICT_SIGN_COUNT = env.bool("WEBAUTHN_STRICT_SIGN_COUNT", default=False)
 
@@ -740,6 +745,10 @@ CELERY_BEAT_SCHEDULE = {
     'cleanup-old-backups-daily': {
         'task': 'apps.backup.tasks.cleanup_old_backups',
         'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)
+    },
+    'cleanup-passkey-challenges-every-five-minutes': {
+        'task': 'apps.sso.tasks.cleanup_passkey_challenges',
+        'schedule': 300,
     },
     'cleanup-expired-sessions-daily': {
         'task': 'apps.sso.tasks.cleanup_expired_sessions',

@@ -233,3 +233,37 @@ def test_invalid_registration_policy_is_rejected_before_creating_challenge(user)
     response = client.post('/api/sso/passkeys/register/options', {'userVerification': 'invalid'}, format='json')
     assert response.status_code == 400
     assert not WebAuthnChallenge.objects.filter(user=user).exists()
+
+
+@pytest.mark.parametrize(
+    'field,value',
+    [
+        ('credentialId', 123),
+        ('clientDataJSON', []),
+        ('attestationObject', {'secret': 'private-proof'}),
+        ('name', 'x' * 256),
+        ('transports', 'internal'),
+        ('transports', ['invalid']),
+        ('attestationObject', 'x' * 65537),
+    ],
+)
+def test_registration_fields_are_bounded_and_not_coerced(user, enrollment, field, value):
+    client, challenge, _, _, payload = enrollment
+    data = payload()
+    data[field] = value
+    response = client.post('/api/sso/passkeys/register/verify', data, format='json')
+    assert response.status_code == 400
+    assert b'private-proof' not in response.content
+    assert not UserPasskey.objects.filter(user=user).exists()
+    assert WebAuthnChallenge.objects.get(challenge=challenge).used_at is None
+    event = SSOAuditLog.objects.get(user=user, event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED)
+    assert event.metadata['operation'] == 'registration'
+
+
+@pytest.mark.parametrize('value', [False, 'true', 1, []])
+def test_registration_options_require_boolean_resident_key_policy(enrollment, value):
+    client, _, _, _, _ = enrollment
+    before = WebAuthnChallenge.objects.count()
+    response = client.post('/api/sso/passkeys/register/options', {'requireResidentKey': value}, format='json')
+    assert response.status_code == 400
+    assert WebAuthnChallenge.objects.count() == before
