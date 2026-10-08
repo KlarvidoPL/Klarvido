@@ -39,7 +39,7 @@ from apps.users.utils import set_auth_cookie
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
 
-from .exceptions import PasskeyChallengeCapacityExceeded
+from .exceptions import PasskeyChallengeCapacityExceeded, PasskeyReauthenticationError
 from . import serializers as passkey_serializers
 from .passkey_security import (
     PasskeyJSONParser,
@@ -729,7 +729,7 @@ class PasskeyReauthenticationVerifyView(PasskeyAPIView):
             else:
                 data = validate_request(passkey_serializers.PasskeyPasswordProofSerializer, request)
                 token = passkey_management.password_grant(request.user, data)
-        except (ValueError, PermissionDenied, ValidationError):
+        except (ValueError, PermissionDenied, ValidationError) as error:
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.PASSKEY_REAUTH_FAILED,
                 user=request.user,
@@ -737,6 +737,10 @@ class PasskeyReauthenticationVerifyView(PasskeyAPIView):
                 success=False,
                 description="Passkey management authentication failed",
             )
+            if isinstance(error, PasskeyReauthenticationError):
+                response = Response({'error': 'Fresh authentication failed', 'code': error.reason}, status=403)
+                response['Cache-Control'] = 'no-store'
+                return response
             raise PermissionDenied("Fresh authentication failed")
         SSOAuditLog.log_event(
             event_type=SSOAuditEventType.PASSKEY_REAUTH_SUCCESS,

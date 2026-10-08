@@ -289,7 +289,11 @@ export function useWebAuthn() {
             body: JSON.stringify(target),
           },
         );
-        if (!optionsResponse.ok) throw new Error('Fresh authentication failed');
+        if (!optionsResponse.ok) {
+          throw Object.assign(new Error('Fresh authentication failed'), {
+            code: optionsResponse.status === 429 ? 'rate_limited' : undefined,
+          });
+        }
         const options: AuthenticationOptions = await optionsResponse.json();
         const credential = (await navigator.credentials.get({
           publicKey: {
@@ -328,7 +332,12 @@ export function useWebAuthn() {
           body: JSON.stringify(proof),
         },
       );
-      if (!response.ok) throw new Error('Fresh authentication failed');
+      if (!response.ok) {
+        const failure = await response.json().catch(() => ({}));
+        throw Object.assign(new Error('Fresh authentication failed'), {
+          code: response.status === 429 ? 'rate_limited' : failure.code,
+        });
+      }
       const data = await response.json();
       if (typeof data.authorization !== 'string' || !data.authorization)
         throw new Error('Fresh authentication failed');

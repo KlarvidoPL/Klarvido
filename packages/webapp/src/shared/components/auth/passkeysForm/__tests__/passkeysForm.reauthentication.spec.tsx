@@ -12,7 +12,7 @@ jest.mock('@sb/webapp-tenants/hooks', () => ({
   ...jest.requireActual('@sb/webapp-tenants/hooks'),
   useTenantPasskeys: jest.fn(),
 }));
-jest.mock('@sb/webapp-sso/hooks', () => ({ useWebAuthn: jest.fn() }));
+jest.mock('@sb/webapp-sso/hooks', () => ({ ...jest.requireActual('@sb/webapp-sso/hooks'), useWebAuthn: jest.fn() }));
 
 const authorize = jest.fn();
 const remove = jest.fn();
@@ -108,4 +108,19 @@ it('hides the two-factor field when OTP is disabled and verifies with password a
   await userEvent.type(screen.getByLabelText('Account password'), 'password');
   await userEvent.click(screen.getByRole('button', { name: 'Verify with password' }));
   await waitFor(() => expect(authorize).toHaveBeenCalledWith('delete', 'pk-1', 'password', undefined));
+});
+
+it.each([
+  ['incorrect_password', 'The account password is incorrect.'],
+  ['incorrect_otp', 'The verification code is invalid.'],
+  ['otp_locked', 'Too many incorrect codes. Try again in 15 minutes.'],
+  ['rate_limited', 'Too many verification attempts. Please wait a moment and try again.'],
+])('shows the specific verification failure for %s', async (code, message) => {
+  authorize.mockRejectedValue(Object.assign(new Error('private error detail'), { code }));
+  render(<PasskeysForm />);
+  await userEvent.click(await screen.findByRole('button', { name: 'Remove passkey?' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Verify with an existing passkey' }));
+  expect(await screen.findByText(message)).toBeInTheDocument();
+  expect(screen.queryByText('private error detail')).not.toBeInTheDocument();
+  expect(remove).not.toHaveBeenCalled();
 });

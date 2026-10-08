@@ -12,6 +12,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from apps.users.exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure
 from apps.users.services.otp import validate_otp
 from apps.sso.models import PasskeyManagementGrant, UserPasskey, WebAuthnChallenge
+from apps.sso.exceptions import PasskeyReauthenticationError
 from .webauthn import WebAuthnService
 
 
@@ -48,15 +49,19 @@ def issue_grant(grant):
 def password_grant(user, data):
     action, passkey = action_target(user, data)
     password = data.get("password")
-    if not user.is_active or not isinstance(password, str) or not user.check_password(password):
+    if not user.is_active:
         raise PermissionDenied("Fresh authentication failed")
+    if not isinstance(password, str) or not user.check_password(password):
+        raise PasskeyReauthenticationError('incorrect_password')
     if user.otp_enabled:
         if not isinstance(data.get("otpToken", ""), str):
             raise PermissionDenied("Fresh authentication failed")
         try:
             validate_otp(user, data.get("otpToken", ""))
-        except (OTPVerificationFailure, OTPAttemptLimitExceeded):
-            raise PermissionDenied("Fresh authentication failed")
+        except OTPAttemptLimitExceeded:
+            raise PasskeyReauthenticationError('otp_locked')
+        except OTPVerificationFailure:
+            raise PasskeyReauthenticationError('incorrect_otp')
     grant = PasskeyManagementGrant.objects.create(
         user=user, action=action, passkey=passkey, expires_at=timezone.now() + GRANT_TTL
     )

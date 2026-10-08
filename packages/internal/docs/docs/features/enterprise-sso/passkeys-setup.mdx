@@ -300,6 +300,13 @@ is bound to the registration challenge. GraphQL `deletePasskey` and REST deletio
 apply the same check. Do not persist or log the authorization. The server stores
 only its hash, and does not issue login tokens or cookies during reauthentication.
 
+For authenticated password verification, failures include a stable `code`:
+`incorrect_password`, `incorrect_otp`, or `otp_locked`. Password validation runs
+before OTP validation; wrong passwords do not consume OTP attempts. Five invalid
+OTP codes lock OTP verification for 15 minutes. Endpoint rate limits also apply
+to password attempts and return HTTP 429. Clients translate these codes rather
+than displaying arbitrary server error text.
+
 Deploy the passkey database migrations before enabling these endpoints. Clients using
 the old registration or deletion flow will receive a fresh-authentication error
 until they adopt the verification step.

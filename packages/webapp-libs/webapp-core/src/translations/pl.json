@@ -5776,5 +5776,11 @@
   },
   "Auth / Two-factor / Passkey login policy": {
     "defaultMessage": "Klucz dostępu potwierdzony odciskiem palca, rozpoznaniem twarzy lub kodem PIN urządzenia zastępuje kod z aplikacji uwierzytelniającej podczas logowania. Logowanie hasłem lub przez konto społecznościowe nadal wymaga kodu, gdy uwierzytelnianie dwuskładnikowe jest włączone."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "Hasło do konta jest nieprawidłowe."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Zbyt wiele prób weryfikacji. Poczekaj chwilę i spróbuj ponownie."
   }
 }

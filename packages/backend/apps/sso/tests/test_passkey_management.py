@@ -251,3 +251,38 @@ def test_cross_origin_clients_can_send_the_authorization_header(settings):
     assert response.status_code == 200
     assert response['Access-Control-Allow-Origin'] == 'https://app.example.com'
     assert 'x-passkey-authorization' in response['Access-Control-Allow-Headers'].lower()
+
+
+def test_reauthentication_distinguishes_password_otp_and_lockout(manager, user):
+    user.otp_enabled = user.otp_verified = True
+    user.otp_base32 = pyotp.random_base32()
+    user.save()
+    correct_otp = pyotp.TOTP(user.otp_base32).now()
+    response = manager.post(VERIFY, {'action': 'register', 'password': 'wrong', 'otpToken': correct_otp}, format='json')
+    assert response.status_code == 403
+    assert response.data['code'] == 'incorrect_password'
+    user.refresh_from_db()
+    assert user.otp_failed_attempts == 0
+    for attempt in range(5):
+        response = manager.post(
+            VERIFY, {'action': 'register', 'password': PASSWORD, 'otpToken': 'invalid'}, format='json'
+        )
+        assert response.status_code == 403
+        assert response.data['code'] == ('incorrect_otp' if attempt < 4 else 'otp_locked')
+        assert response['Cache-Control'] == 'no-store'
+    response = manager.post(
+        VERIFY, {'action': 'register', 'password': PASSWORD, 'otpToken': correct_otp}, format='json'
+    )
+    assert response.status_code == 403
+    assert response.data['code'] == 'otp_locked'
+    assert not PasskeyManagementGrant.objects.exists()
+    user.refresh_from_db()
+    assert user.otp_failed_attempts == 5
+
+
+def test_anonymous_reauthentication_does_not_disclose_failure_reason():
+    response = APIClient().post(
+        VERIFY, {'action': 'register', 'password': 'wrong', 'otpToken': '123456'}, format='json'
+    )
+    assert response.status_code in {401, 403}
+    assert response.data.get('code') not in {'incorrect_password', 'incorrect_otp', 'otp_locked'}

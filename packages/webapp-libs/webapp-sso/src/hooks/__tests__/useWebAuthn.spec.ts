@@ -277,3 +277,21 @@ it('includes API cookies for both browser-bound login requests', async () => {
     fetchMock.mockReset();
   }
 });
+
+it.each([
+  [403, 'incorrect_password'],
+  [403, 'incorrect_otp'],
+  [403, 'otp_locked'],
+  [429, 'rate_limited'],
+])('retains a safe reauthentication code for status %s: %s', async (status, code) => {
+  const fetchMock = jest.mocked(csrfFetch);
+  fetchMock.mockResolvedValueOnce({
+    ok: false,
+    status,
+    json: async () => ({ code, error: 'private server detail' }),
+  } as Response);
+  const { result } = renderHook(() => useWebAuthn());
+  await expect(result.current.authorizePasskeyChange('register', undefined, 'password', '123456'))
+    .rejects.toMatchObject({ code, message: 'Fresh authentication failed' });
+  fetchMock.mockReset();
+});

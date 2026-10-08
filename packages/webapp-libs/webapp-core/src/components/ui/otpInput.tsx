@@ -8,9 +8,10 @@ type OtpInputProps = {
   onValueChange: (value: string) => void;
   label: string;
   disabled?: boolean;
+  autoFocus?: boolean;
 };
 
-export function OtpInput({ value, onValueChange, label, disabled }: OtpInputProps) {
+export function OtpInput({ value, onValueChange, label, disabled, autoFocus }: OtpInputProps) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
@@ -27,6 +28,7 @@ export function OtpInput({ value, onValueChange, label, disabled }: OtpInputProp
           type="text"
           inputMode="numeric"
           autoComplete="one-time-code"
+          autoFocus={autoFocus}
           pattern="[0-9]{6}"
           spellCheck={false}
           disabled={disabled}

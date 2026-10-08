@@ -41,6 +41,7 @@ import {
 
 import { usePasskeys } from '../../hooks/usePasskeys';
 import { useWebAuthn } from '../../hooks/useWebAuthn';
+import { getPasskeyAuthorizationErrorMessage } from '../../hooks/passkeyAuthorizationError';
 
 interface Passkey {
   id: string;
@@ -185,14 +186,12 @@ export function PasskeysManager() {
         await handleRegister(authorization);
       else await handleDelete(pendingChange.passkeyId!, authorization);
       closeAuthorization();
-    } catch {
+    } catch (error) {
       toast({
         variant: 'destructive',
-        description: intl.formatMessage({
-          defaultMessage:
-            'Verification failed. Check your password and two-factor code, or try your existing passkey again.',
-          id: 'Passkeys / Reauthentication failed',
-        }),
+        description: intl.formatMessage(
+          getPasskeyAuthorizationErrorMessage(error),
+        ),
       });
       setPassword('');
       setOtpToken('');

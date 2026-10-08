@@ -5776,5 +5776,11 @@
   },
   "Auth / Two-factor / Passkey login policy": {
     "defaultMessage": "A passkey verified with your fingerprint, face, or device PIN replaces the authenticator code when signing in. Password and social sign-ins still require a code when two-factor authentication is enabled."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "The account password is incorrect."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Too many verification attempts. Please wait a moment and try again."
   }
 }

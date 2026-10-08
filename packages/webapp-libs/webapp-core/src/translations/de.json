@@ -5776,5 +5776,11 @@
   },
   "Auth / Two-factor / Passkey login policy": {
     "defaultMessage": "Ein mit Fingerabdruck, Gesichtserkennung oder Geräte-PIN bestätigter Passkey ersetzt beim Anmelden den Code der Authenticator-App. Bei aktivierter Zwei-Faktor-Authentifizierung ist für die Anmeldung mit Passwort oder über ein soziales Konto weiterhin ein Code erforderlich."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "Das Kontopasswort ist falsch."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Zu viele Verifizierungsversuche. Bitte warten Sie einen Moment und versuchen Sie es erneut."
   }
 }

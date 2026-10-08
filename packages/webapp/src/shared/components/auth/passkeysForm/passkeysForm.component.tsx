@@ -16,7 +16,7 @@ import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
 import { ENV } from '@sb/webapp-core/config/env';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { useWebAuthn } from '@sb/webapp-sso/hooks';
+import { getPasskeyAuthorizationErrorMessage, useWebAuthn } from '@sb/webapp-sso/hooks';
 import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
 import { CheckCircle2, Fingerprint, Key, Loader2, Plus, Shield, Smartphone, Trash2, XCircle } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
@@ -212,14 +212,10 @@ export const PasskeysForm = () => {
       } else {
         await handleDeletePasskey(change.passkeyId!, authorization);
       }
-    } catch {
+    } catch (error) {
       toast({
         variant: 'destructive',
-        description: intl.formatMessage({
-          defaultMessage:
-            'Verification failed. Check your password and two-factor code, or try your existing passkey again.',
-          id: 'Passkeys / Reauthentication failed',
-        }),
+        description: intl.formatMessage(getPasskeyAuthorizationErrorMessage(error)),
       });
       setPassword('');
       setOtpToken('');

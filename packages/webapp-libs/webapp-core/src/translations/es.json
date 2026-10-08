@@ -5776,5 +5776,11 @@
   },
   "Auth / Two-factor / Passkey login policy": {
     "defaultMessage": "Una clave de acceso verificada con tu huella, rostro o PIN del dispositivo sustituye el código de la aplicación de autenticación al iniciar sesión. El inicio de sesión con contraseña o cuenta social sigue requiriendo un código cuando la autenticación de dos factores está activada."
+  },
+  "Passkeys / Incorrect password": {
+    "defaultMessage": "La contraseña de la cuenta es incorrecta."
+  },
+  "Passkeys / Verification rate limit": {
+    "defaultMessage": "Demasiados intentos de verificación. Espera un momento e inténtalo de nuevo."
   }
 }
