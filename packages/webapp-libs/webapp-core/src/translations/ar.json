@@ -5865,64 +5865,64 @@
     "defaultMessage": "تحقّق من بريدك الإلكتروني قبل ربط Google"
   },
   "Auth / Two-factor / Reauth description": {
-    "defaultMessage": "Verify an existing passkey or enter your account password{otp} to continue."
+    "defaultMessage": "تحقق من مفتاح مرور موجود أو أدخل كلمة مرور حسابك{otp} للمتابعة."
   },
   "Auth / Two-factor / Reauth description and code": {
-    "defaultMessage": "and two-factor code"
+    "defaultMessage": " ورمز المصادقة الثنائية"
   },
   "Auth / Two-factor / Reauth or": {
-    "defaultMessage": "or"
+    "defaultMessage": "أو"
   },
   "Auth / Two-factor / Reauth otp label": {
-    "defaultMessage": "Current two-factor code"
+    "defaultMessage": "رمز المصادقة الثنائية الحالي"
   },
   "Auth / Two-factor / Reauth otp-only description": {
-    "defaultMessage": "Enter your current two-factor code to continue."
+    "defaultMessage": "أدخل رمز المصادقة الثنائية الحالي للمتابعة."
   },
   "Auth / Two-factor / Reauth password label": {
-    "defaultMessage": "Account password"
+    "defaultMessage": "كلمة مرور الحساب"
   },
   "Auth / Two-factor / Reauth title": {
-    "defaultMessage": "Verify your identity"
+    "defaultMessage": "تحقق من هويتك"
   },
   "Auth / Two-factor / Reauth verify otp only": {
-    "defaultMessage": "Verify"
+    "defaultMessage": "تحقق"
   },
   "Auth / Two-factor / Reauth verify passkey": {
-    "defaultMessage": "Verify with an existing passkey"
+    "defaultMessage": "تحقق باستخدام مفتاح مرور موجود"
   },
   "Auth / Two-factor / Reauth verify password": {
-    "defaultMessage": "Verify with password"
+    "defaultMessage": "تحقق باستخدام كلمة المرور"
   },
   "Email / OTP Disabled / Link label": {
-    "defaultMessage": "Reset your password"
+    "defaultMessage": "إعادة تعيين كلمة المرور"
   },
   "Email / OTP Disabled / Preheader": {
-    "defaultMessage": "If this wasn't you, reset your password right away."
+    "defaultMessage": "إذا لم يكن هذا أنت، فأعد تعيين كلمة المرور فورًا."
   },
   "Email / OTP Disabled / Subject": {
-    "defaultMessage": "Two-factor authentication was disabled on your account"
+    "defaultMessage": "تم تعطيل المصادقة الثنائية على حسابك"
   },
   "Email / OTP Disabled / Text": {
-    "defaultMessage": "Two-factor authentication was just turned off for your account. If you made this change, no further action is needed. If you didn't, reset your password immediately and contact support."
+    "defaultMessage": "تم للتو تعطيل المصادقة الثنائية لحسابك. إذا كنت قد قمت بهذا التغيير، فلا حاجة لاتخاذ أي إجراء إضافي. إذا لم يكن ذلك أنت، فأعد تعيين كلمة المرور فورًا وتواصل مع الدعم."
   },
   "Email / OTP Disabled / Title": {
-    "defaultMessage": "Two-factor authentication was disabled"
+    "defaultMessage": "تم تعطيل المصادقة الثنائية"
   },
   "Email / OTP Enabled / Link label": {
-    "defaultMessage": "Review account security"
+    "defaultMessage": "مراجعة أمان الحساب"
   },
   "Email / OTP Enabled / Preheader": {
-    "defaultMessage": "If this wasn't you, review your account security right away."
+    "defaultMessage": "إذا لم يكن هذا أنت، فراجع أمان حسابك فورًا."
   },
   "Email / OTP Enabled / Subject": {
-    "defaultMessage": "Two-factor authentication was enabled on your account"
+    "defaultMessage": "تم تفعيل المصادقة الثنائية على حسابك"
   },
   "Email / OTP Enabled / Text": {
-    "defaultMessage": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support."
+    "defaultMessage": "تحمي المصادقة الثنائية الآن حسابك - سيُطلب رمز تحقق بالإضافة إلى كلمة المرور عند تسجيل الدخول. إذا كنت قد قمت بهذا التغيير، فلا حاجة لاتخاذ أي إجراء إضافي. إذا لم يكن ذلك أنت، فراجع أمان حسابك فورًا وتواصل مع الدعم."
   },
   "Email / OTP Enabled / Title": {
-    "defaultMessage": "Two-factor authentication was enabled"
+    "defaultMessage": "تم تفعيل المصادقة الثنائية"
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"

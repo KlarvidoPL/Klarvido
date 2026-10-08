@@ -5865,64 +5865,64 @@
     "defaultMessage": "Google जोड़ने से पहले ईमेल सत्यापित करें"
   },
   "Auth / Two-factor / Reauth description": {
-    "defaultMessage": "Verify an existing passkey or enter your account password{otp} to continue."
+    "defaultMessage": "जारी रखने के लिए किसी मौजूदा पासकी को सत्यापित करें या अपना खाता पासवर्ड{otp} दर्ज करें।"
   },
   "Auth / Two-factor / Reauth description and code": {
-    "defaultMessage": "and two-factor code"
+    "defaultMessage": " और टू-फैक्टर कोड"
   },
   "Auth / Two-factor / Reauth or": {
-    "defaultMessage": "or"
+    "defaultMessage": "या"
   },
   "Auth / Two-factor / Reauth otp label": {
-    "defaultMessage": "Current two-factor code"
+    "defaultMessage": "वर्तमान टू-फैक्टर कोड"
   },
   "Auth / Two-factor / Reauth otp-only description": {
-    "defaultMessage": "Enter your current two-factor code to continue."
+    "defaultMessage": "जारी रखने के लिए अपना वर्तमान टू-फैक्टर कोड दर्ज करें।"
   },
   "Auth / Two-factor / Reauth password label": {
-    "defaultMessage": "Account password"
+    "defaultMessage": "खाता पासवर्ड"
   },
   "Auth / Two-factor / Reauth title": {
-    "defaultMessage": "Verify your identity"
+    "defaultMessage": "अपनी पहचान सत्यापित करें"
   },
   "Auth / Two-factor / Reauth verify otp only": {
-    "defaultMessage": "Verify"
+    "defaultMessage": "सत्यापित करें"
   },
   "Auth / Two-factor / Reauth verify passkey": {
-    "defaultMessage": "Verify with an existing passkey"
+    "defaultMessage": "मौजूदा पासकी से सत्यापित करें"
   },
   "Auth / Two-factor / Reauth verify password": {
-    "defaultMessage": "Verify with password"
+    "defaultMessage": "पासवर्ड से सत्यापित करें"
   },
   "Email / OTP Disabled / Link label": {
-    "defaultMessage": "Reset your password"
+    "defaultMessage": "अपना पासवर्ड रीसेट करें"
   },
   "Email / OTP Disabled / Preheader": {
-    "defaultMessage": "If this wasn't you, reset your password right away."
+    "defaultMessage": "यदि यह आप नहीं थे, तो तुरंत अपना पासवर्ड रीसेट करें।"
   },
   "Email / OTP Disabled / Subject": {
-    "defaultMessage": "Two-factor authentication was disabled on your account"
+    "defaultMessage": "आपके खाते पर टू-फैक्टर प्रमाणीकरण अक्षम कर दिया गया है"
   },
   "Email / OTP Disabled / Text": {
-    "defaultMessage": "Two-factor authentication was just turned off for your account. If you made this change, no further action is needed. If you didn't, reset your password immediately and contact support."
+    "defaultMessage": "आपके खाते के लिए टू-फैक्टर प्रमाणीकरण अभी बंद कर दिया गया है। यदि आपने यह बदलाव किया है, तो आगे कोई कार्रवाई करने की आवश्यकता नहीं है। यदि यह आप नहीं थे, तो तुरंत अपना पासवर्ड रीसेट करें और सहायता टीम से संपर्क करें।"
   },
   "Email / OTP Disabled / Title": {
-    "defaultMessage": "Two-factor authentication was disabled"
+    "defaultMessage": "टू-फैक्टर प्रमाणीकरण अक्षम कर दिया गया है"
   },
   "Email / OTP Enabled / Link label": {
-    "defaultMessage": "Review account security"
+    "defaultMessage": "खाता सुरक्षा की समीक्षा करें"
   },
   "Email / OTP Enabled / Preheader": {
-    "defaultMessage": "If this wasn't you, review your account security right away."
+    "defaultMessage": "यदि यह आप नहीं थे, तो तुरंत अपने खाते की सुरक्षा की समीक्षा करें।"
   },
   "Email / OTP Enabled / Subject": {
-    "defaultMessage": "Two-factor authentication was enabled on your account"
+    "defaultMessage": "आपके खाते पर टू-फैक्टर प्रमाणीकरण सक्षम कर दिया गया है"
   },
   "Email / OTP Enabled / Text": {
-    "defaultMessage": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support."
+    "defaultMessage": "टू-फैक्टर प्रमाणीकरण अब आपके खाते की सुरक्षा कर रहा है - साइन इन करते समय आपके पासवर्ड के अतिरिक्त एक सत्यापन कोड आवश्यक होगा। यदि आपने यह बदलाव किया है, तो आगे कोई कार्रवाई करने की आवश्यकता नहीं है। यदि यह आप नहीं थे, तो तुरंत अपने खाते की सुरक्षा की समीक्षा करें और सहायता टीम से संपर्क करें।"
   },
   "Email / OTP Enabled / Title": {
-    "defaultMessage": "Two-factor authentication was enabled"
+    "defaultMessage": "टू-फैक्टर प्रमाणीकरण सक्षम कर दिया गया है"
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"

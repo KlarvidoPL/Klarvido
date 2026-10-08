@@ -5865,64 +5865,64 @@
     "defaultMessage": "关联 Google 前请先验证邮箱"
   },
   "Auth / Two-factor / Reauth description": {
-    "defaultMessage": "Verify an existing passkey or enter your account password{otp} to continue."
+    "defaultMessage": "验证现有的通行密钥或输入您的账户密码{otp}以继续。"
   },
   "Auth / Two-factor / Reauth description and code": {
-    "defaultMessage": "and two-factor code"
+    "defaultMessage": "和双重验证码"
   },
   "Auth / Two-factor / Reauth or": {
-    "defaultMessage": "or"
+    "defaultMessage": "或"
   },
   "Auth / Two-factor / Reauth otp label": {
-    "defaultMessage": "Current two-factor code"
+    "defaultMessage": "当前的双重验证码"
   },
   "Auth / Two-factor / Reauth otp-only description": {
-    "defaultMessage": "Enter your current two-factor code to continue."
+    "defaultMessage": "输入您当前的双重验证码以继续。"
   },
   "Auth / Two-factor / Reauth password label": {
-    "defaultMessage": "Account password"
+    "defaultMessage": "账户密码"
   },
   "Auth / Two-factor / Reauth title": {
-    "defaultMessage": "Verify your identity"
+    "defaultMessage": "验证您的身份"
   },
   "Auth / Two-factor / Reauth verify otp only": {
-    "defaultMessage": "Verify"
+    "defaultMessage": "验证"
   },
   "Auth / Two-factor / Reauth verify passkey": {
-    "defaultMessage": "Verify with an existing passkey"
+    "defaultMessage": "使用现有通行密钥验证"
   },
   "Auth / Two-factor / Reauth verify password": {
-    "defaultMessage": "Verify with password"
+    "defaultMessage": "使用密码验证"
   },
   "Email / OTP Disabled / Link label": {
-    "defaultMessage": "Reset your password"
+    "defaultMessage": "重置您的密码"
   },
   "Email / OTP Disabled / Preheader": {
-    "defaultMessage": "If this wasn't you, reset your password right away."
+    "defaultMessage": "如果这不是您本人操作，请立即重置密码。"
   },
   "Email / OTP Disabled / Subject": {
-    "defaultMessage": "Two-factor authentication was disabled on your account"
+    "defaultMessage": "您账户的双重验证已被禁用"
   },
   "Email / OTP Disabled / Text": {
-    "defaultMessage": "Two-factor authentication was just turned off for your account. If you made this change, no further action is needed. If you didn't, reset your password immediately and contact support."
+    "defaultMessage": "您账户的双重验证刚刚被关闭。如果是您本人进行了此更改，则无需采取进一步操作。如果不是您，请立即重置密码并联系支持团队。"
   },
   "Email / OTP Disabled / Title": {
-    "defaultMessage": "Two-factor authentication was disabled"
+    "defaultMessage": "双重验证已被禁用"
   },
   "Email / OTP Enabled / Link label": {
-    "defaultMessage": "Review account security"
+    "defaultMessage": "查看账户安全"
   },
   "Email / OTP Enabled / Preheader": {
-    "defaultMessage": "If this wasn't you, review your account security right away."
+    "defaultMessage": "如果这不是您本人操作，请立即查看您的账户安全。"
   },
   "Email / OTP Enabled / Subject": {
-    "defaultMessage": "Two-factor authentication was enabled on your account"
+    "defaultMessage": "您账户的双重验证已启用"
   },
   "Email / OTP Enabled / Text": {
-    "defaultMessage": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support."
+    "defaultMessage": "双重验证现已保护您的账户——登录时除密码外还需要验证码。如果是您本人进行了此更改，则无需采取进一步操作。如果不是您，请立即查看账户安全并联系支持团队。"
   },
   "Email / OTP Enabled / Title": {
-    "defaultMessage": "Two-factor authentication was enabled"
+    "defaultMessage": "双重验证已启用"
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"

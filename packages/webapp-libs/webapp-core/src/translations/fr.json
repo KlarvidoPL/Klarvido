@@ -5865,64 +5865,64 @@
     "defaultMessage": "Vérifiez votre e-mail avant de connecter Google"
   },
   "Auth / Two-factor / Reauth description": {
-    "defaultMessage": "Verify an existing passkey or enter your account password{otp} to continue."
+    "defaultMessage": "Vérifiez une clé d'accès existante ou saisissez votre mot de passe de compte{otp} pour continuer."
   },
   "Auth / Two-factor / Reauth description and code": {
-    "defaultMessage": "and two-factor code"
+    "defaultMessage": " et le code à deux facteurs"
   },
   "Auth / Two-factor / Reauth or": {
-    "defaultMessage": "or"
+    "defaultMessage": "ou"
   },
   "Auth / Two-factor / Reauth otp label": {
-    "defaultMessage": "Current two-factor code"
+    "defaultMessage": "Code à deux facteurs actuel"
   },
   "Auth / Two-factor / Reauth otp-only description": {
-    "defaultMessage": "Enter your current two-factor code to continue."
+    "defaultMessage": "Saisissez votre code à deux facteurs actuel pour continuer."
   },
   "Auth / Two-factor / Reauth password label": {
-    "defaultMessage": "Account password"
+    "defaultMessage": "Mot de passe du compte"
   },
   "Auth / Two-factor / Reauth title": {
-    "defaultMessage": "Verify your identity"
+    "defaultMessage": "Vérifiez votre identité"
   },
   "Auth / Two-factor / Reauth verify otp only": {
-    "defaultMessage": "Verify"
+    "defaultMessage": "Vérifier"
   },
   "Auth / Two-factor / Reauth verify passkey": {
-    "defaultMessage": "Verify with an existing passkey"
+    "defaultMessage": "Vérifier avec une clé d'accès existante"
   },
   "Auth / Two-factor / Reauth verify password": {
-    "defaultMessage": "Verify with password"
+    "defaultMessage": "Vérifier avec le mot de passe"
   },
   "Email / OTP Disabled / Link label": {
-    "defaultMessage": "Reset your password"
+    "defaultMessage": "Réinitialiser votre mot de passe"
   },
   "Email / OTP Disabled / Preheader": {
-    "defaultMessage": "If this wasn't you, reset your password right away."
+    "defaultMessage": "Si ce n'était pas vous, réinitialisez votre mot de passe immédiatement."
   },
   "Email / OTP Disabled / Subject": {
-    "defaultMessage": "Two-factor authentication was disabled on your account"
+    "defaultMessage": "L'authentification à deux facteurs a été désactivée sur votre compte"
   },
   "Email / OTP Disabled / Text": {
-    "defaultMessage": "Two-factor authentication was just turned off for your account. If you made this change, no further action is needed. If you didn't, reset your password immediately and contact support."
+    "defaultMessage": "L'authentification à deux facteurs vient d'être désactivée pour votre compte. Si vous avez effectué ce changement, aucune action supplémentaire n'est nécessaire. Si ce n'était pas vous, réinitialisez immédiatement votre mot de passe et contactez le support."
   },
   "Email / OTP Disabled / Title": {
-    "defaultMessage": "Two-factor authentication was disabled"
+    "defaultMessage": "L'authentification à deux facteurs a été désactivée"
   },
   "Email / OTP Enabled / Link label": {
-    "defaultMessage": "Review account security"
+    "defaultMessage": "Vérifier la sécurité du compte"
   },
   "Email / OTP Enabled / Preheader": {
-    "defaultMessage": "If this wasn't you, review your account security right away."
+    "defaultMessage": "Si ce n'était pas vous, vérifiez immédiatement la sécurité de votre compte."
   },
   "Email / OTP Enabled / Subject": {
-    "defaultMessage": "Two-factor authentication was enabled on your account"
+    "defaultMessage": "L'authentification à deux facteurs a été activée sur votre compte"
   },
   "Email / OTP Enabled / Text": {
-    "defaultMessage": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support."
+    "defaultMessage": "L'authentification à deux facteurs protège désormais votre compte - un code de vérification sera requis en plus de votre mot de passe lors de la connexion. Si vous avez effectué ce changement, aucune action supplémentaire n'est nécessaire. Si ce n'était pas vous, vérifiez immédiatement la sécurité de votre compte et contactez le support."
   },
   "Email / OTP Enabled / Title": {
-    "defaultMessage": "Two-factor authentication was enabled"
+    "defaultMessage": "L'authentification à deux facteurs a été activée"
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"

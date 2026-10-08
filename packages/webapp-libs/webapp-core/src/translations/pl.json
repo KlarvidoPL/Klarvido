@@ -5865,64 +5865,64 @@
     "defaultMessage": "Zweryfikuj e-mail przed połączeniem Google"
   },
   "Auth / Two-factor / Reauth description": {
-    "defaultMessage": "Verify an existing passkey or enter your account password{otp} to continue."
+    "defaultMessage": "Zweryfikuj istniejący klucz dostępu lub wprowadź hasło do konta{otp}, aby kontynuować."
   },
   "Auth / Two-factor / Reauth description and code": {
-    "defaultMessage": "and two-factor code"
+    "defaultMessage": " i kod dwuskładnikowy"
   },
   "Auth / Two-factor / Reauth or": {
-    "defaultMessage": "or"
+    "defaultMessage": "lub"
   },
   "Auth / Two-factor / Reauth otp label": {
-    "defaultMessage": "Current two-factor code"
+    "defaultMessage": "Aktualny kod dwuskładnikowy"
   },
   "Auth / Two-factor / Reauth otp-only description": {
-    "defaultMessage": "Enter your current two-factor code to continue."
+    "defaultMessage": "Wprowadź swój aktualny kod dwuskładnikowy, aby kontynuować."
   },
   "Auth / Two-factor / Reauth password label": {
-    "defaultMessage": "Account password"
+    "defaultMessage": "Hasło do konta"
   },
   "Auth / Two-factor / Reauth title": {
-    "defaultMessage": "Verify your identity"
+    "defaultMessage": "Zweryfikuj swoją tożsamość"
   },
   "Auth / Two-factor / Reauth verify otp only": {
-    "defaultMessage": "Verify"
+    "defaultMessage": "Zweryfikuj"
   },
   "Auth / Two-factor / Reauth verify passkey": {
-    "defaultMessage": "Verify with an existing passkey"
+    "defaultMessage": "Zweryfikuj za pomocą istniejącego klucza dostępu"
   },
   "Auth / Two-factor / Reauth verify password": {
-    "defaultMessage": "Verify with password"
+    "defaultMessage": "Zweryfikuj hasłem"
   },
   "Email / OTP Disabled / Link label": {
-    "defaultMessage": "Reset your password"
+    "defaultMessage": "Zresetuj hasło"
   },
   "Email / OTP Disabled / Preheader": {
-    "defaultMessage": "If this wasn't you, reset your password right away."
+    "defaultMessage": "Jeśli to nie Ty, natychmiast zresetuj hasło."
   },
   "Email / OTP Disabled / Subject": {
-    "defaultMessage": "Two-factor authentication was disabled on your account"
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało wyłączone na Twoim koncie"
   },
   "Email / OTP Disabled / Text": {
-    "defaultMessage": "Two-factor authentication was just turned off for your account. If you made this change, no further action is needed. If you didn't, reset your password immediately and contact support."
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało właśnie wyłączone na Twoim koncie. Jeśli to Ty dokonałeś tej zmiany, nie musisz nic więcej robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
   },
   "Email / OTP Disabled / Title": {
-    "defaultMessage": "Two-factor authentication was disabled"
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało wyłączone"
   },
   "Email / OTP Enabled / Link label": {
-    "defaultMessage": "Review account security"
+    "defaultMessage": "Sprawdź zabezpieczenia konta"
   },
   "Email / OTP Enabled / Preheader": {
-    "defaultMessage": "If this wasn't you, review your account security right away."
+    "defaultMessage": "Jeśli to nie Ty, natychmiast sprawdź zabezpieczenia swojego konta."
   },
   "Email / OTP Enabled / Subject": {
-    "defaultMessage": "Two-factor authentication was enabled on your account"
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało włączone na Twoim koncie"
   },
   "Email / OTP Enabled / Text": {
-    "defaultMessage": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support."
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe teraz chroni Twoje konto - podczas logowania będzie wymagany kod weryfikacyjny oprócz hasła. Jeśli to Ty dokonałeś tej zmiany, nie musisz nic więcej robić. Jeśli to nie Ty, natychmiast sprawdź zabezpieczenia konta i skontaktuj się z pomocą techniczną."
   },
   "Email / OTP Enabled / Title": {
-    "defaultMessage": "Two-factor authentication was enabled"
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało włączone"
   },
   "Passkeys / Reauthenticate passkey": {
     "defaultMessage": "Verify with an existing passkey"
