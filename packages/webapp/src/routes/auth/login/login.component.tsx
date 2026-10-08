@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/w
 import { Separator } from '@sb/webapp-core/components/ui/separator';
 import { ENV } from '@sb/webapp-core/config/env';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
-import { MailCheck, ShieldCheck } from 'lucide-react';
+import { MailCheck, ShieldCheck, X } from 'lucide-react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -64,28 +64,32 @@ export const Login = () => {
           <CardContent className="space-y-6">
             {linking && (
               <section
-                className="space-y-4 rounded-xl border bg-muted/40 p-4"
+                className="relative isolate space-y-3 overflow-hidden rounded-xl border bg-card p-4"
                 role="status"
                 aria-labelledby="social-link-title"
               >
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-background text-primary">
+                <div
+                  className="pointer-events-none absolute -right-8 -top-8 -z-10 h-32 w-32 rounded-full bg-[#42F272]/10 blur-2xl"
+                  aria-hidden="true"
+                />
+                <div className="flex flex-row-reverse items-start gap-4">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#42F272] text-black">
                     <ShieldCheck className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <div className="min-w-0 space-y-2">
-                    <h2 id="social-link-title" className="text-sm font-semibold">
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <h2 id="social-link-title" className="text-sm font-medium leading-snug">
                       <FormattedMessage
                         defaultMessage="Connect Google to your account"
                         id="Auth / Social linking / Heading"
                       />
                     </h2>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
+                    <p className="text-[13px] leading-relaxed text-muted-foreground">
                       <FormattedMessage
                         defaultMessage="Sign in below with your password and a two-factor code if enabled, or use a passkey."
                         id="Auth / Social linking / Confirm account"
                       />
                     </p>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
+                    <p className="text-[13px] leading-relaxed text-muted-foreground">
                       <FormattedMessage
                         defaultMessage="This confirms the account is yours and connects Google for future sign-ins. Your two-factor authentication settings stay unchanged."
                         id="Auth / Social linking / Why confirm"
@@ -93,14 +97,15 @@ export const Login = () => {
                     </p>
                   </div>
                 </div>
-                <div className="border-t pt-3">
+                <div className="flex justify-start pt-1">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="h-auto whitespace-normal px-2 py-1.5 text-muted-foreground"
+                    className="h-auto gap-1.5 whitespace-normal rounded-lg bg-background/60 px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
                     onClick={cancelLink}
                     disabled={canceling}
                   >
+                    <X className="h-3 w-3 shrink-0" aria-hidden="true" />
                     <FormattedMessage defaultMessage="Cancel linking" id="Auth / Social linking / Cancel" />
                   </Button>
                 </div>
@@ -116,16 +121,20 @@ export const Login = () => {
             )}
             {socialStatus === 'unconfirmed_account' && (
               <section
-                className="space-y-4 rounded-xl border bg-muted/40 p-4 text-sm"
+                className="relative isolate space-y-3 overflow-hidden rounded-xl border bg-card p-4 text-[13px]"
                 role="status"
                 aria-labelledby="social-verify-title"
               >
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-background text-primary">
+                <div
+                  className="pointer-events-none absolute -right-8 -top-8 -z-10 h-32 w-32 rounded-full bg-[#42F272]/10 blur-2xl"
+                  aria-hidden="true"
+                />
+                <div className="flex flex-row-reverse items-start gap-4">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#42F272] text-black">
                     <MailCheck className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <div className="min-w-0 space-y-2">
-                    <h2 id="social-verify-title" className="font-semibold">
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <h2 id="social-verify-title" className="text-sm font-medium leading-snug">
                       <FormattedMessage
                         defaultMessage="Verify your email before connecting Google"
                         id="Auth / Social linking / Verify heading"
@@ -139,25 +148,15 @@ export const Login = () => {
                     </p>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <p className="leading-relaxed">
+                <div className="space-y-2">
+                  <p className="leading-relaxed text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="If this is your account, sign in below and verify your email, then try connecting Google again."
                       id="Auth / Social linking / Unconfirmed account - owner"
                     />
                   </p>
-                  {showPasswordLogin && (
-                    <Button variant="link" className="h-auto whitespace-normal p-0 text-sm" asChild>
-                      <Link to={generateLocalePath(RoutesConfig.passwordReset.index)}>
-                        <FormattedMessage
-                          defaultMessage="Forgot your password?"
-                          id="Auth / login / reset password link"
-                        />
-                      </Link>
-                    </Button>
-                  )}
                 </div>
-                <p className="border-t pt-3 leading-relaxed text-muted-foreground">
+                <p className="border-t border-border/60 pt-3 text-xs leading-relaxed text-muted-foreground">
                   {ENV.SUPPORT_EMAIL ? (
                     <FormattedMessage
                       defaultMessage="If you didn't create this account, contact us at {supportEmail} and we'll help verify ownership."

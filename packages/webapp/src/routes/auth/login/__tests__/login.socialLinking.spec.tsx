@@ -79,7 +79,7 @@ it('explains that a matching account exists but is unconfirmed, without a suppor
   await waitForApolloMocks();
   expect(screen.getByRole('status')).toHaveTextContent(/account with this email already exists/i);
   expect(screen.getByRole('heading', { name: /verify your email before connecting google/i })).toBeInTheDocument();
-  expect(screen.getAllByRole('link', { name: /forgot your password/i })[0]).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /forgot your password/i })).toHaveAttribute(
     'href',
     '/en/auth/reset-password'
   );
