@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../app/config/routes';
 import { emailPattern } from '../../../constants';
+import { getSafeAuthRedirect } from '../../../utils/authRedirect';
 import { authSinginMutation } from './loginForm.graphql';
 import { LoginFormFields } from './loginForm.types';
 
@@ -58,7 +59,7 @@ export const useLoginForm = () => {
       const redirect = searchParams.get('redirect');
 
       // Navigate to the redirect URL or home page
-      navigate(redirect ?? generateLocalePath(RoutesConfig.home));
+      navigate(getSafeAuthRedirect(redirect, generateLocalePath(RoutesConfig.home)));
     },
     onError: (error) => {
       const graphQLErrors = extractGraphQLErrors(error);

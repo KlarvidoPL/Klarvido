@@ -6,26 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../app/config/routes';
-
-/**
- * This page is reachable directly (not gated behind an authenticated-only
- * check - see app.component.tsx for why), so `next` has to be treated as
- * untrusted input: anyone can craft a link to this URL with an arbitrary
- * `next` value, and if the visitor happens to already have a valid session,
- * the refresh below would succeed and this would otherwise navigate them
- * straight to an attacker-chosen destination (a classic open-redirect/
- * phishing setup). The backend only ever generates same-origin values here,
- * so anything else is rejected.
- */
-const getSafeNext = (rawNext: string | null): string => {
-  if (!rawNext) return '/';
-  try {
-    const target = new URL(rawNext, window.location.origin);
-    return target.origin === window.location.origin ? rawNext : '/';
-  } catch {
-    return '/';
-  }
-};
+import { getSafeAuthRedirect } from '../../../shared/utils/authRedirect';
 
 /** Complete the cookie-authenticated OAuth session without exposing bearer tokens. */
 export const OAuthCallback = () => {
@@ -36,7 +17,7 @@ export const OAuthCallback = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
-      const next = getSafeNext(searchParams.get('next'));
+      const next = getSafeAuthRedirect(searchParams.get('next'), '/');
 
       try {
         // Not coordinatedRefreshToken(): this is a fresh page load, so there's

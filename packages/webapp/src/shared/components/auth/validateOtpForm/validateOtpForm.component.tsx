@@ -13,6 +13,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { RoutesConfig } from '../../../../app/config/routes';
+import { getSafeAuthRedirect } from '../../../utils/authRedirect';
 import { AuthLogo } from '../authLogo';
 import { FloatingThemeToggle } from '../floatingThemeToggle';
 import { validateOtpMutation } from '../twoFactorAuthForm/twoFactorAuthForm.graphql';
@@ -83,7 +84,7 @@ export const ValidateOtpForm = () => {
         const redirect = searchParams.get('redirect');
 
         // Navigate to the redirect URL or home page
-        navigate(redirect ?? generateLocalePath(RoutesConfig.home));
+        navigate(getSafeAuthRedirect(redirect, generateLocalePath(RoutesConfig.home)));
       }
     } catch (error) {
       // Error is handled by onError callback

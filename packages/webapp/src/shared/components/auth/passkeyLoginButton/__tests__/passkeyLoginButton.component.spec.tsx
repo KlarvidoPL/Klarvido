@@ -240,8 +240,14 @@ describe('PasskeyLoginButton: Component', () => {
       expect(localStorage.getItem('refresh_token')).toBeNull();
     });
 
-    it('should redirect to custom path when redirect param is present', async () => {
-      mockUseLocation.mockReturnValue({ search: '?redirect=%2Fen%2Fprofile' });
+    it.each([
+      '/en/profile',
+      'https://evil.example/phish',
+      '//evil.example',
+      'javascript:alert(1)',
+      '/%252fevil.example',
+    ])('validates the post-login redirect %s', async (redirect) => {
+      mockUseLocation.mockReturnValue({ search: `?redirect=${encodeURIComponent(redirect)}` });
 
       mockFetch
         .mockResolvedValueOnce({
@@ -261,7 +267,7 @@ describe('PasskeyLoginButton: Component', () => {
       await userEvent.click(await screen.findByRole('button', { name: /sign in with passkey/i }));
 
       await waitFor(() => {
-        expect(window.location.href).toBe('/en/profile');
+        expect(window.location.href).toBe(redirect === '/en/profile' ? '/en/profile' : '/en/');
       });
     });
   });

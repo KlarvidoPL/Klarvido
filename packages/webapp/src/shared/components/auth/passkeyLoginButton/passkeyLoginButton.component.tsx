@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useLocation } from 'react-router-dom';
 
+import { getSafeAuthRedirect } from '../../../utils/authRedirect';
+
 // Carries a stable error code through the catch block instead of a raw English
 // message, so the UI can always show a translated string - the backend's own
 // exception text (via PASSKEY_AUTH_ERROR_CODES) is for logs/debugging only.
@@ -186,7 +188,7 @@ export const PasskeyLoginButton = () => {
       const defaultRedirect = `/${locale}/`;
 
       // Force a full page reload to reinitialize with new auth cookies
-      window.location.href = redirect || defaultRedirect;
+      window.location.href = getSafeAuthRedirect(redirect, defaultRedirect);
     } catch (err) {
       console.error('Passkey login error:', err);
       let code = 'verification_failed';
