@@ -300,14 +300,17 @@ is bound to the registration challenge. GraphQL `deletePasskey` and REST deletio
 apply the same check. Do not persist or log the authorization. The server stores
 only its hash, and does not issue login tokens or cookies during reauthentication.
 
-Deploy both database migrations before enabling these endpoints. Clients using
+Deploy the passkey database migrations before enabling these endpoints. Clients using
 the old registration or deletion flow will receive a fresh-authentication error
 until they adopt the verification step.
 
 
 ## Passkey security operations
 
-Deploy migrations `0011_webauthnchallenge_sso_challenge_expiry_idx` and
+Apply all pending migrations with this release, including the `sso` migrations
+`0008` through `0012`. Migrations `0008` and `0009` add management grants and audit
+events, and `0010` adds browser-bound login challenges. Deploy migrations
+`0011_webauthnchallenge_sso_challenge_expiry_idx` and
 `0012_passkeymanagementgrant_sso_grant_expiry_idx` with this release.
 They index challenge and fresh-authentication grant expiry for bounded cleanup. No credential or public-key migration is needed.
 

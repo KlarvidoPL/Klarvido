@@ -691,6 +691,9 @@ class PasskeyManagementGrant(TimestampedMixin, models.Model):
     class Meta:
         indexes = [models.Index(fields=["expires_at"], name="sso_grant_expiry_idx")]
 
+    def __str__(self):
+        return f"Passkey management grant {self.pk} ({self.action})"
+
 
 class SSOAuditLog(TimestampedMixin, models.Model):
     """

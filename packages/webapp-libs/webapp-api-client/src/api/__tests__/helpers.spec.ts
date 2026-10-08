@@ -2,6 +2,8 @@ import { ENV } from '@sb/webapp-core/config/env';
 import axios, { AxiosResponse } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
+import { server } from '../../tests/mocks/server';
+import { mockRefreshToken } from '../../tests/mocks/server/handlers/auth';
 import { AUTH_URL } from '../auth';
 import { client } from '../client';
 import { apiURLs, validateStatus } from '../helpers';
@@ -52,6 +54,7 @@ describe('api', () => {
         let apiPostSpy: jest.SpyInstance, axiosRequestSpy: jest.SpyInstance;
 
         beforeEach(() => {
+          server.use(mockRefreshToken(200));
           apiPostSpy = jest.spyOn(client, 'post');
           axiosRequestSpy = jest.spyOn(axios, 'request');
         });

@@ -25,7 +25,7 @@ from apps.notifications.models import Notification
 from apps.notifications.sender import send_notification
 from apps.notifications.services import NotificationService
 from apps.sso.models import SCIMToken, SSOUserLink, TenantSSOConnection
-from apps.sso.tests.factories import TenantSSOConnectionFactory
+from apps.sso.tests.factories import SSOSessionFactory, TenantSSOConnectionFactory
 from apps.users.authentication import JSONWebTokenChannelsAuthentication
 from config.schema import schema
 
@@ -121,13 +121,16 @@ def test_supported_tokens_and_refresh_still_work(auth_method, user):
     refresh = RefreshToken.for_user(user)
     if auth_method:
         refresh['auth_method'] = auth_method
+    SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
     response = client.post('/api/graphql/', {'query': 'query { currentUser { email } }'}, format='json')
     assert response.json()['data']['currentUser']['email'] == user.email
     response = APIClient().post('/api/auth/token-refresh/', {'refresh': str(refresh)}, format='json')
     assert response.status_code == 200
-    assert RefreshToken(response.json()['refresh']).get('auth_method', 'password') == (auth_method or 'password')
+    assert response.json() == {'success': True}
+    rotated = response.cookies[settings.REFRESH_TOKEN_COOKIE].value
+    assert RefreshToken(rotated).get('auth_method', 'password') == (auth_method or 'password')
 
 
 def test_legacy_enforcement_no_longer_blocks_members(user, tenant, tenant_membership_factory):

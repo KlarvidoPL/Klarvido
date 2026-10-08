@@ -189,16 +189,21 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
     @classmethod
     @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate)
     def mutate_and_get_payload(cls, root, info, **input):
-        with transaction.atomic():
-            try:
-                mutation = super().mutate_and_get_payload(root, info, **input)
-            except ValidationError as error:
-                cls._delete_otp_auth_token_cookie(info)
-                raise error
+        # Failed OTP checks must commit their account-wide attempt counters.
+        # Only token issuance and session creation belong in the atomic block.
+        try:
+            return super().mutate_and_get_payload(root, info, **input)
+        except ValidationError:
+            cls._delete_otp_auth_token_cookie(info)
+            raise
 
-            # Try to get user from OTP auth token to create session
-            user = cls._get_user_from_otp_token(info, input)
-            session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
+    @classmethod
+    def perform_mutate(cls, serializer, info):
+        with transaction.atomic():
+            mutation = super().perform_mutate(serializer, info)
+            session_id = _create_session_for_user(
+                serializer.user, info.context._request, refresh_token=mutation.refresh
+            )
 
         auth_cookies = {
             settings.ACCESS_TOKEN_COOKIE: mutation.access,
@@ -215,27 +220,6 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
     @classmethod
     def _delete_otp_auth_token_cookie(cls, info):
         info.context._request.delete_cookies = [settings.OTP_AUTH_TOKEN_COOKIE]
-
-    @classmethod
-    def _get_user_from_otp_token(cls, info, input):
-        """Extract user from OTP auth token."""
-        from rest_framework_simplejwt import tokens as jwt_tokens, exceptions as jwt_exceptions
-
-        request = info.context._request
-        raw_otp_auth_token = request.COOKIES.get(settings.OTP_AUTH_TOKEN_COOKIE) or input.get("otp_auth_token")
-
-        if not raw_otp_auth_token:
-            return None
-
-        try:
-            otp_auth_token = jwt_tokens.AccessToken(raw_otp_auth_token)
-            user_id = otp_auth_token.get("user_id")
-            if user_id:
-                return models.User.objects.get(id=user_id)
-        except (jwt_exceptions.InvalidToken, jwt_exceptions.TokenError, models.User.DoesNotExist):
-            pass
-
-        return None
 
 
 class DisableOTPMutation(mutations.SerializerMutation):

@@ -13,6 +13,7 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.models import User
+from apps.sso.tests.factories import SSOSessionFactory
 from apps.users.utils import generate_otp_auth_token
 
 pytestmark = pytest.mark.django_db
@@ -79,10 +80,14 @@ class TestOnlyTokensIssuedHere:
         assert refresh_with(foreign_refresh).status_code == 401
 
     def test_normal_refresh_still_works(self, user):
-        response = refresh_with(RefreshToken.for_user(user))
+        refresh = RefreshToken.for_user(user)
+        SSOSessionFactory(user=user, refresh_token_jti=refresh['jti'])
+        response = refresh_with(refresh)
 
         assert response.status_code == 200
-        assert current_user_with_header(response.json()["access"]).json()["data"]["currentUser"]["email"] == user.email
+        assert response.json() == {'success': True}
+        access = response.cookies[settings.ACCESS_TOKEN_COOKIE].value
+        assert current_user_with_header(access).json()["data"]["currentUser"]["email"] == user.email
 
 
 class TestPasswordChange:

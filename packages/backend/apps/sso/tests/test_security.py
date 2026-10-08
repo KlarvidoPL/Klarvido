@@ -56,6 +56,8 @@ class TestWebAuthnOriginValidation:
         with override_settings(
             WEB_APP_URL='https://app.example.com',
             WEBAUTHN_ALLOW_ORIGIN_MISMATCH=True,
+            DEBUG=True,
+            ENVIRONMENT_NAME='local',
         ):
             service = WebAuthnService(user)
             # Should not raise

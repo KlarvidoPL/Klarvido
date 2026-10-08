@@ -1,3 +1,4 @@
+import * as authRequests from '@sb/webapp-api-client/api/auth/auth.requests';
 import { ENV } from '@sb/webapp-core/config/env';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { act, screen, waitFor } from '@testing-library/react';
@@ -34,6 +35,9 @@ jest.mock('react-router-dom', () => ({
 }));
 
 beforeEach(() => {
+  // These UI tests start signed out. Keep bootstrap recovery from consuming
+  // the fetch responses reserved for the WebAuthn ceremony below.
+  jest.spyOn(authRequests, 'coordinatedRefreshToken').mockRejectedValue(new Error('No refresh cookie'));
   mockFetch.mockReset();
   mockCredentialsGet.mockReset();
   mockUseLocation.mockReturnValue({ search: '' });
@@ -53,6 +57,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.restoreAllMocks();
   global.fetch = originalFetch;
   (global as any).PublicKeyCredential = originalPublicKeyCredential;
   (window as any).PublicKeyCredential = originalPublicKeyCredential;

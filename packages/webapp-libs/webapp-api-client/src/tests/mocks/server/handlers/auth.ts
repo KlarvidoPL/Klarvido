@@ -2,9 +2,9 @@ import { DefaultBodyType, PathParams, rest } from 'msw';
 
 import { AUTH_URL } from '../../../../api/auth';
 
-export const mockRefreshToken = (status = 200) =>
+export const mockRefreshToken = (status = 401) =>
   rest.post<DefaultBodyType, PathParams, DefaultBodyType>(AUTH_URL.REFRESH_TOKEN, (req, res, ctx) => {
-    return res(ctx.status(status));
+    return res(ctx.status(status), ctx.json({ success: status === 200 }));
   });
 
 export const mockLogout = (status = 200) =>
