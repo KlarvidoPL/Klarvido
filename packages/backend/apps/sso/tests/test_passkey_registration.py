@@ -146,7 +146,9 @@ def test_enrollment_stores_verified_cose_key_and_can_login(user, enrollment, leg
         format='json',
     )
     assert login.status_code == 200
-    assert login.data['access'] and login.data['refresh']
+    assert login.data == {'success': True}
+    assert settings.ACCESS_TOKEN_COOKIE in login.cookies
+    assert settings.REFRESH_TOKEN_COOKIE in login.cookies
 
 
 @pytest.mark.parametrize(

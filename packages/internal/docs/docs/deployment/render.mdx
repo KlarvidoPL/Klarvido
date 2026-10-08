@@ -112,15 +112,17 @@ The main Django API service requires the most configuration.
 :::warning Important
 `DJANGO_ALLOWED_HOSTS` should NOT include the `https://` prefix:
 - ✅ `backend-api-xxxx.onrender.com,api.yourdomain.com`
-- ❌ `https://backend-api-xxxx.onrender.com`
+- ❌ `https://api.example.com`
 :::
 
 ### URLs (Set after initial deployment)
 
-After your services are deployed, update these with your actual Render URLs.
+After attaching your custom domains, update these with your actual frontend and API URLs.
 
 :::danger Critical - Cross-Origin Configuration Required!
-Since Render deploys webapp and backend on **different subdomains** (e.g., `webapp-xxx.onrender.com` and `backend-xxx.onrender.com`), you **must** configure:
+Browser authentication uses **HttpOnly cookies**, with no JavaScript/localStorage token fallback. Before enabling login, attach frontend and API custom domains under the same parent (for example `app.example.com` and `api.example.com`), or use a same-origin reverse proxy. Separate `webapp-xxx.onrender.com` and `backend-xxx.onrender.com` hosts are separate browser sites; `SameSite=None` alone does not make them work in Safari or browsers blocking third-party cookies.
+
+For same-site custom domains, you **must** configure:
 
 1. **CORS** - Allow cross-origin API requests
 2. **Cookie SameSite** - Allow cookies to be sent cross-origin (set automatically in `render.yaml`)
@@ -130,10 +132,10 @@ Without these, login will fail! The `render.yaml` Blueprint sets `COOKIE_SAMESIT
 
 | Variable | Example Value | Description |
 |----------|---------------|-------------|
-| `WEB_APP_URL` | `https://webapp-xxxx.onrender.com` | Your frontend URL (with `https://`) |
-| `API_URL` | `https://backend-api-xxxx.onrender.com` | Your API URL (with `https://`) |
-| `CORS_ALLOWED_ORIGINS` | `https://webapp-xxxx.onrender.com` | **Critical!** Your webapp origin for CORS (with `https://`) |
-| `CSRF_TRUSTED_ORIGINS` | `https://webapp-xxxx.onrender.com,https://backend-api-xxxx.onrender.com` | Trusted origins for CSRF (with `https://`) |
+| `WEB_APP_URL` | `https://app.example.com` | Your frontend URL (with `https://`) |
+| `API_URL` | `https://api.example.com` | Your API URL (with `https://`) |
+| `CORS_ALLOWED_ORIGINS` | `https://app.example.com` | **Critical!** Your webapp origin for CORS (with `https://`) |
+| `CSRF_TRUSTED_ORIGINS` | `https://app.example.com,https://api.example.com` | Trusted origins for CSRF (with `https://`) |
 
 **How to get your URLs:**
 1. Go to Render Dashboard
@@ -285,8 +287,8 @@ These variables are needed for rendering email templates:
 
 | Variable | Example Value | Description |
 |----------|---------------|-------------|
-| `VITE_WEB_APP_URL` | `https://webapp-xxxx.onrender.com` | Your webapp URL for email links |
-| `VITE_EMAIL_ASSETS_URL` | `https://webapp-xxxx.onrender.com/email-assets` | URL for email assets (images, styles) |
+| `VITE_WEB_APP_URL` | `https://app.example.com` | Your webapp URL for email links |
+| `VITE_EMAIL_ASSETS_URL` | `https://app.example.com/email-assets` | URL for email assets (images, styles) |
 
 ### AI Features (Optional)
 
@@ -311,11 +313,11 @@ The frontend needs these environment variables:
 
 | Variable | Example Value | Description |
 |----------|---------------|-------------|
-| `VITE_BASE_API_URL` | `https://backend-api-xxxx.onrender.com/api` | Backend API URL (**must include `/api` suffix**) |
+| `VITE_BASE_API_URL` | `https://api.example.com/api` | Backend API URL (**must include `/api` suffix**) |
 
 :::warning Don't Forget the /api Suffix!
 The `VITE_BASE_API_URL` must include `/api` at the end:
-- ✅ `https://backend-api-xxx.onrender.com/api`
+- ✅ `https://api.example.com/api`
 - ❌ `https://backend-api-xxx.onrender.com`
 :::
 
@@ -380,7 +382,7 @@ The `mcp-server` service is included in `render.yaml`. By default, it's configur
 
 | Variable | Example Value | Description |
 |----------|---------------|-------------|
-| `GRAPHQL_ENDPOINT` | `https://backend-api-xxxx.onrender.com/api/graphql/` | Your backend's GraphQL endpoint URL |
+| `GRAPHQL_ENDPOINT` | `https://api.example.com/api/graphql/` | Your backend's GraphQL endpoint URL |
 | `MCP_LOG_LEVEL` | `info` | Log level: `debug`, `info`, `warn`, `error` |
 | `MUTATION_MODE` | `explicit` | Mutation mode: `none`, `explicit`, `all` |
 

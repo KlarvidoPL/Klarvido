@@ -225,7 +225,7 @@ describe('PasskeyLoginButton: Component', () => {
               rpId: 'localhost',
             }),
         })
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: true }) });
       mockCredentialsGet.mockResolvedValue(mockPublicKeyCredential());
 
       render(<PasskeyLoginButton />);
@@ -236,6 +236,8 @@ describe('PasskeyLoginButton: Component', () => {
         expect(trackEvent).toHaveBeenCalledWith('auth', 'passkey-login');
       });
       expect(window.location.href).toBe('/en/');
+      expect(localStorage.getItem('token')).toBeNull();
+      expect(localStorage.getItem('refresh_token')).toBeNull();
     });
 
     it('should redirect to custom path when redirect param is present', async () => {
@@ -251,7 +253,7 @@ describe('PasskeyLoginButton: Component', () => {
               rpId: 'localhost',
             }),
         })
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: true }) });
       mockCredentialsGet.mockResolvedValue(mockPublicKeyCredential());
 
       render(<PasskeyLoginButton />);

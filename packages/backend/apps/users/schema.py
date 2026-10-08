@@ -35,7 +35,38 @@ def _create_session_for_user(user, request, refresh_token: str = None):
         return None
 
 
-class ObtainTokenMutation(mutations.SerializerMutation):
+class CookieAuthenticationMutation(mutations.SerializerMutation):
+    """Tokens remain internal to the mutation and are delivered only as HttpOnly cookies."""
+
+    class Meta:
+        abstract = True
+
+    authenticated = graphene.Boolean(required=True)
+
+    @staticmethod
+    def resolve_authenticated(root, info):
+        return bool(getattr(root, "access", None))
+
+    @staticmethod
+    def resolve_access(root, info):
+        return None
+
+    @staticmethod
+    def resolve_refresh(root, info):
+        return None
+
+
+class ObtainTokenMutation(CookieAuthenticationMutation):
+    otp_required = graphene.Boolean(required=True)
+
+    @staticmethod
+    def resolve_otp_required(root, info):
+        return bool(root.otp_auth_token)
+
+    @staticmethod
+    def resolve_otp_auth_token(root, info):
+        return None
+
     class Meta:
         serializer_class = serializers.CookieTokenObtainPairSerializer
 
@@ -83,7 +114,7 @@ class ObtainTokenMutation(mutations.SerializerMutation):
         return mutation
 
 
-class SingUpMutation(mutations.SerializerMutation):
+class SingUpMutation(CookieAuthenticationMutation):
     class Meta:
         serializer_class = serializers.UserSignupSerializer
 
@@ -150,7 +181,7 @@ class VerifyOTPMutation(mutations.SerializerMutation):
         serializer_class = serializers.VerifyOTPSerializer
 
 
-class ValidateOTPMutation(mutations.SerializerMutation):
+class ValidateOTPMutation(CookieAuthenticationMutation):
     class Meta:
         serializer_class = serializers.ValidateOTPSerializer
 
@@ -400,7 +431,7 @@ class UpdateCurrentUserMutation(mutations.UpdateModelMutation):
         return get_user_from_resolver(info).profile
 
 
-class ChangePasswordMutation(mutations.SerializerMutation):
+class ChangePasswordMutation(CookieAuthenticationMutation):
     class Meta:
         serializer_class = serializers.UserAccountChangePasswordSerializer
         exclude = ("user",)

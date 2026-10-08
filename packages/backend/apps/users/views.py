@@ -33,7 +33,7 @@ class CookieTokenRefreshView(jwt_views.TokenRefreshView):
             utils.reset_auth_cookie(response)
             return response
 
-        response = Response(serializer.data, status=status.HTTP_200_OK)
+        response = Response({"success": True}, status=status.HTTP_200_OK)
 
         utils.set_auth_cookie(
             response,

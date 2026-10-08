@@ -20,8 +20,7 @@ export const verifyOtpMutation = gql(/* GraphQL */ `
 export const validateOtpMutation = gql(/* GraphQL */ `
   mutation validateOtp($input: ValidateOTPMutationInput!) {
     validateOtp(input: $input) {
-      access
-      refresh
+      authenticated
     }
   }
 `);

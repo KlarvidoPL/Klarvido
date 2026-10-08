@@ -145,5 +145,6 @@ def test_actual_login_with_csrf_bootstrap(cookies_blocked, user_factory, faker):
     )
     assert response.status_code == 200
     assert not response.json().get('errors'), response.content
-    assert response.json()['data']['tokenAuth']['access']
+    assert response.json()['data']['tokenAuth']['access'] is None
+    assert response.json()['data']['tokenAuth']['refresh'] is None
     assert response.cookies[settings.ACCESS_TOKEN_COOKIE].value

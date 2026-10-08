@@ -254,7 +254,7 @@ services:
       
       # API URL (Required - set after backend deployment)
       - key: VITE_BASE_API_URL
-        sync: false  # Set to your API URL with /api suffix (e.g., https://backend-api-xxxx.onrender.com/api)
+        sync: false # Use a same-site custom API domain (https://api.example.com/api), not a separate onrender.com site.
       
       # Environment name
       - key: VITE_ENVIRONMENT_NAME

@@ -23,7 +23,7 @@ jest.mock('react-router-dom', () => {
 
 const Component = () => <ValidateOtpForm />;
 
-const tokensMock = { access: 'access-token', refresh: 'refresh-token' };
+const tokensMock = { authenticated: true };
 const user = currentUserFactory();
 
 describe('ValidateOtpForm: Component', () => {

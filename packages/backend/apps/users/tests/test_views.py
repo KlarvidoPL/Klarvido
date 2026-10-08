@@ -68,8 +68,8 @@ class TestTokenRefresh:
         response = api_client.post(reverse('jwt_token_refresh'), data={'refresh': str(refresh)})
 
         assert response.status_code == status.HTTP_200_OK
-        new_access_token_raw = response.json().get('access')
-        new_refresh_token_raw = response.json().get('refresh')
+        new_access_token_raw = response.cookies[settings.ACCESS_TOKEN_COOKIE].value
+        new_refresh_token_raw = response.cookies[settings.REFRESH_TOKEN_COOKIE].value
         assert AccessToken(new_access_token_raw), new_access_token_raw
         assert RefreshToken(new_refresh_token_raw), new_refresh_token_raw
         assert BlacklistedToken.objects.filter(token__jti=refresh['jti']).exists()

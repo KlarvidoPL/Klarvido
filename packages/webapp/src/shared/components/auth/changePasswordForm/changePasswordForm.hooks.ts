@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client/react';
-import { useCommonQuery } from '@sb/webapp-api-client/providers';
-import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
+import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { useIntl } from 'react-intl';
@@ -55,12 +55,8 @@ export const useChangePasswordForm = (hasUsablePassword: boolean) => {
   } = form;
 
   const [commitChangePasswordMutation, { loading }] = useMutation(authChangePasswordMutation, {
-    onCompleted: async (data) => {
+    onCompleted: async () => {
       trackEvent('profile', 'password-update');
-
-      if (data.changePassword?.access) {
-        storeAuthTokens(data.changePassword.access, data.changePassword.refresh ?? undefined);
-      }
 
       // A successful call without oldPassword means this was a first-time "set
       // password" for an OAuth-only account - refetch so currentUser.hasUsablePassword

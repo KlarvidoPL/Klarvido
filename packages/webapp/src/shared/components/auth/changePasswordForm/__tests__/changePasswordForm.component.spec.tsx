@@ -31,8 +31,7 @@ const defaultValues = {
 
 const defaultResult = {
   changePassword: {
-    access: '',
-    refresh: '',
+    authenticated: true,
   },
 };
 
@@ -205,7 +204,7 @@ describe('ChangePasswordForm: Component', () => {
     it('should store fresh auth tokens after successfully setting a password', async () => {
       const requestMock = composeMockedQueryResult(authChangePasswordMutation, {
         variables: { input: { newPassword: formData.newPassword } },
-        data: { changePassword: { access: 'new-access-token', refresh: 'new-refresh-token' } },
+        data: { changePassword: { authenticated: true } },
       });
 
       const { waitForApolloMocks } = render(<SetPasswordComponent />, {
@@ -220,8 +219,8 @@ describe('ChangePasswordForm: Component', () => {
 
       await waitForApolloMocks();
 
-      expect(localStorage.getItem('token')).toBe('new-access-token');
-      expect(localStorage.getItem('refresh_token')).toBe('new-refresh-token');
+      expect(localStorage.getItem('token')).toBeNull();
+      expect(localStorage.getItem('refresh_token')).toBeNull();
     });
 
     it('should refetch currentUser after successfully setting a password', async () => {

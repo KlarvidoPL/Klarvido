@@ -6,6 +6,7 @@ from django.urls import reverse
 
 
 def set_auth_cookie(response, data):
+    response["Cache-Control"] = "no-store"
     cookie_max_age = settings.COOKIE_MAX_AGE
     cookie_secure = getattr(settings, "COOKIE_SECURE", True)
     cookie_samesite = getattr(settings, "COOKIE_SAMESITE", "Lax")

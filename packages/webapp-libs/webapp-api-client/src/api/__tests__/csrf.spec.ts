@@ -44,7 +44,7 @@ describe('CSRF request protection', () => {
     expect(options.credentials).toBe('include');
   });
 
-  it('adds CSRF and bearer headers to REST refresh/logout requests', async () => {
+  it('adds CSRF proof and ignores legacy stored bearer tokens for REST logout', async () => {
     fetchMock.mockResolvedValue(jsonResponse({ csrfToken: 'rest-proof' }));
     localStorage.setItem('token', 'explicit-access');
     const adapter = jest.fn(async (config) => ({ data: {}, status: 200, statusText: 'OK', headers: {}, config }));
@@ -53,7 +53,7 @@ describe('CSRF request protection', () => {
       const headers = adapter.mock.calls[0][0].headers;
       const findHeader = (name: string) => Object.entries(headers).find(([key]) => key.toLowerCase() === name)?.[1];
       expect(findHeader('x-csrftoken')).toBe('rest-proof');
-      expect(findHeader('authorization')).toBe('Bearer explicit-access');
+      expect(findHeader('authorization')).toBeUndefined();
     } finally {
       localStorage.removeItem('token');
     }

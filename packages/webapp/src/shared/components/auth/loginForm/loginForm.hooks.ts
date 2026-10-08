@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react';
-import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
@@ -41,15 +41,11 @@ export const useLoginForm = () => {
 
   const [commitLoginMutation, { loading }] = useMutation(authSinginMutation, {
     onCompleted: async ({ tokenAuth }) => {
-      if (tokenAuth?.otpAuthToken) {
+      if (tokenAuth?.otpRequired) {
         return navigate({
           pathname: generateLocalePath(RoutesConfig.validateOtp),
           search: search || undefined,
         });
-      }
-
-      if (tokenAuth?.access) {
-        storeAuthTokens(tokenAuth.access, tokenAuth.refresh ?? undefined);
       }
 
       trackEvent('auth', 'log-in');

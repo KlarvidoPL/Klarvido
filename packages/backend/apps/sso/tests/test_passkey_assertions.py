@@ -97,7 +97,7 @@ def assertion(user):
     return client, passkey, build
 
 
-@pytest.mark.parametrize('mode,omit_handle', [('identified', True), ('identified', False), ('discoverable', False)])
+@pytest.mark.parametrize('mode,omit_handle', [('identified', False), ('discoverable', False)])
 @pytest.mark.parametrize('otp_enabled', [False, True])
 def test_valid_assertion_can_login(user, assertion, mode, omit_handle, otp_enabled):
     user.otp_enabled = otp_enabled
@@ -109,8 +109,10 @@ def test_valid_assertion_can_login(user, assertion, mode, omit_handle, otp_enabl
         payload.pop('userHandle')
     response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
     assert response.status_code == 200
-    assert response.data['access'] and response.data['refresh']
-    assert AccessToken(response.data['access'])['auth_method'] == 'passkey'
+    assert response.data == {'success': True}
+    assert settings.ACCESS_TOKEN_COOKIE in response.cookies
+    assert settings.REFRESH_TOKEN_COOKIE in response.cookies
+    assert AccessToken(response.cookies[settings.ACCESS_TOKEN_COOKIE].value)['auth_method'] == 'passkey'
     assert settings.OTP_AUTH_TOKEN_COOKIE not in response.cookies
     passkey.refresh_from_db()
     challenge.refresh_from_db()
@@ -140,6 +142,7 @@ def test_valid_assertion_can_login(user, assertion, mode, omit_handle, otp_enabl
         ('discoverable', 'invalid-handle'),
         ('discoverable', 'empty-handle'),
         ('discoverable', 'missing-handle'),
+        ('identified', 'missing-handle'),
         ('identified', 'challenge-owner'),
     ],
 )
@@ -448,7 +451,9 @@ def test_browser_bound_login_supports_cookie_and_cookie_blocked_flows(assertion,
         client.credentials(HTTP_ORIGIN=settings.WEB_APP_URL, HTTP_X_CSRFTOKEN=refreshed)
     response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
     assert response.status_code == 200
-    assert response.data['access'] and response.data['refresh']
+    assert response.data == {'success': True}
+    assert settings.ACCESS_TOKEN_COOKIE in response.cookies
+    assert settings.REFRESH_TOKEN_COOKIE in response.cookies
 
 
 def test_legacy_unbound_challenge_cannot_login_over_http(assertion):
@@ -460,3 +465,28 @@ def test_legacy_unbound_challenge_cannot_login_over_http(assertion):
     assert response.status_code == 400
     challenge.refresh_from_db()
     assert challenge.used_at is None
+
+
+@pytest.mark.parametrize('account', ['with-passkey', 'without-passkey', 'inactive', 'unknown', 'omitted'])
+def test_public_login_options_do_not_disclose_accounts_or_credentials(user, assertion, account):
+    client, passkey, _ = assertion
+    email = user.email
+    if account == 'without-passkey':
+        passkey.delete()
+    elif account == 'inactive':
+        user.is_active = False
+        user.save(update_fields=['is_active'])
+    elif account == 'unknown':
+        email = 'unknown@example.com'
+    response = client.post(
+        '/api/sso/passkeys/authenticate/options',
+        {} if account == 'omitted' else {'email': email},
+        format='json',
+    )
+    assert response.status_code == 200
+    assert set(response.data) == {'challenge', 'timeout', 'rpId', 'userVerification'}
+    assert response.data['userVerification'] == 'required'
+    assert response.data['rpId'] == WebAuthnService().rp_id
+    challenge = WebAuthnChallenge.objects.get(challenge=response.data['challenge'])
+    assert challenge.user_id is None
+    assert 'allowCredentials' not in response.data

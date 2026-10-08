@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react';
-import { extractGraphQLErrors, storeAuthTokens } from '@sb/webapp-api-client/api';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sb/webapp-core/components/forms';
@@ -74,9 +74,7 @@ export const ValidateOtpForm = () => {
   const handleFormSubmit = async (values: { token: string }) => {
     try {
       const { data } = await commitValidateOtpMutation({ variables: { input: { otpToken: values.token } } });
-      if (data?.validateOtp?.access) {
-        storeAuthTokens(data.validateOtp.access, data.validateOtp.refresh ?? undefined);
-
+      if (data?.validateOtp?.authenticated) {
         // Reload the common query to get fresh user data
         await reloadCommonQuery();
 

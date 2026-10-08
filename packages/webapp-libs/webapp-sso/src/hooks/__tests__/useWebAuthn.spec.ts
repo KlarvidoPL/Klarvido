@@ -250,14 +250,13 @@ it('includes API cookies for both browser-bound login requests', async () => {
     } as Response)
     .mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ access: 'access', refresh: 'refresh' }),
+      json: async () => ({ success: true }),
     } as Response);
   try {
     const { result } = renderHook(() => useWebAuthn());
     await act(async () => {
       expect(await result.current.authenticateWithPasskey()).toEqual({
-        access: 'access',
-        refresh: 'refresh',
+        success: true,
       });
     });
     expect(fetchMock).toHaveBeenCalledTimes(2);

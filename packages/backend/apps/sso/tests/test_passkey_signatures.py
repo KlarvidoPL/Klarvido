@@ -102,7 +102,7 @@ def test_login_requires_valid_signature(signature_policy, user, public_key_cose,
     passkey = UserPasskeyFactory(user=user, public_key=encode(public_key_cose))
     options = client.post('/api/sso/passkeys/authenticate/options', {'email': user.email}, format='json')
     assert options.status_code == 200
-    assert options.data['allowCredentials'][0]['id'] == passkey.credential_id
+    assert 'allowCredentials' not in options.data
     challenge = options.data['challenge']
     auth_data, client_data, signature = signed_assertion(challenge)
     tokens_before = OutstandingToken.objects.filter(user=user).count()
@@ -112,6 +112,7 @@ def test_login_requires_valid_signature(signature_policy, user, public_key_cose,
         {
             'challenge': challenge,
             'credentialId': passkey.credential_id,
+            'userHandle': WebAuthnService(user)._encode_user_id(user),
             'authenticatorData': encode(auth_data),
             'clientDataJSON': encode(client_data),
             'signature': encode(signature if valid_signature else b'forged-signature'),
@@ -123,7 +124,7 @@ def test_login_requires_valid_signature(signature_policy, user, public_key_cose,
 
     if valid_signature:
         assert response.status_code == 200
-        assert response.data['access'] and response.data['refresh']
+        assert response.data == {'success': True}
         assert settings.ACCESS_TOKEN_COOKIE in response.cookies
         assert settings.REFRESH_TOKEN_COOKIE in response.cookies
         assert OutstandingToken.objects.filter(user=user).count() == tokens_before + 1

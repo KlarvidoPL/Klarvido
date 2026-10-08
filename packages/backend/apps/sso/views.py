@@ -797,16 +797,9 @@ class PasskeyAuthenticationOptionsView(APIView):
 
     def post(self, request):
         browser_binding = browser_csrf_binding(request)
-        # For discoverable credentials, user may not be known yet
-        email = request.data.get("email")
-        user = None
-
-        if email:
-            from apps.users.models import User
-
-            user = User.objects.filter(email__iexact=email).first()
-
-        webauthn_service = WebAuthnService(user)
+        # Public login is always discoverable: never resolve emails or disclose
+        # credential IDs, transports, or whether an account exists.
+        webauthn_service = WebAuthnService()
 
         options, challenge = webauthn_service.create_authentication_options(
             user_verification="required",
@@ -871,14 +864,8 @@ class PasskeyAuthenticationVerifyView(APIView):
             except Exception:
                 session_id = None
 
-            # Return tokens in body for localStorage (Safari/mobile fallback when cookies blocked)
-            response = Response(
-                {
-                    'success': True,
-                    'access': tokens['access'],
-                    'refresh': tokens['refresh'],
-                }
-            )
+            # Browser sessions are delivered only through HttpOnly cookies.
+            response = Response({'success': True})
             auth_cookies = {
                 settings.ACCESS_TOKEN_COOKIE: tokens["access"],
                 settings.REFRESH_TOKEN_COOKIE: tokens["refresh"],

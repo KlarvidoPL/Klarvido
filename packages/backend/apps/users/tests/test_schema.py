@@ -8,7 +8,6 @@ from common.acl.helpers import CommonGroups
 from config import settings
 from graphene_file_upload.django.testing import file_graphql_query
 from graphql_relay import to_global_id
-from rest_framework_simplejwt.settings import api_settings as jwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken, BlacklistedToken, AccessToken
 from .. import models, tokens
 from ..utils import generate_otp_auth_token
@@ -19,11 +18,8 @@ pytestmark = pytest.mark.django_db
 API_GRAPHQL_PATH = "/api/graphql/"
 
 
-def validate_jwt(response_data, user):
-    AuthToken = jwt_api_settings.AUTH_TOKEN_CLASSES[0]
-    token = AuthToken(response_data['access'])
-
-    return token[jwt_api_settings.USER_ID_CLAIM] == user.id
+def validate_cookie_payload(response_data):
+    return response_data['authenticated'] and response_data['access'] is None and response_data['refresh'] is None
 
 
 class TestSignup:
@@ -32,6 +28,7 @@ class TestSignup:
           signUp(input: $input) {
             id
             email
+            authenticated
             access
             refresh
           }
@@ -73,8 +70,10 @@ class TestSignup:
     def test_create_user(self, graphene_client, faker):
         email = faker.email()
         password = faker.password()
-        graphene_client.mutate(self.MUTATION, variable_values={'input': {'email': email, 'password': password}})
-
+        executed = graphene_client.mutate(
+            self.MUTATION, variable_values={'input': {'email': email, 'password': password}}
+        )
+        assert 'errors' not in executed, executed
         assert models.User.objects.get(email=email)
 
     def test_create_user_profile_instance(self, graphene_client, faker):
@@ -129,8 +128,10 @@ class TestObtainToken:
     MUTATION = '''
         mutation($input: ObtainTokenMutationInput!){
           tokenAuth(input: $input) {
+            authenticated,
             access,
             refresh,
+            otpRequired
             otpAuthToken
           }
         }
@@ -152,7 +153,7 @@ class TestObtainToken:
             self.MUTATION, variable_values={'input': {'email': user.email, 'password': password}}
         )
 
-        assert validate_jwt(executed["data"]["tokenAuth"], user)
+        assert validate_cookie_payload(executed["data"]["tokenAuth"])
         assert executed["data"]["tokenAuth"]["otpAuthToken"] is None
 
     def test_sets_session_id_cookie(self, api_client, user, faker):
@@ -193,9 +194,10 @@ class TestObtainToken:
         )
         otp_auth_token = response.json()["data"]["tokenAuth"]["otpAuthToken"]
 
-        assert otp_auth_token
-        assert response.cookies[settings.OTP_AUTH_TOKEN_COOKIE].value == otp_auth_token
-        assert AccessToken(otp_auth_token)["user_id"] == str(user.id)
+        assert otp_auth_token is None
+        assert response.json()["data"]["tokenAuth"]["otpRequired"] is True
+        cookie_token = response.cookies[settings.OTP_AUTH_TOKEN_COOKIE].value
+        assert AccessToken(cookie_token)["user_id"] == str(user.id)
         assert response.json()["data"]["tokenAuth"]["access"] is None
         assert response.json()["data"]["tokenAuth"]["refresh"] is None
 
@@ -458,6 +460,7 @@ class TestChangePasswordMutation:
         mutation ChangePassword($input: ChangePasswordMutationInput!) {
           changePassword(input: $input) {
             refresh
+            authenticated
             access
           }
         }
@@ -477,7 +480,7 @@ class TestChangePasswordMutation:
         user.refresh_from_db()
 
         assert "errors" not in executed
-        assert validate_jwt(executed["data"]["changePassword"], user)
+        assert validate_cookie_payload(executed["data"]["changePassword"])
 
     def test_wrong_old_password(self, graphene_client, user, faker):
         graphene_client.force_authenticate(user)
@@ -519,7 +522,7 @@ class TestChangePasswordMutation:
         )
 
         assert "errors" not in executed
-        assert validate_jwt(executed["data"]["changePassword"], user)
+        assert validate_cookie_payload(executed["data"]["changePassword"])
 
         user.refresh_from_db()
         assert user.check_password(new_password)
@@ -900,6 +903,7 @@ class TestValidateOTPMutation:
     VALIDATE_OTP_MUTATION = '''
         mutation($input: ValidateOTPMutationInput!)  {
           validateOtp(input: $input) {
+            authenticated,
             access,
             refresh
           }
@@ -949,10 +953,10 @@ class TestValidateOTPMutation:
         )
         response_data = response.json()["data"]
 
-        assert validate_jwt(response_data["validateOtp"], user)
+        assert validate_cookie_payload(response_data["validateOtp"])
         assert response.cookies[settings.OTP_AUTH_TOKEN_COOKIE].value == ""
-        assert response.cookies[settings.ACCESS_TOKEN_COOKIE].value == response_data["validateOtp"]["access"]
-        assert response.cookies[settings.REFRESH_TOKEN_COOKIE].value == response_data["validateOtp"]["refresh"]
+        assert AccessToken(response.cookies[settings.ACCESS_TOKEN_COOKIE].value)["user_id"] == str(user.pk)
+        assert RefreshToken(response.cookies[settings.REFRESH_TOKEN_COOKIE].value)["user_id"] == str(user.pk)
 
     def test_success_with_otp_auth_token_in_payload(self, api_client, user_factory, totp_mock):
         user = user_factory.create(otp_verified=True, otp_enabled=True)
@@ -968,7 +972,7 @@ class TestValidateOTPMutation:
         )
         response_data = response.json()["data"]
 
-        assert validate_jwt(response_data["validateOtp"], user)
+        assert validate_cookie_payload(response_data["validateOtp"])
 
 
 class TestDisableOTPMutation:

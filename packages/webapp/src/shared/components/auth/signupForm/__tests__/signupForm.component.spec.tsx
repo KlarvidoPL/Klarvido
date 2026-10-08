@@ -50,8 +50,7 @@ describe('SignupForm: Component', () => {
       variables: mockCredentials,
       data: {
         signUp: {
-          access: 'access-token',
-          refresh: 'refresh-token',
+          authenticated: true,
         },
       },
     });
