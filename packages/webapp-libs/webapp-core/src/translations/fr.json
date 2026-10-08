@@ -5773,5 +5773,8 @@
   },
   "Passkeys / Or": {
     "defaultMessage": "ou"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "Une clé d’accès vérifiée par votre empreinte digitale, votre visage ou le code PIN de votre appareil remplace le code de l’application d’authentification lors de la connexion. La connexion par mot de passe ou compte social nécessite toujours un code lorsque l’authentification à deux facteurs est activée."
   }
 }

@@ -15,6 +15,7 @@ from django.core.cache import cache
 from django.db import connections
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from rest_framework_simplejwt.tokens import AccessToken
 
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog, SSOSession, UserPasskey, WebAuthnChallenge
@@ -95,7 +96,11 @@ def assertion(user):
 
 
 @pytest.mark.parametrize('mode,omit_handle', [('identified', True), ('identified', False), ('discoverable', False)])
-def test_valid_assertion_can_login(user, assertion, mode, omit_handle):
+@pytest.mark.parametrize('otp_enabled', [False, True])
+def test_valid_assertion_can_login(user, assertion, mode, omit_handle, otp_enabled):
+    user.otp_enabled = otp_enabled
+    user.otp_verified = otp_enabled
+    user.save(update_fields=['otp_enabled', 'otp_verified'])
     client, passkey, build = assertion
     payload, challenge = build(mode)
     if omit_handle:
@@ -103,6 +108,8 @@ def test_valid_assertion_can_login(user, assertion, mode, omit_handle):
     response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
     assert response.status_code == 200
     assert response.data['access'] and response.data['refresh']
+    assert AccessToken(response.data['access'])['auth_method'] == 'passkey'
+    assert settings.OTP_AUTH_TOKEN_COOKIE not in response.cookies
     passkey.refresh_from_db()
     challenge.refresh_from_db()
     assert challenge.used_at is not None
@@ -272,3 +279,22 @@ def test_concurrent_zero_counter_assertions_preserve_usage_count(assertion):
     assert passkey.use_count == 2
     assert WebAuthnChallenge.objects.filter(used_at__isnull=False).count() == 2
     assert SSOAuditLog.objects.filter(event_type=SSOAuditEventType.PASSKEY_AUTH_SUCCESS).count() == 2
+
+
+@pytest.mark.parametrize('change', ['missing-uv', 'legacy-policy'])
+def test_otp_enabled_account_cannot_login_with_unverified_passkey(user, assertion, change):
+    user.otp_enabled = True
+    user.otp_verified = True
+    user.save(update_fields=['otp_enabled', 'otp_verified'])
+    client, passkey, build = assertion
+    payload, challenge = build(change=change)
+    tokens_before = OutstandingToken.objects.count()
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    assert response.status_code == 400
+    assert 'access' not in response.data and 'refresh' not in response.data
+    assert OutstandingToken.objects.count() == tokens_before
+    assert not SSOSession.objects.filter(user=user).exists()
+    challenge.refresh_from_db()
+    passkey.refresh_from_db()
+    assert challenge.used_at is None
+    assert passkey.use_count == 0

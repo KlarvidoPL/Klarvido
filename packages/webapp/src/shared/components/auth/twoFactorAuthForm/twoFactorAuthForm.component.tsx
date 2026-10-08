@@ -52,6 +52,13 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
           />
         </p>
 
+        <p className="text-sm text-muted-foreground">
+          <FormattedMessage
+            defaultMessage="A passkey verified with your fingerprint, face, or device PIN replaces the authenticator code when signing in. Password and social sign-ins still require a code when two-factor authentication is enabled."
+            id="Auth / Two-factor / Passkey login policy"
+          />
+        </p>
+
         {isEnabled ? (
           <div className="rounded-lg border bg-card p-4">
             <div className="flex items-center justify-between gap-3">
@@ -67,7 +74,10 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
                         id="Auth / Two-factor / Status label"
                       />
                     </p>
-                    <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400">
+                    <Badge
+                      variant="outline"
+                      className="border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400"
+                    >
                       <FormattedMessage defaultMessage="Enabled" id="Auth / Two-factor / Enabled badge" />
                     </Badge>
                   </div>
@@ -139,10 +149,7 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
       >
         <DialogContent aria-describedby="two-factor-dialog-description">
           <DialogTitle className="sr-only">
-            <FormattedMessage
-              defaultMessage="Set Up Two-Factor Authentication"
-              id="Auth / Two-factor / Dialog Title"
-            />
+            <FormattedMessage defaultMessage="Set Up Two-Factor Authentication" id="Auth / Two-factor / Dialog Title" />
           </DialogTitle>
           <DialogDescription id="two-factor-dialog-description" className="sr-only">
             <FormattedMessage

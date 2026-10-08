@@ -5773,5 +5773,8 @@
   },
   "Passkeys / Or": {
     "defaultMessage": "或"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "登录时，通过指纹、面部识别或设备 PIN 验证的通行密钥可替代身份验证器验证码。启用双重身份验证后，使用密码或社交账号登录仍需输入验证码。"
   }
 }

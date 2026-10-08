@@ -5773,5 +5773,8 @@
   },
   "Passkeys / Or": {
     "defaultMessage": "o"
+  },
+  "Auth / Two-factor / Passkey login policy": {
+    "defaultMessage": "Una clave de acceso verificada con tu huella, rostro o PIN del dispositivo sustituye el código de la aplicación de autenticación al iniciar sesión. El inicio de sesión con contraseña o cuenta social sigue requiriendo un código cuando la autenticación de dos factores está activada."
   }
 }

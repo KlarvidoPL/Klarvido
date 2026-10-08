@@ -850,6 +850,9 @@ class PasskeyAuthenticationVerifyView(APIView):
             from apps.users.utils import set_auth_cookie
             from .services import SessionService
 
+            # Policy: server-verified passkeys with mandatory UV replace the OTP
+            # step, including for OTP-enabled accounts. Never issue tokens before
+            # verify_authentication has checked the signed UV flag.
             tokens = create_jwt_tokens(user, auth_method='passkey')
 
             # Create SSOSession for tracking, linked to the issued refresh token
