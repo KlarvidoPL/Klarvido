@@ -335,7 +335,7 @@ export function useWebAuthn() {
 
   const authorizePasskeyChange = useCallback(
     async (
-      action: 'register' | 'delete',
+      action: 'register' | 'delete' | 'otp_setup' | 'otp_disable',
       passkeyId?: string,
       password?: string,
       otpToken?: string,
@@ -347,6 +347,31 @@ export function useWebAuthn() {
         password,
         otpToken,
       );
+      if (typeof data.authorization !== 'string' || !data.authorization)
+        throw new Error('Fresh authentication failed');
+      return data.authorization;
+    },
+    [],
+  );
+
+  // For an account with no password and no passkey, the only factor it can prove
+  // to replace/disable an already-active 2FA secret is that secret's current code -
+  // there is no "options" step (no passkey challenge, no password check) for this.
+  const authorizeOtpOnly = useCallback(
+    async (action: 'otp_setup' | 'otp_disable', otpToken: string): Promise<string> => {
+      const response = await csrfFetch(`${API_BASE}/passkeys/reauthenticate/verify`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: managementHeaders(),
+        body: JSON.stringify({ action, otpToken }),
+      });
+      if (!response.ok) {
+        const failure = await response.json().catch(() => ({}));
+        throw Object.assign(new Error('Fresh authentication failed'), {
+          code: response.status === 429 ? 'rate_limited' : failure.code,
+        });
+      }
+      const data = await response.json();
       if (typeof data.authorization !== 'string' || !data.authorization)
         throw new Error('Fresh authentication failed');
       return data.authorization;
@@ -379,6 +404,7 @@ export function useWebAuthn() {
     error,
     registerPasskey,
     authorizePasskeyChange,
+    authorizeOtpOnly,
     unlinkSocialAccount,
     authenticateWithPasskey,
   };

@@ -10,7 +10,8 @@ from graphene_file_upload.django.testing import file_graphql_query
 from graphql_relay import to_global_id
 from rest_framework_simplejwt.tokens import RefreshToken, BlacklistedToken, AccessToken
 from .. import models, tokens
-from ..utils import generate_otp_auth_token
+from ..services import otp as otp_services
+from ..services.otp_login import begin_otp_login
 from apps.multitenancy.constants import TenantType
 
 pytestmark = pytest.mark.django_db
@@ -850,19 +851,60 @@ class TestGenerateOTPMutation:
         assert executed["errors"]
         assert executed["errors"][0]["message"] == "permission_denied"
 
-    def test_success(self, graphene_client, user):
+    def test_success(self, api_client, user):
+        # The default `user` fixture has a usable password, so enabling 2FA for the
+        # first time needs fresh proof - acquire a grant like any real client would,
+        # through the same REST endpoint passkey management uses.
         expected_otpauth_url = f'otpauth://totp/{settings.OTP_AUTH_ISSUER_NAME}:{user.email}?secret='.replace(
             '@', '%40'
         )
+        password = 'Fresh-auth-password-42!'
+        user.set_password(password)
+        user.save(update_fields=['password'])
+        api_client.force_authenticate(user)
+        grant = api_client.post(
+            '/api/sso/passkeys/reauthenticate/verify',
+            {'action': 'otp_setup', 'password': password},
+            format='json',
+        )
+        assert grant.status_code == 200, grant.data
+        api_client.credentials(HTTP_X_PASSKEY_AUTHORIZATION=grant.data['authorization'])
 
-        graphene_client.force_authenticate(user)
-        executed = graphene_client.mutate(self.GENERATE_OTP_MUTATION, variable_values={'input': {}})
+        response = api_client.post(
+            '/api/graphql/',
+            {'query': self.GENERATE_OTP_MUTATION, 'variables': {'input': {}}},
+            format='json',
+        )
+        executed = response.json()
         otp_base_32 = executed['data']['generateOtp']['base32']
         otp_auth_url = executed['data']['generateOtp']['otpauthUrl']
 
         assert otp_base_32
         assert expected_otpauth_url in otp_auth_url
-        assert models.User.objects.filter(id=user.id, otp_base32=otp_base_32, otp_auth_url=otp_auth_url).exists()
+        assert models.User.objects.filter(
+            id=user.id, otp_pending_base32=otp_base_32, otp_pending_auth_url=otp_auth_url
+        ).exists()
+
+    def test_requires_fresh_proof_for_account_with_password(self, api_client, user):
+        api_client.force_authenticate(user)
+        response = api_client.post(
+            '/api/graphql/',
+            {'query': self.GENERATE_OTP_MUTATION, 'variables': {'input': {}}},
+            format='json',
+        )
+        assert response.json()['errors']
+        assert not models.User.objects.get(pk=user.pk).otp_pending_base32
+
+    def test_passwordless_passkeyless_account_can_enroll_without_grant(self, graphene_client, user_factory):
+        user = user_factory()
+        user.set_unusable_password()
+        user.save(update_fields=['password'])
+
+        graphene_client.force_authenticate(user)
+        executed = graphene_client.mutate(self.GENERATE_OTP_MUTATION, variable_values={'input': {}})
+
+        assert not executed.get('errors'), executed
+        assert models.User.objects.get(pk=user.pk).otp_pending_base32
 
 
 class TestVerifyOTPMutation:
@@ -880,7 +922,12 @@ class TestVerifyOTPMutation:
         assert executed["errors"]
         assert executed["errors"][0]["message"] == "permission_denied"
 
-    def test_success(self, graphene_client, user, totp_mock):
+    def test_success(self, graphene_client, user_factory, totp_mock):
+        # Passwordless + no passkeys: first-time enrollment needs no grant.
+        user = user_factory()
+        user.set_unusable_password()
+        user.save(update_fields=['password'])
+        otp_services.generate_otp(user)
         totp_mock(verify=True)
 
         graphene_client.force_authenticate(user)
@@ -889,7 +936,11 @@ class TestVerifyOTPMutation:
         assert executed['data']['verifyOtp']['otpVerified'] is True
         assert models.User.objects.filter(id=user.id, otp_enabled=True, otp_verified=True).exists()
 
-    def test_verification_fail(self, graphene_client, user, totp_mock):
+    def test_verification_fail(self, graphene_client, user_factory, totp_mock):
+        user = user_factory()
+        user.set_unusable_password()
+        user.save(update_fields=['password'])
+        otp_services.generate_otp(user)
         totp_mock(verify=False)
 
         graphene_client.force_authenticate(user)
@@ -897,6 +948,24 @@ class TestVerifyOTPMutation:
 
         assert executed["errors"][0]["message"] == "Verification token is invalid"
         assert models.User.objects.filter(id=user.id, otp_enabled=False, otp_verified=False).exists()
+
+    def test_requires_fresh_proof_to_replace_already_active_otp(self, api_client, user_factory):
+        # Replacement always needs proof, even for a passwordless account that
+        # skipped the grant requirement the first time it enrolled.
+        user = user_factory(otp_enabled=True, otp_verified=True, otp_base32='OLDSECRET')
+        user.set_unusable_password()
+        user.save(update_fields=['password'])
+        otp_services.generate_otp(user)
+        api_client.force_authenticate(user)
+
+        response = api_client.post(
+            '/api/graphql/',
+            {'query': self.VERIFY_OTP_MUTATION, 'variables': {'input': {'otpToken': 'token'}}},
+            format='json',
+        )
+
+        assert response.json()['errors']
+        assert models.User.objects.get(pk=user.pk).otp_base32 == 'OLDSECRET'
 
 
 class TestValidateOTPMutation:
@@ -931,7 +1000,7 @@ class TestValidateOTPMutation:
     def test_return_error_for_otp_validation_failure(self, api_client, user_factory, totp_mock):
         user = user_factory.create(otp_verified=False)
         totp_mock(verify=False)
-        api_client.cookies.load({settings.OTP_AUTH_TOKEN_COOKIE: str(generate_otp_auth_token(user))})
+        api_client.cookies.load({settings.OTP_AUTH_TOKEN_COOKIE: begin_otp_login(user, 'password')})
 
         response = api_client.post(
             path=API_GRAPHQL_PATH,
@@ -944,7 +1013,7 @@ class TestValidateOTPMutation:
     def test_success_sets_auth_cookies(self, api_client, user_factory, totp_mock):
         user = user_factory.create(otp_verified=True, otp_enabled=True)
         totp_mock(verify=True)
-        api_client.cookies.load({settings.OTP_AUTH_TOKEN_COOKIE: str(generate_otp_auth_token(user))})
+        api_client.cookies.load({settings.OTP_AUTH_TOKEN_COOKIE: begin_otp_login(user, 'password')})
 
         response = api_client.post(
             path=API_GRAPHQL_PATH,
@@ -966,7 +1035,7 @@ class TestValidateOTPMutation:
             path=API_GRAPHQL_PATH,
             data={
                 "query": self.VALIDATE_OTP_MUTATION,
-                "variables": {'input': {'otpToken': 'token', 'otpAuthToken': str(generate_otp_auth_token(user))}},
+                "variables": {'input': {'otpToken': 'token', 'otpAuthToken': begin_otp_login(user, 'password')}},
             },
             format="json",
         )
@@ -990,11 +1059,42 @@ class TestDisableOTPMutation:
         assert executed["errors"]
         assert executed["errors"][0]["message"] == "permission_denied"
 
-    def test_success(self, graphene_client, user, totp_mock):
-        graphene_client.force_authenticate(user)
-        executed = graphene_client.mutate(self.DISABLE_OTP_MUTATION, variable_values={'input': {}})
+    def test_success(self, api_client, user):
+        # Disabling always needs fresh proof, even when 2FA isn't actually active -
+        # acquire a grant the same way any real client would.
+        password = 'Fresh-auth-password-42!'
+        user.set_password(password)
+        user.save(update_fields=['password'])
+        api_client.force_authenticate(user)
+        grant = api_client.post(
+            '/api/sso/passkeys/reauthenticate/verify',
+            {'action': 'otp_disable', 'password': password},
+            format='json',
+        )
+        assert grant.status_code == 200, grant.data
+        api_client.credentials(HTTP_X_PASSKEY_AUTHORIZATION=grant.data['authorization'])
+
+        response = api_client.post(
+            '/api/graphql/',
+            {'query': self.DISABLE_OTP_MUTATION, 'variables': {'input': {}}},
+            format='json',
+        )
+        executed = response.json()
 
         assert executed['data']['disableOtp']['ok'] is True
         assert models.User.objects.filter(
             id=user.id, otp_enabled=False, otp_verified=False, otp_base32="", otp_auth_url=""
         ).exists()
+
+    def test_requires_fresh_proof(self, api_client, user_factory):
+        user = user_factory(otp_enabled=True, otp_verified=True, otp_base32='SOMESECRET')
+        api_client.force_authenticate(user)
+
+        response = api_client.post(
+            '/api/graphql/',
+            {'query': self.DISABLE_OTP_MUTATION, 'variables': {'input': {}}},
+            format='json',
+        )
+
+        assert response.json()['errors']
+        assert models.User.objects.get(pk=user.pk).otp_enabled

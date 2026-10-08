@@ -21,11 +21,10 @@ function - worth spelling out so a future reader doesn't assume it's a gap:
     password on each authenticated request (apps.users.authentication,
     REVOKE_TOKEN_CLAIM="hash_password") - set_unusable_password() below changes
     that hash immediately.
-  - The separate pending-OTP-login proof (otp_auth_token, parsed directly in
+  - The separate pending-OTP-login proof (PendingOTPLogin, looked up by hash in
     ValidateOTPSerializer rather than going through the access-token auth class
-    above) is blocked because disable_otp() sets otp_verified=False, and
-    apps.users.services.otp._check_otp unconditionally rejects validation while
-    that flag is false, regardless of the token or code presented.
+    above) is explicitly deleted below, and would be rejected even if it weren't:
+    its stored credential_version stops matching the moment the password changes.
   - A passkey authentication (login) challenge against a passkey this function
     just deactivated fails because WebAuthnService.verify_authentication's
     credential lookup filters is_active=True.
@@ -39,7 +38,7 @@ from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog, UserPasskey, WebAuthnChallenge, PasskeyManagementGrant
 from apps.sso.services.sessions import SessionService
 from apps.users import notifications, tokens, jwt
-from apps.users.models import PendingSocialAccountLink, User
+from apps.users.models import PendingOTPLogin, PendingSocialAccountLink, User
 from apps.users.services import otp as otp_services
 
 
@@ -69,6 +68,7 @@ def reclaim_unconfirmed_account(user: User, actor: User) -> User:
     SessionService(account).revoke_all_sessions()
     jwt.blacklist_user_tokens(account)
     PendingSocialAccountLink.objects.filter(user=account).delete()
+    PendingOTPLogin.objects.filter(user=account).delete()
     UserSocialAuth.objects.filter(user=account).delete()
 
     SSOAuditLog.log_event(

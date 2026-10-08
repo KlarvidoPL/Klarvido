@@ -676,7 +676,15 @@ class PasskeyManagementGrant(TimestampedMixin, models.Model):
 
     id = hashid_field.HashidAutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    action = models.CharField(max_length=10, choices=[("register", "Register"), ("delete", "Delete")])
+    action = models.CharField(
+        max_length=20,
+        choices=[
+            ("register", "Register"),
+            ("delete", "Delete"),
+            ("otp_setup", "OTP Setup"),
+            ("otp_disable", "OTP Disable"),
+        ],
+    )
     passkey = models.ForeignKey(UserPasskey, on_delete=models.CASCADE, null=True, blank=True)
     token_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
     authentication_challenge = models.OneToOneField(

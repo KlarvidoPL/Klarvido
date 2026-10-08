@@ -2,7 +2,7 @@
 
 Reviewed 2026-10-08 against master `a4690b1bd5c6bc5daa9ade6cd683b52e7883f647`.
 
-This is a defensive source review with isolated Docker verification, not a production penetration test or a guarantee of complete security. The original audit did not modify application behavior. Findings distinguish reproduced behavior from code observations and deployment-dependent risks. E01 is addressed by the subsequent local implementation described below; E02–E15 remain open.
+This is a defensive source review with isolated Docker verification, not a production penetration test or a guarantee of complete security. The original audit did not modify application behavior. Findings distinguish reproduced behavior from code observations and deployment-dependent risks. E01, E02, E03 and the replay portion of E07 are addressed by the subsequent local implementation described below; E04–E06, E08–E15 and the remainder of E07 remain open.
 
 ## Scope and trust boundaries
 
@@ -14,23 +14,23 @@ No live customer accounts, production credentials, email delivery or production 
 
 ## Prioritized findings
 
-| ID | Severity | Finding | Evidence |
-|---|---|---|---|
-| E01 | High — addressed locally | Password-created accounts can be preregistered and later confirmed through social login while retaining attacker credentials | Source, state-transition probe and remediation regressions |
-| E02 | High | 2FA removal/replacement requires no fresh authentication | HTTP removal and service replacement probes |
-| E03 | High | Pending OTP login survives password changes and lacks account-state binding | Serializer probe |
-| E04 | High | First password can be set on a passwordless account using only an existing session | Serializer probe |
-| E05 | High | Password guessing has no account-wide failure budget | Source |
-| E06 | Medium | Rate-limit enforcement has inconsistent proxy trust and operation-level fail-open behavior | Helper/decorator probes; proxy exposure conditional |
-| E07 | Medium | OTP login proof lacks purpose separation and one-time consumption; TOTP codes are reusable | Serializer/service probes |
-| E08 | Medium — partially addressed locally | Reset completion now locks/rechecks; broader reset/session recovery verification is deferred | Original probe; new recovery-race regression prepared |
-| E09 | Medium | Reset-email throttling does not implement the configured policy or recipient limits | Source |
-| E10 | Medium | Password validation is weaker than the recommended policy and omits user context | Source |
-| E11 | Medium | Monitoring does not comprehensively redact authentication URLs, serialized bodies or OTP secrets | Redaction probes; actual export conditional |
-| E12 | Medium | TOTP secrets are stored in plaintext | Source |
-| E13 | Medium | Signup reveals whether an email is registered | Source and existing test expectation |
-| E14 | Medium | Authentication dependency is in a published vulnerable version range | Lockfile and maintainer advisory; exploitability conditional |
-| E15 | Low | Email/password security events lack a durable audit trail and credential-change notifications | Source |
+| ID  | Severity                             | Finding                                                                                                                      | Evidence                                                              |
+| --- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| E01 | High — addressed locally             | Password-created accounts can be preregistered and later confirmed through social login while retaining attacker credentials | Source, state-transition probe and remediation regressions            |
+| E02 | High — addressed locally             | 2FA removal/replacement requires no fresh authentication                                                                     | HTTP removal and service replacement probes; remediation regressions  |
+| E03 | High — addressed locally             | Pending OTP login survives password changes and lacks account-state binding                                                  | Serializer probe; remediation regressions                             |
+| E04 | High                                 | First password can be set on a passwordless account using only an existing session                                           | Serializer probe                                                      |
+| E05 | High                                 | Password guessing has no account-wide failure budget                                                                         | Source                                                                |
+| E06 | Medium                               | Rate-limit enforcement has inconsistent proxy trust and operation-level fail-open behavior                                   | Helper/decorator probes; proxy exposure conditional                   |
+| E07 | Medium — partially addressed locally | OTP login proof lacks purpose separation and one-time consumption; TOTP codes are reusable                                   | Serializer/service probes; replay fix shipped with E02/E03, see below |
+| E08 | Medium — partially addressed locally | Reset completion now locks/rechecks; broader reset/session recovery verification is deferred                                 | Original probe; new recovery-race regression prepared                 |
+| E09 | Medium                               | Reset-email throttling does not implement the configured policy or recipient limits                                          | Source                                                                |
+| E10 | Medium                               | Password validation is weaker than the recommended policy and omits user context                                             | Source                                                                |
+| E11 | Medium                               | Monitoring does not comprehensively redact authentication URLs, serialized bodies or OTP secrets                             | Redaction probes; actual export conditional                           |
+| E12 | Medium                               | TOTP secrets are stored in plaintext                                                                                         | Source                                                                |
+| E13 | Medium                               | Signup reveals whether an email is registered                                                                                | Source and existing test expectation                                  |
+| E14 | Medium                               | Authentication dependency is in a published vulnerable version range                                                         | Lockfile and maintainer advisory; exploitability conditional          |
+| E15 | Low                                  | Email/password security events lack a durable audit trail and credential-change notifications                                | Source                                                                |
 
 ### E01 — Account preregistration and automatic social linking
 
@@ -98,6 +98,7 @@ vulnerability fixes. Other audit findings remain open.
 - Evidence: an HTTP GraphQL probe disabled OTP using only an ordinary access token. A service probe replaced an active secret and accepted a code from the replacement immediately.
 - Fix: extend the existing passkey-management fresh-proof pattern to MFA actions with dedicated action-bound, one-use grants. Keep enrollment secrets separate from the active secret until successful confirmation; require fresh proof before replacing/removing an active factor. Notify the user and revoke appropriate sessions/pending proofs.
 - Tests: absent/expired/replayed/foreign grants, setup cancellation, active-secret preservation, valid password+OTP and verified-passkey alternatives, concurrent replacement/removal.
+- **Remediation implemented** (`apps/users/serializers.py::GenerateOTPSerializer/VerifyOTPSerializer/DisableOTPSerializer`, `apps/sso/services/passkey_management.py`): `generateOtp`/`verifyOtp` write a _pending_ secret (`User.otp_pending_base32`) separate from the active one; only a successful `verifyOtp` promotes it, so an abandoned/failed setup never touches the active factor. Replacing an already-active factor, or disabling one, now requires a fresh-auth grant from the same `PasskeyManagementGrant` mechanism passkey management already used (`action="otp_setup"` / `"otp_disable"`), via password+current-OTP or a verified passkey. An account with neither a usable password nor a passkey (first-time 2FA setup on a Google-only account) is allowed to enroll without a grant — otherwise it could never turn 2FA on — but any later replacement or disable still needs proof; for that one case with no stronger factor available, its own current OTP code is accepted as the proof (`otp_only_grant`), never for `register`/`delete`. Every enable/replace/disable is audit-logged (`SSOAuditEventType.OTP_ENABLED`/`OTP_DISABLED`) and triggers a commit-deferred, failure-isolated notification email (`OtpEnabledEmail`/`OtpDisabledEmail`). Tests: `apps/users/tests/test_otp_management.py`, `test_schema.py::TestGenerateOTPMutation/TestVerifyOTPMutation/TestDisableOTPMutation`.
 
 ### E03 — Pending OTP proof survives credential changes
 
@@ -108,6 +109,7 @@ vulnerability fixes. Other audit findings remain open.
 - Evidence: after changing a password, the original pending proof completed validation and issued new tokens. An inactive account also received token strings; normal access authentication and refresh independently reject inactive accounts, so that observation alone is not a working inactive-account bypass.
 - Fix: use a dedicated pending-login record/token bound to the current account security version, verified factor and first-factor authentication, invalidate it on relevant security changes, and recheck account state under the session-issuance transaction.
 - Tests: password change/reset, inactive/delete/recreate, factor replacement, and state changes between validation and issuance.
+- **Remediation implemented** (`apps/users/models.py::PendingOTPLogin`, `apps/users/services/otp_login.py`, `apps/users/serializers.py::ValidateOTPSerializer`): the self-signed JWT is replaced by a server-side, one-use `PendingOTPLogin` row (only its SHA-256 hash is stored), created by `begin_otp_login()` after a real password or completed-OAuth first factor and bound to a `credential_version` fingerprint (password hash + OTP enabled/verified/secret). An ordinary access/refresh token can no longer satisfy this step at all, since it can never hash-match a row only `begin_otp_login()` creates. Lookup rejects anything expired, already used, or whose `credential_version` no longer matches (password changed/reset, OTP enabled/disabled/replaced, account deactivated/reclaimed). Validation happens twice: once when the code is checked, and again — under a row lock, atomically with session issuance — immediately before tokens are minted, so a concurrent duplicate submission or a credential change in between cannot both succeed. Account reclaim (`account_reclaim.py`) additionally deletes any outstanding row explicitly. Tests: `apps/users/tests/test_serializers.py`, `test_account_reclaim.py::TestOutstandingProofsFailAfterReclaim`, `test_otp_management.py`.
 
 ### E04 — Passwordless accounts can gain passwords without fresh proof
 
@@ -145,6 +147,7 @@ vulnerability fixes. Other audit findings remain open.
 - Evidence: a regular access token was accepted as pending proof; the same pending proof and current OTP completed twice, producing distinct refresh tokens. Deleting the browser cookie after success does not prevent server-side replay.
 - Fix: purpose-separate pending login proofs, bind them to browser/ceremony context, consume them once atomically with session issuance, and reject previously accepted TOTP timesteps under a row lock. Define concurrency UX for multiple tabs and management ceremonies.
 - Tests: ordinary/foreign tokens, duplicate success including simultaneous submissions, cookie replay, adjacent-window codes and leading-zero handling. NIST recommends accepting each valid OTP only once.
+- **Partially addressed locally, shipped with E02/E03**: purpose separation and ceremony binding of the pending login proof itself are solved as part of E03 above (`PendingOTPLogin` is only ever created by `begin_otp_login()`, so an ordinary token cannot stand in for it, and it is consumed exactly once atomically with session issuance). Separately, `User.otp_last_used_code_hash` (`apps/users/services/otp.py::_check_otp`) now rejects an exact-value replay of the most recently accepted code for every `validate_otp`/`verify_otp` call (login, setup confirmation, and the E02 fresh-auth grants), closing the demonstrated "same proof + same code twice" case. This is value-based, not timestep-based: a _different_ code that is still valid within the adjacent window is still accepted (simpler, and sufficient for the replay risk actually described, but weaker than strict monotonic-timestep rejection). Leading-zero handling and the account-wide rate limiting portions of this finding remain open.
 
 ### E08 — Password reset has a validation/use race
 

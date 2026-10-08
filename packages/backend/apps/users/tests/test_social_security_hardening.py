@@ -24,7 +24,7 @@ from apps.translations.models import Translation, TranslationKey, Locale
 from apps.users import tokens
 from apps.users.serializers import UserAccountConfirmationSerializer, PasswordResetConfirmationSerializer
 from apps.users.services.account_reclaim import reclaim_unconfirmed_account
-from apps.users.utils import generate_otp_auth_token
+from apps.users.services.otp_login import begin_otp_login
 
 pytestmark = pytest.mark.django_db
 
@@ -40,7 +40,7 @@ def test_reclaim_invalidates_all_old_email_and_otp_proofs(user_factory):
     account = user_factory(is_confirmed=False, otp_enabled=True, otp_verified=True, otp_base32=pyotp.random_base32())
     activation = tokens.account_activation_token.make_token(account)
     reset = tokens.password_reset_token.make_token(account)
-    otp = str(generate_otp_auth_token(account))
+    otp = begin_otp_login(account, 'password')
     challenge = WebAuthnChallenge.create_challenge(user=account)
     grant = PasskeyManagementGrant.objects.create(user=account, action='register', expires_at=challenge.expires_at)
     with patch('apps.users.services.account_reclaim.notifications.PasswordResetEmail.send'):
@@ -226,7 +226,6 @@ def test_translation_migration_replaces_english_placeholders_and_preserves_custo
         Translation.objects.filter(key=key, locale__code__in=['en', 'pl', 'de', 'fr', 'es', 'zh', 'hi', 'ar']).count()
         == 8
     )
-
 
 
 def test_reclaim_between_reset_validation_and_save_invalidates_old_reset_proof(user_factory):

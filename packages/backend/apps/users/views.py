@@ -22,6 +22,7 @@ from common.csrf import enforce_api_csrf
 from .jwt import get_jti_from_refresh_token
 from . import serializers, utils
 from .services.social_linking import login_redirect, cancel_link, LINK_COOKIE
+from .services.otp_login import begin_otp_login
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ def complete(request, backend, *args, **kwargs):
         user.backend = "{0}.{1}".format(backend.__module__, backend.__class__.__name__)
 
         if user.otp_verified and user.otp_enabled:
-            otp_auth_token = utils.generate_otp_auth_token(user)
+            otp_auth_token = begin_otp_login(user, "oauth")
             backend.strategy.set_otp_auth_token(otp_auth_token)
         else:
             with transaction.atomic():

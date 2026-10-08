@@ -18,12 +18,14 @@ from .webauthn import WebAuthnService
 
 GRANT_TTL = timedelta(minutes=5)
 
+MANAGEMENT_ACTIONS = {"register", "delete", "otp_setup", "otp_disable"}
+
 
 def action_target(user, data):
     if not isinstance(data, dict):
         raise ValidationError("Invalid authentication request")
     action = data.get("action")
-    if not isinstance(action, str) or action not in {"register", "delete"}:
+    if not isinstance(action, str) or action not in MANAGEMENT_ACTIONS:
         raise ValidationError("Invalid passkey management action")
     passkey = None
     if action == "delete":
@@ -36,6 +38,12 @@ def action_target(user, data):
         if passkey is None:
             raise ValidationError("Passkey not found")
     return action, passkey
+
+
+def user_can_reauthenticate(user):
+    """Whether the user has a way to prove freshness other than their current OTP
+    code - a usable password, or an active passkey."""
+    return user.has_usable_password() or UserPasskey.objects.filter(user=user, is_active=True).exists()
 
 
 def issue_grant(grant):
@@ -66,6 +74,32 @@ def validate_password_proof(user, data):
 def password_grant(user, data):
     action, passkey = action_target(user, data)
     validate_password_proof(user, data)
+    grant = PasskeyManagementGrant.objects.create(
+        user=user, action=action, passkey=passkey, expires_at=timezone.now() + GRANT_TTL
+    )
+    return issue_grant(grant)
+
+
+def otp_only_grant(user, data):
+    """Fresh-auth proof for otp_setup (replace)/otp_disable when the account has
+    neither a usable password nor an active passkey - the current OTP code is the
+    only factor such an account can produce. Never valid for register/delete
+    (passkey management already requires a password path to exist) and never valid
+    when the account *can* use that stronger path instead."""
+    action, passkey = action_target(user, data)
+    if action not in {"otp_setup", "otp_disable"} or user_can_reauthenticate(user):
+        raise PermissionDenied("Fresh authentication failed")
+    if not user.otp_enabled or not user.otp_verified:
+        raise PermissionDenied("Fresh authentication failed")
+    otp_token = data.get("otpToken")
+    if not isinstance(otp_token, str):
+        raise PermissionDenied("Fresh authentication failed")
+    try:
+        validate_otp(user, otp_token)
+    except OTPAttemptLimitExceeded:
+        raise PasskeyReauthenticationError('otp_locked')
+    except OTPVerificationFailure:
+        raise PasskeyReauthenticationError('incorrect_otp')
     grant = PasskeyManagementGrant.objects.create(
         user=user, action=action, passkey=passkey, expires_at=timezone.now() + GRANT_TTL
     )

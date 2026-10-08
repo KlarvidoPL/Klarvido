@@ -61,8 +61,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     otp_verified = models.BooleanField(default=False)
     otp_base32 = models.CharField(max_length=255, blank=True, default="")
     otp_auth_url = models.CharField(max_length=255, blank=True, default="")
+    # Holds a newly generated secret during setup/replacement, kept out of otp_base32
+    # (the active secret used for login) until the user proves they can produce a code
+    # from it - a failed or abandoned setup must never affect the currently active factor.
+    otp_pending_base32 = models.CharField(max_length=255, blank=True, default="")
+    otp_pending_auth_url = models.CharField(max_length=255, blank=True, default="")
     otp_failed_attempts = models.PositiveSmallIntegerField(default=0, editable=False)
     otp_locked_until = models.DateTimeField(null=True, blank=True, editable=False)
+    # Hash of the most recently accepted login TOTP code. Submitting that exact code
+    # again (e.g. a captured request/cookie replayed) is rejected even though it is
+    # still within its validity window - each valid code is only ever usable once.
+    otp_last_used_code_hash = models.CharField(max_length=64, blank=True, default="", editable=False)
 
     objects = UserManager()
 
@@ -91,6 +100,27 @@ class PendingSocialAccountLink(models.Model):
 
     def __str__(self):
         return f'{self.provider} linking confirmation ({self.pk})'
+
+
+class PendingOTPLogin(models.Model):
+    """Server-side, one-use proof of "password/SSO succeeded, now enter your 2FA code".
+
+    Replaces a self-contained signed JWT (which any holder of a valid access/refresh
+    token could otherwise have satisfied) with a DB row that only begin_otp_login()
+    can create, that only matches the account/credentials active when it was issued,
+    and that is marked used atomically with session issuance so it cannot be replayed.
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token_hash = models.CharField(max_length=64, unique=True)
+    auth_method = models.CharField(max_length=20)
+    credential_version = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(db_index=True)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'Pending OTP login ({self.pk})'
 
 
 class SocialAccountUnlinkChallenge(models.Model):

@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.models import User
 from apps.sso.tests.factories import SSOSessionFactory
-from apps.users.utils import generate_otp_auth_token
+from apps.users.services.otp_login import begin_otp_login
 
 pytestmark = pytest.mark.django_db
 
@@ -112,7 +112,7 @@ class TestPasswordChange:
 class TestOtpAuthToken:
     def test_otp_step_token_is_not_a_login_token(self, user):
         """The token handed out after the password step (before the 2FA code) must not authenticate on its own."""
-        otp_auth_token = generate_otp_auth_token(user)
+        otp_auth_token = begin_otp_login(user, "password")
 
         assert current_user_with_header(otp_auth_token).status_code == 401
         assert current_user_with_cookie(otp_auth_token).json()["data"]["currentUser"] is None

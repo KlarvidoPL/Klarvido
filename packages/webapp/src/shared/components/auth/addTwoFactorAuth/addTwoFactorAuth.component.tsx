@@ -17,9 +17,15 @@ import { VerifyOtpFormFields } from './addTwoFactorAuth.types';
 
 export type AddTwoFactorAuthProps = {
   closeModal: () => void;
+  /** Fresh-auth grant token obtained before opening this modal, when the account
+   * needed one (see OtpReauthDialog) - attached to the generate/verify calls so
+   * the backend can allow replacing an already-active factor. Undefined for a
+   * first-time setup on an account that cannot yet produce any proof. */
+  authorization?: string;
 };
 
-export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
+export const AddTwoFactorAuth = ({ closeModal, authorization }: AddTwoFactorAuthProps) => {
+  const mutationContext = authorization ? { headers: { 'X-Passkey-Authorization': authorization } } : undefined;
   const intl = useIntl();
   const { toast } = useToast();
   const { reload } = useCommonQuery();
@@ -80,7 +86,10 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
 
   const submitHandler = async (values: { token: string }) => {
     try {
-      const { data } = await commitVerifyOtpMutation({ variables: { input: { otpToken: values.token } } });
+      const { data } = await commitVerifyOtpMutation({
+        variables: { input: { otpToken: values.token } },
+        context: mutationContext,
+      });
 
       const isOtpVerified = data?.verifyOtp?.otpVerified;
       if (!isOtpVerified) return;
@@ -127,7 +136,7 @@ export const AddTwoFactorAuth = ({ closeModal }: AddTwoFactorAuthProps) => {
 
     const getOtpData = async () => {
       try {
-        const { data } = await commitGenerateOtpMutation();
+        const { data } = await commitGenerateOtpMutation({ context: mutationContext });
 
         // Only update state if component is still mounted
         if (!isMounted) return;

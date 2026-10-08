@@ -16,6 +16,8 @@ import * as BackupReady from './backupReady';
 import * as TenantDeleted from './tenantDeleted';
 
 import * as SocialAccountLinked from './socialAccountLinked';
+import * as OtpEnabled from './otpEnabled';
+import * as OtpDisabled from './otpDisabled';
 //<-- INJECT EMAIL TEMPLATE IMPORT -->
 
 export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
@@ -35,5 +37,7 @@ export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
   [EmailTemplateType.BACKUP_READY]: BackupReady,
   [EmailTemplateType.TENANT_DELETED]: TenantDeleted,
   [EmailTemplateType.SOCIAL_ACCOUNT_LINKED]: SocialAccountLinked,
+  [EmailTemplateType.OTP_ENABLED]: OtpEnabled,
+  [EmailTemplateType.OTP_DISABLED]: OtpDisabled,
   //<-- INJECT EMAIL TEMPLATE -->
 };

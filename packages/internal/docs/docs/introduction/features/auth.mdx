@@ -90,6 +90,14 @@ Once a user has logged in, they can access their profile page. From here, they c
 2FA adds an additional layer of security to the application, making it more difficult for unauthorized users to access
 user accounts.
 
+:::info
+Enabling 2FA for the first time only needs the current session - an account with no password and no passkey
+yet (e.g. a Google-only sign-in) would otherwise have no way to ever turn 2FA on. Any later change -
+replacing the secret or disabling 2FA - always requires fresh proof: your password plus your current code, a
+verified passkey, or, only for an account with neither, that current code by itself. Every enable, replace or
+disable sends a notification email, so an unexpected one is a signal to review your account.
+:::
+
 <p align="center">
   <img src={useBaseUrl("img/features/auth/profile.png")} alt="Profile page" />
 </p>

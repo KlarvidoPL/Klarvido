@@ -10,14 +10,18 @@ from django.utils import timezone
 from apps.users.exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure
 from apps.users.models import User
 from apps.users.services.otp import generate_otp, validate_otp, verify_otp
-from apps.users.utils import generate_otp_auth_token
+from apps.users.services.otp_login import begin_otp_login
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
 def account(user_factory):
-    return user_factory(otp_enabled=True, otp_verified=True, otp_base32=pyotp.random_base32())
+    # otp_pending_base32 mirrors otp_base32 so verify_otp (setup, checked against the
+    # pending secret) and validate_otp (login, checked against the active secret)
+    # exercise the same shared failed-attempt counter in these rate-limit tests.
+    secret = pyotp.random_base32()
+    return user_factory(otp_enabled=True, otp_verified=True, otp_base32=secret, otp_pending_base32=secret)
 
 
 @pytest.mark.parametrize('check', [verify_otp, validate_otp])
@@ -94,7 +98,7 @@ def test_http_login_new_tokens_cannot_reset_limit_or_issue_login_cookies(account
             '/api/graphql/',
             data={
                 'query': query,
-                'variables': {'input': {'otpToken': otp_token, 'otpAuthToken': str(generate_otp_auth_token(account))}},
+                'variables': {'input': {'otpToken': otp_token, 'otpAuthToken': begin_otp_login(account, 'password')}},
             },
             format='json',
         )

@@ -2,7 +2,8 @@ import copy
 
 from django.db import transaction
 from django.utils import timezone
-from apps.sso.models import SSOSession
+from apps.sso.models import SSOSession, SSOAuditLog
+from apps.sso.constants import SSOAuditEventType
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -21,12 +22,13 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.utils import get_md5_hash_password
 from common.decorators import context_user_required
 
+from apps.sso.services import passkey_management
+
 from . import models, tokens, jwt, notifications
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
-from .services.social_linking import validate_link_otp_proof
-from .utils import generate_otp_auth_token
+from .services.otp_login import begin_otp_login, consume_pending_login, find_pending_login
 
 UPLOADED_AVATAR_SIZE_LIMIT = 5 * 1024 * 1024
 
@@ -308,7 +310,7 @@ class CookieTokenObtainPairSerializer(jwt_serializers.TokenObtainPairSerializer)
 
     def create(self, validated_data):
         if self.user.otp_enabled and self.user.otp_verified:
-            return {"otp_auth_token": str(generate_otp_auth_token(self.user))}
+            return {"otp_auth_token": begin_otp_login(self.user, "password")}
 
         return validated_data
 
@@ -442,10 +444,29 @@ class LogoutSerializer(serializers.Serializer):
         return {"ok": True}
 
 
+def _otp_setup_requires_grant(user):
+    # Replacing an already-active factor always needs fresh proof. First-time
+    # enrollment only needs it when the account actually has a way to produce
+    # proof - a password-less, passkey-less account (Google-only, 2FA never set
+    # up) would otherwise be permanently unable to ever turn 2FA on.
+    return user.otp_enabled or passkey_management.user_can_reauthenticate(user)
+
+
 @context_user_required
 class GenerateOTPSerializer(serializers.Serializer):
     base32 = serializers.CharField(read_only=True)
     otpauth_url = serializers.CharField(read_only=True)
+
+    def validate(self, attrs):
+        # Mirrors the passkey-registration "options" step: confirms a live grant
+        # exists without consuming it, so the matching verifyOtp call can still
+        # use it to promote the pending secret to active. require_grant() locks the
+        # grant row, which needs an explicit transaction here (unlike the passkey
+        # REST/GraphQL call sites, this validate() isn't already wrapped in one).
+        if _otp_setup_requires_grant(self.context_user):
+            with transaction.atomic():
+                passkey_management.require_grant(self.context["request"], self.context_user, "otp_setup")
+        return attrs
 
     def create(self, validated_data):
         otp_base32, otp_auth_url = otp_services.generate_otp(self.context_user)
@@ -457,8 +478,26 @@ class VerifyOTPSerializer(serializers.Serializer):
     otp_verified = serializers.BooleanField(read_only=True)
     otp_token = serializers.CharField(write_only=True)
 
+    def validate(self, attrs):
+        self._was_enabled = self.context_user.otp_enabled
+        if _otp_setup_requires_grant(self.context_user):
+            with transaction.atomic():
+                grant = passkey_management.require_grant(self.context["request"], self.context_user, "otp_setup")
+                passkey_management.consume_grant(grant)
+        return attrs
+
     def create(self, validated_data):
         otp_services.verify_otp(self.context_user, validated_data.get("otp_token", ""))
+        SSOAuditLog.log_event(
+            SSOAuditEventType.OTP_ENABLED,
+            user=self.context_user,
+            description=(
+                "Two-factor authentication secret replaced"
+                if self._was_enabled
+                else "Two-factor authentication enabled"
+            ),
+        )
+        notifications.send_after_commit(notifications.OtpEnabledEmail(user=self.context_user))
         return {"otp_verified": True}
 
 
@@ -482,35 +521,37 @@ class ValidateOTPSerializer(serializers.Serializer):
         ):
             self.fail("invalid_token")
 
-        try:
-            otp_auth_token = jwt_tokens.AccessToken(raw_otp_auth_token)
-        except (jwt_exceptions.InvalidToken, jwt_exceptions.TokenError):
+        # find_pending_login rejects a missing/expired/used/foreign token, and - since
+        # it was only ever created by begin_otp_login() for this exact account - also
+        # anything that isn't a genuine pending-login proof (an ordinary access/refresh
+        # token cannot satisfy this, unlike the previous self-signed-JWT design). It
+        # also rejects a proof whose credential_version no longer matches: the account
+        # was deactivated, its password changed/reset, or OTP enabled/disabled/replaced
+        # since this proof was issued.
+        pending = find_pending_login(raw_otp_auth_token)
+        if pending is None:
+            self.fail("invalid_token")
+        self.user = pending.user
+        if not self.user.is_active:
             self.fail("invalid_token")
 
-        if not (user_id := otp_auth_token.get("user_id")):
-            self.fail("invalid_token")
-
-        try:
-            self.user = models.User.objects.get(id=user_id)
-        except models.User.DoesNotExist:
-            self.fail("invalid_token")
-
-        # Pending login proofs cannot survive credential recovery or act as full access tokens.
-        if (
-            not self.user.is_active
-            or otp_auth_token.get('purpose') != 'otp_login'
-            or otp_auth_token.get('hash_password') != get_md5_hash_password(self.user.password)
-        ):
-            self.fail("invalid_token")
-        validate_link_otp_proof(request, self.user, otp_auth_token)
         otp_services.validate_otp(self.user, attrs.get("otp_token", ""))
+        self._raw_otp_auth_token = raw_otp_auth_token
 
         return attrs
 
     def create(self, validated_data):
+        # Re-validate and consume under a row lock, in the same transaction as the
+        # session this issues - so a concurrent duplicate submission of this same
+        # proof cannot both succeed, and nothing can complete after credentials
+        # changed between validate() and here.
+        pending = consume_pending_login(self._raw_otp_auth_token)
+        if pending is None:
+            self.fail("invalid_token")
+
         refresh = RefreshToken.for_user(self.user)
-        refresh['auth_method'] = 'password'
-        refresh.access_token['auth_method'] = 'password'
+        refresh['auth_method'] = pending.auth_method
+        refresh.access_token['auth_method'] = pending.auth_method
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
@@ -518,8 +559,20 @@ class ValidateOTPSerializer(serializers.Serializer):
 class DisableOTPSerializer(serializers.Serializer):
     ok = serializers.BooleanField(read_only=True)
 
+    def validate(self, attrs):
+        with transaction.atomic():
+            grant = passkey_management.require_grant(self.context["request"], self.context_user, "otp_disable")
+            passkey_management.consume_grant(grant)
+        return attrs
+
     def create(self, validated_data):
         otp_services.disable_otp(self.context_user)
+        SSOAuditLog.log_event(
+            SSOAuditEventType.OTP_DISABLED,
+            user=self.context_user,
+            description="Two-factor authentication disabled",
+        )
+        notifications.send_after_commit(notifications.OtpDisabledEmail(user=self.context_user))
         return {"ok": True}
 
 

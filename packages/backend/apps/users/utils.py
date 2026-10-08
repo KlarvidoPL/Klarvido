@@ -1,7 +1,3 @@
-from django.utils import timezone
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.utils import get_md5_hash_password
-
 from django.conf import settings
 from django.urls import reverse
 
@@ -84,13 +80,3 @@ def reset_auth_cookie(response):
 
     # Delete session tracking cookie (set at root path)
     response.delete_cookie(settings.SESSION_ID_COOKIE, path="/", samesite=cookie_samesite)
-
-
-def generate_otp_auth_token(user):
-    otp_auth_token = AccessToken()
-    otp_auth_token["user_id"] = str(user.id)
-    otp_auth_token['purpose'] = 'otp_login'
-    otp_auth_token['hash_password'] = get_md5_hash_password(user.password)
-    otp_auth_token.set_exp(from_time=timezone.now(), lifetime=settings.OTP_AUTH_TOKEN_LIFETIME_MINUTES)
-
-    return otp_auth_token

@@ -727,9 +727,15 @@ class PasskeyReauthenticationVerifyView(PasskeyAPIView):
             if isinstance(request.data, dict) and request.data.get("challenge"):
                 data = validate_request(passkey_serializers.VerifyPasskeySerializer, request)
                 token = passkey_management.passkey_grant(request.user, data, client_ip(request))
-            else:
+            elif isinstance(request.data, dict) and request.data.get("password"):
                 data = validate_request(passkey_serializers.PasskeyPasswordProofSerializer, request)
                 token = passkey_management.password_grant(request.user, data)
+            else:
+                # No password and no passkey challenge: only a passwordless account
+                # with no passkeys can reach here, and only for an OTP management
+                # action - its current OTP code is the only factor it has.
+                data = validate_request(passkey_serializers.OTPOnlyProofSerializer, request)
+                token = passkey_management.otp_only_grant(request.user, data)
         except (ValueError, PermissionDenied, ValidationError) as error:
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.PASSKEY_REAUTH_FAILED,
@@ -748,7 +754,15 @@ class PasskeyReauthenticationVerifyView(PasskeyAPIView):
             user=request.user,
             ip_address=client_ip(request),
             description="Passkey management authentication succeeded",
-            metadata={"method": "passkey" if request.data.get("challenge") else "password"},
+            metadata={
+                "method": (
+                    "passkey"
+                    if request.data.get("challenge")
+                    else "password"
+                    if request.data.get("password")
+                    else "otp_only"
+                )
+            },
         )
         response = Response({"authorization": token})
         response["Cache-Control"] = "no-store"

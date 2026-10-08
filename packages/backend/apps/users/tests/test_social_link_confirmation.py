@@ -14,10 +14,9 @@ from social_django.models import UserSocialAuth
 
 from apps.users.models import PendingSocialAccountLink
 from apps.users.services.social_linking import begin_link, complete_link, LINK_COOKIE
+from apps.users.services.otp_login import begin_otp_login
 from apps.users.tests.test_social_account_linking import run_social_pipeline
-from apps.users.utils import generate_otp_auth_token
 from apps.users.tasks import cleanup_social_link_confirmations
-from apps.users.services.social_linking import validate_link_otp_proof
 from rest_framework_simplejwt.tokens import RefreshToken
 
 pytestmark = pytest.mark.django_db
@@ -173,7 +172,7 @@ def test_otp_proof_failure_does_not_link(social_backend, user_factory):
     request = pending_request(social_backend, account)
     client = APIClient()
     client.cookies[LINK_COOKIE] = request.COOKIES[LINK_COOKIE]
-    client.cookies[settings.OTP_AUTH_TOKEN_COOKIE] = str(generate_otp_auth_token(account))
+    client.cookies[settings.OTP_AUTH_TOKEN_COOKIE] = begin_otp_login(account, 'password')
     response = client.post(
         '/api/graphql/',
         {
@@ -229,11 +228,25 @@ def test_link_succeeds_even_if_notification_send_fails(
     mock_send.assert_called_once()
 
 
-def test_full_access_token_cannot_replace_fresh_password_for_linking(social_backend, user_factory):
-    account = user_factory(is_confirmed=True)
+def test_full_access_token_cannot_satisfy_otp_step_during_linking(social_backend, user_factory):
+    # Unlike the previous self-signed-JWT pending-login proof, an ordinary,
+    # otherwise-valid access token cannot hash-match any PendingOTPLogin row -
+    # only begin_otp_login() (itself only reachable after a real password/OAuth
+    # login) can ever create one.
+    account = user_factory(is_confirmed=True, otp_enabled=True, otp_verified=True, otp_base32=pyotp.random_base32())
     request = pending_request(social_backend, account)
-    with pytest.raises(PermissionDenied):
-        validate_link_otp_proof(request, account, RefreshToken.for_user(account).access_token)
+    client = APIClient()
+    client.cookies[LINK_COOKIE] = request.COOKIES[LINK_COOKIE]
+    client.cookies[settings.OTP_AUTH_TOKEN_COOKIE] = str(RefreshToken.for_user(account).access_token)
+    response = client.post(
+        '/api/graphql/',
+        {
+            'query': 'mutation($input: ValidateOTPMutationInput!) { validateOtp(input: $input) { authenticated } }',
+            'variables': {'input': {'otpToken': pyotp.TOTP(account.otp_base32).now()}},
+        },
+        format='json',
+    )
+    assert 'errors' in response.json()
     assert not UserSocialAuth.objects.exists()
 
 

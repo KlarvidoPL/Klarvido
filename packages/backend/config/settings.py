@@ -753,6 +753,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.users.tasks.cleanup_social_link_confirmations',
         'schedule': 300,
     },
+    'cleanup-pending-otp-logins-every-five-minutes': {
+        'task': 'apps.users.tasks.cleanup_pending_otp_logins',
+        'schedule': 300,
+    },
     'cleanup-expired-sessions-daily': {
         'task': 'apps.sso.tasks.cleanup_expired_sessions',
         'schedule': 60 * 60 * 24,  # Every 24 hours (in seconds)

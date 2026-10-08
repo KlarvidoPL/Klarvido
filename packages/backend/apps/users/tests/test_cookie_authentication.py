@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from apps.sso.models import SSOSession
 from apps.users.models import User
-from apps.users.utils import generate_otp_auth_token
+from apps.users.services.otp_login import begin_otp_login
 
 pytestmark = pytest.mark.django_db
 
@@ -93,7 +93,7 @@ def test_other_authentication_session_failures_roll_back(method, user, totp_mock
         user.otp_enabled = user.otp_verified = True
         user.save(update_fields=['otp_enabled', 'otp_verified'])
         totp_mock(verify=True)
-        client.cookies[settings.OTP_AUTH_TOKEN_COOKIE] = str(generate_otp_auth_token(user))
+        client.cookies[settings.OTP_AUTH_TOKEN_COOKIE] = begin_otp_login(user, 'password')
         field, input_type = 'validateOtp', 'ValidateOTPMutationInput'
         payload = {'otpToken': '123456'}
     else:

@@ -13,3 +13,7 @@ class PasswordResetEmailSerializer(serializers.Serializer):
 
 class SocialAccountLinkedEmailSerializer(serializers.Serializer):
     provider = serializers.CharField()
+
+
+class NoDataEmailSerializer(serializers.Serializer):
+    pass

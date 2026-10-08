@@ -59,3 +59,13 @@ class PasswordResetEmail(UserEmail):
 class SocialAccountLinkedEmail(UserEmail):
     name = "SOCIAL_ACCOUNT_LINKED"
     serializer_class = email_serializers.SocialAccountLinkedEmailSerializer
+
+
+class OtpEnabledEmail(UserEmail):
+    name = "OTP_ENABLED"
+    serializer_class = email_serializers.NoDataEmailSerializer
+
+
+class OtpDisabledEmail(UserEmail):
+    name = "OTP_DISABLED"
+    serializer_class = email_serializers.NoDataEmailSerializer

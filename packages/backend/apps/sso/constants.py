@@ -93,6 +93,10 @@ class SSOAuditEventType(models.TextChoices):
     # Account recovery events
     ACCOUNT_RECLAIMED = "account_reclaimed", "Account Reclaimed by Support"
 
+    # OTP management events
+    OTP_ENABLED = "otp_enabled", "Two-Factor Authentication Enabled"
+    OTP_DISABLED = "otp_disabled", "Two-Factor Authentication Disabled"
+
 
 class Notification(Enum):
     """

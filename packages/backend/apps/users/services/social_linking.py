@@ -9,22 +9,17 @@ from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
-from rest_framework_simplejwt.utils import get_md5_hash_password
 from social_django.models import UserSocialAuth
 
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog
 from apps.users import notifications
 from apps.users.models import PendingSocialAccountLink, User, LanguageChoices
+from apps.users.services.credentials import credential_version
 from apps.users.utils import reset_auth_cookie
 
 LINK_COOKIE = 'pending_social_link'
 LINK_TTL = timedelta(minutes=5)
-
-
-def credential_version(user):
-    state = f'{user.password}:{user.otp_enabled}:{user.otp_verified}:{user.otp_base32}'
-    return hashlib.sha256(state.encode()).hexdigest()
 
 
 def login_redirect(request, code):
@@ -91,13 +86,6 @@ def _link_cookie(request):
     # every caller below is a routine login with no pending link to complete, and must
     # not be broken by that absence.
     return getattr(request, 'COOKIES', {}).get(LINK_COOKIE)
-
-
-def validate_link_otp_proof(request, user, token):
-    if _link_cookie(request) and (
-        token.get('purpose') != 'otp_login' or token.get('hash_password') != get_md5_hash_password(user.password)
-    ):
-        raise PermissionDenied('Account confirmation failed. Please sign in again.')
 
 
 @transaction.atomic

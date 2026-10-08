@@ -1,16 +1,17 @@
 import json
+from datetime import timedelta
 from typing import Optional
 
-from apps.users.exceptions import OTPVerificationFailure
-from django.utils import timezone
-from rest_framework_simplejwt.tokens import AccessToken
-
-from config import settings
-from rest_framework.exceptions import ValidationError, ErrorDetail
-
 import pytest
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError, ErrorDetail
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.users.exceptions import OTPVerificationFailure
+from apps.users.models import PendingOTPLogin
 from apps.users.serializers import ValidateOTPSerializer
-from apps.users.utils import generate_otp_auth_token
+from apps.users.services.otp_login import begin_otp_login
+from config import settings
 
 pytestmark = pytest.mark.django_db
 
@@ -24,18 +25,6 @@ class TestValidateOTPSerializer:
             context = {"request": request}
 
             return context
-
-        return _factory
-
-    @pytest.fixture
-    def otp_token_factory(self):
-        def _factory(**kwargs) -> AccessToken:
-            token = AccessToken()
-            for k, v in kwargs.items():
-                token[k] = v
-            token.set_exp(from_time=timezone.now(), lifetime=settings.OTP_AUTH_TOKEN_LIFETIME_MINUTES)
-
-            return token
 
         return _factory
 
@@ -66,11 +55,12 @@ class TestValidateOTPSerializer:
 
         self.assert_invalid_token(error)
 
-    def test_missing_user_id_in_otp_auth_token_cookie_raises_invalid_token_error(
-        self, context_with_request_cookies, otp_token_factory
-    ):
-        token = otp_token_factory()
-        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: str(token)})
+    def test_foreign_access_token_cannot_satisfy_pending_login(self, context_with_request_cookies, user):
+        # Unlike the previous self-signed-JWT design, an ordinary, otherwise-valid
+        # access/refresh token string cannot hash-match any PendingOTPLogin row -
+        # only begin_otp_login() can ever create one.
+        token = str(RefreshToken.for_user(user).access_token)
+        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: token})
         serializer = ValidateOTPSerializer(data={"otp_token": "token"}, context=context)
 
         with pytest.raises(ValidationError) as error:
@@ -78,11 +68,10 @@ class TestValidateOTPSerializer:
 
         self.assert_invalid_token(error)
 
-    def test_invalid_user_id_in_otp_auth_token_cookie_raises_invalid_token_error(
-        self, context_with_request_cookies, otp_token_factory
-    ):
-        token = otp_token_factory(user_id="not-existing-id")
-        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: str(token)})
+    def test_expired_pending_login_raises_invalid_token_error(self, context_with_request_cookies, user):
+        token = begin_otp_login(user, "password")
+        PendingOTPLogin.objects.filter(user=user).update(expires_at=timezone.now() - timedelta(seconds=1))
+        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: token})
         serializer = ValidateOTPSerializer(data={"otp_token": "token"}, context=context)
 
         with pytest.raises(ValidationError) as error:
@@ -90,9 +79,23 @@ class TestValidateOTPSerializer:
 
         self.assert_invalid_token(error)
 
-    def test_otp_validation_failure_raises_exception(self, context_with_request_cookies, otp_token_factory, user):
-        token = generate_otp_auth_token(user)
-        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: str(token)})
+    def test_pending_login_invalidated_by_password_change_raises_invalid_token_error(
+        self, context_with_request_cookies, user
+    ):
+        token = begin_otp_login(user, "password")
+        user.set_password('BrandNewPassword!9372')
+        user.save()
+        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: token})
+        serializer = ValidateOTPSerializer(data={"otp_token": "token"}, context=context)
+
+        with pytest.raises(ValidationError) as error:
+            serializer.is_valid(raise_exception=True)
+
+        self.assert_invalid_token(error)
+
+    def test_otp_validation_failure_raises_exception(self, context_with_request_cookies, user):
+        token = begin_otp_login(user, "password")
+        context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: token})
         serializer = ValidateOTPSerializer(data={"otp_token": "token"}, context=context)
 
         with pytest.raises(OTPVerificationFailure) as error:
