@@ -4110,7 +4110,7 @@
     "defaultMessage": "Gestionar SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Ver la configuración de seguridad"
+    "defaultMessage": "Ver conexiones SSO, claves de acceso y configuraciones de seguridad"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Ver configuración de seguridad"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Demasiados intentos de verificación. Espera un momento e inténtalo de nuevo."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Cancelar vinculación"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "No se pudo cancelar. Inténtalo de nuevo."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Inicia sesión abajo con tu contraseña y un código de doble factor si está activado, o usa una clave de acceso."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "No se pudo completar el inicio de sesión social. Inicia sesión con tu contraseña o una clave de acceso, o inténtalo de nuevo."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Ya existe una cuenta con este correo electrónico, pero aún no se ha verificado."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Si no creaste esta cuenta, escríbenos a {supportEmail} y te ayudaremos a verificar su titularidad."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Si no creaste esta cuenta, contacta con soporte y te ayudaremos a verificar su titularidad."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "Si es tu cuenta, inicia sesión abajo y verifica tu correo electrónico; después, intenta vincular Google de nuevo."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Restablecer tu contraseña"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Si no fuiste tú, restablece tu contraseña inmediatamente."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Se añadió un nuevo método de inicio de sesión a tu cuenta"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Ahora puedes iniciar sesión con {provider} usando este correo electrónico. Si hiciste este cambio, no necesitas hacer nada más. Si no vinculaste {provider}, restablece tu contraseña inmediatamente y contacta con soporte."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "El inicio de sesión con {provider} se vinculó a tu cuenta"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Confirma con tu contraseña y el código de dos factores si está activado, o con una clave de acceso. Al desvincular, se cerrará tu sesión en todos los dispositivos."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Desvincular inicio de sesión social"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Gestiona el inicio de sesión con Google y Facebook para tu cuenta."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Desvincular"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "Se desvinculó el inicio de sesión social. Vuelve a iniciar sesión."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "No hay cuentas de inicio de sesión social vinculadas."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Añade una contraseña o una clave de acceso antes de desvincular tu último método de inicio de sesión."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "No se pudieron cargar las cuentas vinculadas. Actualiza la página e inténtalo de nuevo."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Cargando cuentas vinculadas…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Usa una clave de acceso existente o establece una contraseña mediante el restablecimiento antes de desvincular."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Cuentas sociales vinculadas"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Conecta Google a tu cuenta"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "Así confirmas que la cuenta es tuya y conectas Google para futuros inicios de sesión. Tus ajustes de autenticación de doble factor no cambian."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Verifica tu correo antes de conectar Google"
   }
 }

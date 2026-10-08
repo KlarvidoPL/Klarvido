@@ -4110,7 +4110,7 @@
     "defaultMessage": "SSO प्रबंधित करें"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "सुरक्षा कॉन्फ़िगरेशन देखें"
+    "defaultMessage": "SSO कनेक्शन, पासकी और सुरक्षा कॉन्फ़िगरेशन देखें"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "सुरक्षा सेटिंग्स देखें"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "सत्यापन के बहुत अधिक प्रयास हुए हैं। कृपया कुछ देर प्रतीक्षा करें और फिर कोशिश करें।"
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "लिंक करना रद्द करें"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "रद्द नहीं किया जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "नीचे अपने पासवर्ड और, यदि चालू है, दो-कारक कोड से साइन इन करें या पासकी का उपयोग करें।"
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "सोशल साइन-इन पूरा नहीं हुआ। पासवर्ड या पासकी से साइन इन करें, या फिर से कोशिश करें।"
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "इस ईमेल वाला खाता पहले से मौजूद है, लेकिन अभी सत्यापित नहीं हुआ है।"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "यदि आपने यह खाता नहीं बनाया है, तो {supportEmail} पर हमसे संपर्क करें। हम खाते का स्वामित्व सत्यापित करने में मदद करेंगे।"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "यदि आपने यह खाता नहीं बनाया है, तो सहायता टीम से संपर्क करें। हम खाते का स्वामित्व सत्यापित करने में मदद करेंगे।"
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "यदि यह आपका खाता है, तो नीचे साइन इन करें और अपना ईमेल सत्यापित करें, फिर Google को दोबारा जोड़ने की कोशिश करें।"
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "अपना पासवर्ड रीसेट करें"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "यदि यह आपने नहीं किया, तो तुरंत अपना पासवर्ड रीसेट करें।"
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "आपके खाते में साइन-इन का नया तरीका जोड़ा गया है"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "अब आप इस ईमेल पते से {provider} का उपयोग करके साइन इन कर सकते हैं। यदि आपने यह बदलाव किया है, तो कुछ और करने की ज़रूरत नहीं है। यदि आपने {provider} नहीं जोड़ा है, तो तुरंत पासवर्ड रीसेट करें और सहायता टीम से संपर्क करें।"
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "{provider} साइन-इन आपके खाते से जोड़ दिया गया है"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "अपने खाते के पासवर्ड और दो-कारक कोड (यदि सक्षम है), या पासकी से पुष्टि करें। अलग करने पर सभी डिवाइस से साइन आउट हो जाएगा।"
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "सोशल साइन-इन अलग करें"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "अपने खाते के Google और Facebook साइन-इन प्रबंधित करें।"
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "अलग करें"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "सोशल साइन-इन अलग कर दिया गया है। कृपया फिर से साइन इन करें।"
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "कोई सोशल साइन-इन खाता जुड़ा नहीं है।"
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "साइन-इन का आखिरी तरीका अलग करने से पहले पासवर्ड या पासकी जोड़ें।"
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "जुड़े खाते लोड नहीं हो सके। पेज रीफ़्रेश करके फिर से कोशिश करें।"
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "जुड़े खाते लोड हो रहे हैं…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "अलग करने से पहले मौजूदा पासकी इस्तेमाल करें या पासवर्ड रीसेट करके पासवर्ड सेट करें।"
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "जुड़े सोशल खाते"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Google को अपने खाते से जोड़ें"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "इससे पुष्टि होगी कि खाता आपका है और भविष्य में साइन इन करने के लिए Google जुड़ जाएगा। आपकी दो-कारक प्रमाणीकरण सेटिंग नहीं बदलेंगी।"
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Google जोड़ने से पहले ईमेल सत्यापित करें"
   }
 }

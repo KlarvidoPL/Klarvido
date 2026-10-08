@@ -46,8 +46,7 @@ def issue_grant(grant):
     return token
 
 
-def password_grant(user, data):
-    action, passkey = action_target(user, data)
+def validate_password_proof(user, data):
     password = data.get("password")
     if not user.is_active:
         raise PermissionDenied("Fresh authentication failed")
@@ -62,6 +61,11 @@ def password_grant(user, data):
             raise PasskeyReauthenticationError('otp_locked')
         except OTPVerificationFailure:
             raise PasskeyReauthenticationError('incorrect_otp')
+
+
+def password_grant(user, data):
+    action, passkey = action_target(user, data)
+    validate_password_proof(user, data)
     grant = PasskeyManagementGrant.objects.create(
         user=user, action=action, passkey=passkey, expires_at=timezone.now() + GRANT_TTL
     )

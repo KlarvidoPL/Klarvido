@@ -61,6 +61,69 @@ function managementHeaders(authorization?: string): Record<string, string> {
   return headers;
 }
 
+async function submitFreshAuthentication(
+  optionsUrl: string,
+  verifyUrl: string,
+  target: Record<string, unknown>,
+  password?: string,
+  otpToken?: string,
+): Promise<Record<string, unknown>> {
+  let proof: Record<string, unknown> = { ...target, password, otpToken };
+  if (password === undefined) {
+    const optionsResponse = await csrfFetch(optionsUrl, {
+      method: 'POST',
+      credentials: 'include',
+      headers: managementHeaders(),
+      body: JSON.stringify(target),
+    });
+    if (!optionsResponse.ok) {
+      throw Object.assign(new Error('Fresh authentication failed'), {
+        code: optionsResponse.status === 429 ? 'rate_limited' : undefined,
+      });
+    }
+    const options: AuthenticationOptions = await optionsResponse.json();
+    const credential = (await navigator.credentials.get({
+      publicKey: {
+        challenge: base64UrlToArrayBuffer(options.challenge),
+        rpId: options.rpId,
+        timeout: options.timeout,
+        userVerification: 'required',
+        allowCredentials: options.allowCredentials?.map((cred) => ({
+          id: base64UrlToArrayBuffer(cred.id),
+          type: 'public-key',
+          transports: cred.transports as AuthenticatorTransport[] | undefined,
+        })),
+      },
+    })) as PublicKeyCredential | null;
+    if (!credential) throw new Error('Fresh authentication failed');
+    const response = credential.response as AuthenticatorAssertionResponse;
+    proof = {
+      ...target,
+      challenge: options.challenge,
+      credentialId: arrayBufferToBase64Url(credential.rawId),
+      authenticatorData: arrayBufferToBase64Url(response.authenticatorData),
+      clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
+      signature: arrayBufferToBase64Url(response.signature),
+      userHandle: response.userHandle
+        ? arrayBufferToBase64Url(response.userHandle)
+        : undefined,
+    };
+  }
+  const response = await csrfFetch(verifyUrl, {
+    method: 'POST',
+    credentials: 'include',
+    headers: managementHeaders(),
+    body: JSON.stringify(proof),
+  });
+  if (!response.ok) {
+    const failure = await response.json().catch(() => ({}));
+    throw Object.assign(new Error('Fresh authentication failed'), {
+      code: response.status === 429 ? 'rate_limited' : failure.code,
+    });
+  }
+  return response.json();
+}
+
 export function useWebAuthn() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -277,71 +340,34 @@ export function useWebAuthn() {
       password?: string,
       otpToken?: string,
     ): Promise<string> => {
-      const target = { action, passkeyId };
-      let proof: Record<string, unknown> = { ...target, password, otpToken };
-      if (password === undefined) {
-        const optionsResponse = await csrfFetch(
-          `${API_BASE}/passkeys/reauthenticate/options`,
-          {
-            method: 'POST',
-            credentials: 'include',
-            headers: managementHeaders(),
-            body: JSON.stringify(target),
-          },
-        );
-        if (!optionsResponse.ok) {
-          throw Object.assign(new Error('Fresh authentication failed'), {
-            code: optionsResponse.status === 429 ? 'rate_limited' : undefined,
-          });
-        }
-        const options: AuthenticationOptions = await optionsResponse.json();
-        const credential = (await navigator.credentials.get({
-          publicKey: {
-            challenge: base64UrlToArrayBuffer(options.challenge),
-            rpId: options.rpId,
-            timeout: options.timeout,
-            userVerification: 'required',
-            allowCredentials: options.allowCredentials?.map((cred) => ({
-              id: base64UrlToArrayBuffer(cred.id),
-              type: 'public-key',
-              transports: cred.transports as
-                | AuthenticatorTransport[]
-                | undefined,
-            })),
-          },
-        })) as PublicKeyCredential | null;
-        if (!credential) throw new Error('Fresh authentication failed');
-        const response = credential.response as AuthenticatorAssertionResponse;
-        proof = {
-          challenge: options.challenge,
-          credentialId: arrayBufferToBase64Url(credential.rawId),
-          authenticatorData: arrayBufferToBase64Url(response.authenticatorData),
-          clientDataJSON: arrayBufferToBase64Url(response.clientDataJSON),
-          signature: arrayBufferToBase64Url(response.signature),
-          userHandle: response.userHandle
-            ? arrayBufferToBase64Url(response.userHandle)
-            : undefined,
-        };
-      }
-      const response = await csrfFetch(
+      const data = await submitFreshAuthentication(
+        `${API_BASE}/passkeys/reauthenticate/options`,
         `${API_BASE}/passkeys/reauthenticate/verify`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: managementHeaders(),
-          body: JSON.stringify(proof),
-        },
+        { action, passkeyId },
+        password,
+        otpToken,
       );
-      if (!response.ok) {
-        const failure = await response.json().catch(() => ({}));
-        throw Object.assign(new Error('Fresh authentication failed'), {
-          code: response.status === 429 ? 'rate_limited' : failure.code,
-        });
-      }
-      const data = await response.json();
       if (typeof data.authorization !== 'string' || !data.authorization)
         throw new Error('Fresh authentication failed');
       return data.authorization;
+    },
+    [],
+  );
+
+  const unlinkSocialAccount = useCallback(
+    async (
+      associationId: string,
+      password?: string,
+      otpToken?: string,
+    ): Promise<void> => {
+      const data = await submitFreshAuthentication(
+        `${ENV.BASE_API_URL}/auth/social-accounts/unlink/options/`,
+        `${ENV.BASE_API_URL}/auth/social-accounts/unlink/`,
+        { associationId },
+        password,
+        otpToken,
+      );
+      if (data.success !== true) throw new Error('Fresh authentication failed');
     },
     [],
   );
@@ -353,6 +379,7 @@ export function useWebAuthn() {
     error,
     registerPasskey,
     authorizePasskeyChange,
+    unlinkSocialAccount,
     authenticateWithPasskey,
   };
 }

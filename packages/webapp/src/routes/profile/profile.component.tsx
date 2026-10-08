@@ -6,7 +6,18 @@ import { Button } from '@sb/webapp-core/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { Separator } from '@sb/webapp-core/components/ui/separator';
 import { useToast } from '@sb/webapp-core/toast/useToast';
-import { AlertTriangle, Crown, Fingerprint, Lock, Mail, Monitor, RefreshCw, Shield, User, UserCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  Crown,
+  Fingerprint,
+  Lock,
+  Mail,
+  Monitor,
+  RefreshCw,
+  Shield,
+  User,
+  UserCircle,
+} from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -15,6 +26,7 @@ import { AvatarForm } from '../../shared/components/auth/avatarForm';
 import { ChangePasswordForm } from '../../shared/components/auth/changePasswordForm';
 import { EditProfileForm } from '../../shared/components/auth/editProfileForm';
 import { PasskeysForm } from '../../shared/components/auth/passkeysForm';
+import { SocialAccounts } from '../../shared/components/auth/socialAccounts/socialAccounts.component';
 import { TwoFactorAuthForm } from '../../shared/components/auth/twoFactorAuthForm';
 import { useAuth } from '../../shared/hooks';
 import { profileResendConfirmationEmailMutation } from './profile.graphql';
@@ -135,7 +147,7 @@ export const Profile = () => {
                           onClick={resendConfirmationEmail}
                           disabled={resendLoading}
                         >
-                          <RefreshCw className={`h-4 w-4 mr-1.5 ${resendLoading ? 'animate-spin' : ''}`} />
+                          <RefreshCw className={`mr-1.5 h-4 w-4 ${resendLoading ? 'animate-spin' : ''}`} />
                           <FormattedMessage
                             defaultMessage="Resend verification email"
                             id="Profile / Email / Resend verification"
@@ -226,6 +238,23 @@ export const Profile = () => {
           </CardHeader>
           <CardContent>
             <PasskeysForm />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <FormattedMessage id="Social accounts / Title" defaultMessage="Connected social accounts" />
+            </CardTitle>
+            <CardDescription>
+              <FormattedMessage
+                id="Social accounts / Description"
+                defaultMessage="Manage Google and Facebook sign-in for your account."
+              />
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SocialAccounts />
           </CardContent>
         </Card>
 

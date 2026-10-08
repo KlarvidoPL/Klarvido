@@ -79,6 +79,29 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.groups.filter(name=name).exists()
 
 
+class PendingSocialAccountLink(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token_hash = models.CharField(max_length=64, unique=True)
+    provider = models.CharField(max_length=64)
+    uid = models.CharField(max_length=255)
+    credential_version = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(db_index=True)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.provider} linking confirmation ({self.pk})'
+
+
+class SocialAccountUnlinkChallenge(models.Model):
+    association = models.ForeignKey('social_django.UserSocialAuth', on_delete=models.CASCADE)
+    challenge = models.OneToOneField('sso.WebAuthnChallenge', on_delete=models.CASCADE)
+    credential_version = models.CharField(max_length=64)
+
+    def __str__(self):
+        return f'Social unlink challenge ({self.pk})'
+
+
 class UserAvatar(ImageWithThumbnailMixin, models.Model):
     original = models.ImageField(storage=get_public_storage(), upload_to=UniqueFilePathGenerator("avatars"), null=True)
     thumbnail = models.ImageField(

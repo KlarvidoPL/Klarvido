@@ -4110,7 +4110,7 @@
     "defaultMessage": "إدارة تسجيل الدخول الموحد"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "عرض إعدادات الأمان"
+    "defaultMessage": "عرض اتصالات تسجيل الدخول الموحد ومفاتيح المرور وإعدادات الأمان"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "عرض إعدادات الأمان"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "محاولات تحقق كثيرة جدًا. يُرجى الانتظار قليلًا ثم المحاولة مرة أخرى."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "إلغاء الربط"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "تعذر الإلغاء. يرجى المحاولة مرة أخرى."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "سجّل الدخول أدناه بكلمة المرور ورمز المصادقة الثنائية إذا كانت مفعّلة، أو استخدم مفتاح مرور."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "تعذر إكمال تسجيل الدخول الاجتماعي. سجّل الدخول بكلمة المرور أو مفتاح مرور، أو حاول مرة أخرى."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "يوجد حساب بهذا البريد الإلكتروني بالفعل، لكنه لم يتم التحقق منه بعد."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "إذا لم تنشئ هذا الحساب، فتواصل معنا عبر {supportEmail} وسنساعدك في التحقق من ملكيته."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "إذا لم تنشئ هذا الحساب، فتواصل مع الدعم وسنساعدك في التحقق من ملكيته."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "إذا كان هذا حسابك، فسجّل الدخول أدناه وتحقق من بريدك الإلكتروني، ثم حاول ربط Google مرة أخرى."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "تمت إضافة طريقة جديدة لتسجيل الدخول إلى حسابك"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "يمكنك الآن تسجيل الدخول باستخدام {provider} عبر هذا البريد الإلكتروني. إذا أجريت هذا التغيير، فلا يلزمك اتخاذ أي إجراء آخر. إذا لم تربط {provider}، فأعد تعيين كلمة المرور فورًا وتواصل مع الدعم."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "تم ربط تسجيل الدخول باستخدام {provider} بحسابك"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "أكد بكلمة مرور حسابك ورمز المصادقة الثنائية إذا كانت مفعّلة، أو بمفتاح مرور. سيؤدي إلغاء الربط إلى تسجيل خروجك من جميع الأجهزة."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "إلغاء ربط تسجيل الدخول الاجتماعي"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "إدارة تسجيل الدخول باستخدام Google وFacebook لحسابك."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "إلغاء الربط"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "تم إلغاء ربط تسجيل الدخول الاجتماعي. يرجى تسجيل الدخول مرة أخرى."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "لا توجد حسابات مرتبطة لتسجيل الدخول الاجتماعي."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "أضف كلمة مرور أو مفتاح مرور قبل إلغاء ربط آخر طريقة لتسجيل الدخول."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "تعذر تحميل الحسابات المرتبطة. حدّث الصفحة وحاول مرة أخرى."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "جارٍ تحميل الحسابات المرتبطة…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "استخدم مفتاح مرور موجودًا، أو عيّن كلمة مرور عبر إعادة تعيينها قبل إلغاء الربط."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "الحسابات الاجتماعية المرتبطة"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "اربط Google بحسابك"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "يؤكد ذلك ملكيتك للحساب ويربط Google لتسجيل الدخول مستقبلاً. تبقى إعدادات المصادقة الثنائية دون تغيير."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "تحقّق من بريدك الإلكتروني قبل ربط Google"
   }
 }

@@ -4110,7 +4110,7 @@
     "defaultMessage": "管理单点登录"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "查看安全配置"
+    "defaultMessage": "查看 SSO 连接、通行密钥和安全配置"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "查看安全设置"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "验证尝试次数过多。请稍候再试。"
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "取消关联"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "无法取消，请重试。"
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "请在下方使用密码及双重验证代码（如已启用）登录，或使用通行密钥。"
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "无法完成社交登录。请使用密码或通行密钥登录，或重试。"
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "该电子邮件地址对应的账户已存在，但尚未验证。"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "如果您没有创建此账户，请通过 {supportEmail} 联系我们，我们将帮助验证账户归属。"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "如果您没有创建此账户，请联系支持人员，我们将帮助验证账户归属。"
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "如果这是您的账户，请在下方登录并验证电子邮件地址，然后再次尝试关联 Google。"
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "重置密码"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "如果不是您操作的，请立即重置密码。"
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "您的账户新增了一种登录方式"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "您现在可以使用此电子邮件地址通过 {provider} 登录。如果是您进行的更改，无需采取其他操作。如果您没有关联 {provider}，请立即重置密码并联系支持人员。"
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "{provider} 登录已关联到您的账户"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "请使用账户密码及已启用的双重验证代码，或通行密钥进行确认。取消关联将使您在所有设备上退出登录。"
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "取消关联社交登录"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "管理账户的 Google 和 Facebook 登录。"
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "取消关联"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "社交登录已取消关联，请重新登录。"
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "尚未关联任何社交登录账户。"
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "取消关联最后一种登录方式前，请先添加密码或通行密钥。"
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "无法加载已关联账户，请刷新页面后重试。"
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "正在加载已关联账户…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "请使用现有通行密钥，或先通过密码重置设置密码，再取消关联。"
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "已关联的社交账户"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "将 Google 关联到您的账户"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "这将确认账户属于您，并关联 Google 以便今后登录。您的双重验证设置将保持不变。"
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "关联 Google 前请先验证邮箱"
   }
 }

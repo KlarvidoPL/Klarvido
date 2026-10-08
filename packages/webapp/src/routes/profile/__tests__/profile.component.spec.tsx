@@ -8,6 +8,10 @@ import { render } from '../../../tests/utils/rendering';
 import { Profile } from '../profile.component';
 import { profileResendConfirmationEmailMutation } from '../profile.graphql';
 
+jest.mock('../../../shared/components/auth/socialAccounts/socialAccounts.component', () => ({
+  SocialAccounts: () => <div>Connected social accounts</div>,
+}));
+
 describe('Profile: Component', () => {
   const Component = () => <Profile />;
 

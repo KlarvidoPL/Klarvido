@@ -16,16 +16,21 @@ def _tiny_jpeg_bytes():
     return buffer.getvalue()
 
 
+def _google_backend():
+    backend = Mock()
+    backend.name = "google-oauth2"
+    return backend
+
+
 class TestPopulateProfileFromSocial:
     """Name, avatar, and email-confirmation are backfilled whenever they're
-    still blank - on the account's first signup, or when an existing
-    password-signup account is later linked (by email) to a Google/Facebook
-    login - but never overwrite a name/avatar the user has already set."""
+    still blank on a new or already linked social account. These helper tests
+    assume the provider identity was resolved by the preceding pipeline steps;
+    email collisions are covered in test_social_account_linking.py."""
 
     def test_confirms_email_and_fills_blank_name_for_existing_account_on_later_login(self, user):
-        """E.g. signed up with email+password, later uses "Sign in with Google"
-        with the same address - is_new is False (no new user is created, just
-        linked by email), but the fields should still be backfilled."""
+        """An existing provider association resolves this account; no new user
+        is created, but blank profile fields should still be backfilled."""
         user.profile.first_name = ""
         user.profile.last_name = ""
         user.profile.save(update_fields=["first_name", "last_name"])
@@ -33,7 +38,11 @@ class TestPopulateProfileFromSocial:
         user.save(update_fields=["is_confirmed"])
 
         populate_profile_from_social(
-            details={"first_name": "Jan", "last_name": "Kowalski"}, response={}, user=user, is_new=False
+            details={"first_name": "Jan", "last_name": "Kowalski", "email": user.email},
+            response={"email_verified": True},
+            user=user,
+            is_new=False,
+            backend=_google_backend(),
         )
 
         user.profile.refresh_from_db()
@@ -41,6 +50,33 @@ class TestPopulateProfileFromSocial:
         assert user.profile.first_name == "Jan"
         assert user.profile.last_name == "Kowalski"
         assert user.is_confirmed is True
+
+    def test_does_not_confirm_email_without_a_verified_matching_provider_email(self, user):
+        """Defense-in-depth: this step alone must not confirm an account just
+        because it's reachable - create_social_user is expected to already have
+        gated that, but this guard should hold even if it didn't."""
+        user.is_confirmed = False
+        user.save(update_fields=["is_confirmed"])
+
+        populate_profile_from_social(
+            details={"email": user.email},
+            response={"email_verified": False},
+            user=user,
+            is_new=False,
+            backend=_google_backend(),
+        )
+        user.refresh_from_db()
+        assert user.is_confirmed is False
+
+        populate_profile_from_social(
+            details={"email": "someone-else@example.com"},
+            response={"email_verified": True},
+            user=user,
+            is_new=False,
+            backend=_google_backend(),
+        )
+        user.refresh_from_db()
+        assert user.is_confirmed is False
 
     def test_does_not_overwrite_an_existing_name_on_later_login(self, user):
         user.profile.first_name = "Existing"
@@ -59,7 +95,13 @@ class TestPopulateProfileFromSocial:
         user.is_confirmed = False
         user.save(update_fields=["is_confirmed"])
 
-        populate_profile_from_social(details={}, response={}, user=user, is_new=True)
+        populate_profile_from_social(
+            details={"email": user.email},
+            response={"email_verified": True},
+            user=user,
+            is_new=True,
+            backend=_google_backend(),
+        )
 
         user.refresh_from_db()
         assert user.is_confirmed is True
@@ -121,9 +163,8 @@ class TestPopulateProfileFromSocial:
 
     @patch("apps.users.pipeline.requests.get")
     def test_downloads_blank_avatar_for_existing_account_on_later_login(self, mock_get, user):
-        """E.g. signed up with email+password (no avatar set), later uses "Sign
-        in with Google" with the same address - is_new is False, but a blank
-        avatar should still be backfilled, same as name/confirmation."""
+        """An already linked provider login should backfill a blank avatar,
+        just as it backfills a blank name."""
         mock_get.return_value = Mock(status_code=200, content=_tiny_jpeg_bytes(), raise_for_status=Mock())
         user.profile.first_name = "Existing"
         user.profile.last_name = "Name"

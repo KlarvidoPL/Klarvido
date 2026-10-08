@@ -15,6 +15,7 @@ import * as ProjectNoteMention from './projectNoteMention';
 import * as BackupReady from './backupReady';
 import * as TenantDeleted from './tenantDeleted';
 
+import * as SocialAccountLinked from './socialAccountLinked';
 //<-- INJECT EMAIL TEMPLATE IMPORT -->
 
 export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
@@ -33,5 +34,6 @@ export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
   [EmailTemplateType.PROJECT_NOTE_MENTION]: ProjectNoteMention,
   [EmailTemplateType.BACKUP_READY]: BackupReady,
   [EmailTemplateType.TENANT_DELETED]: TenantDeleted,
+  [EmailTemplateType.SOCIAL_ACCOUNT_LINKED]: SocialAccountLinked,
   //<-- INJECT EMAIL TEMPLATE -->
 };

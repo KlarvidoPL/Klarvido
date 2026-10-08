@@ -9,17 +9,33 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt import views as jwt_views, tokens as jwt_tokens
 from rest_framework_simplejwt.views import TokenViewBase
 from social_core.actions import do_complete
+from social_core.exceptions import AuthException
 from social_django.utils import psa
 
 from common.csrf import enforce_api_csrf
 
 from .jwt import get_jti_from_refresh_token
 from . import serializers, utils
+from .services.social_linking import login_redirect, cancel_link, LINK_COOKIE
 
 logger = logging.getLogger(__name__)
+
+
+class CancelSocialLinkView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        enforce_api_csrf(request)
+        cancel_link(request)
+        response = Response({'ok': True})
+        response['Cache-Control'] = 'no-store'
+        response.delete_cookie(LINK_COOKIE, samesite=settings.COOKIE_SAMESITE)
+        return response
 
 
 class CookieTokenRefreshView(jwt_views.TokenRefreshView):
@@ -133,12 +149,15 @@ def complete(request, backend, *args, **kwargs):
     # ambient request.user here would make "Sign in with Google" silently associate
     # (and log back into) the *current* session's user regardless of which Google
     # account was picked, instead of the account that identity actually belongs to.
-    return do_complete(
-        request.backend,
-        _do_login,
-        user=None,
-        redirect_name=REDIRECT_FIELD_NAME,
-        request=request,
-        *args,  # noqa: B026
-        **kwargs,
-    )
+    try:
+        return do_complete(
+            request.backend,
+            _do_login,
+            user=None,
+            redirect_name=REDIRECT_FIELD_NAME,
+            request=request,
+            *args,  # noqa: B026
+            **kwargs,
+        )
+    except AuthException:
+        return login_redirect(request, 'failed')

@@ -518,8 +518,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.social_user",
     "social_core.pipeline.user.get_username",
-    "social_core.pipeline.social_auth.associate_by_email",
-    "social_core.pipeline.user.create_user",
+    "apps.users.pipeline.create_social_user",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "apps.users.pipeline.populate_profile_from_social",
@@ -748,6 +747,10 @@ CELERY_BEAT_SCHEDULE = {
     },
     'cleanup-passkey-challenges-every-five-minutes': {
         'task': 'apps.sso.tasks.cleanup_passkey_challenges',
+        'schedule': 300,
+    },
+    'cleanup-social-link-confirmations-every-five-minutes': {
+        'task': 'apps.users.tasks.cleanup_social_link_confirmations',
         'schedule': 300,
     },
     'cleanup-expired-sessions-daily': {

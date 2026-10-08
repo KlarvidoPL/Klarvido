@@ -12,7 +12,8 @@ export const ENV = {
   CONTENTFUL_TOKEN: process.env.VITE_CONTENTFUL_TOKEN,
   STRIPE_PUBLISHABLE_KEY: process.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '',
   GOOGLE_ANALYTICS_TRACKING_ID: process.env.VITE_GOOGLE_ANALYTICS_TRACKING_ID,
-  
+  SUPPORT_EMAIL: process.env.VITE_SUPPORT_EMAIL ?? '',
+
   // Supported authentication feature flags
   // Enterprise SSO is disabled in code and cannot be enabled through the environment.
   ENABLE_PASSKEYS: process.env.VITE_ENABLE_PASSKEYS !== 'false', // Default: enabled  

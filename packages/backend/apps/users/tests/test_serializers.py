@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError, ErrorDetail
 
 import pytest
 from apps.users.serializers import ValidateOTPSerializer
+from apps.users.utils import generate_otp_auth_token
 
 pytestmark = pytest.mark.django_db
 
@@ -90,7 +91,7 @@ class TestValidateOTPSerializer:
         self.assert_invalid_token(error)
 
     def test_otp_validation_failure_raises_exception(self, context_with_request_cookies, otp_token_factory, user):
-        token = otp_token_factory(user_id=str(user.id))
+        token = generate_otp_auth_token(user)
         context = context_with_request_cookies({settings.OTP_AUTH_TOKEN_COOKIE: str(token)})
         serializer = ValidateOTPSerializer(data={"otp_token": "token"}, context=context)
 

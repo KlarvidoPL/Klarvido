@@ -75,6 +75,16 @@ pnpm translations:sync
 pnpm translations:extract-and-sync
 ```
 
+Extraction preserves previously registered keys because dynamic message IDs cannot
+all be discovered by FormatJS. Remove retired keys explicitly from `master.json`
+before syncing. Existing English translations stay intact unless their source
+default changes.
+
+Database exports include `published_keys` metadata so the frontend exporter can
+distinguish published text from English fallbacks. Missing database translations
+retain their bundled locale values; published Admin edits take precedence. An
+incomplete development database must not erase translations from the repository.
+
 The extraction covers all webapp packages:
 - `webapp/src/**/*.tsx`
 - `webapp-libs/webapp-core/src/**/*.tsx`

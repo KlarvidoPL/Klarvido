@@ -25,6 +25,7 @@ from . import models, tokens, jwt, notifications
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
+from .services.social_linking import validate_link_otp_proof
 from .utils import generate_otp_auth_token
 
 UPLOADED_AVATAR_SIZE_LIMIT = 5 * 1024 * 1024
@@ -144,10 +145,13 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
 
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = validated_data.pop("user")
+        # Serialize with support recovery and recheck against current credentials.
+        user = models.User.objects.select_for_update().get(pk=validated_data['user'].pk)
+        self.validate({**validated_data, 'user': user})
         user.is_confirmed = True
-        user.save()
+        user.save(update_fields=['is_confirmed'])
         return {"ok": True}
 
 
@@ -262,12 +266,14 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
 
         return {**attrs, "user": user}
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = validated_data.pop("user")
-        new_password = validated_data.pop("new_password")
-        user.set_password(new_password)
+        user = models.User.objects.select_for_update().get(pk=validated_data['user'].pk)
+        if not tokens.password_reset_token.check_token(user, validated_data['token']):
+            raise exceptions.ValidationError(_("Malformed password reset token"), "invalid_token")
+        user.set_password(validated_data['new_password'])
         jwt.blacklist_user_tokens(user)
-        user.save()
+        user.save(update_fields=['password'])
         return {"ok": True}
 
 
@@ -489,6 +495,14 @@ class ValidateOTPSerializer(serializers.Serializer):
         except models.User.DoesNotExist:
             self.fail("invalid_token")
 
+        # Pending login proofs cannot survive credential recovery or act as full access tokens.
+        if (
+            not self.user.is_active
+            or otp_auth_token.get('purpose') != 'otp_login'
+            or otp_auth_token.get('hash_password') != get_md5_hash_password(self.user.password)
+        ):
+            self.fail("invalid_token")
+        validate_link_otp_proof(request, self.user, otp_auth_token)
         otp_services.validate_otp(self.user, attrs.get("otp_token", ""))
 
         return attrs

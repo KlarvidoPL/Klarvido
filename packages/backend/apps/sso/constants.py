@@ -90,6 +90,9 @@ class SSOAuditEventType(models.TextChoices):
     KSEF_TOKEN_TESTED = "ksef_token_tested", "KSeF Token Tested"
     KSEF_TOKEN_DELETED = "ksef_token_deleted", "KSeF Token Deleted"
 
+    # Account recovery events
+    ACCOUNT_RECLAIMED = "account_reclaimed", "Account Reclaimed by Support"
+
 
 class Notification(Enum):
     """

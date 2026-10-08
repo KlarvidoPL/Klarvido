@@ -4110,7 +4110,7 @@
     "defaultMessage": "SSO verwalten"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Sicherheitskonfiguration anzeigen"
+    "defaultMessage": "SSO-Verbindungen, Passkeys und Sicherheitskonfigurationen anzeigen"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Sicherheitseinstellungen anzeigen"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Zu viele Verifizierungsversuche. Bitte warten Sie einen Moment und versuchen Sie es erneut."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Verknüpfung abbrechen"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "Abbrechen nicht möglich. Bitte versuche es erneut."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Melden Sie sich unten mit Ihrem Passwort und, falls aktiviert, einem Zwei-Faktor-Code an oder verwenden Sie einen Passkey."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "Die soziale Anmeldung konnte nicht abgeschlossen werden. Melde dich mit deinem Passwort oder Passkey an oder versuche es erneut."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Ein Konto mit dieser E-Mail-Adresse existiert bereits, wurde aber noch nicht bestätigt."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Wenn du dieses Konto nicht erstellt hast, kontaktiere uns unter {supportEmail}. Wir helfen dir, die Inhaberschaft zu bestätigen."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Wenn du dieses Konto nicht erstellt hast, kontaktiere den Support. Wir helfen dir, die Inhaberschaft zu bestätigen."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "Wenn dies dein Konto ist, melde dich unten an und bestätige deine E-Mail-Adresse. Versuche danach erneut, Google zu verknüpfen."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Passwort zurücksetzen"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Wenn du das nicht warst, setze sofort dein Passwort zurück."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Deinem Konto wurde eine neue Anmeldemethode hinzugefügt"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Du kannst dich jetzt mit {provider} und dieser E-Mail-Adresse anmelden. Wenn du diese Änderung vorgenommen hast, musst du nichts weiter tun. Wenn du {provider} nicht verknüpft hast, setze sofort dein Passwort zurück und kontaktiere den Support."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "Die Anmeldung mit {provider} wurde mit deinem Konto verknüpft"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Bestätige mit deinem Passwort und, falls aktiviert, dem Zwei-Faktor-Code oder einem Passkey. Beim Trennen wirst du auf allen Geräten abgemeldet."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Soziale Anmeldung trennen"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Verwalte die Anmeldung mit Google und Facebook für dein Konto."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Trennen"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "Die soziale Anmeldung wurde getrennt. Bitte melde dich erneut an."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "Es sind keine Konten für die soziale Anmeldung verknüpft."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Füge ein Passwort oder einen Passkey hinzu, bevor du deine letzte Anmeldemethode trennst."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "Verknüpfte Konten konnten nicht geladen werden. Lade die Seite neu und versuche es erneut."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Verknüpfte Konten werden geladen…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Verwende einen bestehenden Passkey oder lege vor dem Trennen über die Passwortzurücksetzung ein Passwort fest."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Verknüpfte soziale Konten"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Google mit Ihrem Konto verbinden"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "So bestätigen Sie, dass das Konto Ihnen gehört, und verbinden Google für künftige Anmeldungen. Ihre Einstellungen zur Zwei-Faktor-Authentifizierung bleiben unverändert."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "E-Mail vor dem Verbinden mit Google bestätigen"
   }
 }

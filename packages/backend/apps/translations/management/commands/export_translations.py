@@ -119,7 +119,7 @@ class Command(BaseCommand):
 
     def dump_all_translations_as_json(self):
         """Dump all translations as JSON to stdout for external processing."""
-        result = {"locales": [], "translations": {}}
+        result = {"locales": [], "translations": {}, "published_keys": {}}
 
         # Get master keys
         master_keys = {key.key: key.default_message for key in TranslationKey.objects.filter(is_deprecated=False)}
@@ -140,6 +140,8 @@ class Command(BaseCommand):
             ).select_related("key")
 
             locale_translations = {t.key.key: t.value for t in translations}
+            # Consumers must distinguish reviewed English text from an English fallback.
+            result["published_keys"][locale.code] = list(locale_translations)
 
             # Include all keys with fallback to master
             full_translations = {}

@@ -35,6 +35,7 @@ from common.csrf import browser_csrf_binding
 
 from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
 from apps.users.utils import set_auth_cookie
+from apps.users.services.social_linking import complete_link, LINK_COOKIE
 
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
@@ -917,6 +918,10 @@ class PasskeyAuthenticationVerifyView(PasskeyAPIView):
             if session_id:
                 auth_cookies[settings.SESSION_ID_COOKIE] = session_id
             set_auth_cookie(response, auth_cookies)
+            if complete_link(request, user):
+                response.delete_cookie(LINK_COOKIE, samesite=settings.COOKIE_SAMESITE)
+            if settings.OTP_AUTH_TOKEN_COOKIE in request.COOKIES:
+                response.delete_cookie(settings.OTP_AUTH_TOKEN_COOKIE, samesite=settings.COOKIE_SAMESITE)
             return response
 
         except ValueError as e:

@@ -4314,7 +4314,7 @@
     "defaultMessage": "Zarządzanie SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Wyświetlanie konfiguracji zabezpieczeń"
+    "defaultMessage": "Wyświetlaj połączenia SSO, klucze dostępu i konfiguracje zabezpieczeń"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Wyświetlanie ustawień zabezpieczeń"
@@ -5190,7 +5190,7 @@
     "defaultMessage": "Skonfiguruj SSO"
   },
   "Tenant Security Settings / Audit Description": {
-    "defaultMessage": "Przeglądaj ostatnie zdarzenia SSO, SCIM i KSeF w swojej organizacji"
+    "defaultMessage": "Przeglądaj ostatnie zdarzenia bezpieczeństwa w swojej organizacji"
   },
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Dziennik zdarzeń bezpieczeństwa"
@@ -5208,7 +5208,7 @@
     "defaultMessage": "Brak zdarzeń zabezpieczeń"
   },
   "Tenant Security Settings / No Audit Events Hint": {
-    "defaultMessage": "Zdarzenia SSO i SCIM, takie jak logowania przez SSO, tworzenie użytkowników i zmiany konfiguracji, oraz zmiany tokenu KSeF, pojawią się tutaj."
+    "defaultMessage": "Zdarzenia zabezpieczeń, takie jak logowania SSO, tworzenie użytkowników i zmiany konfiguracji, pojawią się tutaj."
   },
   "Tenant Security Settings / No Filtered Audit Events": {
     "defaultMessage": "Brak zdarzeń spełniających kryteria filtrów"
@@ -5670,7 +5670,7 @@
     "defaultMessage": "Wybierz organizację, w której chcesz pracować"
   },
   "Companies / Empty": {
-    "defaultMessage": "Dodaj pierwszą organizację, aby rozpocząć pracę w Klarvido."
+    "defaultMessage": "Nie masz jeszcze dostępu do żadnej organizacji. Dodaj organizację lub zaakceptuj zaproszenie poniżej."
   },
   "Companies / Empty title": {
     "defaultMessage": "Nie masz jeszcze organizacji"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Zbyt wiele prób weryfikacji. Poczekaj chwilę i spróbuj ponownie."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Anuluj łączenie"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "Nie udało się anulować. Spróbuj ponownie."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Zaloguj się poniżej hasłem i kodem dwuskładnikowym, jeśli jest włączony, lub użyj klucza dostępu."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "Nie udało się zakończyć logowania społecznościowego. Zaloguj się hasłem lub kluczem dostępu albo spróbuj ponownie."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Konto z tym adresem e-mail już istnieje, ale nie zostało jeszcze zweryfikowane."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Jeśli nie utworzono tego konta, napisz do nas na {supportEmail}, a pomożemy potwierdzić jego własność."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Jeśli nie utworzono tego konta, skontaktuj się z pomocą techniczną, aby potwierdzić jego własność."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "Jeśli to Twoje konto, zaloguj się poniżej i zweryfikuj adres e-mail, a następnie spróbuj ponownie połączyć Google."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Zresetuj hasło"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Jeśli to nie Ty, natychmiast zresetuj hasło."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Dodano nową metodę logowania do Twojego konta"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Możesz teraz logować się przez {provider}, używając tego adresu e-mail. Jeśli to Twoja zmiana, nie musisz nic więcej robić. Jeśli nie połączono {provider}, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "Logowanie przez {provider} zostało połączone z Twoim kontem"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Potwierdź hasłem do konta i kodem dwuskładnikowym, jeśli jest włączony, lub kluczem dostępu. Odłączenie wyloguje Cię ze wszystkich urządzeń."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Odłącz logowanie społecznościowe"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Zarządzaj logowaniem przez Google i Facebook do swojego konta."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Odłącz"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "Logowanie społecznościowe zostało odłączone. Zaloguj się ponownie."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "Brak połączonych kont do logowania społecznościowego."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Dodaj hasło lub klucz dostępu przed odłączeniem ostatniej metody logowania."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "Nie udało się wczytać połączonych kont. Odśwież stronę i spróbuj ponownie."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Wczytywanie połączonych kont…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Użyj istniejącego klucza dostępu lub ustaw hasło przez resetowanie hasła przed odłączeniem."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Połączone konta społecznościowe"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Połącz Google ze swoim kontem"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "W ten sposób potwierdzisz, że konto należy do Ciebie, i połączysz Google do kolejnych logowań. Twoje ustawienia uwierzytelniania dwuskładnikowego pozostają bez zmian."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Zweryfikuj e-mail przed połączeniem Google"
   }
 }

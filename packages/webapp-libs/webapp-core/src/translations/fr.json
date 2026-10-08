@@ -4110,7 +4110,7 @@
     "defaultMessage": "Gérer le SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Afficher la configuration de sécurité"
+    "defaultMessage": "Afficher les connexions SSO, les clés d'accès et les configurations de sécurité"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Afficher les paramètres de sécurité"
@@ -5782,5 +5782,86 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Trop de tentatives de vérification. Patientez un instant et réessayez."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Annuler l’association"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "Impossible d’annuler. Veuillez réessayer."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Connectez-vous ci-dessous avec votre mot de passe et un code à deux facteurs si cette option est activée, ou utilisez une clé d’accès."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "La connexion sociale a échoué. Connectez-vous avec votre mot de passe ou une clé d’accès, ou réessayez."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Un compte avec cette adresse e-mail existe déjà, mais n’a pas encore été vérifié."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Si vous n’avez pas créé ce compte, contactez-nous à {supportEmail} pour vérifier que vous en êtes propriétaire."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Si vous n’avez pas créé ce compte, contactez l’assistance pour vérifier que vous en êtes propriétaire."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "S’il s’agit de votre compte, connectez-vous ci-dessous et vérifiez votre adresse e-mail, puis réessayez d’associer Google."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Réinitialiser votre mot de passe"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Si vous n’êtes pas à l’origine de cette action, réinitialisez immédiatement votre mot de passe."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Une nouvelle méthode de connexion a été ajoutée à votre compte"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Vous pouvez maintenant vous connecter avec {provider} en utilisant cette adresse e-mail. Si vous avez effectué ce changement, aucune autre action n’est nécessaire. Si vous n’avez pas associé {provider}, réinitialisez immédiatement votre mot de passe et contactez l’assistance."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "La connexion avec {provider} a été associée à votre compte"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Confirmez avec votre mot de passe et le code à deux facteurs si activé, ou une clé d’accès. La dissociation vous déconnecte de tous vos appareils."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Dissocier la connexion sociale"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Gérez la connexion avec Google et Facebook à votre compte."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Dissocier"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "La connexion sociale a été dissociée. Veuillez vous reconnecter."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "Aucun compte de connexion sociale n’est associé."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Ajoutez un mot de passe ou une clé d’accès avant de dissocier votre dernière méthode de connexion."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "Impossible de charger les comptes associés. Actualisez la page et réessayez."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Chargement des comptes associés…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Utilisez une clé d’accès existante ou définissez un mot de passe via la réinitialisation avant de dissocier le compte."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Comptes sociaux associés"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Connectez Google à votre compte"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "Vous confirmez ainsi que le compte vous appartient et connectez Google pour les prochaines connexions. Vos paramètres d’authentification à deux facteurs restent inchangés."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Vérifiez votre e-mail avant de connecter Google"
   }
 }

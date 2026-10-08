@@ -16,10 +16,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const TRANSLATIONS_DIR = path.join(
-  __dirname,
-  '../../webapp-libs/webapp-core/src/translations'
-);
+const TRANSLATIONS_DIR = path.join(__dirname, '../../webapp-libs/webapp-core/src/translations');
 
 /**
  * Check if docker compose backend container is running
@@ -62,14 +59,11 @@ async function exportTranslations() {
 
   try {
     // Use the Django management command with json-dump format
-    const output = execSync(
-      'docker compose exec -T backend python manage.py export_translations --format=json-dump',
-      {
-        encoding: 'utf8',
-        maxBuffer: 50 * 1024 * 1024, // 50MB buffer for large translation data
-        stdio: ['pipe', 'pipe', 'pipe'],
-      }
-    );
+    const output = execSync('docker compose exec -T backend python manage.py export_translations --format=json-dump', {
+      encoding: 'utf8',
+      maxBuffer: 50 * 1024 * 1024, // 50MB buffer for large translation data
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
 
     // Parse the JSON output (skip any warning lines)
     const lines = output.split('\n');
@@ -86,6 +80,11 @@ async function exportTranslations() {
     }
 
     const data = JSON.parse(jsonLine);
+    if (!data.published_keys) {
+      throw new Error('Backend export must include published_keys; update the backend before exporting');
+    }
+    const masterPath = path.join(TRANSLATIONS_DIR, 'master.json');
+    const master = JSON.parse(fs.readFileSync(masterPath, 'utf8'));
 
     console.log(`📚 Found ${data.locales.length} active locales`);
     console.log('');
@@ -106,17 +105,22 @@ async function exportTranslations() {
       const translationCount = Object.keys(translations).length;
 
       // Build output with defaultMessage wrapper
-      const outputData = {};
-      for (const [key, value] of Object.entries(translations)) {
-        outputData[key] = { defaultMessage: value };
-      }
-
       const outputPath = path.join(TRANSLATIONS_DIR, `${localeCode}.json`);
-      fs.writeFileSync(
-        outputPath,
-        JSON.stringify(outputData, null, 2),
-        'utf8'
+      const existing = fs.existsSync(outputPath) ? JSON.parse(fs.readFileSync(outputPath, 'utf8')) : {};
+      const publishedKeys = new Set(data.published_keys[localeCode] || []);
+      // Keep bundled values for keys absent from an incomplete local database.
+      // Keys removed from the master catalogue are deliberately dropped.
+      const outputData = Object.fromEntries(Object.entries(existing).filter(([key]) => key in master));
+      for (const [key, value] of Object.entries(translations)) {
+        if (publishedKeys.has(key) || !outputData[key]) {
+          outputData[key] = { defaultMessage: value };
+        }
+      }
+      data.translations[localeCode] = Object.fromEntries(
+        Object.entries(outputData).map(([key, value]) => [key, value.defaultMessage])
       );
+
+      fs.writeFileSync(outputPath, JSON.stringify(outputData, null, 2), 'utf8');
 
       const percent = totalKeys > 0 ? ((translationCount / totalKeys) * 100).toFixed(1) : 0;
       const rtlMarker = locale.rtl ? ' (RTL)' : '';
@@ -126,11 +130,7 @@ async function exportTranslations() {
 
     // Also create a locales.json file with metadata
     const localesPath = path.join(TRANSLATIONS_DIR, 'locales.json');
-    fs.writeFileSync(
-      localesPath,
-      JSON.stringify(data.locales, null, 2),
-      'utf8'
-    );
+    fs.writeFileSync(localesPath, JSON.stringify(data.locales, null, 2), 'utf8');
     console.log(`  ✅ locales.json - ${data.locales.length} locales`);
 
     // Create translations_export.json for backend deployment
@@ -140,17 +140,12 @@ async function exportTranslations() {
       translations: data.translations,
     };
     const exportPath = path.join(TRANSLATIONS_DIR, 'translations_export.json');
-    fs.writeFileSync(
-      exportPath,
-      JSON.stringify(exportData, null, 2),
-      'utf8'
-    );
+    fs.writeFileSync(exportPath, JSON.stringify(exportData, null, 2), 'utf8');
     console.log(`  ✅ translations_export.json - deployment bundle`);
 
     console.log('');
     console.log('✅ Export complete!');
     console.log(`   Output directory: ${TRANSLATIONS_DIR}`);
-
   } catch (error) {
     console.error('❌ Export failed:', error.message);
     process.exit(1);

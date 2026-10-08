@@ -20,18 +20,21 @@ from . import models
 from . import serializers
 from .services.default_organization import default_organization_id
 from .services.users import get_user_from_resolver, get_role_names, get_user_avatar_url
+from .services.social_linking import complete_link
 
 
 logger = logging.getLogger(__name__)
 
 
-def _create_session_for_user(user, request, refresh_token: str):
+def _create_session_for_user(user, request, refresh_token: str, *, link_social=False):
     """Authentication must have a durable, revocable session before setting cookies."""
     try:
         jti = get_jti_from_refresh_token(refresh_token)
         if not user or not jti:
             raise ValueError("Missing session owner or refresh token")
         _, session_id = SessionService(user).create_session(request, refresh_token_jti=jti)
+        if link_social:
+            complete_link(request, user)
         return session_id
     except Exception:
         logger.error("Authentication session creation failed")
@@ -100,7 +103,9 @@ class ObtainTokenMutation(CookieAuthenticationMutation):
                     except models.User.DoesNotExist:
                         user = None
 
-                session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
+                session_id = _create_session_for_user(
+                    user, info.context._request, refresh_token=mutation.refresh, link_social=True
+                )
 
                 auth_cookies = {
                     settings.ACCESS_TOKEN_COOKIE: mutation.access,
@@ -202,7 +207,7 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
         with transaction.atomic():
             mutation = super().perform_mutate(serializer, info)
             session_id = _create_session_for_user(
-                serializer.user, info.context._request, refresh_token=mutation.refresh
+                serializer.user, info.context._request, refresh_token=mutation.refresh, link_social=True
             )
 
         auth_cookies = {
@@ -219,7 +224,10 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
 
     @classmethod
     def _delete_otp_auth_token_cookie(cls, info):
-        info.context._request.delete_cookies = [settings.OTP_AUTH_TOKEN_COOKIE]
+        info.context._request.delete_cookies = [
+            *getattr(info.context._request, 'delete_cookies', []),
+            settings.OTP_AUTH_TOKEN_COOKIE,
+        ]
 
 
 class DisableOTPMutation(mutations.SerializerMutation):

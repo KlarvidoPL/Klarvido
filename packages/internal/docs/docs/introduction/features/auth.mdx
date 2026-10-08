@@ -14,6 +14,45 @@ The login and signup pages are designed to be simple and user-friendly (and full
 their email address and password, or they can use social authentication with Google or Facebook. The signup page
 allows new users to register for an account by providing their email address and password.
 
+Social sign-in identifies an account through its existing Google or Facebook association. A matching email address
+does not automatically link a social identity to a password account or another provider's account, and the
+provider must itself report that email as verified (Google's `email_verified` claim) - an unverified provider
+email is rejected outright, whether it would have created a new account or matched an existing one.
+
+For a verified existing account, the first provider connection redirects to the login page and requires the
+account password plus OTP if enabled, or a verified passkey. Confirmation expires after five minutes and can
+be cancelled. Linking sends the account owner a notification email so an unexpected connection is noticed.
+After linking, social sign-in requires OTP when enabled; direct verified passkey login remains an alternative
+without an additional OTP step.
+
+A matching but unconfirmed account is never automatically reclaimed by a social login - the real owner may
+simply not have confirmed yet, and could already hold organization data. Instead the login page explains that
+an account with that email exists, points the owner at the normal sign-in-and-verify path, and directs anyone
+who didn't create the account to contact support. Support can resolve a genuine dispute from Django Admin's
+Users list ("Reclaim unconfirmed account" action, superusers only) after verifying ownership out of band: it
+strips the account's password, OTP, passkeys, sessions and any social links, then emails a password-reset link
+to let the rightful owner back in.
+
+Connected social providers can be disconnected from Profile → Connected social accounts. Removal requires
+fresh password authentication plus OTP if enabled, or a verified passkey. The last login method cannot be
+removed. Disconnecting cancels pending links and revokes all sessions, including the current session.
+
+Support reclaim also invalidates existing confirmation-email links, password-reset links and pending OTP
+login proofs, and removes pending passkey challenges and management grants. Older confirmation-email links
+issued before this token hardening need to be resent. Both confirmation and password-reset completion recheck
+their token under an account lock, so an in-flight request cannot restore credentials after reclaim.
+
+The translation data migration fills these security messages and replaces English placeholders while
+preserving customized translations. Publish all locales from Django Admin after deployment to update the
+runtime translation files; bundled fallbacks and the deployment translation export also contain the messages.
+
+For historical accounts, run `python manage.py review_social_links --details` in the backend to obtain a
+read-only inventory of social links without recorded fresh ownership proof. The report omits email addresses
+and provider UIDs. Missing proof does not establish abuse: legacy records do not capture linking provenance.
+Verify mailbox ownership, review registered credentials and organization memberships, and check the security
+history before recovery. New verified provider signups and explicit links record their ownership proof. Confirmed accounts require an incident review; the unconfirmed reclaim action must
+not be used for them. This command never removes links, credentials or memberships automatically.
+
 <p align="center">
   <img src={useBaseUrl("img/features/auth/login.png")} alt="Login page" />
   <img src={useBaseUrl("img/features/auth/signup.png")} alt="Sign up page" />

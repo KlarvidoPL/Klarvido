@@ -5,6 +5,7 @@ import hashlib
 import json
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
+from types import SimpleNamespace
 
 import cbor2
 import pytest
@@ -13,14 +14,18 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connections
+from django.test import RequestFactory
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from social_django.models import UserSocialAuth
 
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import SSOAuditLog, SSOSession, UserPasskey, WebAuthnChallenge
 from apps.sso.services.webauthn import WebAuthnService
 from apps.sso.tests.factories import UserPasskeyFactory
+from apps.users.models import PendingSocialAccountLink
+from apps.users.services.social_linking import begin_link, LINK_COOKIE
 
 
 pytestmark = pytest.mark.django_db
@@ -41,10 +46,12 @@ def assertion(user):
     token = client.get('/api/auth/csrf/').json()['csrfToken']
     client.credentials(HTTP_X_CSRFTOKEN=token)
 
-    def build(mode='identified', change=None, sign_count=1):
+    def build(mode='identified', change=None, sign_count=1, options_path=None, options_data=None):
         options = client.post(
-            '/api/sso/passkeys/authenticate/options',
-            {'email': user.email, 'userVerification': 'discouraged'} if mode == 'identified' else {},
+            options_path or '/api/sso/passkeys/authenticate/options',
+            options_data
+            if options_data is not None
+            else ({'email': user.email, 'userVerification': 'discouraged'} if mode == 'identified' else {}),
             format='json',
         )
         assert options.status_code == 200
@@ -550,3 +557,52 @@ def test_internal_verification_error_is_not_exposed(assertion, monkeypatch):
     event = SSOAuditLog.objects.get(user=passkey.user, event_type=SSOAuditEventType.PASSKEY_AUTH_FAILED)
     assert 'PRIVATE-ASSERTION' not in str(event.metadata)
     assert not event.error_message
+
+
+@pytest.mark.parametrize('change', [None, 'missing-uv'])
+def test_signed_passkey_confirms_social_link_only_after_verification(assertion, user, change):
+    client, passkey, build = assertion
+    user.is_confirmed = True
+    user.otp_enabled = user.otp_verified = True
+    user.otp_base32 = 'JBSWY3DPEHPK3PXP'
+    user.save()
+    request = RequestFactory().get('/')
+    request.session = {}
+    backend = SimpleNamespace(name='google-oauth2', strategy=SimpleNamespace(request=request))
+    redirect = begin_link(backend, user, 'provider-identity')
+    client.cookies[LINK_COOKIE] = redirect.cookies[LINK_COOKIE].value
+    payload, _ = build(change=change)
+    response = client.post('/api/sso/passkeys/authenticate/verify', payload, format='json')
+    if change:
+        assert response.status_code == 400
+        assert not UserSocialAuth.objects.exists()
+        assert PendingSocialAccountLink.objects.get(user=user).used_at is None
+    else:
+        assert response.status_code == 200
+        assert response.json() == {'success': True}
+        assert UserSocialAuth.objects.get(provider='google-oauth2', uid='provider-identity').user_id == user.pk
+        assert response.cookies[LINK_COOKIE]['max-age'] == 0
+        assert PendingSocialAccountLink.objects.get(user=user).used_at is not None
+
+
+@pytest.mark.parametrize('change', [None, 'missing-uv', 'wrong-signature'])
+def test_social_unlink_requires_signed_uv_passkey(assertion, user, change):
+    client, passkey, build = assertion
+    client.force_authenticate(user)
+    association = UserSocialAuth.objects.create(user=user, provider='google-oauth2', uid='unlink-identity')
+    payload, _ = build(
+        change=change,
+        options_path='/api/auth/social-accounts/unlink/options/',
+        options_data={'associationId': str(association.pk)},
+    )
+    if change == 'wrong-signature':
+        payload['signature'] = encode(b'invalid-signature')
+    payload['associationId'] = str(association.pk)
+    response = client.post('/api/auth/social-accounts/unlink/', payload, format='json')
+    if change:
+        assert response.status_code == 403
+        assert UserSocialAuth.objects.filter(pk=association.pk).exists()
+    else:
+        assert response.status_code == 200
+        assert not UserSocialAuth.objects.filter(pk=association.pk).exists()
+        assert client.post('/api/auth/social-accounts/unlink/', payload, format='json').status_code == 403
