@@ -9,6 +9,7 @@ from apps.users.exceptions import OTPAttemptLimitExceeded, OTPVerificationFailur
 from apps.users.constants import OTPErrors
 from apps.users.models import User
 from config import settings
+from .security import record, enqueue_email
 
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_DURATION = timedelta(minutes=15)
@@ -30,26 +31,28 @@ def generate_otp(user: User) -> Tuple[str, str]:
     return otp_base32, otp_auth_url
 
 
-def verify_otp(user: User, otp_token: str):
+def verify_otp(user: User, otp_token: str, request=None):
     """Confirm a code from the pending secret and, only on success, promote it to
     the active factor."""
-    _check_otp(user, otp_token, setup=True)
+    _check_otp(user, otp_token, setup=True, request=request)
 
 
-def validate_otp(user: User, otp_token: str):
-    _check_otp(user, otp_token, setup=False)
+def validate_otp(user: User, otp_token: str, request=None):
+    _check_otp(user, otp_token, setup=False, request=request)
 
 
 def _code_hash(otp_token) -> str:
     return hashlib.sha256(otp_token.encode()).hexdigest() if isinstance(otp_token, str) else ""
 
 
-def _check_otp(user: User, otp_token: str, *, setup: bool):
+def _check_otp(user: User, otp_token: str, *, setup: bool, request=None):
     # Persist counters before raising: rolling back failures would allow unlimited guesses.
     # The row lock serializes guesses across processes, IPs and newly issued login tokens.
+    request = getattr(request, '_request', request)
     error = None
     with transaction.atomic():
         account = User.objects.select_for_update().get(pk=user.pk)
+        was_enabled = account.otp_enabled
         now = timezone.now()
         secret = account.otp_pending_base32 if setup else account.otp_base32
         if account.otp_locked_until and account.otp_locked_until > now:
@@ -107,7 +110,25 @@ def _check_otp(user: User, otp_token: str, *, setup: bool):
             # Preserve the service's existing contract for callers holding this user instance.
             for field in fields:
                 setattr(user, field, getattr(account, field))
+        if error:
+            record(
+                'auth_otp_verification',
+                request=request,
+                user=account,
+                success=False,
+                outcome='locked' if isinstance(error, OTPAttemptLimitExceeded) else 'invalid_code',
+                method='otp',
+            )
+        elif setup:
+            event = record(
+                'auth_otp_management', request=request, user=account, outcome='replaced' if was_enabled else 'enabled'
+            )
+            enqueue_email(account, 'OTP_REPLACED' if was_enabled else 'OTP_ENABLED', event=event)
+            # Preserve the existing event names consumed by audit integrations.
+            record('otp_enabled', request=request, user=account, outcome='replaced' if was_enabled else 'enabled')
     if error:
+        if request is not None:
+            request._otp_failure_audited = True
         raise error
 
 

@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "这将移除您账户的额外安全层——您可以随时重新启用它。"
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "查看你的电子邮件"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "如果此地址可以接收账户邮件，我们将发送操作说明。请查看收件箱和垃圾邮件文件夹。你也可以在下方登录。"
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "返回"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "账户登录说明"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "此电子邮件地址已有关联账户。请使用原密码或通行密钥登录。如果忘记密码，请在登录页面重置密码。如果邮箱尚未验证，请登录并请求验证邮件，然后再关联 Google。此次请求没有更改你的账户。"
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "你的密码已更改"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "你的账户密码已更改或重置。如果是你本人操作，无需采取进一步行动。如果不是，请立即重置密码并联系支持团队。"
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "你的双重身份验证方式已替换"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "保护你账户的身份验证器已替换。如果是你本人操作，无需采取进一步行动。如果不是，请立即重置密码并联系支持团队。"
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "无法开始 Google 登录。请重试。"
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "注册请求"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "邮箱确认"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "密码登录"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "双重登录验证"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "双重身份验证"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "密码重置请求"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "密码重置"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "密码更改"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "双重身份验证更改"
   }
 }

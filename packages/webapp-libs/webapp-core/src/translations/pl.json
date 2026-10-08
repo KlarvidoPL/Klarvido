@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "Spowoduje to usunięcie dodatkowej warstwy zabezpieczeń z Twojego konta - możesz włączyć ją ponownie w dowolnym momencie."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Sprawdź swoją skrzynkę e-mail"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Jeśli na ten adres można wysłać wiadomości dotyczące konta, wyślemy instrukcje. Sprawdź skrzynkę odbiorczą i folder spam. Możesz też zalogować się poniżej."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Wstecz"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Instrukcje logowania do konta"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Konto z tym adresem e-mail już istnieje. Zaloguj się dotychczasowym hasłem lub kluczem dostępu. Jeśli nie pamiętasz hasła, zresetuj je na stronie logowania. Jeśli adres nie jest jeszcze zweryfikowany, zaloguj się i poproś o wiadomość weryfikacyjną przed połączeniem Google. To zgłoszenie nie zmieniło Twojego konta."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Twoje hasło zostało zmienione"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Hasło do Twojego konta zostało zmienione lub zresetowane. Jeśli to Twoja zmiana, nie musisz nic robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Twoje uwierzytelnianie dwuskładnikowe zostało zastąpione"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "Zastąpiono metodę uwierzytelniania chroniącą Twoje konto. Jeśli to Twoja zmiana, nie musisz nic robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Nie udało się rozpocząć logowania Google. Spróbuj ponownie."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Zgłoszenie rejestracji"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Potwierdzenie e-maila"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Logowanie hasłem"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Wymagane uwierzytelnianie dwuskładnikowe"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Weryfikacja dwuskładnikowa"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Prośba o reset hasła"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Reset hasła"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Zmiana hasła"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Zmiana uwierzytelniania dwuskładnikowego"
   }
 }

@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "इससे आपके खाते से सुरक्षा की अतिरिक्त परत हट जाएगी - आप इसे किसी भी समय फिर से सक्षम कर सकते हैं।"
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "अपना ईमेल देखें"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "यदि इस पते पर खाते के ईमेल भेजे जा सकते हैं, तो हम निर्देश भेजेंगे। अपना इनबॉक्स और स्पैम फ़ोल्डर देखें। आप नीचे साइन इन भी कर सकते हैं।"
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "वापस"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "खाते में साइन इन करने के निर्देश"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "इस ईमेल पते से पहले से एक खाता जुड़ा है। अपने मौजूदा पासवर्ड या पासकी से साइन इन करें। पासवर्ड भूल गए हैं तो साइन इन पृष्ठ से उसे रीसेट करें। ईमेल अभी सत्यापित नहीं है तो Google जोड़ने से पहले साइन इन करके सत्यापन ईमेल माँगें। इस अनुरोध से आपका खाता नहीं बदला है।"
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "आपका पासवर्ड बदल दिया गया है"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "आपके खाते का पासवर्ड बदला या रीसेट किया गया है। यदि यह आपने किया है, तो कुछ और करने की जरूरत नहीं है। अन्यथा तुरंत पासवर्ड रीसेट करें और सहायता से संपर्क करें।"
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "आपका दो-कारक प्रमाणीकरण बदल दिया गया है"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "आपके खाते की सुरक्षा करने वाला प्रमाणक बदल दिया गया है। यदि यह आपने किया है, तो कुछ और करने की जरूरत नहीं है। अन्यथा तुरंत पासवर्ड रीसेट करें और सहायता से संपर्क करें।"
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Google साइन इन शुरू नहीं हो सका। कृपया फिर से कोशिश करें।"
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "पंजीकरण अनुरोध"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "ईमेल की पुष्टि"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "पासवर्ड से साइन इन"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "दो-कारक साइन इन चुनौती"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "दो-कारक सत्यापन"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "पासवर्ड रीसेट अनुरोध"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "पासवर्ड रीसेट"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "पासवर्ड परिवर्तन"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "दो-कारक प्रमाणीकरण में बदलाव"
   }
 }

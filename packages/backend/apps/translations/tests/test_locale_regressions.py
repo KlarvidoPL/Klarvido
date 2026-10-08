@@ -50,3 +50,18 @@ def test_locale_repair_restores_placeholder_but_keeps_custom_admin_text():
     migration.restore_locale_translations(apps, SimpleNamespace(connection=connection))
     row.refresh_from_db()
     assert row.value == 'Własny tekst administratora'
+
+
+def test_auth_messages_replace_english_placeholders_but_preserve_custom_text():
+    locale = LocaleFactory(code='pl')
+    key = TranslationKeyFactory(key='Auth / Signup / Check email title', default_message='Check your email')
+    row = TranslationFactory(key=key, locale=locale, value='Check your email')
+    migration = importlib.import_module('apps.translations.migrations.0007_auth_security_translations')
+    migration.add_messages(apps, SimpleNamespace(connection=connection))
+    row.refresh_from_db()
+    assert row.value == 'Sprawdź swoją skrzynkę e-mail'
+    row.value = 'Własna treść administratora'
+    row.save()
+    migration.add_messages(apps, SimpleNamespace(connection=connection))
+    row.refresh_from_db()
+    assert row.value == 'Własna treść administratora'

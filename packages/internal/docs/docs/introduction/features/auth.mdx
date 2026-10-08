@@ -2,7 +2,7 @@
 title: Authentication and authorization
 ---
 
-import useBaseUrl from "@docusaurus/useBaseUrl";
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 SaaS Boilerplate comes packed with authentication and authorization functionality that is built-in, making it easy for
 you to secure your SaaS application. The system includes login, signup, and password forgot pages, as well as email
@@ -54,9 +54,37 @@ history before recovery. New verified provider signups and explicit links record
 not be used for them. This command never removes links, credentials or memberships automatically.
 
 <p align="center">
-  <img src={useBaseUrl("img/features/auth/login.png")} alt="Login page" />
-  <img src={useBaseUrl("img/features/auth/signup.png")} alt="Sign up page" />
+  <img src={useBaseUrl('img/features/auth/login.png')} alt="Login page" />
+  <img src={useBaseUrl('img/features/auth/signup.png')} alt="Sign up page" />
 </p>
+
+### Signup and email verification
+
+Successful email/password signup immediately logs the new user in and opens the main panel, even before
+email verification. An activation email is queued for delivery. Existing accounts are never overwritten or
+logged in through signup; duplicate-email validation remains. This product behavior leaves signup account
+enumeration (E13) open. Connecting Google and other operations requiring verified ownership still enforce it.
+
+Google sign-in starts through a CSRF-protected browser POST. Deployments must apply the upgraded
+social-auth package migrations along with application migrations and rebuild the backend and workers.
+
+### Authentication audit and security emails
+
+Password and OTP authentication outcomes and credential changes have durable security records.
+Account audit records and notification delivery status are available to superusers in Django Admin;
+these account records are independent of an organization’s activity-log toggle.
+
+Password changes/reset completions and authenticator enablement, replacement and removal notify the
+account owner. The database outbox survives broker outages and is swept every 30 seconds by Celery Beat.
+Run the regular Celery worker and Beat services on every deployment target. Failed deliveries retry up to
+eight times; exhausted retries remain visible in administration. Delivery can repeat after a crash between
+SMTP acceptance and recording success. A notification-delivery failure does not undo a committed change.
+
+The new account audit family and notification recipient data use 90-day retention by default, configurable
+through `AUTH_AUDIT_RETENTION_DAYS`. Cleanup processes bounded batches daily. Set
+`AUTH_AUDIT_TRUSTED_PROXIES` to trusted, sanitizing reverse-proxy CIDRs to record forwarded client IPs;
+otherwise the direct peer address is recorded. Audit records exclude credential material and raw request data.
+Rebuild the email renderer when deploying the new notification templates.
 
 ### Password Forgot
 
@@ -64,7 +92,10 @@ In case a user forgets their password, the password forgot page allows them to r
 email address. An email is sent to the user with a link to reset their password.
 
 <p align="center">
-  <img src={useBaseUrl("img/features/auth/password-forgot.png")} alt="Forgot password page" />
+  <img
+    src={useBaseUrl('img/features/auth/password-forgot.png')}
+    alt="Forgot password page"
+  />
 </p>
 
 ### Email Verification
@@ -73,7 +104,10 @@ Email verification is a critical part of the authentication process. When a user
 email address with a verification link. The user must click on the link to verify their email address.
 
 <p align="center">
-  <img src={useBaseUrl("img/features/auth/verification-email.png")} alt="Email verification message" />
+  <img
+    src={useBaseUrl('img/features/auth/verification-email.png')}
+    alt="Email verification message"
+  />
 </p>
 
 ### Profile Page
@@ -99,7 +133,7 @@ disable sends a notification email, so an unexpected one is a signal to review y
 :::
 
 <p align="center">
-  <img src={useBaseUrl("img/features/auth/profile.png")} alt="Profile page" />
+  <img src={useBaseUrl('img/features/auth/profile.png')} alt="Profile page" />
 </p>
 
 ### Active Sessions
@@ -132,10 +166,11 @@ For enterprise customers, SaaS Boilerplate includes advanced authentication opti
 - **Per-tenant SSO Configuration** - Each organization can configure their own SSO settings
 
 :::info Where is each feature managed?
+
 - **SSO/SCIM/Audit Logs** - Organization-level, managed by tenant admins in **Organization Settings → Security**
 - **Passkeys** - Personal credentials, managed by each user in their **Profile → Passkeys**
 - **Active Sessions** - Personal, managed by each user in their **Profile → Active Sessions**
-:::
+  :::
 
 These features are enabled by default and can be configured via environment variables:
 
@@ -151,12 +186,12 @@ See the [Enterprise SSO Guide](/features/enterprise-sso) for complete setup inst
 
 Ready to customize the authentication system? Check out these how-to guides:
 
-| Guide | Description |
-|-------|-------------|
-| [Add a Profile Field](/working-with-sb/users/create-profile-field) | Extend user profiles with custom data |
-| [Add OAuth Provider](/working-with-sb/users/create-oauth-method) | Integrate additional social login options |
-| [Create Custom Role](/working-with-sb/users/create-role) | Define new permission levels |
-| [Admin User Management](/working-with-sb/users/admin-page) | Manage users from the admin panel |
+| Guide                                                              | Description                               |
+| ------------------------------------------------------------------ | ----------------------------------------- |
+| [Add a Profile Field](/working-with-sb/users/create-profile-field) | Extend user profiles with custom data     |
+| [Add OAuth Provider](/working-with-sb/users/create-oauth-method)   | Integrate additional social login options |
+| [Create Custom Role](/working-with-sb/users/create-role)           | Define new permission levels              |
+| [Admin User Management](/working-with-sb/users/admin-page)         | Manage users from the admin panel         |
 
 ---
 

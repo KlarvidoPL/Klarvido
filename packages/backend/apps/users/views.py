@@ -5,7 +5,8 @@ from apps.sso.services import SessionService
 from config import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.http import require_POST
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -13,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt import views as jwt_views, tokens as jwt_tokens
 from rest_framework_simplejwt.views import TokenViewBase
-from social_core.actions import do_complete
+from social_core.actions import do_complete, do_auth
 from social_core.exceptions import AuthException
 from social_django.utils import psa
 
@@ -105,6 +106,15 @@ class LogoutView(TokenViewBase):
         response = Response({"ok": True}, status=status.HTTP_200_OK)
         utils.reset_auth_cookie(response)
         return response
+
+
+@never_cache
+@csrf_protect
+@require_POST
+@psa("social:complete")
+def begin(request, backend):
+    # Sign-in must not implicitly associate with an ambient Django admin session.
+    return do_auth(request.backend, redirect_name=REDIRECT_FIELD_NAME, user=None)
 
 
 @never_cache

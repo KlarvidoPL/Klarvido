@@ -1,6 +1,8 @@
 from email.utils import formataddr
 from unittest.mock import Mock, patch, MagicMock
 import json
+import subprocess
+from celery.exceptions import Ignore
 
 import pytest
 from django.conf import settings
@@ -65,3 +67,21 @@ class TestSendEmail:
 
         sent_email = mail.outbox[0]
         assert sent_email.from_email == settings.EMAIL_FROM_ADDRESS
+
+
+def test_renderer_failures_do_not_log_credential_links(caplog):
+    secret = 'private-reset-token-value'
+    with patch(
+        'common.emails.subprocess.run',
+        side_effect=subprocess.CalledProcessError(
+            1,
+            ['node'],
+            output=secret.encode(),
+            stderr=secret.encode(),
+        ),
+    ), patch('common.emails.send_email.update_state') as state:
+        with pytest.raises(Ignore):
+            send_email.run('private@example.com', 'PASSWORD_RESET', {'token': secret})
+    assert secret not in caplog.text
+    assert 'private@example.com' not in caplog.text
+    assert state.call_args.kwargs['meta'] == {'reason': 'email_rendering_failed'}

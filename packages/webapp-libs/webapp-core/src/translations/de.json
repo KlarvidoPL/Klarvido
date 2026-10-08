@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "Dadurch wird die zusätzliche Sicherheitsebene von Ihrem Konto entfernt - Sie können sie jederzeit wieder aktivieren."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Prüfe deine E-Mails"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Wenn diese Adresse Konto-E-Mails empfangen kann, senden wir dir Anweisungen. Prüfe deinen Posteingang und Spamordner. Du kannst dich auch unten anmelden."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Zurück"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Anweisungen zur Kontoanmeldung"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Für diese E-Mail-Adresse besteht bereits ein Konto. Melde dich mit deinem bisherigen Passwort oder Passkey an. Falls du dein Passwort vergessen hast, setze es auf der Anmeldeseite zurück. Ist deine E-Mail noch nicht bestätigt, melde dich an und fordere eine Bestätigungs-E-Mail an, bevor du Google verbindest. Diese Anfrage hat dein Konto nicht verändert."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Dein Passwort wurde geändert"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Dein Kontopasswort wurde geändert oder zurückgesetzt. Wenn du das warst, musst du nichts weiter tun. Andernfalls setze dein Passwort sofort zurück und kontaktiere den Support."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Deine Zwei-Faktor-Authentifizierung wurde ersetzt"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "Der Authenticator zum Schutz deines Kontos wurde ersetzt. Wenn du das warst, musst du nichts weiter tun. Andernfalls setze dein Passwort sofort zurück und kontaktiere den Support."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Die Google-Anmeldung konnte nicht gestartet werden. Bitte versuche es erneut."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Registrierungsanfrage"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "E-Mail-Bestätigung"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Passwortanmeldung"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Zwei-Faktor-Anmeldeprüfung"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Zwei-Faktor-Prüfung"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Anfrage zum Zurücksetzen des Passworts"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Passwort zurückgesetzt"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Passwortänderung"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Änderung der Zwei-Faktor-Authentifizierung"
   }
 }

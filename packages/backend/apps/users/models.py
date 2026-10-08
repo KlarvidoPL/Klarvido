@@ -2,6 +2,7 @@ import hashid_field
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
+from django.utils import timezone
 
 from common.acl.helpers import CommonGroups
 from common.models import ImageWithThumbnailMixin
@@ -177,3 +178,36 @@ class UserProfile(models.Model):
     def __str__(self) -> str:
         full_name = f"{self.first_name} {self.last_name}".strip()
         return full_name if full_name else self.user.email
+
+
+class SecurityEmailOutbox(models.Model):
+    """No credential values: activation tokens are generated only when delivering."""
+
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    event_id = models.CharField(max_length=64, unique=True)
+    recipient = models.EmailField()
+    kind = models.CharField(max_length=40)
+    language = models.CharField(max_length=8, default='en')
+    created_at = models.DateTimeField(auto_now_add=True)
+    next_attempt_at = models.DateTimeField(default=timezone.now, db_index=True)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    failed_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=40, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['next_attempt_at'],
+                name='users_security_email_due_idx',
+                condition=models.Q(sent_at__isnull=True, failed_at__isnull=True, cancelled_at__isnull=True),
+            )
+        ]
+
+
+class SignupEmailCooldown(models.Model):
+    recipient_hash = models.CharField(max_length=64, primary_key=True)
+    last_sent_at = models.DateTimeField(null=True)
+    day_started_at = models.DateTimeField(default=timezone.now)
+    daily_count = models.PositiveSmallIntegerField(default=0)

@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "This removes the extra layer of security from your account - you can re-enable it at any time."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Check your email"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "If this address can receive account emails, we will send instructions. Check your inbox and spam folder. You can also sign in below."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Back"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Account sign-in instructions"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "An account already uses this email address. Sign in with your existing password or passkey. If you forgot your password, use password reset on the sign-in page. If your email is not verified yet, sign in and request a verification email before connecting Google. This request did not change your account."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Your password was changed"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Your account password was changed or reset. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Your two-factor authentication was replaced"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "The authenticator protecting your account was replaced. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Unable to start Google sign-in. Please try again."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Registration request"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Email confirmation"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Password login"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Two-factor login challenge"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Two-factor verification"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Password reset request"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Password reset"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Password change"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Two-factor authentication change"
   }
 }

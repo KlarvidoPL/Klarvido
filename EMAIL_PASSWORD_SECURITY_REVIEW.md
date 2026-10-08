@@ -2,7 +2,7 @@
 
 Reviewed 2026-10-08 against master `a4690b1bd5c6bc5daa9ade6cd683b52e7883f647`.
 
-This is a defensive source review with isolated Docker verification, not a production penetration test or a guarantee of complete security. The original audit did not modify application behavior. Findings distinguish reproduced behavior from code observations and deployment-dependent risks. E01, E02, E03 and the replay portion of E07 are addressed by the subsequent local implementation described below; E04–E06, E08–E15 and the remainder of E07 remain open.
+This is a defensive source review with isolated Docker verification, not a production penetration test or a guarantee of complete security. The original audit did not modify application behavior. Findings distinguish reproduced behavior from code observations and deployment-dependent risks. E01, E02, E03 and the replay portion of E07 are addressed by the subsequent local implementation described below; E14 and E15 are implemented locally but await final verification. E13 requires no action: the current signup behavior and its account-enumeration risk are accepted as an intentional product decision. E04–E06, E08–E12 and the remainder of E07 remain open.
 
 ## Scope and trust boundaries
 
@@ -14,23 +14,23 @@ No live customer accounts, production credentials, email delivery or production 
 
 ## Prioritized findings
 
-| ID  | Severity                             | Finding                                                                                                                      | Evidence                                                              |
-| --- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| E01 | High — addressed locally             | Password-created accounts can be preregistered and later confirmed through social login while retaining attacker credentials | Source, state-transition probe and remediation regressions            |
-| E02 | High — addressed locally             | 2FA removal/replacement requires no fresh authentication                                                                     | HTTP removal and service replacement probes; remediation regressions  |
-| E03 | High — addressed locally             | Pending OTP login survives password changes and lacks account-state binding                                                  | Serializer probe; remediation regressions                             |
-| E04 | High                                 | First password can be set on a passwordless account using only an existing session                                           | Serializer probe                                                      |
-| E05 | High                                 | Password guessing has no account-wide failure budget                                                                         | Source                                                                |
-| E06 | Medium                               | Rate-limit enforcement has inconsistent proxy trust and operation-level fail-open behavior                                   | Helper/decorator probes; proxy exposure conditional                   |
-| E07 | Medium — partially addressed locally | OTP login proof lacks purpose separation and one-time consumption; TOTP codes are reusable                                   | Serializer/service probes; replay fix shipped with E02/E03, see below |
-| E08 | Medium — partially addressed locally | Reset completion now locks/rechecks; broader reset/session recovery verification is deferred                                 | Original probe; new recovery-race regression prepared                 |
-| E09 | Medium                               | Reset-email throttling does not implement the configured policy or recipient limits                                          | Source                                                                |
-| E10 | Medium                               | Password validation is weaker than the recommended policy and omits user context                                             | Source                                                                |
-| E11 | Medium                               | Monitoring does not comprehensively redact authentication URLs, serialized bodies or OTP secrets                             | Redaction probes; actual export conditional                           |
-| E12 | Medium                               | TOTP secrets are stored in plaintext                                                                                         | Source                                                                |
-| E13 | Medium                               | Signup reveals whether an email is registered                                                                                | Source and existing test expectation                                  |
-| E14 | Medium                               | Authentication dependency is in a published vulnerable version range                                                         | Lockfile and maintainer advisory; exploitability conditional          |
-| E15 | Low                                  | Email/password security events lack a durable audit trail and credential-change notifications                                | Source                                                                |
+| ID  | Severity                                    | Finding                                                                                                                      | Evidence                                                              |
+| --- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| E01 | High — addressed locally                    | Password-created accounts can be preregistered and later confirmed through social login while retaining attacker credentials | Source, state-transition probe and remediation regressions            |
+| E02 | High — addressed locally                    | 2FA removal/replacement requires no fresh authentication                                                                     | HTTP removal and service replacement probes; remediation regressions  |
+| E03 | High — addressed locally                    | Pending OTP login survives password changes and lacks account-state binding                                                  | Serializer probe; remediation regressions                             |
+| E04 | High                                        | First password can be set on a passwordless account using only an existing session                                           | Serializer probe                                                      |
+| E05 | High                                        | Password guessing has no account-wide failure budget                                                                         | Source                                                                |
+| E06 | Medium                                      | Rate-limit enforcement has inconsistent proxy trust and operation-level fail-open behavior                                   | Helper/decorator probes; proxy exposure conditional                   |
+| E07 | Medium — partially addressed locally        | OTP login proof lacks purpose separation and one-time consumption; TOTP codes are reusable                                   | Serializer/service probes; replay fix shipped with E02/E03, see below |
+| E08 | Medium — partially addressed locally        | Reset completion now locks/rechecks; broader reset/session recovery verification is deferred                                 | Original probe; new recovery-race regression prepared                 |
+| E09 | Medium                                      | Reset-email throttling does not implement the configured policy or recipient limits                                          | Source                                                                |
+| E10 | Medium                                      | Password validation is weaker than the recommended policy and omits user context                                             | Source                                                                |
+| E11 | Medium                                      | Monitoring does not comprehensively redact authentication URLs, serialized bodies or OTP secrets                             | Redaction probes; actual export conditional                           |
+| E12 | Medium                                      | TOTP secrets are stored in plaintext                                                                                         | Source                                                                |
+| E13 | Medium — no action needed                   | Signup reveals whether an email is registered                                                                                | Source and existing test expectation                                  |
+| E14 | Medium — implemented, verification deferred | Authentication dependency is in a published vulnerable version range                                                         | Lockfile and maintainer advisory; exploitability conditional          |
+| E15 | Low — implemented, verification deferred    | Email/password security events lack a durable audit trail and credential-change notifications                                | Source                                                                |
 
 ### E01 — Account preregistration and automatic social linking
 
@@ -199,27 +199,29 @@ the original audit behavior.
 
 ### E13 — Signup account enumeration
 
-- Likelihood: High; impact: Medium. Type: account existence disclosure.
-- Components: [signup email validation](packages/backend/apps/users/serializers.py:73).
-- `UniqueValidator` returns a distinguishable duplicate-email error. Password reset already returns the same `ok` result for known and unknown addresses, but signup still allows address enumeration.
-- Fix: design a consistent registration response and deliver the appropriate next step privately to the email owner. Preserve useful guidance through email rather than disclosing registered addresses publicly. Add recipient cooldowns to any such email flow.
-- Tests: known/unknown registration responses and timing characteristics; no repeated-mail abuse; case-insensitive normalization.
+- Original evidence: the public duplicate-email validator returned an account-existence error.
+- Status: **No action needed — accepted product decision.** The user requires successful signup to immediately authenticate a new, unverified account and enter the main panel. The check-email interstitial has been removed.
+- Existing accounts are never overwritten or authenticated through signup. Duplicate-email validation remains, so signup can reveal account existence. Concealing this fully requires changing the onboarding behavior; no mitigation is claimed.
+- Signup activation emails use the durable outbox. Successful signup is audited only after revocable session creation, in the same transaction. Rejected signup requests are audited separately.
+- Verification deferred: automatic login, activation outbox, unchanged existing credentials and session-failure rollback tests are adjusted but not run.
 
 ### E14 — Published vulnerable social-auth dependency
 
-- Likelihood: Low; impact: High; rated Medium because exploitability depends on provider behavior. Type: vulnerable authentication dependency.
-- Components: [lockfile](packages/backend/uv.lock:3890), matching `~=5.0.0` requirement in backend project metadata.
-- `social-auth-app-django` is locked to `5.0.0`. The maintainer advisory for CVE-2025-61783 covers versions before `5.6.0`: email association could happen even with that pipeline step omitted. Provider email verification/uniqueness affects exploitability. This application currently explicitly enables email association, so upgrading alone does not fix E01 or make its linking policy safe.
-- Fix: update the constraint and lockfile to a supported patched release after compatibility review; run provider-flow, cookie, redirect, account-linking and disconnect regressions. Do not rely only on removing `associate_by_email` while retaining the old dependency.
-- Tests: new and existing password accounts, explicit secure linking, disabled automatic linking, provider identity validation and legacy social associations. No external-provider exploit was attempted.
+- Original evidence: `social-auth-app-django==5.0.0` was within the affected range of CVE-2025-61783 (fixed in 5.6.0). Source: [maintainer advisory](https://github.com/python-social-auth/social-app-django/security/advisories/GHSA-wv4w-6qv2-qqfg).
+- Implemented: project constraints and `uv.lock` now select `social-auth-app-django==6.1.0` and `social-auth-core==5.2.0`, with required cryptography, PyJWT, PyOpenSSL and requests updates. Django 5.2/Python 3.11 remain supported.
+- Google initiation uses a top-level CSRF-protected POST, matching version 6’s POST-only authentication initiation. The custom begin view passes no ambient account to the provider flow. Existing callback state checks and explicit E01 linking remain; unused disconnect URLs remain unavailable.
+- Verification deferred: provider signup/login, existing password accounts, explicit linking, OTP, cookie/session handling, redirects and legacy associations must pass against the upgraded packages before release. Include the upstream social-auth database migrations during deployment.
 
 ### E15 — Missing authentication security audit and alerts
 
-- Likelihood: Medium; impact: Low. Type: detection/forensics gap.
-- Components: users serializers/schema/OTP services.
-- Session rows provide session tracking, not a durable record of failed password attempts, credential reset/change, MFA replacement/removal or their outcomes. These paths do not emit the structured security audit events used by passkey services, nor dedicated credential-change notifications.
-- Fix: record success/failure security events with stable actor/account identifiers, trustworthy client context and correlation IDs; notify credential/factor changes. Define retention and privacy rules, and never record passwords, reset tokens, OTP values or seeds.
-- Tests: events for actual outcomes only, correct actor attribution, secret exclusion and notification delivery after commit.
+- Implemented: account authentication events are persisted in the security audit store for signup, confirmation, password login, OTP challenges/checks/lockout, reset requests/completion, password changes and MFA enrollment/replacement/removal. Successful login is recorded only after session creation. Rejected operations are logged outside rolled-back mutation transactions; OTP failures share the committed attempt-counter transaction.
+- Records contain server-generated correlation IDs, stable account/actor identifiers, controlled outcomes and authentication methods. Unknown submitted emails are HMAC identifiers. Raw user-agent strings are reduced to browser/OS/device categories. Passwords, OTP values/seeds, reset/activation tokens, cookies and request bodies are excluded.
+- Audit and notification-outbox creation participate in credential-change transactions; storage failure rolls back the change. Alerts distinguish password changes/resets, MFA enablement, replacement and removal. Durable outbox rows hold no credential proofs; activation/reset tokens are generated only during delivery.
+- Delivery: Celery Beat sweeps the outbox every 30 seconds; concurrent workers use row locks. Delivery retries exponentially up to eight attempts, with a one-hour maximum interval. Exhausted retries are visible in superuser-only read-only administration and sanitized logs. Deleted-account and stale-recipient messages are marked cancelled. SMTP delivery is at least once: a crash after SMTP acceptance but before the database commit can produce a duplicate email.
+- Retention: the new `auth_*` audit family, email-outbox recipient data and signup cooldown rows expire after `AUTH_AUDIT_RETENTION_DAYS` (default 90), using bounded daily cleanup. Other tenant/SSO audit families keep their existing retention. Account deletion preserves audit identifiers while nulling the user FK. Outbox recipient addresses are retained until cleanup for delivery/accountability.
+- IP attribution trusts `REMOTE_ADDR` unless its peer belongs to explicitly configured `AUTH_AUDIT_TRUSTED_PROXIES`; only then is the forwarded chain inspected from the trusted end. Configure only proxy networks that sanitize incoming forwarded headers.
+- All new UI/email/event strings have translations in the eight supported locales, with a migration preserving administrator overrides.
+- Verification deferred: outcome/attribution/redaction, rollback, deletion, retention, CSRF initiation, outbox retries/cancellation and notification regressions were added or adjusted. Tests, lint and type checks have not been run for these changes, at the user’s request.
 
 ## Controls already present
 
@@ -249,6 +251,6 @@ Temporary defensive probes cover OTP management, pending-proof freshness/purpose
 
 Existing targeted coverage was also checked for signup/login, reset/change, serializers, cookies, refresh/logout, account-bound tokens, OTP counters, CSRF, social confirmation and invitation ownership. The isolated database needed its expected `user` seed group restored after earlier transaction-test flushes; that fixture-only adjustment was not an application fix. No frontend lint/type-check was needed because application/frontend code was unchanged.
 
-Recommended order: E01 and E02 first; E03/E07 as one pending-login redesign; E04; E05/E06/E09 as authentication-abuse hardening; E08; E11/E12; then E10/E13/E14/E15. The dependency update should precede final validation of revised social-account linking.
+Recommended order: E01 and E02 first; E03/E07 as one pending-login redesign; E04; E05/E06/E09 as authentication-abuse hardening; E08; E11/E12; then E10/E14/E15. E13 is excluded from remediation by the accepted product decision. The dependency update should precede final validation of revised social-account linking.
 
 Reference guidance: [OWASP authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html), [OWASP MFA](https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html), [OWASP password reset](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html), [NIST authenticator guidance](https://pages.nist.gov/800-63-4/sp800-63b/authenticators/), [Python Social Auth linking guidance](https://python-social-auth.readthedocs.io/en/latest/use_cases.html#associate-users-by-email), [maintainer CVE-2025-61783 advisory](https://github.com/python-social-auth/social-app-django/security/advisories/GHSA-wv4w-6qv2-qqfg).

@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "Cela supprimera la couche de sécurité supplémentaire de votre compte - vous pouvez la réactiver à tout moment."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Consultez vos e-mails"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Si cette adresse peut recevoir des e-mails concernant le compte, nous enverrons des instructions. Consultez votre boîte de réception et vos indésirables. Vous pouvez aussi vous connecter ci-dessous."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Retour"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Instructions de connexion au compte"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Un compte utilise déjà cette adresse e-mail. Connectez-vous avec votre mot de passe actuel ou votre clé d’accès. Si vous avez oublié votre mot de passe, réinitialisez-le depuis la page de connexion. Si votre adresse n’est pas encore vérifiée, connectez-vous et demandez un e-mail de vérification avant de connecter Google. Cette demande n’a pas modifié votre compte."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Votre mot de passe a été modifié"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Le mot de passe de votre compte a été modifié ou réinitialisé. Si vous avez effectué ce changement, aucune action n’est nécessaire. Sinon, réinitialisez immédiatement votre mot de passe et contactez l’assistance."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Votre authentification à deux facteurs a été remplacée"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "L’authentificateur qui protège votre compte a été remplacé. Si vous avez effectué ce changement, aucune action n’est nécessaire. Sinon, réinitialisez immédiatement votre mot de passe et contactez l’assistance."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Impossible de démarrer la connexion Google. Réessayez."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Demande d’inscription"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Confirmation de l’e-mail"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Connexion par mot de passe"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Vérification de connexion à deux facteurs"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Vérification à deux facteurs"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Demande de réinitialisation du mot de passe"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Réinitialisation du mot de passe"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Modification du mot de passe"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Modification de l’authentification à deux facteurs"
   }
 }

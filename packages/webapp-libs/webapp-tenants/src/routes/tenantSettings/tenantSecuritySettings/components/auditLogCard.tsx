@@ -138,6 +138,22 @@ const getEventIcon = (eventType: string) => {
 
 // Labels for event types that are translated in the frontend. Other types fall back to the label sent by the backend.
 const EVENT_TYPE_MESSAGES = defineMessages({
+  auth_signup: { id: 'Audit / Event / auth_signup', defaultMessage: 'Registration request' },
+  auth_email_confirmation: { id: 'Audit / Event / auth_email_confirmation', defaultMessage: 'Email confirmation' },
+  auth_password_login: { id: 'Audit / Event / auth_password_login', defaultMessage: 'Password login' },
+  auth_otp_challenge: { id: 'Audit / Event / auth_otp_challenge', defaultMessage: 'Two-factor login challenge' },
+  auth_otp_verification: { id: 'Audit / Event / auth_otp_verification', defaultMessage: 'Two-factor verification' },
+  auth_password_reset_request: {
+    id: 'Audit / Event / auth_password_reset_request',
+    defaultMessage: 'Password reset request',
+  },
+  auth_password_reset: { id: 'Audit / Event / auth_password_reset', defaultMessage: 'Password reset' },
+  auth_password_change: { id: 'Audit / Event / auth_password_change', defaultMessage: 'Password change' },
+  auth_otp_management: {
+    id: 'Audit / Event / auth_otp_management',
+    defaultMessage: 'Two-factor authentication change',
+  },
+
   passkey_reauth_success: {
     id: 'Audit / Event / Passkey reauthentication succeeded',
     defaultMessage: 'Passkey management verification succeeded',

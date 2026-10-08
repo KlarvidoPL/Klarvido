@@ -1,9 +1,12 @@
 import importlib
+from datetime import timedelta
 
 from django.conf import settings
 from celery import shared_task
 from django.utils import timezone
-from .models import PendingOTPLogin, PendingSocialAccountLink
+from .models import PendingOTPLogin, PendingSocialAccountLink, SecurityEmailOutbox, SignupEmailCooldown
+from apps.sso.models import SSOAuditLog
+from .services.security import AUTH_EVENTS, process_outbox
 from .services.export.services import user as user_services
 
 module_name, package = settings.LAMBDA_TASKS_BASE_HANDLER.rsplit(".", maxsplit=1)
@@ -34,3 +37,28 @@ def cleanup_pending_otp_logins():
     ids = list(PendingOTPLogin.objects.filter(expires_at__lt=timezone.now()).values_list('pk', flat=True)[:1000])
     count, _ = PendingOTPLogin.objects.filter(pk__in=ids).delete()
     return count
+
+
+@shared_task(ignore_result=True)
+def deliver_security_emails():
+    process_outbox()
+
+
+@shared_task(ignore_result=True)
+def cleanup_authentication_records():
+    cutoff = timezone.now() - timedelta(days=max(1, settings.AUTH_AUDIT_RETENTION_DAYS))
+    backlog = False
+    for model, query in (
+        (SSOAuditLog, SSOAuditLog.objects.filter(event_type__in=AUTH_EVENTS, created_at__lt=cutoff)),
+        (SecurityEmailOutbox, SecurityEmailOutbox.objects.filter(created_at__lt=cutoff)),
+        (SignupEmailCooldown, SignupEmailCooldown.objects.filter(day_started_at__lt=cutoff)),
+    ):
+        for _ in range(10):
+            ids = list(query.values_list('pk', flat=True)[:1000])
+            if not ids:
+                break
+            model.objects.filter(pk__in=ids).delete()
+        backlog = backlog or query.exists()
+    if backlog:
+        # Keep each job bounded while draining heavy traffic instead of accumulating old records.
+        cleanup_authentication_records.apply_async(countdown=60)

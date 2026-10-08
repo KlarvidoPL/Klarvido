@@ -38,6 +38,17 @@ class SSOAuditEventType(models.TextChoices):
     Types of SSO audit events.
     """
 
+    # Email/password authentication events
+    AUTH_SIGNUP = "auth_signup", "Registration request"
+    AUTH_EMAIL_CONFIRMATION = "auth_email_confirmation", "Email confirmation"
+    AUTH_PASSWORD_LOGIN = "auth_password_login", "Password login"
+    AUTH_OTP_CHALLENGE = "auth_otp_challenge", "Two-factor login challenge"
+    AUTH_OTP_VERIFICATION = "auth_otp_verification", "Two-factor verification"
+    AUTH_PASSWORD_RESET_REQUEST = "auth_password_reset_request", "Password reset request"
+    AUTH_PASSWORD_RESET = "auth_password_reset", "Password reset"
+    AUTH_PASSWORD_CHANGE = "auth_password_change", "Password change"
+    AUTH_OTP_MANAGEMENT = "auth_otp_management", "Two-factor authentication change"
+
     # Configuration events
     IDP_CONFIG_CREATED = "idp_config_created", "IdP Configuration Created"
     IDP_CONFIG_UPDATED = "idp_config_updated", "IdP Configuration Updated"

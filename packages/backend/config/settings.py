@@ -808,3 +808,19 @@ EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 # Translations settings
 # Translations use the same storage backend as the rest of the app (STORAGE_BACKEND)
 # No additional configuration needed - uses R2_*, B2_*, MINIO_*, or AWS_* settings automatically
+
+# Privacy defaults for account authentication records (separate from tenant audit retention).
+AUTH_AUDIT_RETENTION_DAYS = env.int("AUTH_AUDIT_RETENTION_DAYS", default=90)
+AUTH_AUDIT_TRUSTED_PROXIES = env.list("AUTH_AUDIT_TRUSTED_PROXIES", default=[])
+CELERY_BEAT_SCHEDULE.update(
+    {
+        "deliver-security-emails": {"task": "apps.users.tasks.deliver_security_emails", "schedule": 30},
+        "cleanup-authentication-records": {
+            "task": "apps.users.tasks.cleanup_authentication_records",
+            "schedule": 86400,
+        },
+    }
+)
+
+# Bound synchronous SMTP delivery in the durable security-email worker.
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=15)

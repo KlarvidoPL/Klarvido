@@ -28,6 +28,7 @@ class TestSignup:
         mutation SignUp($input: SingUpMutationInput!) {
           signUp(input: $input) {
             id
+            ok
             email
             authenticated
             access
@@ -38,9 +39,12 @@ class TestSignup:
 
     @staticmethod
     def _run_correct_sing_up_mutation(graphene_client, faker):
-        return graphene_client.mutate(
-            TestSignup.MUTATION, variable_values={'input': {'email': faker.email(), 'password': faker.password()}}
+        email = faker.email()
+        result = graphene_client.mutate(
+            TestSignup.MUTATION, variable_values={'input': {'email': email, 'password': faker.password()}}
         )
+        result['_signup_email'] = email
+        return result
 
     def test_return_error_with_missing_email(self, graphene_client, faker):
         password = faker.password()
@@ -79,13 +83,13 @@ class TestSignup:
 
     def test_create_user_profile_instance(self, graphene_client, faker):
         executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
-        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+        user = models.User.objects.get(email=executed['_signup_email'])
 
         assert user.profile
 
     def test_add_to_user_group(self, graphene_client, faker):
         executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
-        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+        user = models.User.objects.get(email=executed['_signup_email'])
 
         assert user.has_group(CommonGroups.User)
 
@@ -94,7 +98,7 @@ class TestSignup:
         state (see the org-scoped nav/route-guard changes) - signup must not
         silently create a personal tenant just to satisfy "everyone has ≥1 tenant"."""
         executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
-        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+        user = models.User.objects.get(email=executed['_signup_email'])
 
         assert user.tenants.count() == 0
 
@@ -104,7 +108,7 @@ class TestSignup:
             self.MUTATION,
             variable_values={'input': {'email': email, 'password': faker.password(), 'language': 'pl'}},
         )
-        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+        user = models.User.objects.get(email=email)
 
         assert user.profile.language == 'pl'
 
@@ -114,13 +118,13 @@ class TestSignup:
             self.MUTATION,
             variable_values={'input': {'email': email, 'password': faker.password(), 'language': 'xx'}},
         )
-        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+        user = models.User.objects.get(email=email)
 
         assert user.profile.language == models.LanguageChoices.ENGLISH
 
     def test_defaults_to_english_when_language_omitted(self, graphene_client, faker):
         executed = TestSignup._run_correct_sing_up_mutation(graphene_client, faker)
-        user = models.User.objects.get(id=executed['data']['signUp']["id"])
+        user = models.User.objects.get(email=executed['_signup_email'])
 
         assert user.profile.language == models.LanguageChoices.ENGLISH
 

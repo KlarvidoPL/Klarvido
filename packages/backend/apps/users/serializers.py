@@ -2,8 +2,7 @@ import copy
 
 from django.db import transaction
 from django.utils import timezone
-from apps.sso.models import SSOSession, SSOAuditLog
-from apps.sso.constants import SSOAuditEventType
+from apps.sso.models import SSOSession
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -25,6 +24,7 @@ from common.decorators import context_user_required
 from apps.sso.services import passkey_management
 
 from . import models, tokens, jwt, notifications
+from .services.security import enqueue_email, record
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
@@ -72,6 +72,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSignupSerializer(serializers.ModelSerializer):
+    ok = serializers.BooleanField(read_only=True)
     id = rest.HashidSerializerCharField(source_field="users.User.id", read_only=True)
     email = serializers.EmailField(
         validators=[validators.UniqueValidator(queryset=dj_auth.get_user_model().objects.all())],
@@ -86,7 +87,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = dj_auth.get_user_model()
-        fields = ("id", "email", "password", "language", "access", "refresh")
+        fields = ("id", "email", "password", "language", "access", "refresh", "ok")
 
     def validate_password(self, password):
         password_validation.validate_password(password)
@@ -109,11 +110,15 @@ class UserSignupSerializer(serializers.ModelSerializer):
         if jwt_api_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, user)
 
-        notifications.AccountActivationEmail(
-            user=user, data={"user_id": user.id.hashid, "token": tokens.account_activation_token.make_token(user)}
-        ).send()
+        enqueue_email(user, 'ACCOUNT_ACTIVATION')
 
-        return {"id": user.id, "email": user.email, "access": str(refresh.access_token), "refresh": str(refresh)}
+        return {
+            "ok": True,
+            "id": user.id,
+            "email": user.email,
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        }
 
 
 class UserAccountConfirmationSerializer(serializers.Serializer):
@@ -152,8 +157,10 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
         # Serialize with support recovery and recheck against current credentials.
         user = models.User.objects.select_for_update().get(pk=validated_data['user'].pk)
         self.validate({**validated_data, 'user': user})
-        user.is_confirmed = True
-        user.save(update_fields=['is_confirmed'])
+        if not user.is_confirmed:
+            user.is_confirmed = True
+            user.save(update_fields=['is_confirmed'])
+            record('auth_email_confirmation', request=self.context.get('request'), user=user)
         return {"ok": True}
 
 
@@ -202,11 +209,14 @@ class UserAccountChangePasswordSerializer(serializers.Serializer):
 
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
         user = validated_data.pop("user")
         new_password = validated_data.pop("new_password")
         user.set_password(new_password)
         user.save()
+        event = record('auth_password_change', request=self.context.get('request'), user=user)
+        enqueue_email(user, 'PASSWORD_CHANGED', event=event)
 
         refresh = jwt_tokens.RefreshToken.for_user(user)
         refresh['auth_method'] = 'password'
@@ -224,20 +234,24 @@ class PasswordResetSerializer(serializers.Serializer):
     def validate(self, attrs):
         user = None
         try:
-            user = dj_auth.get_user_model().objects.get(email=attrs["email"])
+            user = dj_auth.get_user_model().objects.get(email__iexact=attrs["email"].strip())
         except dj_auth.get_user_model().DoesNotExist:
             pass
 
         return {**attrs, "user": user}
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = validated_data.pop("user")
-
-        if user:
-            notifications.PasswordResetEmail(
-                user=user, data={"user_id": user.id.hashid, "token": tokens.password_reset_token.make_token(user)}
-            ).send()
-
+        user = validated_data['user']
+        event = record(
+            'auth_password_reset_request',
+            request=self.context.get('request'),
+            user=user,
+            email=validated_data.get('email', ''),
+            outcome='accepted',
+        )
+        if user and user.is_active:
+            enqueue_email(user, 'PASSWORD_RESET', event=event)
         return {"ok": True}
 
 
@@ -276,6 +290,8 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
         user.set_password(validated_data['new_password'])
         jwt.blacklist_user_tokens(user)
         user.save(update_fields=['password'])
+        event = record('auth_password_reset', request=self.context.get('request'), user=user)
+        enqueue_email(user, 'PASSWORD_CHANGED', event=event)
         return {"ok": True}
 
 
@@ -468,8 +484,15 @@ class GenerateOTPSerializer(serializers.Serializer):
                 passkey_management.require_grant(self.context["request"], self.context_user, "otp_setup")
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
         otp_base32, otp_auth_url = otp_services.generate_otp(self.context_user)
+        record(
+            'auth_otp_management',
+            request=self.context.get('request'),
+            user=self.context_user,
+            outcome='enrollment_started',
+        )
         return {"base32": otp_base32, "otpauth_url": otp_auth_url}
 
 
@@ -479,7 +502,6 @@ class VerifyOTPSerializer(serializers.Serializer):
     otp_token = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        self._was_enabled = self.context_user.otp_enabled
         if _otp_setup_requires_grant(self.context_user):
             with transaction.atomic():
                 grant = passkey_management.require_grant(self.context["request"], self.context_user, "otp_setup")
@@ -487,17 +509,7 @@ class VerifyOTPSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        otp_services.verify_otp(self.context_user, validated_data.get("otp_token", ""))
-        SSOAuditLog.log_event(
-            SSOAuditEventType.OTP_ENABLED,
-            user=self.context_user,
-            description=(
-                "Two-factor authentication secret replaced"
-                if self._was_enabled
-                else "Two-factor authentication enabled"
-            ),
-        )
-        notifications.send_after_commit(notifications.OtpEnabledEmail(user=self.context_user))
+        otp_services.verify_otp(self.context_user, validated_data.get("otp_token", ""), self.context.get('request'))
         return {"otp_verified": True}
 
 
@@ -535,7 +547,7 @@ class ValidateOTPSerializer(serializers.Serializer):
         if not self.user.is_active:
             self.fail("invalid_token")
 
-        otp_services.validate_otp(self.user, attrs.get("otp_token", ""))
+        otp_services.validate_otp(self.user, attrs.get("otp_token", ""), request)
         self._raw_otp_auth_token = raw_otp_auth_token
 
         return attrs
@@ -549,6 +561,7 @@ class ValidateOTPSerializer(serializers.Serializer):
         if pending is None:
             self.fail("invalid_token")
 
+        self.auth_method = pending.auth_method
         refresh = RefreshToken.for_user(self.user)
         refresh['auth_method'] = pending.auth_method
         refresh.access_token['auth_method'] = pending.auth_method
@@ -565,14 +578,14 @@ class DisableOTPSerializer(serializers.Serializer):
             passkey_management.consume_grant(grant)
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
         otp_services.disable_otp(self.context_user)
-        SSOAuditLog.log_event(
-            SSOAuditEventType.OTP_DISABLED,
-            user=self.context_user,
-            description="Two-factor authentication disabled",
+        event = record(
+            'auth_otp_management', request=self.context.get('request'), user=self.context_user, outcome='disabled'
         )
-        notifications.send_after_commit(notifications.OtpDisabledEmail(user=self.context_user))
+        record('otp_disabled', request=self.context.get('request'), user=self.context_user)
+        enqueue_email(self.context_user, 'OTP_DISABLED', event=event)
         return {"ok": True}
 
 

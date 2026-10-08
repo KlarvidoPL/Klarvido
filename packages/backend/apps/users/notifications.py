@@ -69,3 +69,18 @@ class OtpEnabledEmail(UserEmail):
 class OtpDisabledEmail(UserEmail):
     name = "OTP_DISABLED"
     serializer_class = email_serializers.NoDataEmailSerializer
+
+
+class PasswordChangedEmail(UserEmail):
+    name = "PASSWORD_CHANGED"
+    serializer_class = email_serializers.NoDataEmailSerializer
+
+
+class SignupGuidanceEmail(UserEmail):
+    name = "SIGNUP_GUIDANCE"
+    serializer_class = email_serializers.NoDataEmailSerializer
+
+
+class OtpReplacedEmail(UserEmail):
+    name = "OTP_REPLACED"
+    serializer_class = email_serializers.NoDataEmailSerializer

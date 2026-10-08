@@ -1,12 +1,11 @@
 from django.urls import path, include
 from django.urls import re_path
-from social_django import views as django_social_views
 
 from . import views, social_accounts_views
 
 social_patterns = [
     # authentication / association
-    re_path(r"^login/(?P<backend>[^/]+)/$", django_social_views.auth, name="begin"),
+    re_path(r"^login/(?P<backend>[^/]+)/$", views.begin, name="begin"),
     re_path(r"^complete/(?P<backend>[^/]+)/$", views.complete, name="complete"),
     # No disconnection route: social_django's stock disconnect view requires only an
     # authenticated session (no fresh password/OTP/passkey proof), the same gap this

@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "سيؤدي هذا إلى إزالة طبقة الأمان الإضافية من حسابك - يمكنك إعادة تفعيلها في أي وقت."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "تحقق من بريدك الإلكتروني"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "إذا كان هذا العنوان يمكنه تلقي رسائل الحساب، فسنرسل التعليمات. تحقق من صندوق الوارد ومجلد الرسائل غير المرغوب فيها. يمكنك أيضًا تسجيل الدخول أدناه."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "رجوع"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "تعليمات تسجيل الدخول إلى الحساب"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "يوجد حساب يستخدم هذا البريد الإلكتروني بالفعل. سجّل الدخول بكلمة المرور الحالية أو مفتاح المرور. إذا نسيت كلمة المرور، فأعد تعيينها من صفحة تسجيل الدخول. إذا لم يتم التحقق من بريدك بعد، فسجّل الدخول واطلب رسالة تحقق قبل ربط Google. لم يغيّر هذا الطلب حسابك."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "تم تغيير كلمة مرورك"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "تم تغيير كلمة مرور حسابك أو إعادة تعيينها. إذا أجريت هذا التغيير، فلا يلزم إجراء آخر. إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا واتصل بالدعم."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "تم استبدال المصادقة الثنائية لحسابك"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "تم استبدال تطبيق المصادقة الذي يحمي حسابك. إذا أجريت هذا التغيير، فلا يلزم إجراء آخر. إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا واتصل بالدعم."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "تعذر بدء تسجيل الدخول عبر Google. حاول مرة أخرى."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "طلب تسجيل"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "تأكيد البريد الإلكتروني"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "تسجيل الدخول بكلمة المرور"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "طلب تحقق ثنائي لتسجيل الدخول"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "التحقق الثنائي"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "طلب إعادة تعيين كلمة المرور"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "تغيير كلمة المرور"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "تغيير المصادقة الثنائية"
   }
 }

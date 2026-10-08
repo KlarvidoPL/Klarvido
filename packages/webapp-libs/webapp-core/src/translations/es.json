@@ -5935,5 +5935,62 @@
   },
   "Auth / Two-factor / Reauth disable warning": {
     "defaultMessage": "Esto eliminará la capa adicional de seguridad de tu cuenta - puedes volver a activarla en cualquier momento."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Revisa tu correo electrónico"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Si esta dirección puede recibir correos de la cuenta, enviaremos instrucciones. Revisa tu bandeja de entrada y la carpeta de spam. También puedes iniciar sesión abajo."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Volver"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Instrucciones para iniciar sesión"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Ya existe una cuenta con esta dirección. Inicia sesión con tu contraseña actual o clave de acceso. Si olvidaste la contraseña, restablécela en la página de inicio de sesión. Si el correo aún no está verificado, inicia sesión y solicita un correo de verificación antes de conectar Google. Esta solicitud no modificó tu cuenta."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Tu contraseña ha cambiado"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "La contraseña de tu cuenta se cambió o restableció. Si realizaste el cambio, no necesitas hacer nada más. Si no fuiste tú, restablece tu contraseña inmediatamente y contacta con soporte."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Se reemplazó tu autenticación de dos factores"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "Se reemplazó el autenticador que protege tu cuenta. Si realizaste el cambio, no necesitas hacer nada más. Si no fuiste tú, restablece tu contraseña inmediatamente y contacta con soporte."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "No se pudo iniciar el acceso con Google. Inténtalo de nuevo."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Solicitud de registro"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Confirmación de correo"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Acceso con contraseña"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Verificación de acceso de dos factores"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Verificación de dos factores"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Solicitud de restablecimiento de contraseña"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Restablecimiento de contraseña"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Cambio de contraseña"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Cambio de autenticación de dos factores"
   }
 }

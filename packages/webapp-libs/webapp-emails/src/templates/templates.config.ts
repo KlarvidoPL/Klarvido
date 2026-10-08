@@ -1,23 +1,26 @@
 import { EmailTemplateDefinition, EmailTemplateType } from '../types';
 import * as AccountActivation from './accountActivation';
+import * as BackupReady from './backupReady';
+import * as InvoiceCreated from './invoiceCreated';
+import * as InvoiceFileAdded from './invoiceFileAdded';
+import * as InvoiceRequestAssigned from './invoiceRequestAssigned';
+import * as InvoiceRequestComment from './invoiceRequestComment';
+import * as InvoiceRequestMention from './invoiceRequestMention';
+import * as OtpDisabled from './otpDisabled';
+import * as OtpEnabled from './otpEnabled';
+import * as OtpReplaced from './otpReplaced';
+import * as PasswordChanged from './passwordChanged';
 import * as PasswordReset from './passwordReset';
+import * as ProjectNoteMention from './projectNoteMention';
+import * as SignupGuidance from './signupGuidance';
+import * as SocialAccountLinked from './socialAccountLinked';
 import * as SubscriptionError from './subscriptionError';
+import * as TenantDeleted from './tenantDeleted';
 import * as TenantInvitation from './tenantInvitation';
 import * as TrialExpiresSoon from './trialExpiresSoon';
 import * as UserExport from './userExport';
 import * as UserExportAdmin from './userExportAdmin';
-import * as InvoiceRequestAssigned from './invoiceRequestAssigned';
-import * as InvoiceRequestComment from './invoiceRequestComment';
-import * as InvoiceRequestMention from './invoiceRequestMention';
-import * as InvoiceCreated from './invoiceCreated';
-import * as InvoiceFileAdded from './invoiceFileAdded';
-import * as ProjectNoteMention from './projectNoteMention';
-import * as BackupReady from './backupReady';
-import * as TenantDeleted from './tenantDeleted';
 
-import * as SocialAccountLinked from './socialAccountLinked';
-import * as OtpEnabled from './otpEnabled';
-import * as OtpDisabled from './otpDisabled';
 //<-- INJECT EMAIL TEMPLATE IMPORT -->
 
 export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
@@ -39,5 +42,8 @@ export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
   [EmailTemplateType.SOCIAL_ACCOUNT_LINKED]: SocialAccountLinked,
   [EmailTemplateType.OTP_ENABLED]: OtpEnabled,
   [EmailTemplateType.OTP_DISABLED]: OtpDisabled,
+  [EmailTemplateType.SIGNUP_GUIDANCE]: SignupGuidance,
+  [EmailTemplateType.PASSWORD_CHANGED]: PasswordChanged,
+  [EmailTemplateType.OTP_REPLACED]: OtpReplaced,
   //<-- INJECT EMAIL TEMPLATE -->
 };

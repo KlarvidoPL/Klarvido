@@ -167,3 +167,25 @@ class UserAdmin(BaseUserAdmin):
         return TemplateResponse(request, "admin/users/user/reclaim_confirmation.html", context)
 
     reclaim_unconfirmed_account.short_description = _("Reclaim unconfirmed account (support use only)")
+
+
+@admin.register(models.SecurityEmailOutbox)
+class SecurityEmailOutboxAdmin(admin.ModelAdmin):
+    list_display = ('kind', 'created_at', 'attempts', 'sent_at', 'failed_at', 'cancelled_at', 'last_error')
+    list_filter = ('kind', 'failed_at', 'sent_at', 'cancelled_at')
+    readonly_fields = [field.name for field in models.SecurityEmailOutbox._meta.fields]
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

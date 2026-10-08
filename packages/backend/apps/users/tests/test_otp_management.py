@@ -12,6 +12,7 @@ from rest_framework.test import APIClient
 
 from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import PasskeyManagementGrant, SSOAuditLog
+from apps.users.models import SecurityEmailOutbox
 
 pytestmark = pytest.mark.django_db
 
@@ -140,8 +141,7 @@ class TestOtpOnlyGrantForPasswordlessPasskeylessAccount:
 
 
 class TestAuditAndNotifications:
-    @patch('apps.users.serializers.notifications.OtpEnabledEmail.send')
-    def test_enabling_is_audited_and_notified(self, mock_send, user_factory, django_capture_on_commit_callbacks):
+    def test_enabling_is_audited_and_notified(self, user_factory, django_capture_on_commit_callbacks):
         user = user_factory()
         user.set_unusable_password()
         user.save(update_fields=['password'])
@@ -159,10 +159,9 @@ class TestAuditAndNotifications:
 
         assert response.json()['data']['verifyOtp']['otpVerified'] is True
         assert SSOAuditLog.objects.filter(event_type=SSOAuditEventType.OTP_ENABLED, user=user).exists()
-        mock_send.assert_called_once()
+        assert SecurityEmailOutbox.objects.filter(user=user, kind='OTP_ENABLED').count() == 1
 
-    @patch('apps.users.serializers.notifications.OtpDisabledEmail.send')
-    def test_disabling_is_audited_and_notified(self, mock_send, user_factory, django_capture_on_commit_callbacks):
+    def test_disabling_is_audited_and_notified(self, user_factory, django_capture_on_commit_callbacks):
         user = user_factory(otp_enabled=True, otp_verified=True, otp_base32=pyotp.random_base32())
         user.set_password(PASSWORD)
         user.save(update_fields=['password'])
@@ -177,7 +176,7 @@ class TestAuditAndNotifications:
 
         assert response.json()['data']['disableOtp']['ok'] is True
         assert SSOAuditLog.objects.filter(event_type=SSOAuditEventType.OTP_DISABLED, user=user).exists()
-        mock_send.assert_called_once()
+        assert SecurityEmailOutbox.objects.filter(user=user, kind='OTP_DISABLED').count() == 1
 
 
 class TestLoginCodeIsSingleUse:

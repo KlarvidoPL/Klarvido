@@ -18,6 +18,7 @@ from apps.multitenancy.schema import TenantType
 from .jwt import get_jti_from_refresh_token
 from . import models
 from . import serializers
+from .services.security import audit_failures, record
 from .services.default_organization import default_organization_id
 from .services.users import get_user_from_resolver, get_role_names, get_user_avatar_url
 from .services.social_linking import complete_link
@@ -78,11 +79,20 @@ class ObtainTokenMutation(CookieAuthenticationMutation):
 
     @classmethod
     @ratelimit.ratelimit(key="ip", rate="30/min")
+    @audit_failures('auth_password_login')
     def mutate_and_get_payload(cls, root, info, **input):
         with transaction.atomic():
             mutation = super().mutate_and_get_payload(root, info, **input)
 
             if mutation.otp_auth_token:
+                account = models.User.objects.get(email__iexact=input['email'])
+                record(
+                    'auth_otp_challenge',
+                    request=info.context._request,
+                    user=account,
+                    outcome='first_factor_verified',
+                    method='password',
+                )
                 otp_cookies = {
                     settings.OTP_AUTH_TOKEN_COOKIE: mutation.otp_auth_token,
                 }
@@ -107,6 +117,7 @@ class ObtainTokenMutation(CookieAuthenticationMutation):
                     user, info.context._request, refresh_token=mutation.refresh, link_social=True
                 )
 
+                record('auth_password_login', request=info.context._request, user=user, method='password')
                 auth_cookies = {
                     settings.ACCESS_TOKEN_COOKIE: mutation.access,
                     settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
@@ -123,11 +134,14 @@ class ObtainTokenMutation(CookieAuthenticationMutation):
 
 
 class SingUpMutation(CookieAuthenticationMutation):
+    ok = graphene.Boolean(required=True)
+
     class Meta:
         serializer_class = serializers.UserSignupSerializer
 
     @classmethod
     @ratelimit.ratelimit(key="ip", rate="10/min")
+    @audit_failures('auth_signup')
     def mutate_and_get_payload(cls, root, info, **input):
         with transaction.atomic():
             mutation = super().mutate_and_get_payload(root, info, **input)
@@ -142,6 +156,9 @@ class SingUpMutation(CookieAuthenticationMutation):
                     pass
 
             session_id = _create_session_for_user(user, info.context._request, refresh_token=mutation.refresh)
+            record(
+                'auth_signup', request=info.context._request, user=user, method='password', outcome='account_created'
+            )
 
         auth_cookies = {
             settings.ACCESS_TOKEN_COOKIE: mutation.access,
@@ -161,6 +178,11 @@ class ConfirmEmailMutation(mutations.SerializerMutation):
     class Meta:
         serializer_class = serializers.UserAccountConfirmationSerializer
 
+    @classmethod
+    @audit_failures('auth_email_confirmation')
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
 
 class PasswordResetMutation(mutations.SerializerMutation):
     class Meta:
@@ -168,6 +190,7 @@ class PasswordResetMutation(mutations.SerializerMutation):
 
     @classmethod
     @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate)
+    @audit_failures('auth_password_reset_request')
     def mutate_and_get_payload(cls, root, info, **input):
         return super().mutate_and_get_payload(root, info, **input)
 
@@ -176,15 +199,30 @@ class PasswordResetConfirmationMutation(mutations.SerializerMutation):
     class Meta:
         serializer_class = serializers.PasswordResetConfirmationSerializer
 
+    @classmethod
+    @audit_failures('auth_password_reset')
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
 
 class GenerateOTPMutation(mutations.SerializerMutation):
     class Meta:
         serializer_class = serializers.GenerateOTPSerializer
 
+    @classmethod
+    @audit_failures('auth_otp_management')
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
 
 class VerifyOTPMutation(mutations.SerializerMutation):
     class Meta:
         serializer_class = serializers.VerifyOTPSerializer
+
+    @classmethod
+    @audit_failures('auth_otp_management')
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
 
 
 class ValidateOTPMutation(CookieAuthenticationMutation):
@@ -193,6 +231,7 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
 
     @classmethod
     @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate)
+    @audit_failures('auth_otp_verification')
     def mutate_and_get_payload(cls, root, info, **input):
         # Failed OTP checks must commit their account-wide attempt counters.
         # Only token issuance and session creation belong in the atomic block.
@@ -208,6 +247,13 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
             mutation = super().perform_mutate(serializer, info)
             session_id = _create_session_for_user(
                 serializer.user, info.context._request, refresh_token=mutation.refresh, link_social=True
+            )
+            record(
+                'auth_otp_verification',
+                request=info.context._request,
+                user=serializer.user,
+                method=serializer.auth_method,
+                outcome='login_completed',
             )
 
         auth_cookies = {
@@ -233,6 +279,11 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
 class DisableOTPMutation(mutations.SerializerMutation):
     class Meta:
         serializer_class = serializers.DisableOTPSerializer
+
+    @classmethod
+    @audit_failures('auth_otp_management')
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
 
 
 class MarkWelcomeModalSeenMutation(graphene.ClientIDMutation):
@@ -428,6 +479,7 @@ class ChangePasswordMutation(CookieAuthenticationMutation):
         exclude = ("user",)
 
     @classmethod
+    @audit_failures('auth_password_change')
     def mutate_and_get_payload(cls, root, info, **input):
         with transaction.atomic():
             mutation = super().mutate_and_get_payload(root, info, **input)

@@ -73,9 +73,9 @@ def get_email_translations(lang: str) -> dict:
     return {}
 
 
-@shared_task(bind=True)
-def send_email(self, to: str | list[str], email_type: str, email_data: dict, lang: str = DEFAULT_EMAIL_LANGUAGE):
-    logger.info(f"Starting send_email task: type={email_type}, to={to}, lang={lang}")
+def deliver_email_message(to: str | list[str], email_type: str, email_data: dict, lang: str = DEFAULT_EMAIL_LANGUAGE):
+    """Synchronous delivery shared by ordinary tasks and the durable security outbox."""
+    logger.info("Starting email delivery: type=%s, lang=%s", email_type, lang)
 
     # Fetch translations from database
     translations = get_email_translations(lang)
@@ -99,6 +99,7 @@ def send_email(self, to: str | list[str], email_type: str, email_data: dict, lan
             input=bytes(render_script, "utf-8"),
             capture_output=True,
             check=True,
+            timeout=30,
             cwd="/app/scripts/runtime",
             # Environmental variables are mapped manually to avoid secret values from being exposed to email renderer
             # script that is usually maintained by non-backend developers
@@ -109,23 +110,10 @@ def send_email(self, to: str | list[str], email_type: str, email_data: dict, lan
             },
         )
         logger.debug("Node.js renderer completed successfully")
-    except subprocess.CalledProcessError as e:
-        logger.error(
-            f"Email rendering failed for {email_type}: "
-            f"return_code={e.returncode}, "
-            f"stdout={e.output.decode('utf-8', errors='replace') if e.output else 'None'}, "
-            f"stderr={e.stderr.decode('utf-8', errors='replace') if e.stderr else 'None'}"
-        )
-        self.update_state(
-            state=states.FAILURE,
-            meta={
-                "return_code": e.returncode,
-                "cmd": e.cmd,
-                "output": e.output,
-                "stderr": e.stderr,
-            },
-        )
-        raise Ignore()
+    except subprocess.CalledProcessError:
+        # Renderer output can contain credential-bearing links: never log it.
+        logger.error("Email rendering failed: type=%s", email_type)
+        raise
 
     if isinstance(to, str):
         to = (to,)
@@ -133,11 +121,8 @@ def send_email(self, to: str | list[str], email_type: str, email_data: dict, lan
     try:
         rendered_email = json.loads(node_process.stdout)
         logger.debug(f"Email rendered: subject='{rendered_email.get('subject', 'N/A')}'")
-    except json.JSONDecodeError as e:
-        logger.error(
-            f"Failed to parse rendered email JSON for {email_type}: {e}. "
-            f"stdout={node_process.stdout.decode('utf-8', errors='replace') if node_process.stdout else 'None'}"
-        )
+    except json.JSONDecodeError:
+        logger.error("Invalid email renderer response: type=%s", email_type)
         raise
 
     from_email = (
@@ -157,8 +142,17 @@ def send_email(self, to: str | list[str], email_type: str, email_data: dict, lan
 
     try:
         sent_count = email.send()
-        logger.info(f"Email sent successfully: type={email_type}, to={to}, sent_count={sent_count}")
+        logger.info("Email sent successfully: type=%s, sent_count=%s", email_type, sent_count)
         return {"sent_emails_count": sent_count}
-    except Exception as e:
-        logger.error(f"Failed to send email via {settings.EMAIL_BACKEND}: {e}")
+    except Exception:
+        logger.error("Email delivery failed: type=%s", email_type)
         raise
+
+
+@shared_task(bind=True)
+def send_email(self, to: str | list[str], email_type: str, email_data: dict, lang: str = DEFAULT_EMAIL_LANGUAGE):
+    try:
+        return deliver_email_message(to, email_type, email_data, lang)
+    except subprocess.CalledProcessError:
+        self.update_state(state=states.FAILURE, meta={'reason': 'email_rendering_failed'})
+        raise Ignore()
