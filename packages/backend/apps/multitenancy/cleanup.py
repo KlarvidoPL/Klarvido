@@ -10,7 +10,12 @@ from django.utils import timezone
 
 from apps.backup.encryption import get_backup_encryption_service
 from apps.demo.models import DocumentDemoItem
-from common.storages import get_exports_storage, delete_storage_prefix, organization_document_prefix
+from common.storages import (
+    get_exports_storage,
+    delete_storage_file,
+    delete_storage_prefix,
+    organization_document_prefix,
+)
 from .models import ResourceCleanup, Tenant
 
 logger = logging.getLogger(__name__)
@@ -102,9 +107,9 @@ def process_resource_cleanup(cleanup_id):
 
     try:
         if cleanup.resource_type == ResourceCleanup.ResourceType.EXPORT_FILE:
-            get_exports_storage().delete(cleanup.resource_path)
+            delete_storage_file(get_exports_storage(), cleanup.resource_path)
         elif cleanup.resource_type == ResourceCleanup.ResourceType.DOCUMENT_FILE:
-            DocumentDemoItem._meta.get_field('file').storage.delete(cleanup.resource_path)
+            delete_storage_file(DocumentDemoItem._meta.get_field('file').storage, cleanup.resource_path)
         elif cleanup.resource_type == ResourceCleanup.ResourceType.BACKUP_KEY:
             if not get_backup_encryption_service().delete_tenant_key(cleanup.organization_id, strict=True):
                 raise RuntimeError('Backup key deletion was not confirmed')

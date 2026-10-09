@@ -39,6 +39,22 @@ export function createBackendTaskRole(
   exportsBucket.grantReadWrite(taskRole);
   exportsBucket.grantPutAcl(taskRole);
 
+  taskRole.addToPolicy(
+    new iam.PolicyStatement({
+      actions: ['s3:GetBucketVersioning', 's3:ListBucketVersions'],
+      resources: [fileUploadsBucket.bucketArn, exportsBucket.bucketArn],
+    }),
+  );
+  taskRole.addToPolicy(
+    new iam.PolicyStatement({
+      actions: ['s3:DeleteObjectVersion'],
+      resources: [
+        fileUploadsBucket.arnForObjects('*'),
+        exportsBucket.arnForObjects('*'),
+      ],
+    }),
+  );
+
   const eventBus = events.EventBus.fromEventBusName(
     scope,
     'WorkersEventBus',

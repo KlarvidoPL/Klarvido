@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.utils.deconstruct import deconstructible
 from storages.backends.s3boto3 import S3Boto3Storage
+from storages.utils import clean_name
 
 
 @deconstructible
@@ -36,8 +37,44 @@ class OrganizationDocumentPathGenerator:
         return f'{organization_document_prefix(organization_id)}{secrets.token_hex(8)}/{filename}'
 
 
+def delete_storage_file(storage, path):
+    """Permanently remove a recorded file, including historical S3 versions."""
+    if isinstance(storage, S3Boto3Storage) and _has_storage_versions(storage):
+        # Match Django's normal key normalization for existing recorded paths.
+        key = storage._normalize_name(clean_name(path))
+        _delete_storage_versions(storage, key, exact=True)
+    else:
+        storage.delete(path)
+
+
+def _has_storage_versions(storage):
+    response = storage.connection.meta.client.get_bucket_versioning(Bucket=storage.bucket_name)
+    # Suspended buckets can still contain versions from when versioning was enabled.
+    return response.get('Status') in ('Enabled', 'Suspended')
+
+
+def _delete_storage_versions(storage, prefix, *, exact=False, progress=None):
+    client = storage.connection.meta.client
+    pages = client.get_paginator('list_object_versions').paginate(
+        Bucket=storage.bucket_name, Prefix=prefix, PaginationConfig={'PageSize': 1000}
+    )
+    for page in pages:
+        if progress is not None:
+            progress()
+        for collection in ('Versions', 'DeleteMarkers'):
+            for index, item in enumerate(page.get(collection, [])):
+                key = item['Key']
+                if not key.startswith(prefix):
+                    raise ValueError('Storage listing returned a version outside the cleanup prefix')
+                if exact and key != prefix:
+                    continue
+                if progress is not None and index % 100 == 0:
+                    progress()
+                client.delete_object(Bucket=storage.bucket_name, Key=key, VersionId=item['VersionId'])
+
+
 def delete_storage_prefix(storage, prefix, *, progress=None):
-    """Delete current objects under an exact directory prefix, including unrecorded files.
+    """Delete objects and versions under an exact directory prefix, including unrecorded files.
 
     S3-compatible storage is streamed through ListObjectsV2 pagination. The caller
     may renew its durable cleanup lease while a large scan is in progress.
@@ -57,6 +94,9 @@ def delete_storage_prefix(storage, prefix, *, progress=None):
     if isinstance(storage, S3Boto3Storage):
         location = storage.location.strip('/')
         full_prefix = f'{location}/{prefix}' if location else prefix
+        if _has_storage_versions(storage):
+            _delete_storage_versions(storage, full_prefix, progress=progress)
+            return
         client = storage.connection.meta.client
         pages = client.get_paginator('list_objects_v2').paginate(
             Bucket=storage.bucket_name, Prefix=full_prefix, PaginationConfig={'PageSize': 1000}
