@@ -14,6 +14,7 @@ import { ENV } from '@sb/webapp-core/config/env';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { getPasskeyAuthorizationErrorMessage, useWebAuthn } from '@sb/webapp-sso/hooks';
+import { Link2 } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
@@ -107,9 +108,12 @@ export const SocialAccounts = () => {
   return (
     <div className="space-y-4">
       {data.accounts.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          <FormattedMessage id="Social accounts / Empty" defaultMessage="No social sign-in accounts are connected." />
-        </p>
+        <div className="rounded-lg border border-dashed border-muted-foreground/30 p-6 text-center">
+          <Link2 className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">
+            <FormattedMessage id="Social accounts / Empty" defaultMessage="No social sign-in accounts are connected." />
+          </p>
+        </div>
       )}
       {data.accounts.map((account) => {
         const ProviderIcon = providerIcons[account.provider];

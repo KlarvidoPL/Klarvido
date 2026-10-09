@@ -837,7 +837,7 @@ if env.str("PASSKEY_TRUSTED_PROXY_COUNT", default=None) is not None:
     )
 CELERY_BEAT_SCHEDULE.update(
     {
-        "deliver-security-emails": {"task": "apps.users.tasks.deliver_security_emails", "schedule": 30},
+        "deliver-security-emails": {"task": "apps.users.tasks.deliver_security_emails", "schedule": 15},
         "cleanup-authentication-records": {
             "task": "apps.users.tasks.cleanup_authentication_records",
             "schedule": 86400,

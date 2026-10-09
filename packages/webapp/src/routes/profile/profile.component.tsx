@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Crown,
   Fingerprint,
+  Link2,
   Lock,
   Mail,
   Monitor,
@@ -243,7 +244,8 @@ export const Profile = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Link2 className="h-5 w-5" />
               <FormattedMessage id="Social accounts / Title" defaultMessage="Connected social accounts" />
             </CardTitle>
             <CardDescription>
