@@ -410,7 +410,7 @@ RATE_LIMITS = {
     # Authentication - protect against credential stuffing and abuse
     "auth.login": {"rate": env("RATE_LIMIT_AUTH_LOGIN", default="30/min")},
     "auth.signup": {"rate": env("RATE_LIMIT_AUTH_SIGNUP", default="10/min")},
-    "auth.password_reset": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_RESET", default="5/hour")},
+    "auth.password_reset": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_RESET", default="30/hour")},
     "auth.otp": {"rate": env("RATE_LIMIT_AUTH_OTP", default="10/min")},
     "auth.passkey": {"rate": env("RATE_LIMIT_AUTH_PASSKEY", default="10/min")},
     # GraphQL - global limits

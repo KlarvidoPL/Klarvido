@@ -166,7 +166,7 @@ the original audit behavior.
 
 ### E09 — Reset-email abuse controls
 
-- Implemented, verification deferred: reset requests use the configured `auth.password_reset` rate (default five/IP/hour), trusted-proxy IP resolution, and atomic HMAC-keyed database recipient counters. A global row serializes budget admission across workers.
+- Implemented, verification deferred: reset requests use the configured `auth.password_reset` rate (default 30/IP/hour), trusted-proxy IP resolution, and atomic HMAC-keyed database recipient counters. A global row serializes budget admission across workers.
 - Accepted behavior change: one email/address per five minutes, five/address per UTC day, and 500 newly queued reset emails/hour globally. Limits are configurable; retries do not consume additional admission budget. Known, unknown, inactive, throttled and limiter-failure requests retain the generic success result. Failed limit checks never bypass sending controls.
 - Reset proofs expire after one hour, including previously issued proofs. Activation proofs retain their independent existing lifetime. Tokens are generated at outbox delivery, so the reset lifetime starts when the message is rendered.
 - Added deferred tests: configured limits, recipient/case/IP boundaries, concurrent admission, suppression, unavailable limiter, and separate reset/activation expiry.

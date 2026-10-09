@@ -89,7 +89,7 @@ Rebuild the email renderer when deploying the new notification templates.
 ### Recovery limits and password validation
 
 Password-reset requests always show the generic confirmation. The configured reset policy defaults to
-five requests per IP/hour, one email/address every five minutes, five/address per UTC day and 500 newly
+30 requests per IP/hour, one email/address every five minutes, five/address per UTC day and 500 newly
 queued messages/hour globally. Suppressed requests do not disclose account existence; unavailable limit
 checks suppress delivery. `AUTH_AUDIT_TRUSTED_PROXIES` also controls forwarded IP handling for reset limits.
 Reset links expire after one hour, including previously issued links. Email-confirmation expiry is unchanged.

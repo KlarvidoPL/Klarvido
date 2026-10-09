@@ -78,6 +78,14 @@ def test_configured_ip_policy_is_enforced(settings):
     assert admit_reset(request(), 'second@example.com', deliverable=False) == 'ip_limited'
 
 
+def test_shared_ip_allows_thirty_requests_across_recipients(settings):
+    settings.RATE_LIMITS = {'auth.password_reset': {'rate': '30/hour'}}
+    clear_config_cache()
+    for index in range(30):
+        assert admit_reset(request(), f'account{index}@example.com', deliverable=False) == 'accepted'
+    assert admit_reset(request(), 'next@example.com', deliverable=False) == 'ip_limited'
+
+
 def test_admission_failure_never_queues_an_email(user_factory):
     user = user_factory()
     with patch('apps.users.services.password_recovery.is_ratelimited', side_effect=RuntimeError('cache unavailable')):
