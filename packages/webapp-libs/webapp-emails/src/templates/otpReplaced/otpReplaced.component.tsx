@@ -15,27 +15,25 @@ export const Template = () => {
       })}
       title={
         <FormattedMessage
-          defaultMessage={'Your two-factor authentication was replaced'}
+          defaultMessage="Your two-factor authentication was replaced"
           id="Email / OtpReplaced / Title"
         />
       }
       text={
         <FormattedMessage
-          defaultMessage={
-            'The authenticator protecting your account was replaced. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support.'
-          }
+          defaultMessage="The authenticator protecting your account was replaced. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support."
           id="Email / OtpReplaced / Text"
         />
       }
       footer={{ companyName: 'Klarvido' }}
     >
       <Button linkTo={path(RoutesConfig.profile)}>
-        <FormattedMessage defaultMessage={'Review account security'} id="Email / OTP Enabled / Link label" />
+        <FormattedMessage defaultMessage="Review account security" id="Email / OTP Enabled / Link label" />
       </Button>
     </Layout>
   );
 };
 
 export const Subject = () => (
-  <FormattedMessage defaultMessage={'Your two-factor authentication was replaced'} id="Email / OtpReplaced / Title" />
+  <FormattedMessage defaultMessage="Your two-factor authentication was replaced" id="Email / OtpReplaced / Title" />
 );

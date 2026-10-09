@@ -1,4 +1,3 @@
-import { getOauthUrl, startOAuthLogin } from './auth.hooks';
 import { OAuthProvider } from './auth.types';
 
 const mockGetCsrfToken = jest.fn();
@@ -8,6 +7,21 @@ jest.mock('../csrf', () => ({
   resetCsrfToken: () => mockResetCsrfToken(),
 }));
 jest.mock('../helpers', () => ({ apiURL: (path: string) => `https://api.example.com/api${path}` }));
+
+// A real client (via setupFilesAfterEnv's MSW server) already required api/helpers.ts before
+// this file's jest.mock('../helpers', ...) above could register, permanently caching the real,
+// unmocked module for any plain top-level `import './auth.hooks'` here - Jest can't retroactively
+// swap out a module another file already required. jest.isolateModules forces a fresh
+// require of auth.hooks (and its ../csrf/../helpers imports) in a sandboxed registry that does
+// see the mocks registered above.
+let getOauthUrl: typeof import('./auth.hooks').getOauthUrl;
+let startOAuthLogin: typeof import('./auth.hooks').startOAuthLogin;
+
+beforeAll(() => {
+  jest.isolateModules(() => {
+    ({ getOauthUrl, startOAuthLogin } = require('./auth.hooks'));
+  });
+});
 
 describe('Google sign-in initiation', () => {
   beforeEach(() => jest.clearAllMocks());
