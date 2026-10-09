@@ -9,6 +9,7 @@ import hashlib
 import io
 import json
 import logging
+import uuid
 import zipfile
 from datetime import datetime
 
@@ -18,7 +19,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from . import cleanup
-from .models import ResourceCleanup
+from .models import ResourceCleanup, Tenant, ActionLogExport, ActionLog, has_tenant_access, user_has_permission
+from apps.notifications.models import Notification
 from common.action_logging.service import log_action
 from .constants import ActionActorType
 from common.storages import get_exports_storage
@@ -51,9 +53,6 @@ def export_action_logs(self, export_id: str):
     5. Uploads to storage
     6. Creates a notification for the user
     """
-    from .models import ActionLogExport, ActionLog, has_tenant_access, user_has_permission
-    from apps.notifications.models import Notification
-
     # Load the export job
     try:
         export_job = ActionLogExport.objects.select_related("tenant", "requested_by").get(pk=export_id)
@@ -78,23 +77,37 @@ def export_action_logs(self, export_id: str):
         )
 
     def deny_export():
+        updated = ActionLogExport.objects.filter(pk=export_job.pk, tenant_id=export_job.tenant_id).update(
+            status=ActionLogExport.Status.FAILED, error_message="permission_denied", completed_at=timezone.now()
+        )
+        if not updated:
+            return {"error": "Export job deleted", "status": "cancelled"}
         export_job.status = ActionLogExport.Status.FAILED
-        export_job.error_message = "permission_denied"
-        export_job.completed_at = timezone.now()
-        export_job.save(update_fields=["status", "error_message", "completed_at"])
         log_export_result(export_job, "export_failed")
         return {"error": "permission_denied"}
 
-    # Recheck queued jobs: membership or permissions may have changed since enqueueing.
-    if not requester_is_authorized():
-        return deny_export()
+    with transaction.atomic():
+        tenant = Tenant.objects.select_for_update().filter(pk=export_job.tenant_id).first()
+        if tenant is None:
+            return {"error": "Organization deleted", "status": "cancelled"}
+        if not requester_is_authorized():
+            return deny_export()
+        # Explicit updates cannot recreate a job that was deleted concurrently.
+        if not ActionLogExport.objects.filter(
+            pk=export_job.pk,
+            tenant=tenant,
+            status__in=[ActionLogExport.Status.PENDING, ActionLogExport.Status.PROCESSING],
+        ).update(
+            status=ActionLogExport.Status.PROCESSING, started_at=timezone.now(), celery_task_id=self.request.id or ""
+        ):
+            status = (
+                ActionLogExport.objects.filter(pk=export_job.pk, tenant=tenant).values_list('status', flat=True).first()
+            )
+            return {"status": status or "cancelled"}
 
-    # Mark as processing
-    export_job.status = ActionLogExport.Status.PROCESSING
-    export_job.started_at = timezone.now()
-    export_job.celery_task_id = self.request.id or ""
-    export_job.save()
-
+    saved_path = None
+    publication_path = None
+    published = False
     try:
         # Build query based on filters
         filters = export_job.filters or {}
@@ -213,45 +226,65 @@ def export_action_logs(self, export_id: str):
         timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
         content_hash = hashlib.sha256(zip_content).hexdigest()[:12]
         # Filename is relative to the storage location ('exports/')
-        filename = f"action_logs/{export_job.tenant_id}/{timestamp}_{content_hash}.zip"
+        filename = f"action_logs/{export_job.tenant_id}/{timestamp}_{content_hash}_{uuid.uuid4().hex}.zip"
 
-        if not requester_is_authorized():
-            return deny_export()
+        with transaction.atomic():
+            # Deletion holds this same lock while collecting paths and cascading
+            # records. No upload may begin after that snapshot has been taken.
+            tenant = Tenant.objects.select_for_update().filter(pk=export_job.tenant_id).first()
+            if tenant is None:
+                return {"error": "Organization deleted", "status": "cancelled"}
+            current_job = ActionLogExport.objects.filter(pk=export_job.pk, tenant=tenant).first()
+            if current_job is None:
+                return {"error": "Export job deleted", "status": "cancelled"}
+            if current_job.status in [ActionLogExport.Status.COMPLETED, ActionLogExport.Status.FAILED]:
+                return {"status": current_job.status}
+            if not requester_is_authorized():
+                return deny_export()
 
-        # Upload to storage using exports-specific backend (enforces SigV4 for R2)
-        storage = get_exports_storage()
-        saved_path = storage.save(filename, ContentFile(zip_content))
-        logger.info(f"Saved export to {saved_path}")
+            # Upload to storage using exports-specific backend (enforces SigV4 for R2)
+            storage = get_exports_storage()
+            publication_path = filename
+            saved_path = storage.save(filename, ContentFile(zip_content))
+            logger.info(f"Saved export to {saved_path}")
 
-        # Update export job
-        export_job.status = ActionLogExport.Status.COMPLETED
-        export_job.completed_at = timezone.now()
-        export_job.file_path = saved_path
-        export_job.file_size = file_size
-        export_job.log_count = log_count
-        export_job.save()
+            # Update export job
+            export_job.status = ActionLogExport.Status.COMPLETED
+            export_job.completed_at = timezone.now()
+            export_job.file_path = saved_path
+            export_job.file_size = file_size
+            export_job.log_count = log_count
+            export_job.save(
+                update_fields=['status', 'completed_at', 'file_path', 'file_size', 'log_count', 'updated_at']
+            )
 
-        if not requester_is_authorized():
-            storage.delete(saved_path)
-            export_job.file_path = ""
-            export_job.save(update_fields=["file_path"])
-            return deny_export()
+            if not requester_is_authorized():
+                cleanup.schedule_resource_cleanup(
+                    ResourceCleanup.ResourceType.EXPORT_FILE,
+                    organization_id=export_job.tenant_id,
+                    resource_path=saved_path,
+                )
+                export_job.file_path = ""
+                export_job.save(update_fields=["file_path"])
+                return deny_export()
 
-        log_export_result(export_job, "export_completed")
+            log_export_result(export_job, "export_completed")
 
-        # Create notification for the user
-        download_url = export_job.get_download_url()
-        Notification.objects.create(
-            user=export_job.requested_by,
-            type="ACTION_LOG_EXPORT_READY",
-            data={
-                "export_id": str(export_job.id),
-                "tenant_name": export_job.tenant.name,
-                "log_count": log_count,
-                "file_size": file_size,
-                "download_url": download_url,
-            },
-        )
+            # Create notification for the user
+            download_url = export_job.get_download_url()
+            Notification.objects.create(
+                user=export_job.requested_by,
+                type="ACTION_LOG_EXPORT_READY",
+                data={
+                    "export_id": str(export_job.id),
+                    "tenant_name": export_job.tenant.name,
+                    "log_count": log_count,
+                    "file_size": file_size,
+                    "download_url": download_url,
+                },
+            )
+
+        published = True
 
         logger.info(f"Export {export_id} completed successfully with {log_count} logs")
         return {
@@ -262,11 +295,22 @@ def export_action_logs(self, export_id: str):
 
     except Exception as exc:
         logger.exception(f"Export {export_id} failed: {exc}")
-        export_job.status = ActionLogExport.Status.FAILED
-        export_job.error_message = str(exc)
-        export_job.completed_at = timezone.now()
-        export_job.save()
-        log_export_result(export_job, "export_failed")
+        if not published and (saved_path or publication_path):
+            cleanup.schedule_resource_cleanup(
+                ResourceCleanup.ResourceType.EXPORT_FILE,
+                organization_id=export_job.tenant_id,
+                resource_path=saved_path or publication_path,
+            )
+        with transaction.atomic():
+            tenant = Tenant.objects.select_for_update().filter(pk=export_job.tenant_id).first()
+            if tenant is None:
+                return {"error": "Organization deleted", "status": "cancelled"}
+            if not ActionLogExport.objects.filter(pk=export_job.pk, tenant=tenant).update(
+                status=ActionLogExport.Status.FAILED, error_message=str(exc), completed_at=timezone.now()
+            ):
+                return {"error": "Export job deleted", "status": "cancelled"}
+            export_job.status = ActionLogExport.Status.FAILED
+            log_export_result(export_job, "export_failed")
 
         # Notify user of failure
         Notification.objects.create(

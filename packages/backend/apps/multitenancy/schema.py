@@ -572,22 +572,32 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
         if tenant.type == ConstantsTenantType.DEFAULT:
             raise exceptions.GraphQlValidationError("Cannot delete default type tenant.")
 
-        # Gathered before the delete, since the cascade removes the memberships and the rows holding these paths
         tenant_pk = str(tenant.pk)
-        tenant_name = tenant.name
         deleter = info.context.user
-        members = [
-            membership.user
-            for membership in tenant.user_memberships.filter(is_accepted=True, user__isnull=False).select_related(
-                "user__profile"
-            )
-        ]
-        file_paths = [
-            *tenant.backuprecord_set.exclude(file_path="").values_list("file_path", flat=True),
-            *tenant.action_log_exports.exclude(file_path="").values_list("file_path", flat=True),
-        ]
-
         with transaction.atomic():
+            # Workers acquire this same lock before encrypting/uploading and recording
+            # file paths. Collect paths only after any in-flight publisher commits.
+            tenant = models.Tenant.objects.select_for_update().filter(pk=tenant_pk).first()
+            if tenant is None:
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+            # Acquiring the lock can wait for an upload. Recheck authorization
+            # rather than relying only on the permission check before that wait.
+            if not models.has_tenant_access(deleter, tenant) or not models.user_has_permission(
+                deleter, tenant, 'org.delete'
+            ):
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+            tenant_name = tenant.name
+            members = [
+                membership.user
+                for membership in tenant.user_memberships.filter(is_accepted=True, user__isnull=False).select_related(
+                    "user__profile"
+                )
+            ]
+            file_paths = [
+                *tenant.backuprecord_set.exclude(file_path="").values_list("file_path", flat=True),
+                *tenant.action_log_exports.exclude(file_path="").values_list("file_path", flat=True),
+            ]
+
             log_delete(
                 tenant_id=tenant.pk,
                 entity_type="tenant",

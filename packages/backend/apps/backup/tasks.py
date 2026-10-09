@@ -4,13 +4,16 @@ Celery tasks for backup operations.
 
 import hashlib
 import logging
+import uuid
 
 from celery import shared_task
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
 
-from apps.multitenancy.models import Tenant
+from apps.multitenancy.models import Tenant, ResourceCleanup
+from apps.multitenancy.cleanup import schedule_resource_cleanup
 from common.action_logging.service import log_action
 from apps.multitenancy.constants import ActionActorType
 from common.storages import get_exports_storage
@@ -56,20 +59,6 @@ def create_backup(self, tenant_id: str, config_id: str = None, scheduled_at: str
 
     logger.info(f"Starting backup for tenant {tenant_id}")
 
-    try:
-        tenant = Tenant.objects.get(pk=tenant_id)
-    except Tenant.DoesNotExist:
-        logger.error(f"Tenant {tenant_id} not found")
-        return {"error": "Tenant not found", "success": False}
-
-    # Load backup config if provided
-    backup_config = None
-    if config_id:
-        try:
-            backup_config = BackupConfig.objects.get(pk=config_id, tenant=tenant)
-        except BackupConfig.DoesNotExist:
-            logger.warning(f"BackupConfig {config_id} not found, proceeding without config")
-
     # Use scheduled_at for created_at when provided (scheduler trigger) to avoid ~25h drift
     # from worker queue delay. For manual triggers, scheduled_at is None so we use current time.
     record_created_at = timezone.now()
@@ -80,18 +69,25 @@ def create_backup(self, tenant_id: str, config_id: str = None, scheduled_at: str
         except (ValueError, TypeError):
             pass
 
-    # Create backup record
-    backup_record = BackupRecord.objects.create(
-        tenant=tenant,
-        backup_config=backup_config,
-        status=BackupRecord.Status.PROCESSING,
-    )
-    # Django's auto_now_add overrides explicit create(created_at=...), so use update() when
-    # we need a specific timestamp (scheduler's scheduled_at) for correct 24h interval.
-    if scheduled_at:
-        BackupRecord.objects.filter(pk=backup_record.pk).update(created_at=record_created_at)
-        backup_record.refresh_from_db()
+    # Creating the job also takes the organization lock: a stale tenant object
+    # must not create new dependent records after deletion has committed.
+    with transaction.atomic():
+        tenant = Tenant.objects.select_for_update().filter(pk=tenant_id).first()
+        if tenant is None:
+            return {"error": "Organization deleted", "success": False, "status": "cancelled"}
+        backup_config = None
+        if config_id:
+            backup_config = BackupConfig.objects.filter(pk=config_id, tenant=tenant).first()
+        backup_record = BackupRecord.objects.create(
+            tenant=tenant, backup_config=backup_config, status=BackupRecord.Status.PROCESSING
+        )
+        if scheduled_at:
+            BackupRecord.objects.filter(pk=backup_record.pk).update(created_at=record_created_at)
+            backup_record.refresh_from_db()
 
+    saved_path = None
+    publication_path = None
+    published = False
     try:
         # Get module/model selection from config
         selected_modules = backup_config.selected_modules if backup_config else []
@@ -108,38 +104,52 @@ def create_backup(self, tenant_id: str, config_id: str = None, scheduled_at: str
         xml_content = backup_service.generate_xml()
         xml_bytes = xml_content.encode('utf-8')
 
-        # Encrypt backup content
-        encryption_service = get_backup_encryption_service()
-        encrypted_bytes = encryption_service.encrypt_backup(xml_bytes, str(tenant_id))
+        # Content generation is outside the lock. Key creation, upload and the
+        # recorded path form one publication step, serialized with deletion.
+        with transaction.atomic():
+            tenant = Tenant.objects.select_for_update().filter(pk=tenant_id).first()
+            if tenant is None:
+                return {"error": "Organization deleted", "success": False, "status": "cancelled"}
+            backup_record = BackupRecord.objects.filter(pk=backup_record.pk, tenant=tenant).first()
+            if backup_record is None:
+                return {"error": "Backup record deleted", "success": False, "status": "cancelled"}
+            # Encrypt backup content
+            encryption_service = get_backup_encryption_service()
+            encrypted_bytes = encryption_service.encrypt_backup(xml_bytes, str(tenant_id))
 
-        if encrypted_bytes is None:
-            raise Exception("Failed to encrypt backup content")
+            if encrypted_bytes is None:
+                raise Exception("Failed to encrypt backup content")
 
-        file_size = len(encrypted_bytes)
-        is_encrypted = True
+            file_size = len(encrypted_bytes)
+            is_encrypted = True
 
-        # Generate filename with timestamp and hash
-        timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
-        content_hash = hashlib.sha256(encrypted_bytes).hexdigest()[:12]
-        filename = f"tenant_backups/{tenant_id}/{timestamp}_{content_hash}.xml"
+            # Generate filename with timestamp and hash
+            timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+            content_hash = hashlib.sha256(encrypted_bytes).hexdigest()[:12]
+            filename = f"tenant_backups/{tenant_id}/{timestamp}_{content_hash}_{uuid.uuid4().hex}.xml"
 
-        # Save to storage
-        storage = get_exports_storage()
-        saved_path = storage.save(filename, ContentFile(encrypted_bytes))
-        logger.info(f"Saved encrypted backup to {saved_path}")
+            # Save to storage
+            storage = get_exports_storage()
+            publication_path = filename
+            saved_path = storage.save(filename, ContentFile(encrypted_bytes))
+            logger.info(f"Saved encrypted backup to {saved_path}")
 
-        # Verify file was actually saved
-        if not storage.exists(saved_path):
-            raise Exception(f"Backup file was not saved successfully to {saved_path}")
+            # Verify file was actually saved
+            if not storage.exists(saved_path):
+                raise Exception(f"Backup file was not saved successfully to {saved_path}")
 
-        # Update backup record
-        backup_record.status = BackupRecord.Status.COMPLETED
-        backup_record.file_path = saved_path
-        backup_record.file_size = file_size
-        backup_record.is_encrypted = is_encrypted
-        backup_record.model_counts = backup_service.model_counts
-        backup_record.save()
-        log_backup_result(backup_record, "backup_completed")
+            # Update backup record
+            backup_record.status = BackupRecord.Status.COMPLETED
+            backup_record.file_path = saved_path
+            backup_record.file_size = file_size
+            backup_record.is_encrypted = is_encrypted
+            backup_record.model_counts = backup_service.model_counts
+            backup_record.save(
+                update_fields=['status', 'file_path', 'file_size', 'is_encrypted', 'model_counts', 'updated_at']
+            )
+            log_backup_result(backup_record, "backup_completed")
+
+        published = True
 
         # Build link to the backup settings page in the web app (where the user can decrypt & download)
         import os
@@ -225,10 +235,25 @@ def create_backup(self, tenant_id: str, config_id: str = None, scheduled_at: str
 
     except Exception as exc:
         logger.exception(f"Backup failed for tenant {tenant_id}: {exc}")
-        backup_record.status = BackupRecord.Status.FAILED
-        backup_record.error_message = str(exc)
-        backup_record.save()
-        log_backup_result(backup_record, "backup_failed")
+        # A failed publication may already have written its object. Keep cleanup
+        # durable even when the organization/job disappeared in the meantime.
+        if not published and (saved_path or publication_path):
+            schedule_resource_cleanup(
+                ResourceCleanup.ResourceType.EXPORT_FILE,
+                organization_id=tenant_id,
+                resource_path=saved_path or publication_path,
+            )
+        with transaction.atomic():
+            tenant = Tenant.objects.select_for_update().filter(pk=tenant_id).first()
+            if tenant is None:
+                return {"error": "Organization deleted", "success": False, "status": "cancelled"}
+            updated = BackupRecord.objects.filter(pk=backup_record.pk, tenant=tenant).update(
+                status=BackupRecord.Status.FAILED, error_message=str(exc), updated_at=timezone.now()
+            )
+            if not updated:
+                return {"error": "Backup record deleted", "success": False, "status": "cancelled"}
+            backup_record.status = BackupRecord.Status.FAILED
+            log_backup_result(backup_record, "backup_failed")
 
         # Notify user of failure
         try:
