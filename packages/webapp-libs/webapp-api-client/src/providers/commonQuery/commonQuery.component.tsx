@@ -75,7 +75,9 @@ export const CommonQuery = ({ children }: PropsWithChildren) => {
       const isAuthError =
         error.message?.includes('401') ||
         error.message?.includes('Unauthorized') ||
-        graphQLErrors?.some((e) => e.extensions?.['code'] === 'UNAUTHENTICATED');
+        graphQLErrors?.some(
+          (e) => e.extensions?.['code'] === 'UNAUTHENTICATED' || e.extensions?.['code'] === 'not_authenticated'
+        );
 
       if (isAuthError) {
         redirectAttempted.current = true;

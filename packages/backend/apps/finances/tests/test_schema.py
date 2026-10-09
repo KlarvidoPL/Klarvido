@@ -128,7 +128,7 @@ class TestActiveSubscriptionQuery:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_error_for_member_user(
         self,
@@ -372,7 +372,7 @@ class TestCancelActiveSubscriptionMutation:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_error_if_customer_has_no_paid_subscription(
         self, graphene_client, subscription_schedule, user_factory, tenant_membership_factory
@@ -470,7 +470,7 @@ class TestAllPaymentMethodsQuery:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_only_customer_payment_methods_by_member(
         self, graphene_client, customer, payment_method_factory, user_factory, tenant_membership_factory
@@ -542,7 +542,7 @@ class TestUpdateDefaultPaymentMethodMutation:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_fetch_unknown_payment_method_from_stripe(
         self, graphene_client, stripe_request, payment_method_factory, user_factory, tenant_membership_factory
@@ -756,7 +756,7 @@ class TestAllChargesQuery:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_only_customer_charges_by_member(
         self, graphene_client, customer, user_factory, tenant_membership_factory
@@ -858,7 +858,7 @@ class TestChargeQuery:
         executed = graphene_client.query(self.CHARGE_QUERY, variable_values=variable_values)
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_charge_by_member(
         self, graphene_client, customer, charge_factory, user_factory, tenant_membership_factory
@@ -945,7 +945,7 @@ class TestPaymentIntentQuery:
         executed = graphene_client.query(self.PAYMENT_INTENT_QUERY, variable_values=variable_values)
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_error_if_not_users_payment_intent(
         self, graphene_client, customer, payment_intent_factory, user_factory, tenant_membership_factory
@@ -1033,7 +1033,7 @@ class TestCreatePaymentIntentMutation:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_error_if_product_is_not_passed(
         self, graphene_client, user_factory, tenant, tenant_membership_factory
@@ -1148,7 +1148,7 @@ class TestUpdatePaymentIntentMutation:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_error_if_product_belongs_to_other_user(
         self, graphene_client, payment_intent_factory, customer, user_factory, tenant_membership_factory
@@ -1248,7 +1248,7 @@ class TestCreateSetupIntentMutation:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_creates_payment_intent_by_admin(self, graphene_client, user_factory, tenant, tenant_membership_factory):
         user = self._get_user_from_customer_tenant(

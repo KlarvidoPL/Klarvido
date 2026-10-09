@@ -55,7 +55,7 @@ class TestUpdateNotificationMutation:
 
         notification.refresh_from_db()
         assert notification.read_at is None
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     @staticmethod
     def is_ok_response(response_data: dict) -> bool:

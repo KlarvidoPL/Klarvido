@@ -463,7 +463,7 @@ class TestUpdateCurrentUserMutation:
         )
 
         assert len(executed["errors"]) == 1
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
         assert executed["data"] == {'updateCurrentUser': None}
 
 
@@ -515,7 +515,7 @@ class TestChangePasswordMutation:
         )
 
         assert len(executed["errors"]) == 1
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
         assert executed["data"] == {'changePassword': None}
 
     def test_passwordless_account_without_grant_cannot_set_password(self, user, faker):
@@ -895,7 +895,7 @@ class TestGenerateOTPMutation:
         executed = graphene_client.mutate(self.GENERATE_OTP_MUTATION, variable_values={'input': {}})
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_success(self, api_client, user):
         # The default `user` fixture has a usable password, so enabling 2FA for the
@@ -968,7 +968,7 @@ class TestVerifyOTPMutation:
         executed = graphene_client.mutate(self.VERIFY_OTP_MUTATION, variable_values={'input': {'otpToken': 'token'}})
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_success(self, graphene_client, user_factory, totp_mock):
         # Passwordless + no passkeys: first-time enrollment needs no grant.
@@ -1105,7 +1105,7 @@ class TestDisableOTPMutation:
         executed = graphene_client.mutate(self.DISABLE_OTP_MUTATION, variable_values={'input': {}})
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_success(self, api_client, user):
         # Disabling always needs fresh proof, even when 2FA isn't actually active -

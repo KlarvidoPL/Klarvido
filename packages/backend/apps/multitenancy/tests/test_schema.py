@@ -127,7 +127,7 @@ class TestCompanyLookupByNipQuery:
     def test_unauthenticated_user(self, mock_lookup, graphene_client):
         executed = graphene_client.query(self.QUERY, variable_values={"nip": VALID_NIP})
 
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
         mock_lookup.assert_not_called()
 
 
@@ -246,7 +246,7 @@ class TestCreateTenantMutation:
 
     def test_unauthenticated_user(self, graphene_client):
         executed = self.mutate(graphene_client, {"name": "Test", **COMPANY_DETAILS})
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     @classmethod
     def mutate(cls, graphene_client, data):
@@ -492,7 +492,7 @@ class TestUpdateTenantMutation:
                 "name": "Tenant 2",
             },
         )
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_superuser_without_membership_can_update(self, graphene_client, user_factory, tenant_factory):
         """Superuser bypass: owner-equivalent access without a real membership row."""
@@ -599,7 +599,7 @@ class TestDeleteTenantMutation:
     def test_unauthenticated_user(self, graphene_client, tenant_factory):
         tenant = tenant_factory(name="Tenant 1")
         executed = self.mutate(graphene_client, self.input_for(tenant))
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_delete_over_http_resolves_tenant_from_tenant_id(
         self, mocker, user, tenant_factory, tenant_membership_factory
@@ -764,7 +764,7 @@ class TestCreateTenantInvitationMutation:
                 "role": TenantUserRole.ADMIN.upper(),
             },
         )
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_invite_superuser_is_rejected(
         self, graphene_client, user, user_factory, tenant_factory, tenant_membership_factory
@@ -1037,7 +1037,7 @@ class TestDeleteTenantMembershipMutation:
                 "id": to_global_id("TenantMembershipType", tenant_membership.id),
             },
         )
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     @classmethod
     def mutate(cls, graphene_client, data):
@@ -1236,7 +1236,7 @@ class TestUpdateTenantMembershipMutation:
                 "role": "ADMIN",
             },
         )
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_superuser_without_membership_can_update(
         self, graphene_client, user_factory, tenant_factory, tenant_membership_factory
@@ -1484,7 +1484,7 @@ class TestAcceptTenantInvitationMutation:
         executed = self.mutate(
             graphene_client, {"id": to_global_id("TenantMembershipType", membership.id), "token": "token"}
         )
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     @classmethod
     def mutate(cls, graphene_client, data):
@@ -1559,7 +1559,7 @@ class TestDeclineTenantInvitationMutation:
         executed = self.mutate(
             graphene_client, {"id": to_global_id("TenantMembershipType", membership.id), "token": "token"}
         )
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     @classmethod
     def mutate(cls, graphene_client, data):
@@ -1972,7 +1972,7 @@ class TestTenantQuery:
         for tenant_user in tenant_users:
             tenant_membership_factory(tenant=tenant, role=TenantUserRole.MEMBER, user=tenant_user)
         executed = graphene_client.query(query, variable_values={"id": to_global_id("TenantType", tenant.pk)})
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_tenant_query_superuser_without_membership_returns_tenant_with_null_membership(
         self, graphene_client, user_factory, tenant_factory

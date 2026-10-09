@@ -183,7 +183,12 @@ const handleApiErrors = (
     for (const err of graphQLErrors) {
       switch (err.extensions?.['code']) {
         case 'UNAUTHENTICATED':
-          IS_LOCAL_ENV && console.log('[handleApiErrors] UNAUTHENTICATED error, attempting refresh');
+        // Backend's default "must be authenticated" check on a mutation/query field (e.g. an
+        // access token already invalidated by a password change elsewhere, but not yet
+        // naturally expired - see CHECK_REVOKE_TOKEN) - distinct from a genuine, authenticated
+        // permission_denied, which must NOT trigger a refresh (that would just retry forever).
+        case 'not_authenticated':
+          IS_LOCAL_ENV && console.log('[handleApiErrors] unauthenticated error, attempting refresh');
           return callRefresh();
         default:
           IS_LOCAL_ENV && console.log(`[GraphQL error]`, err);

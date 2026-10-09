@@ -383,7 +383,7 @@ class TestCrudDemoItemQuery:
         )
 
         assert executed["errors"]
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_return_none_if_item_does_not_exist(self, graphene_client, user, tenant):
         item_global_id = to_global_id("CrudDemoItemType", "invalid-id")
@@ -791,7 +791,7 @@ class TestDeleteCrudDemoItemMutation:
         )
 
         assert len(executed["errors"]) == 1
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
         assert executed["errors"][0]["path"] == ["deleteCrudDemoItem"]
         assert executed["data"] == {"deleteCrudDemoItem": None}
         assert models.CrudDemoItem.objects.filter(id=crud_demo_item.id).exists()
@@ -947,7 +947,7 @@ class TestDeleteDocumentDemoItemMutation:
         )
 
         assert len(executed["errors"]) == 1
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
         assert executed["errors"][0]["path"] == ["deleteDocumentDemoItem"]
         assert executed["data"] == {"deleteDocumentDemoItem": None}
         assert models.DocumentDemoItem.objects.filter(id=document_demo_item.id).exists()

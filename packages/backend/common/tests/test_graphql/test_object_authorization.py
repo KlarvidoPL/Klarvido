@@ -194,7 +194,7 @@ def test_stacked_permissions_all_execute(mocker):
     resolver = mocker.Mock()
     wrapped = permission_classes(Second)(permission_classes(First)(lambda root, info: resolver()))
     with pytest.raises(PermissionDenied, match='permission_denied'):
-        wrapped(None, SimpleNamespace(context=SimpleNamespace()))
+        wrapped(None, SimpleNamespace(context=SimpleNamespace(user=SimpleNamespace(is_authenticated=True))))
     assert calls == ['first', 'second']
     resolver.assert_not_called()
 
@@ -257,7 +257,9 @@ def test_class_and_field_permissions_accumulate():
             graphene.Field(graphene.String, resolver=lambda root, info: 'secret')
         )
 
-    result = graphene.Schema(query=Query).execute('{ secret }', context_value=SimpleNamespace())
+    result = graphene.Schema(query=Query).execute(
+        '{ secret }', context_value=SimpleNamespace(user=SimpleNamespace(is_authenticated=True))
+    )
     assert result.data == {'secret': None}
     assert result.errors[0].message == 'permission_denied'
     assert calls == ['field', 'class']
