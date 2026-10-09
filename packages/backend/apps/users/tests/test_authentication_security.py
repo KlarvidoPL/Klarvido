@@ -277,6 +277,8 @@ def test_google_initiation_requires_csrf_protected_post():
     csrf = client.get('/api/auth/csrf/').json()['csrfToken']
     with patch('apps.users.views.do_auth') as auth:
         auth.return_value = client.get('/api/auth/csrf/')
-        response = client.post(url, {'csrfmiddlewaretoken': csrf, 'locale': 'pl'})
+        response = client.post(
+            url, {'csrfmiddlewaretoken': csrf, 'locale': 'pl'}, HTTP_ORIGIN='http://testserver'
+        )
     assert response.status_code == 200
     assert auth.call_args.kwargs['user'] is None

@@ -126,7 +126,7 @@ seed/provisioning URL required to display the QR code.
 
 Authentication bodies, headers, OTP material and credential-bearing URL values are filtered before Sentry
 or X-Ray export and in application/server logging. Default monitoring PII capture is disabled. Frontend pages
-use `no-referrer`; reset-link URLs remain usable after refresh. Review historical monitoring records and any
+use `strict-origin`; reset-link URLs remain usable after refresh. Review historical monitoring records and any
 external proxy/CDN logs separately because application filters do not delete previously collected data.
 
 ### Password Forgot

@@ -181,7 +181,7 @@ the original audit behavior.
 ### E11 — Authentication monitoring redaction
 
 - Implemented, verification deferred: error/transaction/breadcrumb hooks sanitize nested and serialized data in backend and frontend. Credential-bearing URL segments/query values are filtered. Bodies, headers and GraphQL variables are discarded; OTP seeds, codes and provisioning material are explicitly sensitive. Default PII collection is disabled and stack locals remain disabled.
-- Django/server log formatting and the X-Ray export emitter sanitize output. Unparseable trace documents are dropped without an unredacted fallback. Frontend nginx access logging omits query strings/referrers and replaces credential-bearing paths. Browser documents and supported response headers use `no-referrer`.
+- Django/server log formatting and the X-Ray export emitter sanitize output. Unparseable trace documents are dropped without an unredacted fallback. Frontend nginx access logging omits query strings/referrers and replaces credential-bearing paths. Browser documents and supported response headers use `strict-origin`.
 - Reset URL routes and refresh behavior remain unchanged; no browser token persistence or extra recovery screen is introduced. These controls govern future application exports. Historical monitoring data, external proxy logs and provider retention require separate operational review.
 - Added deferred synthetic tests for structured/serialized bodies, URL tokens, cookies, OAuth codes, enrollment URLs, malformed documents, logging and tracing boundaries.
 

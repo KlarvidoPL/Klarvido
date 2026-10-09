@@ -302,7 +302,7 @@ services:
       - "traefik.http.middlewares.webapp-headers.headers.stsIncludeSubdomains=true"
       - "traefik.http.middlewares.webapp-headers.headers.contentTypeNosniff=true"
       - "traefik.http.middlewares.webapp-headers.headers.frameDeny=true"
-      - "traefik.http.middlewares.webapp-headers.headers.referrerPolicy=no-referrer"
+      - "traefik.http.middlewares.webapp-headers.headers.referrerPolicy=strict-origin"
       - "traefik.http.routers.webapp.middlewares=webapp-headers"
       # www.DOMAIN -> 301 redirect to bare DOMAIN (same cert resolver, same service)
       - "traefik.http.routers.webapp-www.rule=Host(`www.${DOMAIN}`)"

@@ -45,6 +45,7 @@ services:
     command: ["./scripts/runtime/run_local_celery_worker_default.sh"]
     volumes:
       - ./packages/backend/:/app
+      - ./packages/webapp-libs/webapp-emails/build/email-renderer/:/app/scripts/runtime/email/renderer:ro
       - /app/__pypackages__
       - web_backend_staticfiles:/app/static
     env_file:
