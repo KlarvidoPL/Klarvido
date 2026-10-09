@@ -4,6 +4,7 @@ import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-clie
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { GraphQLError } from 'graphql';
 
 import { RoutesConfig } from '../../../config/routes';
 import { currentUserPermissionsQuery } from '../../../routes/tenantSettings/tenantRoles/tenantRoles.graphql';
@@ -25,6 +26,44 @@ const createPermissionsMock = (permissions: string[] = []) => {
 
 describe('TenantDangerSettings: Component', () => {
   const Component = () => <TenantDangerZone />;
+
+  it('requires OTP and keeps the dialog open for correcting an invalid code', async () => {
+    const user = currentUserFactory({
+      otpEnabled: true,
+      otpVerified: true,
+      tenants: [tenantFactory({ name: 'name', id: MOCKED_TENANT_ID })],
+    });
+    const failed = composeMockedQueryResult(deleteTenantMutation, {
+      variables: { input: { id: MOCKED_TENANT_ID, tenantId: MOCKED_TENANT_ID, otpToken: '123456' } },
+      errors: [
+        new GraphQLError('GraphQlValidationError', {
+          extensions: { otp_token: [{ message: 'Invalid code', code: 'otp_verification_failure' }] },
+        }),
+      ],
+    });
+    render(<Component />, {
+      apolloMocks: [fillCommonQueryWithUser(user), createPermissionsMock(['org.delete']), failed],
+      routerProps: createMockRouterProps(RoutesConfig.tenant.settings.general, { tenantId: MOCKED_TENANT_ID }),
+    });
+    const trigger = await screen.findByRole('button', { name: /delete organization/i });
+    await waitFor(() => expect(trigger).not.toBeDisabled());
+    await userEvent.click(trigger);
+    await userEvent.type(screen.getByLabelText(/Type DELETE name to confirm/i), 'DELETE name');
+    const submit = screen.getByRole('button', { name: /continue/i });
+    expect(submit).toBeDisabled();
+    const code = screen.getByLabelText('Authentication code');
+    await userEvent.type(code, '12345');
+    expect(submit).toBeDisabled();
+    await userEvent.type(code, '6');
+    expect(submit).not.toBeDisabled();
+    await userEvent.click(submit);
+    expect(await screen.findByText('The verification code is invalid.')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    await userEvent.click(trigger);
+    expect(screen.getByLabelText('Authentication code')).toHaveValue('');
+    expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
+  });
 
   it('should render title', async () => {
     const user = currentUserFactory({
@@ -83,9 +122,7 @@ describe('TenantDangerSettings: Component', () => {
 
     // Wait for permissions to load and check for no permission message
     await waitFor(() => {
-      expect(
-        screen.getByText(/You don't have permission to delete this organization/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/You don't have permission to delete this organization/i)).toBeInTheDocument();
     });
   });
 

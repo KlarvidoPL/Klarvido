@@ -2664,6 +2664,7 @@ input UpdateTenantMutationInput {
   clientMutationId: String
 }
 input DeleteTenantMutationInput {
+  otpToken: String
   id: String
   tenantId: String!
   clientMutationId: String

@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.contrib.admin.actions import delete_selected as django_delete_selected
+from django.core.exceptions import PermissionDenied
+from common.graphql.exceptions import GraphQlValidationError
 from django.db import transaction
 
 from . import models
 from .constants import TenantType
-from .services.deletion import delete_organization
+from .services.deletion import delete_organization, require_deletion_otp
 
 
 @admin.register(models.OrganizationDeletionDelivery)
@@ -45,6 +48,51 @@ class ResourceCleanupAdmin(admin.ModelAdmin):
 @admin.register(models.Tenant)
 class TenantAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "type")
+    actions = ['delete_selected']
+    delete_confirmation_template = 'admin/multitenancy/tenant/delete_confirmation.html'
+    delete_selected_confirmation_template = 'admin/multitenancy/tenant/delete_selected_confirmation.html'
+
+    def delete_view(self, request, object_id, extra_context=None):
+        context = dict(extra_context or {})
+        if request.method == 'POST':
+            obj = self.get_object(request, object_id)
+            if obj is not None and not self.has_delete_permission(request, obj):
+                raise PermissionDenied
+            try:
+                # Django wraps delete_view in atomic(). Validate first so failed
+                # OTP attempt counters survive returning the confirmation page.
+                require_deletion_otp(request, getattr(request, 'POST', {}).get('otp_token'))
+            except GraphQlValidationError as exc:
+                context['otp_error'] = str(exc.detail['otp_token'][0])
+                original_method = request.method
+                request.method = 'GET'
+                try:
+                    return super().delete_view(request, object_id, extra_context=context)
+                finally:
+                    request.method = original_method
+        return super().delete_view(request, object_id, extra_context=context)
+
+    @admin.action(description=django_delete_selected.short_description, permissions=['delete'])
+    def delete_selected(self, request, queryset):
+        error = None
+        if request.POST.get('post'):
+            if not self.has_delete_permission(request):
+                raise PermissionDenied
+            try:
+                require_deletion_otp(request, getattr(request, 'POST', {}).get('otp_token'))
+            except GraphQlValidationError as exc:
+                error = str(exc.detail['otp_token'][0])
+        original_post = request.POST
+        if error:
+            request.POST = request.POST.copy()
+            request.POST.pop('post', None)
+        try:
+            response = django_delete_selected(self, request, queryset)
+            if error and response is not None:
+                response.context_data['otp_error'] = error
+            return response
+        finally:
+            request.POST = original_post
 
     def has_delete_permission(self, request, obj=None):
         if obj is not None and obj.type == TenantType.DEFAULT:
@@ -64,9 +112,12 @@ class TenantAdmin(admin.ModelAdmin):
         return []
 
     def delete_model(self, request, obj):
-        delete_organization(obj.pk, request, via_admin=True)
+        delete_organization(obj.pk, request, via_admin=True, otp_token=getattr(request, 'POST', {}).get('otp_token'))
 
     def delete_queryset(self, request, queryset):
+        if not self.has_delete_permission(request):
+            raise PermissionDenied
+        require_deletion_otp(request, getattr(request, 'POST', {}).get('otp_token'))
         # Stable lock ordering prevents bulk deletions deadlocking each other.
         # An error must roll back the entire selection, including cleanup jobs.
         with transaction.atomic():

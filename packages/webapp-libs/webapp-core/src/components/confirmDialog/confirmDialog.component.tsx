@@ -19,7 +19,10 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
 export interface ConfirmDialogProps extends PropsWithChildren {
-  onContinue: (e: MouseEvent<HTMLButtonElement>) => void;
+  onContinue: (e: MouseEvent<HTMLButtonElement>) => void | Promise<boolean | void>;
+  content?: ReactNode;
+  continueDisabled?: boolean;
+  closeOnContinue?: boolean;
   onCancel?: (e: MouseEvent<HTMLButtonElement>) => void;
   title: ReactNode;
   description?: ReactNode;
@@ -52,6 +55,9 @@ export const ConfirmDialog = ({
   onOpenChange: controlledOnOpenChange,
   confirmationText,
   confirmationLabel,
+  content,
+  continueDisabled = false,
+  closeOnContinue = true,
 }: ConfirmDialogProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState('');
@@ -59,7 +65,13 @@ export const ConfirmDialog = ({
   // Support both controlled and uncontrolled modes
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const setOpen = isControlled ? (controlledOnOpenChange || (() => {})) : setInternalOpen;
+  const setOpen = useCallback(
+    (value: boolean) => {
+      if (!isControlled) setInternalOpen(value);
+      controlledOnOpenChange?.(value);
+    },
+    [isControlled, controlledOnOpenChange]
+  );
 
   // Reset the typed confirmation whenever the dialog closes, so reopening starts fresh.
   useEffect(() => {
@@ -84,11 +96,16 @@ export const ConfirmDialog = ({
     [onCancel, setOpen]
   );
   const handleContinue = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      setOpen(false);
-      onContinue(e);
+    async (e: MouseEvent<HTMLButtonElement>) => {
+      if (closeOnContinue) {
+        setOpen(false);
+        onContinue(e);
+      } else {
+        e.preventDefault();
+        if (await onContinue(e)) setOpen(false);
+      }
     },
-    [onContinue, setOpen]
+    [onContinue, setOpen, closeOnContinue]
   );
 
   return (
@@ -124,6 +141,7 @@ export const ConfirmDialog = ({
             />
           </div>
         )}
+        {content}
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>
             {cancelLabel ?? <FormattedMessage id="Confirm Dialog / Cancel label" defaultMessage="Cancel" />}
@@ -131,7 +149,7 @@ export const ConfirmDialog = ({
           <AlertDialogAction
             className={buttonVariants({ variant })}
             onClick={handleContinue}
-            disabled={!isConfirmed}
+            disabled={!isConfirmed || continueDisabled}
           >
             {continueLabel ?? <FormattedMessage id="Confirm Dialog / Continue label" defaultMessage="Continue" />}
           </AlertDialogAction>

@@ -1656,6 +1656,7 @@ export type DeleteTenantMembershipMutationPayload = {
 export type DeleteTenantMutationInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
+  otpToken?: InputMaybe<Scalars['String']['input']>;
   tenantId: Scalars['String']['input'];
 };
 

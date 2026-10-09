@@ -536,6 +536,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
         model = models.Tenant
 
     class Input:
+        otp_token = graphene.String()
         id = graphene.String()
         # Resolved by TenantUserRoleMiddleware (with the membership check) into info.context.tenant - it never falls
         # back to the generic `id`, so without this the requires("org.delete") check has no tenant to evaluate
@@ -566,7 +567,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
         if tenant.type == ConstantsTenantType.DEFAULT:
             raise exceptions.GraphQlValidationError("Cannot delete default type tenant.")
 
-        delete_organization(tenant.pk, info.context)
+        delete_organization(tenant.pk, info.context, otp_token=kwargs.get('otp_token'))
 
         close_old_connections()
 

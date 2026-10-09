@@ -25,13 +25,14 @@ MUTATION = '''
 '''
 
 
-def delete_tenant(graphene_client, user, tenant):
+def delete_tenant(graphene_client, user, tenant, otp_token=None):
     graphene_client.force_authenticate(user)
     graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
     tenant_global_id = to_global_id("TenantType", tenant.id)
-    return graphene_client.mutate(
-        MUTATION, variable_values={"input": {"id": tenant_global_id, "tenantId": tenant_global_id}}
-    )
+    input_data = {"id": tenant_global_id, "tenantId": tenant_global_id}
+    if otp_token is not None:
+        input_data['otpToken'] = otp_token
+    return graphene_client.mutate(MUTATION, variable_values={"input": input_data})
 
 
 @pytest.fixture(autouse=True)

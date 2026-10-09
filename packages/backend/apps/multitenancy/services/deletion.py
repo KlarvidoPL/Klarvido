@@ -8,6 +8,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework.exceptions import PermissionDenied
+from apps.users.models import User
+from apps.users.exceptions import OTPVerificationFailure, OTPAttemptLimitExceeded
+from apps.users.services.otp import validate_otp
+from common.graphql.exceptions import GraphQlValidationError
 
 from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
@@ -21,7 +25,25 @@ from ..constants import ActionActorType, TenantType
 logger = logging.getLogger(__name__)
 
 
-def delete_organization(tenant_id, request, *, via_admin=False):
+def require_deletion_otp(request, otp_token=None):
+    account = User.objects.get(pk=request.user.pk)
+    if not (account.otp_enabled and account.otp_verified):
+        return
+    if getattr(request, '_organization_deletion_otp_verified', None) == (
+        str(account.pk),
+        account.otp_last_used_code_hash,
+    ):
+        return
+    if not otp_token:
+        raise GraphQlValidationError({'otp_token': ['This field is required.']}, code='required')
+    try:
+        validate_otp(account, otp_token, request)
+    except (OTPVerificationFailure, OTPAttemptLimitExceeded) as exc:
+        raise GraphQlValidationError({'otp_token': [str(exc)]}, code=exc.code)
+    request._organization_deletion_otp_verified = (str(account.pk), account.otp_last_used_code_hash)
+
+
+def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None):
     """Lock, authorize, snapshot cleanup/audit work and delete in one transaction."""
     actor_type = (
         (ActionActorType.SUPERUSER if request.user.is_superuser else ActionActorType.USER)
@@ -30,6 +52,19 @@ def delete_organization(tenant_id, request, *, via_admin=False):
     )
     tenant_pk = str(tenant_id)
     deleter = request.user
+    # OTP failures must commit their account-wide attempt counters. Validate
+    # before the deletion transaction, after checking access to the target.
+    target = models.Tenant.objects.filter(pk=tenant_pk).first()
+    if target is None:
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    if via_admin:
+        if not (deleter.is_active and deleter.is_staff and deleter.has_perm('multitenancy.delete_tenant')):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    elif not models.has_tenant_access(deleter, target) or not models.user_has_permission(deleter, target, 'org.delete'):
+        raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    if target.type == TenantType.DEFAULT:
+        raise ValidationError('Cannot delete default type tenant.')
+    require_deletion_otp(request, otp_token)
     with transaction.atomic():
         # Workers acquire this same lock before encrypting/uploading and recording
         # file paths. Collect paths only after any in-flight publisher commits.
@@ -40,6 +75,16 @@ def delete_organization(tenant_id, request, *, via_admin=False):
         # rather than relying only on the permission check before that wait.
         if tenant.type == TenantType.DEFAULT:
             raise ValidationError('Cannot delete default type tenant.')
+        # An upload may have delayed this lock. Recheck the account's current
+        # factor state without consuming another code inside the transaction.
+        account = User.objects.get(pk=deleter.pk)
+        if (
+            account.otp_enabled
+            and account.otp_verified
+            and getattr(request, '_organization_deletion_otp_verified', None)
+            != (str(account.pk), account.otp_last_used_code_hash)
+        ):
+            raise GraphQlValidationError({'otp_token': ['This field is required.']}, code='required')
         if via_admin:
             if not (deleter.is_active and deleter.is_staff and deleter.has_perm('multitenancy.delete_tenant')):
                 raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
