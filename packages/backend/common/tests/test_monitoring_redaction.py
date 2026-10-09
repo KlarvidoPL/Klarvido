@@ -2,8 +2,12 @@ import json
 import logging
 from unittest.mock import Mock
 
+import pytest
+
 from config.monitoring import processor, CredentialSafeFormatter
 from config.tracing import CredentialSafeEmitter
+
+pytestmark = pytest.mark.django_db
 
 
 def event_with_secrets():

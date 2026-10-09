@@ -6,9 +6,8 @@ import pytest
 from django.conf import settings
 from django.test import RequestFactory
 from django.utils import timezone
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied, ValidationError
 from rest_framework.test import APIClient
-from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
 from social_django.models import UserSocialAuth
 
@@ -16,6 +15,7 @@ from apps.sso.constants import SSOAuditEventType
 from apps.sso.models import PasskeyManagementGrant, SSOAuditLog, WebAuthnChallenge
 from apps.sso.services.sessions import SessionService
 from apps.users.models import PendingSocialAccountLink
+from apps.users.authentication import SupportedJWTAuthentication
 from apps.users.services.account_reclaim import reclaim_unconfirmed_account
 
 pytestmark = pytest.mark.django_db
@@ -149,11 +149,11 @@ class TestOutstandingProofsFailAfterReclaim:
 
         reclaim_unconfirmed_account(account, superuser)
 
-        # Direct unit check of the mechanism this relies on: simplejwt's own
-        # CHECK_REVOKE_TOKEN rejects the token the instant it's reconstructed,
-        # independent of any particular endpoint.
-        with pytest.raises(TokenError):
-            AccessToken(access_cookie)
+        # JWT parsing verifies signature/expiry; password revocation is checked when
+        # authentication loads the current account, not when constructing AccessToken.
+        with pytest.raises(AuthenticationFailed) as failure:
+            SupportedJWTAuthentication().get_user(AccessToken(access_cookie))
+        assert failure.value.get_codes() == 'password_changed'
 
         stale_client = APIClient()
         stale_client.cookies[settings.ACCESS_TOKEN_COOKIE] = access_cookie

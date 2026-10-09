@@ -54,7 +54,10 @@ def test_action_flags_organization_memberships_before_reclaiming(admin_client, u
 
 def test_action_shows_no_memberships_when_account_has_none(admin_client, user_factory):
     client, _ = admin_client
-    account = user_factory(is_confirmed=False)
+    account = user_factory.build(is_confirmed=False)
+    account.set_password('synthetic-test-password')
+    account.save()
+    assert not account.tenant_memberships.exists()
 
     response = client.post(
         reverse("admin:users_user_changelist"),

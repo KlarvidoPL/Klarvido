@@ -28,6 +28,9 @@ def test_request_data_redacts_token_keys_at_any_depth():
 
     redacted = monitoring._redact(data)
 
-    assert redacted["variables"]["token"] == "[Filtered]"
+    # Serialized GraphQL bodies are withheld entirely, including non-secret variables.
+    assert redacted["variables"] == "[Filtered]"
+    assert redacted["query"] == "[Filtered]"
     assert redacted["batch"][0]["nested"]["KSEF_TOKEN"] == "[Filtered]"
-    assert redacted["variables"]["tenantId"] == "VGVuYW50VHlwZTox"
+    assert "plaintext-ksef-token" not in str(redacted)
+    assert data["variables"]["token"] == "plaintext-ksef-token"

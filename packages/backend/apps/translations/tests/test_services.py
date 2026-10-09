@@ -10,6 +10,13 @@ from ..services import TranslationPublisher, TranslationSyncer, get_translations
 from .factories import LocaleFactory, EnglishLocaleFactory, TranslationKeyFactory, TranslationFactory
 
 
+@pytest.fixture(autouse=True)
+def isolated_translation_catalog(db):
+    """Service unit tests use their own catalog, independent of migration seed data."""
+    TranslationKey.objects.all().delete()
+    Locale.objects.all().delete()
+
+
 @pytest.fixture
 def english_locale(db):
     return EnglishLocaleFactory()

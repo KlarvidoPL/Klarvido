@@ -2,6 +2,7 @@
 
 import pytest
 from django.conf import settings
+from django.test import RequestFactory
 from django.utils import timezone
 from graphql_relay import to_global_id
 from rest_framework.test import APIClient
@@ -156,8 +157,6 @@ def test_new_notifications_do_not_store_tokens(user, tenant_factory, tenant_memb
 def test_signup_with_invited_email_stays_blocked_until_email_confirmation(
     tenant_factory, tenant_membership_factory, mocker
 ):
-    from types import SimpleNamespace
-
     membership = pending_invitation(None, tenant_factory, tenant_membership_factory)
     membership.invitee_email_address = 'invited-synthetic@example.com'
     membership.save(update_fields=['invitee_email_address'])
@@ -173,9 +172,11 @@ def test_signup_with_invited_email_stays_blocked_until_email_confirmation(
     acceptance = {'input': {'id': to_global_id('TenantMembershipType', str(membership.pk)), 'token': emailed_token}}
     assert execute(client, ACCEPT, acceptance).get('errors')
     notify.assert_not_called()
+    request = RequestFactory().post('/api/graphql/')
+    request.user = user
     confirmation = UserAccountConfirmationSerializer(
         data={'user': str(user.pk), 'token': account_activation_token.make_token(user)},
-        context={'request': SimpleNamespace(user=user)},
+        context={'request': request},
     )
     assert confirmation.is_valid(), confirmation.errors
     confirmation.save()
