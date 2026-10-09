@@ -27,7 +27,7 @@ class TestGenerateSaasIdeasMutation:
         )
 
         assert len(executed["errors"]) == 1
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
         openai_client_mock.get_saas_ideas.assert_not_called()
 
     def test_failure_for_open_api_exception(self, graphene_client, user, input_data, openai_completion_mock):

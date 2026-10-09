@@ -14,6 +14,8 @@ class SupportedJWTAuthentication(authentication.JWTAuthentication):
 
     def get_validated_token(self, raw_token):
         token = super().get_validated_token(raw_token)
+        if token.get('purpose') == 'otp_login':
+            raise InvalidToken('Full authentication is required.')
         if token.get("auth_method") == "sso":
             raise InvalidToken("Enterprise SSO is disabled.")
         return token

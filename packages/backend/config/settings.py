@@ -4,6 +4,7 @@ import os
 import warnings
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 # Suppress pkg_resources deprecation warnings from third-party packages
 # (docutils, etc.) until they release fixes
@@ -164,8 +165,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {"credential_safe": {"()": "config.redaction.CredentialSafeFormatter"}},
     "handlers": {
         "console": {
+            "formatter": "credential_safe",
             "class": "logging.StreamHandler",
         },
     },
@@ -274,8 +277,9 @@ CACHES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "apps.users.services.password_policy.ApplicationPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
@@ -407,9 +411,10 @@ RATE_LIMITS = {
     # Authentication - protect against credential stuffing and abuse
     "auth.login": {"rate": env("RATE_LIMIT_AUTH_LOGIN", default="30/min")},
     "auth.signup": {"rate": env("RATE_LIMIT_AUTH_SIGNUP", default="10/min")},
-    "auth.password_reset": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_RESET", default="5/hour")},
+    "auth.password_reset": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_RESET", default="30/hour")},
     "auth.otp": {"rate": env("RATE_LIMIT_AUTH_OTP", default="10/min")},
     "auth.passkey": {"rate": env("RATE_LIMIT_AUTH_PASSKEY", default="10/min")},
+    "auth.password_change": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_CHANGE", default="10/min")},
     # GraphQL - global limits
     "graphql.global.anon": {"rate": env("RATE_LIMIT_GQL_ANON", default="60/min")},
     "graphql.global.user": {
@@ -518,8 +523,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.social_user",
     "social_core.pipeline.user.get_username",
-    "social_core.pipeline.social_auth.associate_by_email",
-    "social_core.pipeline.user.create_user",
+    "apps.users.pipeline.create_social_user",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "apps.users.pipeline.populate_profile_from_social",
@@ -700,9 +704,8 @@ API_URL = env("API_URL", default="http://localhost:5001")
 # Signature verification is mandatory; no compatibility bypass is supported.
 # Allow origin mismatch during development only
 WEBAUTHN_ALLOW_ORIGIN_MISMATCH = env.bool("WEBAUTHN_ALLOW_ORIGIN_MISMATCH", default=IS_LOCAL_DEBUG)
-# Trust forwarded client IPs only when ingress sanitizes X-Forwarded-For.
-# Zero ignores forwarded headers; set the known number of trusted proxy hops.
-PASSKEY_TRUSTED_PROXY_COUNT = env.int("PASSKEY_TRUSTED_PROXY_COUNT", default=0)
+# Passkey request IPs are resolved through TRUSTED_PROXIES (see above), the same CIDR allow-list
+# used by every other IP resolver in the app - not a passkey-specific setting.
 PASSKEY_MAX_CHALLENGES = env.int("PASSKEY_MAX_CHALLENGES", default=100000)
 PASSKEY_MAX_USER_CHALLENGES = env.int("PASSKEY_MAX_USER_CHALLENGES", default=100)
 # Strict sign count verification (detects cloned authenticators)
@@ -748,6 +751,14 @@ CELERY_BEAT_SCHEDULE = {
     },
     'cleanup-passkey-challenges-every-five-minutes': {
         'task': 'apps.sso.tasks.cleanup_passkey_challenges',
+        'schedule': 300,
+    },
+    'cleanup-social-link-confirmations-every-five-minutes': {
+        'task': 'apps.users.tasks.cleanup_social_link_confirmations',
+        'schedule': 300,
+    },
+    'cleanup-pending-otp-logins-every-five-minutes': {
+        'task': 'apps.users.tasks.cleanup_pending_otp_logins',
         'schedule': 300,
     },
     'cleanup-expired-sessions-daily': {
@@ -801,3 +812,48 @@ EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 # Translations settings
 # Translations use the same storage backend as the rest of the app (STORAGE_BACKEND)
 # No additional configuration needed - uses R2_*, B2_*, MINIO_*, or AWS_* settings automatically
+
+# Privacy defaults for account authentication records (separate from tenant audit retention).
+AUTH_AUDIT_RETENTION_DAYS = env.int("AUTH_AUDIT_RETENTION_DAYS", default=90)
+
+# Single source of truth for which reverse-proxy hops are allowed to supply a client IP via
+# X-Forwarded-For (CIDR list, e.g. the Docker network the Traefik/VPS proxy runs on). Used by
+# every IP resolver in the codebase (common.ratelimiting.utils.get_client_ip and its callers,
+# via _trusted_proxy_networks() there) - an empty list means forwarded headers are never
+# trusted and REMOTE_ADDR (the proxy itself) is used as-is. AUTH_AUDIT_TRUSTED_PROXIES is the
+# older, audit-only name; the resolver checks TRUSTED_PROXIES first and falls back to it live at
+# call time (not aliased once here) so a deployment - or a test overriding either setting - only
+# has to set the one it means. New configuration should set TRUSTED_PROXIES.
+TRUSTED_PROXIES = env.list("TRUSTED_PROXIES", default=[])
+AUTH_AUDIT_TRUSTED_PROXIES = env.list("AUTH_AUDIT_TRUSTED_PROXIES", default=[])
+
+# Replaced by TRUSTED_PROXIES above (a CIDR allow-list, consistent with every other IP resolver)
+# rather than a hop count specific to passkeys. Fail loudly instead of silently ignoring it if a
+# deployment still sets it, so a stale env var doesn't look like it's doing something it isn't.
+if env.str("PASSKEY_TRUSTED_PROXY_COUNT", default=None) is not None:
+    raise ImproperlyConfigured(
+        "PASSKEY_TRUSTED_PROXY_COUNT was replaced by TRUSTED_PROXIES (a CIDR allow-list shared by "
+        "all IP resolvers). Remove it from your environment and set TRUSTED_PROXIES instead."
+    )
+CELERY_BEAT_SCHEDULE.update(
+    {
+        "deliver-security-emails": {"task": "apps.users.tasks.deliver_security_emails", "schedule": 15},
+        "cleanup-authentication-records": {
+            "task": "apps.users.tasks.cleanup_authentication_records",
+            "schedule": 86400,
+        },
+    }
+)
+
+# Bound synchronous SMTP delivery in the durable security-email worker.
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=15)
+
+# Authentication secrets are independent of DJANGO_SECRET_KEY and database backups.
+OTP_ENCRYPTION_KEYS = env("OTP_ENCRYPTION_KEYS", default="")
+OTP_ENCRYPTION_KEYS_FILE = env("OTP_ENCRYPTION_KEYS_FILE", default="")
+AUTH_PASSWORD_RESET_TIMEOUT = env.int("AUTH_PASSWORD_RESET_TIMEOUT", default=3600)
+RESET_EMAIL_COOLDOWN_SECONDS = env.int("RESET_EMAIL_COOLDOWN_SECONDS", default=300)
+RESET_EMAIL_DAILY_LIMIT = env.int("RESET_EMAIL_DAILY_LIMIT", default=5)
+RESET_EMAIL_GLOBAL_HOURLY_LIMIT = env.int("RESET_EMAIL_GLOBAL_HOURLY_LIMIT", default=500)
+
+SECURE_REFERRER_POLICY = "strict-origin"

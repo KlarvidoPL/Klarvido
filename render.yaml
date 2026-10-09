@@ -195,7 +195,15 @@ services:
         sync: false  # Comma-separated list of trusted origins (with https://)
       - key: CORS_ALLOWED_ORIGINS
         sync: false  # Comma-separated list of allowed origins for CORS (e.g., https://webapp-xxxx.onrender.com)
-      
+
+      # Trusted reverse-proxy CIDRs for X-Forwarded-For (IP-based rate limiting, passkey
+      # throttling, auth audit logs). Left unset by default: Render's own load balancer IP is
+      # then used as everyone's client IP, which is safe (not a bypass) but buckets every
+      # visitor together. Only set this to Render's published edge IP ranges if you've verified
+      # them for your region - don't guess a CIDR here.
+      - key: TRUSTED_PROXIES
+        sync: false
+
       # OAuth (set in Render Dashboard if using social auth)
       - key: SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
         sync: false

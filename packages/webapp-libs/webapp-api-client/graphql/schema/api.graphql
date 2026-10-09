@@ -1403,6 +1403,7 @@ type ApiMutation {
   disableOtp(input: DisableOTPMutationInput!): DisableOTPMutationPayload
   markWelcomeModalSeen(input: MarkWelcomeModalSeenMutationInput!): MarkWelcomeModalSeenMutationPayload
   resendConfirmationEmail(input: ResendConfirmationEmailMutationInput!): ResendConfirmationEmailMutationPayload
+  requestPasswordSetLink(input: RequestPasswordSetLinkMutationInput!): RequestPasswordSetLinkMutationPayload
   tokenAuth(input: ObtainTokenMutationInput!): ObtainTokenMutationPayload
   signUp(input: SingUpMutationInput!): SingUpMutationPayload
   confirm(input: ConfirmEmailMutationInput!): ConfirmEmailMutationPayload
@@ -1811,6 +1812,10 @@ type ResendConfirmationEmailMutationPayload {
   ok: Boolean
   clientMutationId: String
 }
+type RequestPasswordSetLinkMutationPayload {
+  ok: Boolean
+  clientMutationId: String
+}
 type ObtainTokenMutationPayload {
   access: String
   refresh: String
@@ -1824,6 +1829,7 @@ type SingUpMutationPayload {
   email: String
   access: String
   refresh: String
+  ok: Boolean!
   authenticated: Boolean!
   clientMutationId: String
 }
@@ -1837,6 +1843,9 @@ type PasswordResetMutationPayload {
 }
 type PasswordResetConfirmationMutationPayload {
   ok: Boolean
+  refresh: String
+  access: String
+  authenticated: Boolean!
   clientMutationId: String
 }
 type ValidateOTPMutationPayload {
@@ -1994,6 +2003,24 @@ enum BackupRestoreRecordConflictStrategyChoices {
 }
 "An enumeration."
 enum SsoSSOAuditLogEventTypeChoices {
+  "Registration request"
+  AUTH_SIGNUP
+  "Email confirmation"
+  AUTH_EMAIL_CONFIRMATION
+  "Password login"
+  AUTH_PASSWORD_LOGIN
+  "Two-factor login challenge"
+  AUTH_OTP_CHALLENGE
+  "Two-factor verification"
+  AUTH_OTP_VERIFICATION
+  "Password reset request"
+  AUTH_PASSWORD_RESET_REQUEST
+  "Password reset"
+  AUTH_PASSWORD_RESET
+  "Password change"
+  AUTH_PASSWORD_CHANGE
+  "Two-factor authentication change"
+  AUTH_OTP_MANAGEMENT
   "IdP Configuration Created"
   IDP_CONFIG_CREATED
   "IdP Configuration Updated"
@@ -2062,6 +2089,12 @@ enum SsoSSOAuditLogEventTypeChoices {
   KSEF_TOKEN_TESTED
   "KSeF Token Deleted"
   KSEF_TOKEN_DELETED
+  "Account Reclaimed by Support"
+  ACCOUNT_RECLAIMED
+  "Two-Factor Authentication Enabled"
+  OTP_ENABLED
+  "Two-Factor Authentication Disabled"
+  OTP_DISABLED
 }
 "An enumeration."
 enum MultitenancyActionLogActionTypeChoices {
@@ -2735,6 +2768,7 @@ input ChangePasswordMutationInput {
   oldPassword: String
   "New password"
   newPassword: String!
+  otpToken: String
   clientMutationId: String
 }
 input UpdateCurrentUserMutationInput {
@@ -2762,6 +2796,9 @@ input MarkWelcomeModalSeenMutationInput {
   clientMutationId: String
 }
 input ResendConfirmationEmailMutationInput {
+  clientMutationId: String
+}
+input RequestPasswordSetLinkMutationInput {
   clientMutationId: String
 }
 input ObtainTokenMutationInput {

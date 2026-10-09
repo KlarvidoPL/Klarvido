@@ -9,3 +9,11 @@ class AccountActivationEmailSerializer(serializers.Serializer):
 class PasswordResetEmailSerializer(serializers.Serializer):
     user_id = serializers.CharField()
     token = serializers.CharField()
+
+
+class SocialAccountLinkedEmailSerializer(serializers.Serializer):
+    provider = serializers.CharField()
+
+
+class NoDataEmailSerializer(serializers.Serializer):
+    pass

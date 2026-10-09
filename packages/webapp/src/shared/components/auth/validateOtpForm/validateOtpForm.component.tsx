@@ -46,6 +46,12 @@ export const ValidateOtpForm = () => {
           id: 'Auth / OTP / Attempt limit',
           defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
         }),
+        // Same id/translation as changePasswordForm's identical code (E06) - OTP validation
+        // also fails closed if the rate limiter itself is unreachable.
+        rate_limit_unavailable: intl.formatMessage({
+          id: 'Auth / Change password / Rate limit unavailable',
+          defaultMessage: 'Sign-in is temporarily unavailable. Please try again shortly.',
+        }),
       },
     },
     defaultValues: {

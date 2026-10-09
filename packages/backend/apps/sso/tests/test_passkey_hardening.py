@@ -145,15 +145,21 @@ def test_cache_failure_blocks_challenge_issuance():
 
 
 def test_forwarded_ip_requires_explicit_proxy_trust(settings):
+    # Hop-count trust (PASSKEY_TRUSTED_PROXY_COUNT) was replaced by the CIDR allow-list
+    # (TRUSTED_PROXIES) shared by every IP resolver in the app - see E06 in
+    # EMAIL_PASSWORD_SECURITY_REVIEW.md and common.ratelimiting.utils.get_client_ip.
     request = APIRequestFactory().get('/', REMOTE_ADDR='192.0.2.10', HTTP_X_FORWARDED_FOR='198.51.100.99, 203.0.113.20')
-    settings.PASSKEY_TRUSTED_PROXY_COUNT = 0
+    settings.TRUSTED_PROXIES = []
     assert client_ip(request) == '192.0.2.10'
-    settings.PASSKEY_TRUSTED_PROXY_COUNT = 1
-    assert client_ip(request) == '203.0.113.20'
-    settings.PASSKEY_TRUSTED_PROXY_COUNT = 2
+    # REMOTE_ADDR is not itself a trusted proxy: the forwarded chain is ignored entirely.
+    settings.TRUSTED_PROXIES = ['198.51.100.0/24']
+    assert client_ip(request) == '192.0.2.10'
+    # REMOTE_ADDR is trusted, and so is the nearest forwarded hop - walk one more.
+    settings.TRUSTED_PROXIES = ['192.0.2.0/24', '203.0.113.0/24']
     assert client_ip(request) == '198.51.100.99'
     request.META['HTTP_X_FORWARDED_FOR'] = 'malformed'
-    settings.PASSKEY_TRUSTED_PROXY_COUNT = 1
+    assert client_ip(request) == '192.0.2.10'
+    request.META['REMOTE_ADDR'] = 'malformed'
     assert client_ip(request) is None
 
 
@@ -195,7 +201,6 @@ def test_cleanup_removes_expired_challenges_and_keeps_live_ones():
         {'COOKIE_SECURE': False},
         {'RATE_LIMITS': {'auth.passkey': {'rate': '0/min'}}},
         {'WEBAUTHN_ALLOWED_ORIGINS': ['https://other.example.com']},
-        {'PASSKEY_TRUSTED_PROXY_COUNT': -1},
         {'PASSKEY_MAX_CHALLENGES': 0},
         {'CACHES': {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}},
     ],

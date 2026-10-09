@@ -55,7 +55,7 @@ class TestPermissionClassesForQueryConnectionField:
 
         executed = graphene_client.query(self.QUERY)
 
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_override_global_policy_for_connection_field(self, graphene_client):
         Query = self.create_query(query_policies=(policies.AnyoneFullAccess,))
@@ -117,7 +117,7 @@ class TestPermissionClassesForQueryField:
 
         executed = graphene_client.query(self.QUERY, variable_values={'id': item_global_id})
 
-        assert executed["errors"][0]["message"] == "permission_denied"
+        assert executed["errors"][0]["message"] == "not_authenticated"
 
     def test_override_global_policy_for_field(self, graphene_client, crud_demo_item):
         Query = self.create_query(query_policies=(policies.AnyoneFullAccess,))
@@ -168,7 +168,7 @@ class TestPermissionClassesForMutationField:
 
         executed = self.call_mutation(graphene_client, tenant)
 
-        assert executed["errors"][0]["message"] == "permission_denied", executed
+        assert executed["errors"][0]["message"] == "not_authenticated", executed
 
     def test_override_global_policy(self, graphene_client, user, tenant):
         Mutation = self.create_mutation(mutation_policies=(policies.AdminFullAccess,))

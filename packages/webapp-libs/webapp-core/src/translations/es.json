@@ -4110,7 +4110,7 @@
     "defaultMessage": "Gestionar SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Ver la configuración de seguridad"
+    "defaultMessage": "Ver conexiones SSO, claves de acceso y configuraciones de seguridad"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Ver configuración de seguridad"
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Demasiados intentos de verificación. Espera un momento e inténtalo de nuevo."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Cancelar vinculación"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "No se pudo cancelar. Inténtalo de nuevo."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Inicia sesión abajo con tu contraseña y un código de doble factor si está activado, o usa una clave de acceso."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "No se pudo completar el inicio de sesión social. Inicia sesión con tu contraseña o una clave de acceso, o inténtalo de nuevo."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Ya existe una cuenta con este correo electrónico, pero aún no se ha verificado."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Si no creaste esta cuenta, escríbenos a {supportEmail} y te ayudaremos a verificar su titularidad."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Si no creaste esta cuenta, contacta con soporte y te ayudaremos a verificar su titularidad."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "Si es tu cuenta, inicia sesión abajo y verifica tu correo electrónico; después, intenta vincular Google de nuevo."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Restablecer tu contraseña"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Si no fuiste tú, restablece tu contraseña inmediatamente."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Se añadió un nuevo método de inicio de sesión a tu cuenta"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Ahora puedes iniciar sesión con {provider} usando este correo electrónico. Si hiciste este cambio, no necesitas hacer nada más. Si no vinculaste {provider}, restablece tu contraseña inmediatamente y contacta con soporte."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "El inicio de sesión con {provider} se vinculó a tu cuenta"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Confirma con tu contraseña y el código de dos factores si está activado, o con una clave de acceso. Al desvincular, se cerrará tu sesión en todos los dispositivos."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Desvincular inicio de sesión social"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Gestiona el inicio de sesión con Google para tu cuenta."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Desvincular"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "Se desvinculó el inicio de sesión social. Vuelve a iniciar sesión."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "No hay cuentas de inicio de sesión social vinculadas."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Añade una contraseña o una clave de acceso antes de desvincular tu último método de inicio de sesión."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "No se pudieron cargar las cuentas vinculadas. Actualiza la página e inténtalo de nuevo."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Cargando cuentas vinculadas…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Usa una clave de acceso existente o establece una contraseña mediante el restablecimiento antes de desvincular."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Cuentas sociales vinculadas"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Conecta Google a tu cuenta"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "Así confirmas que la cuenta es tuya y conectas Google para futuros inicios de sesión. Tus ajustes de autenticación de doble factor no cambian."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Verifica tu correo antes de conectar Google"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "Verifica una clave de acceso existente o introduce la contraseña de tu cuenta{otp} para continuar."
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": " y el código de dos factores"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "o"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "Código de dos factores actual"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "Introduce tu código de dos factores actual para continuar."
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "Contraseña de la cuenta"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "Verifica tu identidad"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "Verificar"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "Verificar con una clave de acceso existente"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "Verificar con contraseña"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "Restablecer tu contraseña"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "Si no fuiste tú, restablece tu contraseña de inmediato."
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "La autenticación de dos factores se ha desactivado en tu cuenta"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "La autenticación de dos factores se acaba de desactivar en tu cuenta. Si realizaste este cambio, no se requiere ninguna otra acción. Si no fuiste tú, restablece tu contraseña de inmediato y contacta con soporte."
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "La autenticación de dos factores se ha desactivado"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "Revisar la seguridad de la cuenta"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "Si no fuiste tú, revisa la seguridad de tu cuenta de inmediato."
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "La autenticación de dos factores se ha activado en tu cuenta"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "La autenticación de dos factores ahora protege tu cuenta - se requerirá un código de verificación además de tu contraseña al iniciar sesión. Si realizaste este cambio, no se requiere ninguna otra acción. Si no fuiste tú, revisa la seguridad de tu cuenta de inmediato y contacta con soporte."
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "La autenticación de dos factores se ha activado"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "Desactivar"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "¿Desactivar la autenticación de dos factores?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "Esto eliminará la capa adicional de seguridad de tu cuenta - puedes volver a activarla en cualquier momento."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Revisa tu correo electrónico"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Si esta dirección puede recibir correos de la cuenta, enviaremos instrucciones. Revisa tu bandeja de entrada y la carpeta de spam. También puedes iniciar sesión abajo."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Volver"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Instrucciones para iniciar sesión"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Ya existe una cuenta con esta dirección. Inicia sesión con tu contraseña actual o clave de acceso. Si olvidaste la contraseña, restablécela en la página de inicio de sesión. Si el correo aún no está verificado, inicia sesión y solicita un correo de verificación antes de conectar Google. Esta solicitud no modificó tu cuenta."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Tu contraseña ha cambiado"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "La contraseña de tu cuenta se cambió o restableció. Si realizaste el cambio, no necesitas hacer nada más. Si no fuiste tú, restablece tu contraseña inmediatamente y contacta con soporte."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Se reemplazó tu autenticación de dos factores"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "Se reemplazó el autenticador que protege tu cuenta. Si realizaste el cambio, no necesitas hacer nada más. Si no fuiste tú, restablece tu contraseña inmediatamente y contacta con soporte."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "No se pudo iniciar el acceso con Google. Inténtalo de nuevo."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Solicitud de registro"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Confirmación de correo"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Acceso con contraseña"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Verificación de acceso de dos factores"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Verificación de dos factores"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Solicitud de restablecimiento de contraseña"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Restablecimiento de contraseña"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Cambio de contraseña"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Cambio de autenticación de dos factores"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Código de autenticación"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "El inicio de sesión no está disponible temporalmente. Vuelve a intentarlo en breve."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Envíame un enlace para configurar una contraseña"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "Esta cuenta aún no tiene contraseña. Te enviaremos un enlace para configurar una."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Algo salió mal. Vuelve a intentarlo."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Te hemos enviado un enlace para configurar tu contraseña."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Demasiados intentos. Vuelve a intentarlo más tarde."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Configurar contraseña"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Este enlace caduca en 1 hora por tu seguridad"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Configura tu contraseña"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Has solicitado configurar una contraseña para tu cuenta. Haz clic en el botón de abajo para elegir una. Si no has realizado esta solicitud, puedes ignorar este correo de forma segura."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Configura tu contraseña"
   }
 }

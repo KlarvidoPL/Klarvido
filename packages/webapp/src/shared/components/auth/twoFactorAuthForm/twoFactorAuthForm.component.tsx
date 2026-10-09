@@ -1,18 +1,21 @@
 import { useMutation } from '@apollo/client/react';
-import { useCommonQuery } from '@sb/webapp-api-client/providers';
+import { getFragmentData } from '@sb/webapp-api-client/graphql';
+import { commonQueryCurrentUserFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
-import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { Badge } from '@sb/webapp-core/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@sb/webapp-core/components/ui/dialog';
 import { useOpenState } from '@sb/webapp-core/hooks';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
 import { reportError } from '@sb/webapp-core/utils/reportError';
+import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
 import { CheckCircle2, Plus, Shield, ShieldOff } from 'lucide-react';
+import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { AddTwoFactorAuth } from '../addTwoFactorAuth';
 import { disableOtpMutation } from './twoFactorAuthForm.graphql';
+import { OtpReauthDialog } from './otpReauthDialog.component';
 
 export type TwoFactorAuthFormProps = {
   isEnabled?: boolean;
@@ -21,9 +24,14 @@ export type TwoFactorAuthFormProps = {
 export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { reload } = useCommonQuery();
+  const { reload, data: commonData } = useCommonQuery();
+  const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser);
+  const { passkeys } = useTenantPasskeys();
+  const canReauthenticate = currentUser?.hasUsablePassword === true || passkeys.length > 0;
 
   const { isOpen: isModalOpen, setIsOpen: setIsModalOpen } = useOpenState(false);
+  const [enrollAuthorization, setEnrollAuthorization] = useState<string | undefined>(undefined);
+  const [pendingReauth, setPendingReauth] = useState<'otp_setup' | 'otp_disable' | null>(null);
   const [commitDisableOtpMutation] = useMutation(disableOtpMutation, { variables: { input: {} } });
 
   const successMessage = intl.formatMessage({
@@ -31,8 +39,10 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
     defaultMessage: 'Two-Factor Auth disabled successfully!',
   });
 
-  const disable2FA = async () => {
-    const { data } = await commitDisableOtpMutation();
+  const disable2FA = async (authorization: string) => {
+    const { data } = await commitDisableOtpMutation({
+      context: { headers: { 'X-Passkey-Authorization': authorization } },
+    });
 
     const isDeleted = data?.disableOtp?.ok;
     if (!isDeleted) return;
@@ -40,6 +50,15 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
     trackEvent('auth', 'otp-disabled');
     toast({ description: successMessage, variant: 'info' });
     reload();
+  };
+
+  const startEnabling2FA = () => {
+    if (canReauthenticate) {
+      setPendingReauth('otp_setup');
+    } else {
+      setEnrollAuthorization(undefined);
+      setIsModalOpen(true);
+    }
   };
 
   return (
@@ -89,33 +108,15 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
                   </p>
                 </div>
               </div>
-              <ConfirmDialog
-                onContinue={() => {
-                  disable2FA().catch(reportError);
-                }}
-                variant="destructive"
-                title={
-                  <FormattedMessage
-                    defaultMessage="Disable two-factor authentication?"
-                    id="Auth / Two-factor / Disable confirm title"
-                  />
-                }
-                description={
-                  <FormattedMessage
-                    defaultMessage="This will remove the extra layer of security from your account. You can re-enable it at any time."
-                    id="Auth / Two-factor / Disable confirm description"
-                  />
-                }
+              <Button
+                variant="ghost"
+                size="sm"
+                className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
+                onClick={() => setPendingReauth('otp_disable')}
               >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive dark:text-red-400"
-                >
-                  <ShieldOff className="mr-2 h-4 w-4" />
-                  <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Disable button" />
-                </Button>
-              </ConfirmDialog>
+                <ShieldOff className="mr-2 h-4 w-4" />
+                <FormattedMessage defaultMessage="Disable" id="Auth / Two-factor / Disable button" />
+              </Button>
             </div>
           </div>
         ) : (
@@ -133,13 +134,29 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
                 id="Auth / Two-factor / Not enabled description"
               />
             </p>
-            <Button onClick={() => setIsModalOpen(true)}>
+            <Button onClick={startEnabling2FA}>
               <Plus className="mr-2 h-4 w-4" />
               <FormattedMessage defaultMessage="Enable 2FA" id="Auth / Two-factor / Setup button" />
             </Button>
           </div>
         )}
       </div>
+
+      <OtpReauthDialog
+        open={pendingReauth !== null}
+        action={pendingReauth ?? 'otp_setup'}
+        onClose={() => setPendingReauth(null)}
+        onAuthorized={(authorization) => {
+          const action = pendingReauth;
+          setPendingReauth(null);
+          if (action === 'otp_disable') {
+            disable2FA(authorization).catch(reportError);
+          } else {
+            setEnrollAuthorization(authorization);
+            setIsModalOpen(true);
+          }
+        }}
+      />
 
       <Dialog
         open={isModalOpen}
@@ -157,7 +174,7 @@ export const TwoFactorAuthForm = ({ isEnabled }: TwoFactorAuthFormProps) => {
               id="Auth / Two-factor / Dialog Description"
             />
           </DialogDescription>
-          <AddTwoFactorAuth closeModal={() => setIsModalOpen(false)} />
+          <AddTwoFactorAuth closeModal={() => setIsModalOpen(false)} authorization={enrollAuthorization} />
         </DialogContent>
       </Dialog>
     </>

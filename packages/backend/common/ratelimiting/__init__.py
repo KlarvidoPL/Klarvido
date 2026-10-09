@@ -42,7 +42,7 @@ from .throttles import (
     AuthenticationThrottle,
 )
 from .websocket import WebSocketRateLimiter
-from .utils import get_client_ip, get_rate_limit_key
+from .utils import get_client_ip, rate_limit_ip, get_rate_limit_key
 
 __all__ = [
     # Configuration
@@ -69,5 +69,6 @@ __all__ = [
     "WebSocketRateLimiter",
     # Utils
     "get_client_ip",
+    "rate_limit_ip",
     "get_rate_limit_key",
 ]

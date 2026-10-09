@@ -4110,7 +4110,7 @@
     "defaultMessage": "إدارة تسجيل الدخول الموحد"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "عرض إعدادات الأمان"
+    "defaultMessage": "عرض اتصالات تسجيل الدخول الموحد ومفاتيح المرور وإعدادات الأمان"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "عرض إعدادات الأمان"
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "محاولات تحقق كثيرة جدًا. يُرجى الانتظار قليلًا ثم المحاولة مرة أخرى."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "إلغاء الربط"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "تعذر الإلغاء. يرجى المحاولة مرة أخرى."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "سجّل الدخول أدناه بكلمة المرور ورمز المصادقة الثنائية إذا كانت مفعّلة، أو استخدم مفتاح مرور."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "تعذر إكمال تسجيل الدخول الاجتماعي. سجّل الدخول بكلمة المرور أو مفتاح مرور، أو حاول مرة أخرى."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "يوجد حساب بهذا البريد الإلكتروني بالفعل، لكنه لم يتم التحقق منه بعد."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "إذا لم تنشئ هذا الحساب، فتواصل معنا عبر {supportEmail} وسنساعدك في التحقق من ملكيته."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "إذا لم تنشئ هذا الحساب، فتواصل مع الدعم وسنساعدك في التحقق من ملكيته."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "إذا كان هذا حسابك، فسجّل الدخول أدناه وتحقق من بريدك الإلكتروني، ثم حاول ربط Google مرة أخرى."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "تمت إضافة طريقة جديدة لتسجيل الدخول إلى حسابك"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "يمكنك الآن تسجيل الدخول باستخدام {provider} عبر هذا البريد الإلكتروني. إذا أجريت هذا التغيير، فلا يلزمك اتخاذ أي إجراء آخر. إذا لم تربط {provider}، فأعد تعيين كلمة المرور فورًا وتواصل مع الدعم."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "تم ربط تسجيل الدخول باستخدام {provider} بحسابك"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "أكد بكلمة مرور حسابك ورمز المصادقة الثنائية إذا كانت مفعّلة، أو بمفتاح مرور. سيؤدي إلغاء الربط إلى تسجيل خروجك من جميع الأجهزة."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "إلغاء ربط تسجيل الدخول الاجتماعي"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "إدارة تسجيل الدخول عبر Google لحسابك."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "إلغاء الربط"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "تم إلغاء ربط تسجيل الدخول الاجتماعي. يرجى تسجيل الدخول مرة أخرى."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "لا توجد حسابات مرتبطة لتسجيل الدخول الاجتماعي."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "أضف كلمة مرور أو مفتاح مرور قبل إلغاء ربط آخر طريقة لتسجيل الدخول."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "تعذر تحميل الحسابات المرتبطة. حدّث الصفحة وحاول مرة أخرى."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "جارٍ تحميل الحسابات المرتبطة…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "استخدم مفتاح مرور موجودًا، أو عيّن كلمة مرور عبر إعادة تعيينها قبل إلغاء الربط."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "الحسابات الاجتماعية المرتبطة"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "اربط Google بحسابك"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "يؤكد ذلك ملكيتك للحساب ويربط Google لتسجيل الدخول مستقبلاً. تبقى إعدادات المصادقة الثنائية دون تغيير."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "تحقّق من بريدك الإلكتروني قبل ربط Google"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "تحقق من مفتاح مرور موجود أو أدخل كلمة مرور حسابك{otp} للمتابعة."
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": " ورمز المصادقة الثنائية"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "أو"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "رمز المصادقة الثنائية الحالي"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "أدخل رمز المصادقة الثنائية الحالي للمتابعة."
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "كلمة مرور الحساب"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "تحقق من هويتك"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "تحقق"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "تحقق باستخدام مفتاح مرور موجود"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "تحقق باستخدام كلمة المرور"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "إذا لم يكن هذا أنت، فأعد تعيين كلمة المرور فورًا."
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "تم تعطيل المصادقة الثنائية على حسابك"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "تم للتو تعطيل المصادقة الثنائية لحسابك. إذا كنت قد قمت بهذا التغيير، فلا حاجة لاتخاذ أي إجراء إضافي. إذا لم يكن ذلك أنت، فأعد تعيين كلمة المرور فورًا وتواصل مع الدعم."
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "تم تعطيل المصادقة الثنائية"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "مراجعة أمان الحساب"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "إذا لم يكن هذا أنت، فراجع أمان حسابك فورًا."
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "تم تفعيل المصادقة الثنائية على حسابك"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "تحمي المصادقة الثنائية الآن حسابك - سيُطلب رمز تحقق بالإضافة إلى كلمة المرور عند تسجيل الدخول. إذا كنت قد قمت بهذا التغيير، فلا حاجة لاتخاذ أي إجراء إضافي. إذا لم يكن ذلك أنت، فراجع أمان حسابك فورًا وتواصل مع الدعم."
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "تم تفعيل المصادقة الثنائية"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "تعطيل"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "هل تريد تعطيل المصادقة الثنائية؟"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "سيؤدي هذا إلى إزالة طبقة الأمان الإضافية من حسابك - يمكنك إعادة تفعيلها في أي وقت."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "تحقق من بريدك الإلكتروني"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "إذا كان هذا العنوان يمكنه تلقي رسائل الحساب، فسنرسل التعليمات. تحقق من صندوق الوارد ومجلد الرسائل غير المرغوب فيها. يمكنك أيضًا تسجيل الدخول أدناه."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "رجوع"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "تعليمات تسجيل الدخول إلى الحساب"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "يوجد حساب يستخدم هذا البريد الإلكتروني بالفعل. سجّل الدخول بكلمة المرور الحالية أو مفتاح المرور. إذا نسيت كلمة المرور، فأعد تعيينها من صفحة تسجيل الدخول. إذا لم يتم التحقق من بريدك بعد، فسجّل الدخول واطلب رسالة تحقق قبل ربط Google. لم يغيّر هذا الطلب حسابك."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "تم تغيير كلمة مرورك"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "تم تغيير كلمة مرور حسابك أو إعادة تعيينها. إذا أجريت هذا التغيير، فلا يلزم إجراء آخر. إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا واتصل بالدعم."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "تم استبدال المصادقة الثنائية لحسابك"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "تم استبدال تطبيق المصادقة الذي يحمي حسابك. إذا أجريت هذا التغيير، فلا يلزم إجراء آخر. إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا واتصل بالدعم."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "تعذر بدء تسجيل الدخول عبر Google. حاول مرة أخرى."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "طلب تسجيل"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "تأكيد البريد الإلكتروني"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "تسجيل الدخول بكلمة المرور"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "طلب تحقق ثنائي لتسجيل الدخول"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "التحقق الثنائي"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "طلب إعادة تعيين كلمة المرور"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "إعادة تعيين كلمة المرور"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "تغيير كلمة المرور"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "تغيير المصادقة الثنائية"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "رمز المصادقة"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "تسجيل الدخول غير متاح مؤقتًا. حاول مرة أخرى قريبًا."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "أرسل لي رابطًا لتعيين كلمة مرور"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "لا يحتوي هذا الحساب على كلمة مرور بعد. سنرسل لك رابطًا لتعيين واحدة."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "حدث خطأ ما. حاول مرة أخرى."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "لقد أرسلنا لك رابطًا لتعيين كلمة المرور الخاصة بك."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "عدد المحاولات كبير جدًا. حاول مرة أخرى لاحقًا."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "تعيين كلمة المرور"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "ينتهي صلاحية هذا الرابط في غضون ساعة واحدة لأمانك"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "قم بتعيين كلمة مرورك"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "لقد طلبت تعيين كلمة مرور لحسابك. انقر على الزر أدناه لاختيار واحدة. إذا لم تقم بهذا الطلب، يمكنك تجاهل هذا البريد الإلكتروني بأمان."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "قم بتعيين كلمة مرورك"
   }
 }

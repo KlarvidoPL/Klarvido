@@ -73,7 +73,7 @@ All rate limits can be overridden via environment variables:
 # Authentication
 RATE_LIMIT_AUTH_LOGIN=30/min
 RATE_LIMIT_AUTH_SIGNUP=10/min
-RATE_LIMIT_AUTH_PASSWORD_RESET=5/hour
+RATE_LIMIT_AUTH_PASSWORD_RESET=30/hour
 
 # GraphQL global limits
 RATE_LIMIT_GQL_ANON=60/min
@@ -121,7 +121,7 @@ RATE_LIMITS = {
 | --------------------- | ------- | ----------------------- |
 | `auth.login`          | 30/min  | Login attempts (by IP)  |
 | `auth.signup`         | 10/min  | Signup requests (by IP) |
-| `auth.password_reset` | 5/hour  | Password reset requests |
+| `auth.password_reset` | 30/hour | Password reset requests |
 | `auth.otp`            | 10/min  | OTP validation attempts |
 | `auth.passkey`        | 10/min  | Passkey authentication  |
 

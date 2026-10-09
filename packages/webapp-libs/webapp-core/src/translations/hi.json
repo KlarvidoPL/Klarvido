@@ -4110,7 +4110,7 @@
     "defaultMessage": "SSO प्रबंधित करें"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "सुरक्षा कॉन्फ़िगरेशन देखें"
+    "defaultMessage": "SSO कनेक्शन, पासकी और सुरक्षा कॉन्फ़िगरेशन देखें"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "सुरक्षा सेटिंग्स देखें"
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "सत्यापन के बहुत अधिक प्रयास हुए हैं। कृपया कुछ देर प्रतीक्षा करें और फिर कोशिश करें।"
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "लिंक करना रद्द करें"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "रद्द नहीं किया जा सका। कृपया फिर से कोशिश करें।"
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "नीचे अपने पासवर्ड और, यदि चालू है, दो-कारक कोड से साइन इन करें या पासकी का उपयोग करें।"
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "सोशल साइन-इन पूरा नहीं हुआ। पासवर्ड या पासकी से साइन इन करें, या फिर से कोशिश करें।"
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "इस ईमेल वाला खाता पहले से मौजूद है, लेकिन अभी सत्यापित नहीं हुआ है।"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "यदि आपने यह खाता नहीं बनाया है, तो {supportEmail} पर हमसे संपर्क करें। हम खाते का स्वामित्व सत्यापित करने में मदद करेंगे।"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "यदि आपने यह खाता नहीं बनाया है, तो सहायता टीम से संपर्क करें। हम खाते का स्वामित्व सत्यापित करने में मदद करेंगे।"
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "यदि यह आपका खाता है, तो नीचे साइन इन करें और अपना ईमेल सत्यापित करें, फिर Google को दोबारा जोड़ने की कोशिश करें।"
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "अपना पासवर्ड रीसेट करें"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "यदि यह आपने नहीं किया, तो तुरंत अपना पासवर्ड रीसेट करें।"
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "आपके खाते में साइन-इन का नया तरीका जोड़ा गया है"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "अब आप इस ईमेल पते से {provider} का उपयोग करके साइन इन कर सकते हैं। यदि आपने यह बदलाव किया है, तो कुछ और करने की ज़रूरत नहीं है। यदि आपने {provider} नहीं जोड़ा है, तो तुरंत पासवर्ड रीसेट करें और सहायता टीम से संपर्क करें।"
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "{provider} साइन-इन आपके खाते से जोड़ दिया गया है"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "अपने खाते के पासवर्ड और दो-कारक कोड (यदि सक्षम है), या पासकी से पुष्टि करें। अलग करने पर सभी डिवाइस से साइन आउट हो जाएगा।"
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "सोशल साइन-इन अलग करें"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "अपने खाते के लिए Google साइन-इन प्रबंधित करें।"
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "अलग करें"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "सोशल साइन-इन अलग कर दिया गया है। कृपया फिर से साइन इन करें।"
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "कोई सोशल साइन-इन खाता जुड़ा नहीं है।"
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "साइन-इन का आखिरी तरीका अलग करने से पहले पासवर्ड या पासकी जोड़ें।"
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "जुड़े खाते लोड नहीं हो सके। पेज रीफ़्रेश करके फिर से कोशिश करें।"
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "जुड़े खाते लोड हो रहे हैं…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "अलग करने से पहले मौजूदा पासकी इस्तेमाल करें या पासवर्ड रीसेट करके पासवर्ड सेट करें।"
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "जुड़े सोशल खाते"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Google को अपने खाते से जोड़ें"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "इससे पुष्टि होगी कि खाता आपका है और भविष्य में साइन इन करने के लिए Google जुड़ जाएगा। आपकी दो-कारक प्रमाणीकरण सेटिंग नहीं बदलेंगी।"
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Google जोड़ने से पहले ईमेल सत्यापित करें"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "जारी रखने के लिए किसी मौजूदा पासकी को सत्यापित करें या अपना खाता पासवर्ड{otp} दर्ज करें।"
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": " और टू-फैक्टर कोड"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "या"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "वर्तमान टू-फैक्टर कोड"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "जारी रखने के लिए अपना वर्तमान टू-फैक्टर कोड दर्ज करें।"
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "खाता पासवर्ड"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "अपनी पहचान सत्यापित करें"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "सत्यापित करें"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "मौजूदा पासकी से सत्यापित करें"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "पासवर्ड से सत्यापित करें"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "अपना पासवर्ड रीसेट करें"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "यदि यह आप नहीं थे, तो तुरंत अपना पासवर्ड रीसेट करें।"
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "आपके खाते पर टू-फैक्टर प्रमाणीकरण अक्षम कर दिया गया है"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "आपके खाते के लिए टू-फैक्टर प्रमाणीकरण अभी बंद कर दिया गया है। यदि आपने यह बदलाव किया है, तो आगे कोई कार्रवाई करने की आवश्यकता नहीं है। यदि यह आप नहीं थे, तो तुरंत अपना पासवर्ड रीसेट करें और सहायता टीम से संपर्क करें।"
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "टू-फैक्टर प्रमाणीकरण अक्षम कर दिया गया है"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "खाता सुरक्षा की समीक्षा करें"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "यदि यह आप नहीं थे, तो तुरंत अपने खाते की सुरक्षा की समीक्षा करें।"
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "आपके खाते पर टू-फैक्टर प्रमाणीकरण सक्षम कर दिया गया है"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "टू-फैक्टर प्रमाणीकरण अब आपके खाते की सुरक्षा कर रहा है - साइन इन करते समय आपके पासवर्ड के अतिरिक्त एक सत्यापन कोड आवश्यक होगा। यदि आपने यह बदलाव किया है, तो आगे कोई कार्रवाई करने की आवश्यकता नहीं है। यदि यह आप नहीं थे, तो तुरंत अपने खाते की सुरक्षा की समीक्षा करें और सहायता टीम से संपर्क करें।"
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "टू-फैक्टर प्रमाणीकरण सक्षम कर दिया गया है"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "अक्षम करें"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "क्या टू-फैक्टर प्रमाणीकरण अक्षम करें?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "इससे आपके खाते से सुरक्षा की अतिरिक्त परत हट जाएगी - आप इसे किसी भी समय फिर से सक्षम कर सकते हैं।"
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "अपना ईमेल देखें"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "यदि इस पते पर खाते के ईमेल भेजे जा सकते हैं, तो हम निर्देश भेजेंगे। अपना इनबॉक्स और स्पैम फ़ोल्डर देखें। आप नीचे साइन इन भी कर सकते हैं।"
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "वापस"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "खाते में साइन इन करने के निर्देश"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "इस ईमेल पते से पहले से एक खाता जुड़ा है। अपने मौजूदा पासवर्ड या पासकी से साइन इन करें। पासवर्ड भूल गए हैं तो साइन इन पृष्ठ से उसे रीसेट करें। ईमेल अभी सत्यापित नहीं है तो Google जोड़ने से पहले साइन इन करके सत्यापन ईमेल माँगें। इस अनुरोध से आपका खाता नहीं बदला है।"
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "आपका पासवर्ड बदल दिया गया है"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "आपके खाते का पासवर्ड बदला या रीसेट किया गया है। यदि यह आपने किया है, तो कुछ और करने की जरूरत नहीं है। अन्यथा तुरंत पासवर्ड रीसेट करें और सहायता से संपर्क करें।"
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "आपका दो-कारक प्रमाणीकरण बदल दिया गया है"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "आपके खाते की सुरक्षा करने वाला प्रमाणक बदल दिया गया है। यदि यह आपने किया है, तो कुछ और करने की जरूरत नहीं है। अन्यथा तुरंत पासवर्ड रीसेट करें और सहायता से संपर्क करें।"
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Google साइन इन शुरू नहीं हो सका। कृपया फिर से कोशिश करें।"
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "पंजीकरण अनुरोध"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "ईमेल की पुष्टि"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "पासवर्ड से साइन इन"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "दो-कारक साइन इन चुनौती"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "दो-कारक सत्यापन"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "पासवर्ड रीसेट अनुरोध"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "पासवर्ड रीसेट"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "पासवर्ड परिवर्तन"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "दो-कारक प्रमाणीकरण में बदलाव"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "प्रमाणीकरण कोड"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "साइन-इन अभी अस्थायी रूप से अनुपलब्ध है। कृपया कुछ समय बाद पुनः प्रयास करें।"
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "मुझे पासवर्ड सेट करने के लिए लिंक भेजें"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "इस खाते में अभी तक पासवर्ड नहीं है। हम आपको एक सेट करने के लिए लिंक भेजेंगे।"
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।"
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "हमने आपको आपका पासवर्ड सेट करने के लिए एक लिंक भेजा है।"
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "बहुत अधिक प्रयास। बाद में पुनः प्रयास करें।"
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "पासवर्ड सेट करें"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "आपकी सुरक्षा के लिए यह लिंक 1 घंटे में समाप्त हो जाएगा"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "अपना पासवर्ड सेट करें"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "आपने अपने खाते के लिए पासवर्ड सेट करने का अनुरोध किया है। एक चुनने के लिए नीचे दिए गए बटन पर क्लिक करें। यदि आपने यह अनुरोध नहीं किया है, तो आप इस ईमेल को सुरक्षित रूप से अनदेखा कर सकते हैं।"
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "अपना पासवर्ड सेट करें"
   }
 }

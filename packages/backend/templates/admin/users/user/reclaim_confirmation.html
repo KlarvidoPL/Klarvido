@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% translate 'Reclaim unconfirmed account' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if ineligible %}
+    <p>{% translate "Only unconfirmed accounts can be reclaimed. Remove the following from your selection and try again:" %}</p>
+    <ul>
+        {% for user in ineligible %}
+        <li>{{ user.email }} ({% translate "already confirmed" %})</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>
+        {% translate "This permanently revokes the selected accounts' current password, OTP, all passkeys, all active sessions and any linked social (Google) identity. Only use this after verifying out of band (e.g. a support conversation) that the requester owns the mailbox. Organization memberships and profile data are kept for manual review." %}
+    </p>
+    <h2>{% translate "Accounts" %}</h2>
+    <ul>
+        {% for user in queryset %}
+        <li>
+            {{ user.email }}
+            {% if user.reclaim_memberships %}
+            <br>
+            <strong>{% translate "Organization memberships (kept, review manually):" %}</strong>
+            <ul>
+                {% for membership in user.reclaim_memberships %}
+                <li>{{ membership.tenant.name }} &mdash; {{ membership.get_role_display }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <br>
+            <em>{% translate "No organization memberships." %}</em>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <p>{% translate "A password-reset email will be sent to each address so its rightful owner can regain access." %}</p>
+    <form method="post">{% csrf_token %}
+    <div>
+    {% for user in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ user.pk|unlocalize }}">
+    {% endfor %}
+    <input type="hidden" name="action" value="reclaim_unconfirmed_account">
+    <input type="hidden" name="post" value="yes">
+    <input type="submit" value="{% translate 'Yes, reclaim these accounts' %}">
+    <a href="{% url opts|admin_urlname:'changelist' %}" class="button cancel-link">{% translate "No, take me back" %}</a>
+    </div>
+    </form>
+{% endif %}
+{% endblock %}

@@ -4,6 +4,7 @@ export const authRequestPasswordResetConfirmMutation = gql(/* GraphQL */ `
   mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {
     passwordResetConfirm(input: $input) {
       ok
+      authenticated
     }
   }
 `);

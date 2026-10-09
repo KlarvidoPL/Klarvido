@@ -1,6 +1,8 @@
 from rest_framework.exceptions import APIException
 from rest_framework.views import exception_handler
 
+from common.ratelimiting.utils import rate_limit_ip
+
 
 def custom_exception_handler(exc, context):
     """
@@ -20,8 +22,7 @@ def custom_exception_handler(exc, context):
 
 
 def get_client_ip(request):
-    """Retrieve client ip from x-forwarded-for header in case of load balancer usage"""
-    if x_forwarded_for := request.META.get("x-forwarded-for"):
-        return x_forwarded_for.split(",")[0]
-
-    return request.META["REMOTE_ADDR"]
+    """Used as RATELIMIT_IP_META_KEY (django-ratelimit's `key="ip"` resolver) - delegates to the
+    single trusted-proxy-aware resolver shared by every other IP lookup in the app, instead of
+    trusting an unconditionally client-supplied X-Forwarded-For header."""
+    return rate_limit_ip(request)

@@ -4110,7 +4110,7 @@
     "defaultMessage": "管理单点登录"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "查看安全配置"
+    "defaultMessage": "查看 SSO 连接、通行密钥和安全配置"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "查看安全设置"
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "验证尝试次数过多。请稍候再试。"
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "取消关联"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "无法取消，请重试。"
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "请在下方使用密码及双重验证代码（如已启用）登录，或使用通行密钥。"
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "无法完成社交登录。请使用密码或通行密钥登录，或重试。"
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "该电子邮件地址对应的账户已存在，但尚未验证。"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "如果您没有创建此账户，请通过 {supportEmail} 联系我们，我们将帮助验证账户归属。"
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "如果您没有创建此账户，请联系支持人员，我们将帮助验证账户归属。"
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "如果这是您的账户，请在下方登录并验证电子邮件地址，然后再次尝试关联 Google。"
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "重置密码"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "如果不是您操作的，请立即重置密码。"
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "您的账户新增了一种登录方式"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "您现在可以使用此电子邮件地址通过 {provider} 登录。如果是您进行的更改，无需采取其他操作。如果您没有关联 {provider}，请立即重置密码并联系支持人员。"
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "{provider} 登录已关联到您的账户"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "请使用账户密码及已启用的双重验证代码，或通行密钥进行确认。取消关联将使您在所有设备上退出登录。"
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "取消关联社交登录"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "管理您账户的 Google 登录方式。"
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "取消关联"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "社交登录已取消关联，请重新登录。"
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "尚未关联任何社交登录账户。"
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "取消关联最后一种登录方式前，请先添加密码或通行密钥。"
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "无法加载已关联账户，请刷新页面后重试。"
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "正在加载已关联账户…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "请使用现有通行密钥，或先通过密码重置设置密码，再取消关联。"
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "已关联的社交账户"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "将 Google 关联到您的账户"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "这将确认账户属于您，并关联 Google 以便今后登录。您的双重验证设置将保持不变。"
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "关联 Google 前请先验证邮箱"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "验证现有的通行密钥或输入您的账户密码{otp}以继续。"
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": "和双重验证码"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "或"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "当前的双重验证码"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "输入您当前的双重验证码以继续。"
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "账户密码"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "验证您的身份"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "验证"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "使用现有通行密钥验证"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "使用密码验证"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "重置您的密码"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "如果这不是您本人操作，请立即重置密码。"
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "您账户的双重验证已被禁用"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "您账户的双重验证刚刚被关闭。如果是您本人进行了此更改，则无需采取进一步操作。如果不是您，请立即重置密码并联系支持团队。"
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "双重验证已被禁用"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "查看账户安全"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "如果这不是您本人操作，请立即查看您的账户安全。"
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "您账户的双重验证已启用"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "双重验证现已保护您的账户——登录时除密码外还需要验证码。如果是您本人进行了此更改，则无需采取进一步操作。如果不是您，请立即查看账户安全并联系支持团队。"
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "双重验证已启用"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "禁用"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "要禁用双重验证吗？"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "这将移除您账户的额外安全层——您可以随时重新启用它。"
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "查看你的电子邮件"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "如果此地址可以接收账户邮件，我们将发送操作说明。请查看收件箱和垃圾邮件文件夹。你也可以在下方登录。"
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "返回"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "账户登录说明"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "此电子邮件地址已有关联账户。请使用原密码或通行密钥登录。如果忘记密码，请在登录页面重置密码。如果邮箱尚未验证，请登录并请求验证邮件，然后再关联 Google。此次请求没有更改你的账户。"
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "你的密码已更改"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "你的账户密码已更改或重置。如果是你本人操作，无需采取进一步行动。如果不是，请立即重置密码并联系支持团队。"
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "你的双重身份验证方式已替换"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "保护你账户的身份验证器已替换。如果是你本人操作，无需采取进一步行动。如果不是，请立即重置密码并联系支持团队。"
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "无法开始 Google 登录。请重试。"
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "注册请求"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "邮箱确认"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "密码登录"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "双重登录验证"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "双重身份验证"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "密码重置请求"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "密码重置"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "密码更改"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "双重身份验证更改"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "验证码"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "登录暂时不可用，请稍后重试。"
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "给我发送设置密码的链接"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "该账户尚未设置密码。我们将向您发送一个链接以设置密码。"
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "出了点问题，请重试。"
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "我们已向您发送了设置密码的链接。"
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "尝试次数过多，请稍后再试。"
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "设置密码"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "为了您的安全，此链接将在1小时后失效"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "设置您的密码"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "您请求为您的账户设置密码。点击下面的按钮选择密码。如果这不是您本人的请求，可以安全地忽略此邮件。"
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "设置您的密码"
   }
 }

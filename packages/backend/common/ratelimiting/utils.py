@@ -4,9 +4,11 @@ Rate Limiting Utilities.
 Helper functions for rate limiting operations.
 """
 
+import ipaddress
 import logging
 from typing import Optional, Union
 
+from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpRequest
 
@@ -15,38 +17,75 @@ from .constants import RateLimitKey
 
 logger = logging.getLogger(__name__)
 
+# Unresolvable/unparseable peers must still land in a single stable rate-limit bucket rather
+# than bypassing the limit entirely - see rate_limit_ip() below.
+UNKNOWN_IP_BUCKET = "unknown"
 
-def get_client_ip(request: HttpRequest) -> str:
+
+def _trusted_proxy_networks():
+    # TRUSTED_PROXIES is the canonical setting; AUTH_AUDIT_TRUSTED_PROXIES (the older,
+    # audit-only name) is read as a fallback live at call time, not aliased once at settings
+    # load - so a deployment (or a test) only has to set the one it means, and overriding
+    # either one via Django's `settings` object at runtime is honored immediately.
+    raw = getattr(settings, "TRUSTED_PROXIES", None) or getattr(settings, "AUTH_AUDIT_TRUSTED_PROXIES", None) or []
+    networks = []
+    for value in raw:
+        try:
+            networks.append(ipaddress.ip_network(value))
+        except ValueError:
+            logger.warning("Ignoring invalid trusted-proxy entry: %s", value)
+    return networks
+
+
+def get_client_ip(request: HttpRequest) -> Optional[str]:
     """
-    Get client IP address from request.
-
-    Handles common proxy headers (X-Forwarded-For, X-Real-IP) for
-    deployments behind load balancers or reverse proxies.
+    The single trusted-proxy-aware client IP resolver used across the codebase (rate limiting,
+    passkey throttling, authentication audit logging). X-Forwarded-For is only trusted through
+    hops that match a network in settings.TRUSTED_PROXIES - an attacker-controlled browser can
+    set that header to anything, so without a configured trust chain it is ignored entirely and
+    the direct peer (REMOTE_ADDR) is used. Walks the forwarded chain right-to-left (closest hop
+    first), continuing past each hop that is itself a trusted proxy and stopping at the first
+    hop that isn't (or the start of the chain).
 
     Args:
-        request: Django HttpRequest object
+        request: Django HttpRequest object (or an object with a `._request` attribute wrapping
+            one, e.g. GraphQL's info.context)
 
     Returns:
-        Client IP address string
+        Client IP address string, or None if REMOTE_ADDR itself cannot be parsed.
     """
-    # X-Forwarded-For header (most common)
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        # Take the first IP (client IP before any proxies)
-        return x_forwarded_for.split(",")[0].strip()
+    if request is None:
+        return None
+    request = getattr(request, "_request", request)
+    try:
+        peer = ipaddress.ip_address(request.META.get("REMOTE_ADDR", ""))
+    except ValueError:
+        return None
 
-    # X-Real-IP header (nginx)
-    x_real_ip = request.META.get("HTTP_X_REAL_IP")
-    if x_real_ip:
-        return x_real_ip.strip()
+    networks = _trusted_proxy_networks()
+    if networks and any(peer in network for network in networks):
+        chain = request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")
+        for raw in reversed(chain):
+            raw = raw.strip()
+            if not raw:
+                continue
+            try:
+                candidate = ipaddress.ip_address(raw)
+            except ValueError:
+                break
+            peer = candidate
+            if not any(peer in network for network in networks):
+                break
 
-    # CF-Connecting-IP (Cloudflare)
-    cf_connecting_ip = request.META.get("HTTP_CF_CONNECTING_IP")
-    if cf_connecting_ip:
-        return cf_connecting_ip.strip()
+    return str(peer)
 
-    # Direct connection
-    return request.META.get("REMOTE_ADDR", "127.0.0.1")
+
+def rate_limit_ip(request: HttpRequest) -> str:
+    """Never-None variant of get_client_ip() for building rate-limit cache keys, where a bare
+    None would either collide every unresolvable client into the literal string "None" or (if a
+    caller treats None as "skip limiting") bypass the limit outright. Use this, not
+    get_client_ip(), whenever the result becomes part of a rate-limit identifier."""
+    return get_client_ip(request) or UNKNOWN_IP_BUCKET
 
 
 def get_user_id(request: HttpRequest) -> Optional[str]:
@@ -111,25 +150,25 @@ def get_rate_limit_key(
 
     # Determine the identifier based on key type
     if key_type == RateLimitKey.IP:
-        identifier = get_client_ip(request)
+        identifier = rate_limit_ip(request)
     elif key_type == RateLimitKey.USER:
         identifier = get_user_id(request)
         if not identifier:
             # Fall back to IP if not authenticated
-            identifier = f"anon:{get_client_ip(request)}"
+            identifier = f"anon:{rate_limit_ip(request)}"
     elif key_type == RateLimitKey.USER_OR_IP:
         identifier = get_user_id(request)
-        identifier = f"ip:{get_client_ip(request)}" if not identifier else f"user:{identifier}"
+        identifier = f"ip:{rate_limit_ip(request)}" if not identifier else f"user:{identifier}"
     elif key_type == RateLimitKey.TENANT:
         identifier = get_tenant_id(request)
         if not identifier:
-            identifier = f"no_tenant:{get_client_ip(request)}"
+            identifier = f"no_tenant:{rate_limit_ip(request)}"
     elif key_type == RateLimitKey.USER_TENANT:
-        user_id = get_user_id(request) or f"anon:{get_client_ip(request)}"
+        user_id = get_user_id(request) or f"anon:{rate_limit_ip(request)}"
         tenant_id = get_tenant_id(request) or "no_tenant"
         identifier = f"{user_id}:{tenant_id}"
     else:
-        identifier = get_client_ip(request)
+        identifier = rate_limit_ip(request)
 
     # Build the cache key
     parts = ["ratelimit"]

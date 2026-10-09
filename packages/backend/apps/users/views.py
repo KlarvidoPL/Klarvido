@@ -5,21 +5,39 @@ from apps.sso.services import SessionService
 from config import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.http import require_POST
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt import views as jwt_views, tokens as jwt_tokens
 from rest_framework_simplejwt.views import TokenViewBase
-from social_core.actions import do_complete
+from social_core.actions import do_complete, do_auth
+from social_core.exceptions import AuthException
 from social_django.utils import psa
 
 from common.csrf import enforce_api_csrf
 
 from .jwt import get_jti_from_refresh_token
 from . import serializers, utils
+from .services.social_linking import login_redirect, cancel_link, LINK_COOKIE
+from .services.otp_login import begin_otp_login
 
 logger = logging.getLogger(__name__)
+
+
+class CancelSocialLinkView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        enforce_api_csrf(request)
+        cancel_link(request)
+        response = Response({'ok': True})
+        response['Cache-Control'] = 'no-store'
+        response.delete_cookie(LINK_COOKIE, samesite=settings.COOKIE_SAMESITE)
+        return response
 
 
 class CookieTokenRefreshView(jwt_views.TokenRefreshView):
@@ -91,6 +109,15 @@ class LogoutView(TokenViewBase):
 
 
 @never_cache
+@csrf_protect
+@require_POST
+@psa("social:complete")
+def begin(request, backend):
+    # Sign-in must not implicitly associate with an ambient Django admin session.
+    return do_auth(request.backend, redirect_name=REDIRECT_FIELD_NAME, user=None)
+
+
+@never_cache
 @csrf_exempt
 @psa("social:complete")
 def complete(request, backend, *args, **kwargs):
@@ -100,7 +127,7 @@ def complete(request, backend, *args, **kwargs):
         user.backend = "{0}.{1}".format(backend.__module__, backend.__class__.__name__)
 
         if user.otp_verified and user.otp_enabled:
-            otp_auth_token = utils.generate_otp_auth_token(user)
+            otp_auth_token = begin_otp_login(user, "oauth")
             backend.strategy.set_otp_auth_token(otp_auth_token)
         else:
             with transaction.atomic():
@@ -133,12 +160,15 @@ def complete(request, backend, *args, **kwargs):
     # ambient request.user here would make "Sign in with Google" silently associate
     # (and log back into) the *current* session's user regardless of which Google
     # account was picked, instead of the account that identity actually belongs to.
-    return do_complete(
-        request.backend,
-        _do_login,
-        user=None,
-        redirect_name=REDIRECT_FIELD_NAME,
-        request=request,
-        *args,  # noqa: B026
-        **kwargs,
-    )
+    try:
+        return do_complete(
+            request.backend,
+            _do_login,
+            user=None,
+            redirect_name=REDIRECT_FIELD_NAME,
+            request=request,
+            *args,  # noqa: B026
+            **kwargs,
+        )
+    except AuthException:
+        return login_redirect(request, 'failed')

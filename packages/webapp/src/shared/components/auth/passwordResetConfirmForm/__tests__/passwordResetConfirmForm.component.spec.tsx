@@ -1,3 +1,4 @@
+import { fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils/fixtures';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { screen } from '@testing-library/react';
@@ -42,17 +43,23 @@ describe('PasswordResetConfirmForm: Component', () => {
     <PasswordResetConfirmForm {...defaultProps} {...props} />
   );
 
-  it('should show success message if action completes successfully', async () => {
+  it('should show success message and sign the browser in (E04/forgot-password UX)', async () => {
+    // Completing this is as strong a proof as a password, so the mutation now signs this
+    // browser in immediately (fresh cookies) instead of sending the user back to /login to
+    // type the password they just set - the frontend reflects that by refetching currentUser.
     const requestMock = composeMockedQueryResult(authRequestPasswordResetConfirmMutation, {
       variables: defaultVariables,
       data: {
         passwordResetConfirm: {
           ok: true,
+          authenticated: true,
         },
       },
     });
-    render(<Component />, {
-      apolloMocks: append(requestMock),
+    const refreshQueryMock = fillCommonQueryWithUser();
+
+    const { waitForApolloMocks } = render(<Component />, {
+      apolloMocks: (defaultMocks) => defaultMocks.concat(requestMock, refreshQueryMock),
     });
 
     await fillForm();
@@ -61,6 +68,8 @@ describe('PasswordResetConfirmForm: Component', () => {
     const toast = await screen.findByTestId('toast-1');
     expect(toast).toHaveTextContent('Password reset successfully!');
     expect(trackEvent).toHaveBeenCalledWith('auth', 'reset-password-confirm');
+
+    await waitForApolloMocks();
   });
 
   it('should show error if required value is missing', async () => {

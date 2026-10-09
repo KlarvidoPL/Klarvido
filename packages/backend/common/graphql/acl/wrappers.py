@@ -4,11 +4,12 @@ from typing import Type, Callable
 import graphene
 from graphene.relay.node import NodeField
 from graphene.types import Field
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.request import Request
 from . import types
 
 PERMISSION_DENIED_MESSAGE = "permission_denied"
+NOT_AUTHENTICATED_MESSAGE = "not_authenticated"
 
 
 def check_permissions(perms: types.PermissionsClasses, request: Request | dict, root):
@@ -17,6 +18,15 @@ def check_permissions(perms: types.PermissionsClasses, request: Request | dict, 
         return
     for permission_class in perms:
         if not permission_class().has_permission(request=request, view=root):
+            # Distinguish "no session at all" (including one invalidated by a password
+            # change - CHECK_REVOKE_TOKEN - but not yet naturally expired) from "authenticated
+            # but genuinely lacks this permission". The frontend only attempts a silent
+            # token-refresh-then-redirect-to-login recovery for the former; conflating the two
+            # into one generic permission_denied previously left a stale second-browser session
+            # showing a raw, untranslated error instead of being signed out.
+            user = getattr(request, "user", None)
+            if not user or not user.is_authenticated:
+                raise NotAuthenticated(NOT_AUTHENTICATED_MESSAGE)
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
 
 

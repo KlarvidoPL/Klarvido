@@ -5,6 +5,7 @@ import os
 from multiprocessing import cpu_count
 
 import environ
+from .redaction import CredentialSafeFormatter
 
 env = environ.Env(
     # set casting, default value
@@ -42,6 +43,8 @@ bind = f"0.0.0.0:{port}"
 max_requests = 1000
 max_requests_jitter = 50  # Prevent all workers from restarting at once
 accesslog = "-"
+# Avoid OAuth query parameters, referrers, and raw user-agent values.
+access_log_format = '%(m)s %(U)s %(s)s %(b)s'
 errorlog = "-"
 workers = max_workers()
 worker_class = "uvicorn.workers.UvicornWorker"
@@ -50,8 +53,13 @@ timeout = 120  # Increase timeout for slow requests
 
 class HealthCheckFilter(logging.Filter):
     def filter(self, record):
-        return not record.args["a"].startswith("ELB-HealthChecker")
+        if isinstance(record.args, dict):
+            return not record.args.get("a", "").startswith("ELB-HealthChecker")
+        return True
 
 
 def on_starting(server):
     server.log.access_log.addFilter(HealthCheckFilter())
+    for logger in (server.log.access_log, server.log.error_log):
+        for handler in logger.handlers:
+            handler.setFormatter(CredentialSafeFormatter())

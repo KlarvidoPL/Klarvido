@@ -155,6 +155,7 @@ describe('useWebAuthn', () => {
       );
       expect(get.mock.calls[0][0].publicKey.userVerification).toBe('required');
       expect(JSON.parse(fetchMock.mock.calls[1][1]?.body as string)).toEqual({
+        action: 'register',
         challenge: 'AQ',
         credentialId: 'AQ',
         authenticatorData: 'Ag',
@@ -283,15 +284,63 @@ it.each([
   [403, 'incorrect_otp'],
   [403, 'otp_locked'],
   [429, 'rate_limited'],
-])('retains a safe reauthentication code for status %s: %s', async (status, code) => {
+])(
+  'retains a safe reauthentication code for status %s: %s',
+  async (status, code) => {
+    const fetchMock = jest.mocked(csrfFetch);
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      status,
+      json: async () => ({ code, error: 'private server detail' }),
+    } as Response);
+    const { result } = renderHook(() => useWebAuthn());
+    await expect(
+      result.current.authorizePasskeyChange(
+        'register',
+        undefined,
+        'password',
+        '123456',
+      ),
+    ).rejects.toMatchObject({ code, message: 'Fresh authentication failed' });
+    fetchMock.mockReset();
+  },
+);
+
+it('binds password unlink verification to the selected association and includes API cookies', async () => {
+  const fetchMock = jest.mocked(csrfFetch);
+  fetchMock.mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ success: true }),
+  } as Response);
+  const { result } = renderHook(() => useWebAuthn());
+  await result.current.unlinkSocialAccount('17', 'password', '012345');
+  expect(fetchMock).toHaveBeenCalledWith(
+    expect.stringContaining('/auth/social-accounts/unlink/'),
+    expect.objectContaining({
+      credentials: 'include',
+      body: JSON.stringify({
+        associationId: '17',
+        password: 'password',
+        otpToken: '012345',
+      }),
+    }),
+  );
+  fetchMock.mockReset();
+});
+
+it('preserves the unlink verification failure code without leaking server details', async () => {
   const fetchMock = jest.mocked(csrfFetch);
   fetchMock.mockResolvedValueOnce({
     ok: false,
-    status,
-    json: async () => ({ code, error: 'private server detail' }),
+    status: 403,
+    json: async () => ({ code: 'otp_locked', error: 'private detail' }),
   } as Response);
   const { result } = renderHook(() => useWebAuthn());
-  await expect(result.current.authorizePasskeyChange('register', undefined, 'password', '123456'))
-    .rejects.toMatchObject({ code, message: 'Fresh authentication failed' });
+  await expect(
+    result.current.unlinkSocialAccount('17', 'password', '012345'),
+  ).rejects.toMatchObject({
+    code: 'otp_locked',
+    message: 'Fresh authentication failed',
+  });
   fetchMock.mockReset();
 });

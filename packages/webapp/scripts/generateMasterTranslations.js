@@ -18,22 +18,23 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-const OUTPUT_PATH = path.join(
-  __dirname,
-  '../../webapp-libs/webapp-core/src/translations/master.json'
-);
+const OUTPUT_PATH = path.join(__dirname, '../../webapp-libs/webapp-core/src/translations/master.json');
 
-const EN_TRANSLATIONS_PATH = path.join(
-  __dirname,
-  '../../webapp-libs/webapp-core/src/translations/en.json'
-);
+const EN_TRANSLATIONS_PATH = path.join(__dirname, '../../webapp-libs/webapp-core/src/translations/en.json');
 
 function generateMasterTranslations() {
   console.log('🔍 Extracting translations from source files...');
   console.log('');
 
+  const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'klarvido-intl-'));
+  const extractedPath = path.join(temporaryDirectory, 'extracted.json');
   try {
+    const previousMaster = fs.existsSync(OUTPUT_PATH) ? JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')) : {};
+    const previousEnglish = fs.existsSync(EN_TRANSLATIONS_PATH)
+      ? JSON.parse(fs.readFileSync(EN_TRANSLATIONS_PATH, 'utf8'))
+      : {};
     // Run formatjs extract with extended format to get descriptions
     // Using explicit file patterns to ensure all webapp-libs are included
     // Glob patterns must NOT have extra quotes when shell expansion is used
@@ -67,31 +68,35 @@ function generateMasterTranslations() {
       '**/*.spec.tsx',
       '**/*.spec.ts',
       '**/tests/mocks/**',
-      ...sourcePatterns.map(p => p.replace(/\*\*\/\*\.\{ts,tsx\}$/, '**/*.d.ts')),
+      ...sourcePatterns.map((p) => p.replace(/\*\*\/\*\.\{ts,tsx\}$/, '**/*.d.ts')),
     ];
 
     const command = [
       'npx formatjs extract',
-      ...sourcePatterns.map(p => `'${p}'`),
+      ...sourcePatterns.map((p) => `'${p}'`),
       "--id-interpolation-pattern '[sha512:contenthash:base64:6]'",
-      `--out-file '${OUTPUT_PATH}'`,
-      ...ignorePatterns.map(p => `--ignore '${p}'`),
+      `--out-file '${extractedPath}'`,
+      ...ignorePatterns.map((p) => `--ignore '${p}'`),
     ].join(' ');
 
     execSync(command, {
       cwd: path.join(__dirname, '..'),
       stdio: 'inherit',
-      shell: '/bin/bash',  // Ensure proper shell with glob expansion
+      shell: '/bin/bash', // Ensure proper shell with glob expansion
     });
 
     // Check if the file was created
-    if (!fs.existsSync(OUTPUT_PATH)) {
+    if (!fs.existsSync(extractedPath)) {
       throw new Error('Master translations file was not created');
     }
 
     // Read and count keys
-    const content = fs.readFileSync(OUTPUT_PATH, 'utf8');
-    const translations = JSON.parse(content);
+    const extracted = JSON.parse(fs.readFileSync(extractedPath, 'utf8'));
+    // Dynamic IDs and manually registered messages cannot all be statically extracted.
+    // Remove retired keys explicitly from master.json rather than deleting them here.
+    const translations = { ...previousMaster, ...extracted };
+    const content = JSON.stringify(translations, null, 2) + '\n';
+    fs.writeFileSync(OUTPUT_PATH, content, 'utf8');
     const keyCount = Object.keys(translations).length;
 
     console.log('');
@@ -101,17 +106,26 @@ function generateMasterTranslations() {
     console.log('');
 
     // Also update en.json with the same content for bundled fallback
-    fs.writeFileSync(EN_TRANSLATIONS_PATH, content, 'utf8');
+    const english = Object.fromEntries(
+      Object.entries(translations).map(([key, message]) => [
+        key,
+        previousEnglish[key] && previousMaster[key]?.defaultMessage === message.defaultMessage
+          ? previousEnglish[key]
+          : message,
+      ])
+    );
+    fs.writeFileSync(EN_TRANSLATIONS_PATH, JSON.stringify(english, null, 2) + '\n', 'utf8');
     console.log(`   Also updated: ${EN_TRANSLATIONS_PATH}`);
     console.log('');
 
     return true;
-
   } catch (error) {
     console.error('❌ Failed to generate master translations:', error.message);
-    process.exit(1);
+    process.exitCode = 1;
+    return false;
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
   }
 }
 
 generateMasterTranslations();
-

@@ -11,7 +11,8 @@ interface ImportMetaEnv {
   readonly VITE_CONTENTFUL_TOKEN: string;
   readonly VITE_STRIPE_PUBLISHABLE_KEY: string;
   readonly VITE_GOOGLE_ANALYTICS_TRACKING_ID: string;
-  
+  readonly VITE_SUPPORT_EMAIL: string;
+
   // Enterprise Authentication Feature Flags
   readonly VITE_ENABLE_PASSKEYS: string;
   readonly VITE_ENABLE_SOCIAL_LOGIN: string;

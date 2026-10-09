@@ -1,6 +1,7 @@
 import copy
 
 from django.db import transaction
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from apps.sso.models import SSOSession
 
@@ -8,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.conf import settings
 from django.contrib import auth as dj_auth
-from django.contrib.auth import password_validation, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
 from django.utils.translation import gettext as _
 from graphql_relay import from_global_id, to_global_id
@@ -21,11 +22,18 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.utils import get_md5_hash_password
 from common.decorators import context_user_required
 
+from apps.sso.services import passkey_management
+
 from . import models, tokens, jwt, notifications
+from .exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure, PasswordBudgetExceeded
+from .services.security import enqueue_email, record
+from .services.password_recovery import admit_reset
+from .services.password_policy import validate_password
+from .services.password_budget import check_password as check_password_budget, clear as clear_password_budget
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
-from .utils import generate_otp_auth_token
+from .services.otp_login import begin_otp_login, consume_pending_login, find_pending_login
 
 UPLOADED_AVATAR_SIZE_LIMIT = 5 * 1024 * 1024
 
@@ -69,6 +77,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSignupSerializer(serializers.ModelSerializer):
+    ok = serializers.BooleanField(read_only=True)
     id = rest.HashidSerializerCharField(source_field="users.User.id", read_only=True)
     email = serializers.EmailField(
         validators=[validators.UniqueValidator(queryset=dj_auth.get_user_model().objects.all())],
@@ -83,11 +92,14 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = dj_auth.get_user_model()
-        fields = ("id", "email", "password", "language", "access", "refresh")
+        fields = ("id", "email", "password", "language", "access", "refresh", "ok")
 
-    def validate_password(self, password):
-        password_validation.validate_password(password)
-        return password
+    def validate(self, attrs):
+        try:
+            validate_password(attrs['password'], models.User(email=attrs['email']))
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError({'password': serializers.as_serializer_error(error)['non_field_errors']})
+        return attrs
 
     def create(self, validated_data):
         language = validated_data.get("language") or ""
@@ -106,11 +118,15 @@ class UserSignupSerializer(serializers.ModelSerializer):
         if jwt_api_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, user)
 
-        notifications.AccountActivationEmail(
-            user=user, data={"user_id": user.id.hashid, "token": tokens.account_activation_token.make_token(user)}
-        ).send()
+        enqueue_email(user, 'ACCOUNT_ACTIVATION')
 
-        return {"id": user.id, "email": user.email, "access": str(refresh.access_token), "refresh": str(refresh)}
+        return {
+            "ok": True,
+            "id": user.id,
+            "email": user.email,
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        }
 
 
 class UserAccountConfirmationSerializer(serializers.Serializer):
@@ -144,10 +160,15 @@ class UserAccountConfirmationSerializer(serializers.Serializer):
 
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = validated_data.pop("user")
-        user.is_confirmed = True
-        user.save()
+        # Serialize with support recovery and recheck against current credentials.
+        user = models.User.objects.select_for_update().get(pk=validated_data['user'].pk)
+        self.validate({**validated_data, 'user': user})
+        if not user.is_confirmed:
+            user.is_confirmed = True
+            user.save(update_fields=['is_confirmed'])
+            record('auth_email_confirmation', request=self.context.get('request'), user=user)
         return {"ok": True}
 
 
@@ -168,39 +189,107 @@ class ResendConfirmationEmailSerializer(serializers.Serializer):
         return {"ok": True}
 
 
+class RequestPasswordSetLinkSerializer(serializers.Serializer):
+    """First password on a passwordless account with no passkey and no 2FA (E04) - the only
+    case with no stronger factor available to prove freshness with a grant, so it gets a
+    one-time emailed link instead, reusing the existing password-reset token/confirmation flow
+    (the token is bound to the account's current - unusable - password hash exactly like a
+    normal reset, so it works identically and dies the moment a password exists)."""
+
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ok = serializers.BooleanField(read_only=True)
+
+    def validate(self, attrs):
+        if attrs["user"].has_usable_password():
+            raise exceptions.ValidationError(_("This account already has a password."))
+        return attrs
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+        event = record('auth_password_set_link', request=self.context.get('request'), user=user)
+        enqueue_email(user, 'PASSWORD_SET', event=event)
+        return {"ok": True}
+
+
 class UserAccountChangePasswordSerializer(serializers.Serializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     old_password = serializers.CharField(write_only=True, required=False, allow_blank=True, help_text=_("Old password"))
     new_password = serializers.CharField(write_only=True, help_text=_("New password"))
+    # Only meaningful when changing an *already-set* password on an account with 2FA enabled
+    # (E04) - the old password alone is exactly what a hijacked session or a phished credential
+    # already has; the current OTP code is the second factor that proves this is really the
+    # account owner, not just whoever holds the old password.
+    otp_token = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     refresh = serializers.CharField(read_only=True)
     access = serializers.CharField(read_only=True)
 
-    def validate_new_password(self, new_password):
-        password_validation.validate_password(new_password)
-        return new_password
-
     def validate(self, attrs):
         user = attrs["user"]
+        request = self.context.get("request")
 
         # An OAuth-only account has no password to check against - Django sets it
         # "unusable" on signup, and check_password() would always return False for
-        # it, so a first-time password set must skip this rather than being
-        # permanently locked out of ever adding one.
+        # it, so this is a first-time password *set*, not a change.
         if user.has_usable_password():
             old_password = attrs.get("old_password")
             if not old_password:
                 raise exceptions.ValidationError({"old_password": _("This field is required.")}, "required")
-            if not user.check_password(old_password):
+
+            # Account-wide failure budget (E05), shared with login - guessing the old password
+            # here is exactly as much a brute-force avenue as the login form itself.
+            try:
+                correct = check_password_budget(user.email, lambda: user.check_password(old_password))
+            except PasswordBudgetExceeded as exc:
+                raise exceptions.ValidationError({"old_password": str(exc)}, code="too_many_attempts")
+            if not correct:
                 raise exceptions.ValidationError({"old_password": _("Wrong old password")}, "wrong_password")
 
+            if user.otp_enabled and user.otp_verified:
+                otp_token = attrs.get("otp_token")
+                if not otp_token:
+                    raise exceptions.ValidationError({"otp_token": _("This field is required.")}, "required")
+                try:
+                    otp_services.validate_otp(user, otp_token, request)
+                except (OTPVerificationFailure, OTPAttemptLimitExceeded) as exc:
+                    raise exceptions.ValidationError({"otp_token": str(exc)}, code=exc.code)
+        else:
+            # First-ever password on a passwordless account (E04): a bare session is not
+            # fresh-auth proof - a hijacked/left-open session could otherwise plant a
+            # permanent password on an account the attacker doesn't actually own. Reuses the
+            # same one-use, action-bound grant 2FA setup/disable already requires (passkey
+            # ceremony, or - only when the account has no passkey either - its current OTP
+            # code). An account with none of those (no password, no passkey, no 2FA) cannot
+            # produce any grant and must use the emailed set-password link instead
+            # (RequestPasswordSetLinkSerializer / the existing password-reset-confirm flow).
+            with transaction.atomic():
+                grant = passkey_management.require_grant(request, user, "password_set")
+                passkey_management.consume_grant(grant)
+
+        try:
+            validate_password(attrs['new_password'], user)
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError(
+                {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
+            )
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
         user = validated_data.pop("user")
         new_password = validated_data.pop("new_password")
+        validated_data.pop("otp_token", None)
+        was_passwordless = not user.has_usable_password()
         user.set_password(new_password)
         user.save()
+        clear_password_budget(user.email)
+        event = record(
+            'auth_password_change',
+            request=self.context.get('request'),
+            user=user,
+            outcome='password_set' if was_passwordless else 'changed',
+        )
+        enqueue_email(user, 'PASSWORD_CHANGED', event=event)
 
         refresh = jwt_tokens.RefreshToken.for_user(user)
         refresh['auth_method'] = 'password'
@@ -218,20 +307,27 @@ class PasswordResetSerializer(serializers.Serializer):
     def validate(self, attrs):
         user = None
         try:
-            user = dj_auth.get_user_model().objects.get(email=attrs["email"])
+            user = dj_auth.get_user_model().objects.get(email__iexact=attrs["email"].strip())
         except dj_auth.get_user_model().DoesNotExist:
             pass
 
         return {**attrs, "user": user}
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = validated_data.pop("user")
-
-        if user:
-            notifications.PasswordResetEmail(
-                user=user, data={"user_id": user.id.hashid, "token": tokens.password_reset_token.make_token(user)}
-            ).send()
-
+        user = validated_data['user']
+        outcome = admit_reset(
+            self.context.get('request'), validated_data['email'], deliverable=bool(user and user.is_active)
+        )
+        event = record(
+            'auth_password_reset_request',
+            request=self.context.get('request'),
+            user=user,
+            email=validated_data.get('email', ''),
+            outcome=outcome,
+        )
+        if outcome == 'accepted' and user and user.is_active:
+            enqueue_email(user, 'PASSWORD_RESET', event=event)
         return {"ok": True}
 
 
@@ -243,10 +339,8 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
     token = serializers.CharField(write_only=True, help_text=_("Token"))
 
     ok = serializers.BooleanField(read_only=True)
-
-    def validate_new_password(self, new_password):
-        password_validation.validate_password(new_password)
-        return new_password
+    refresh = serializers.CharField(read_only=True)
+    access = serializers.CharField(read_only=True)
 
     def validate(self, attrs):
         token = attrs["token"]
@@ -260,15 +354,41 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
         if not tokens.password_reset_token.check_token(user, token):
             raise exceptions.ValidationError(_("Malformed password reset token"), "invalid_token")
 
+        try:
+            validate_password(attrs['new_password'], user)
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError(
+                {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
+            )
         return {**attrs, "user": user}
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = validated_data.pop("user")
-        new_password = validated_data.pop("new_password")
-        user.set_password(new_password)
+        user = models.User.objects.select_for_update().get(pk=validated_data['user'].pk)
+        if not tokens.password_reset_token.check_token(user, validated_data['token']):
+            raise exceptions.ValidationError(_("Malformed password reset token"), "invalid_token")
+        try:
+            validate_password(validated_data['new_password'], user)
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError(
+                {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
+            )
+        user.set_password(validated_data['new_password'])
+        # Blacklist every outstanding token minted before this point - the browser that
+        # completed this reset gets a brand-new one below instead (not blacklisted, since it
+        # doesn't exist yet). Any other logged-in session's SSOSession row is separately
+        # revoked in ChangePasswordMutation/PasswordResetConfirmationMutation.perform_mutate,
+        # once the new session's ID is known to exclude from it.
         jwt.blacklist_user_tokens(user)
-        user.save()
-        return {"ok": True}
+        user.save(update_fields=['password'])
+        clear_password_budget(user.email)
+        event = record('auth_password_reset', request=self.context.get('request'), user=user)
+        enqueue_email(user, 'PASSWORD_CHANGED', event=event)
+
+        self.user = user
+        refresh = jwt_tokens.RefreshToken.for_user(user)
+        refresh['auth_method'] = 'password'
+        return {"ok": True, "access": str(refresh.access_token), "refresh": str(refresh)}
 
 
 class CookieTokenObtainPairSerializer(jwt_serializers.TokenObtainPairSerializer):
@@ -293,16 +413,33 @@ class CookieTokenObtainPairSerializer(jwt_serializers.TokenObtainPairSerializer)
     refresh = serializers.CharField(read_only=True, default=None)
 
     def validate(self, attrs):
+        email = attrs.get(self.username_field, "")
+
+        def attempt():
+            try:
+                return super(CookieTokenObtainPairSerializer, self).validate(attrs)
+            except exceptions.AuthenticationFailed:
+                return None
+
+        # Account-wide failure budget (E05): the per-IP limit on this mutation lets a
+        # distributed attacker spread guesses across many source addresses, never exhausting a
+        # shared counter against one account. A locked account is rejected (generically) before
+        # the real check runs at all - including a correct password, which is the whole point of
+        # a real budget - and a failure's counter update commits independently of whatever the
+        # calling mutation's transaction does afterward (see password_budget.check_password).
         try:
-            data = super().validate(attrs)
-        except exceptions.AuthenticationFailed as e:
-            raise exceptions.ValidationError(e.detail)
+            data = check_password_budget(email, attempt)
+        except PasswordBudgetExceeded as exc:
+            raise exceptions.ValidationError({"non_field_errors": str(exc)}, code="too_many_attempts")
+
+        if data is None:
+            raise exceptions.ValidationError(self.error_messages["no_active_account"], code="no_active_account")
 
         return data
 
     def create(self, validated_data):
         if self.user.otp_enabled and self.user.otp_verified:
-            return {"otp_auth_token": str(generate_otp_auth_token(self.user))}
+            return {"otp_auth_token": begin_otp_login(self.user, "password")}
 
         return validated_data
 
@@ -436,13 +573,39 @@ class LogoutSerializer(serializers.Serializer):
         return {"ok": True}
 
 
+def _otp_setup_requires_grant(user):
+    # Replacing an already-active factor always needs fresh proof. First-time
+    # enrollment only needs it when the account actually has a way to produce
+    # proof - a password-less, passkey-less account (Google-only, 2FA never set
+    # up) would otherwise be permanently unable to ever turn 2FA on.
+    return user.otp_enabled or passkey_management.user_can_reauthenticate(user)
+
+
 @context_user_required
 class GenerateOTPSerializer(serializers.Serializer):
     base32 = serializers.CharField(read_only=True)
     otpauth_url = serializers.CharField(read_only=True)
 
+    def validate(self, attrs):
+        # Mirrors the passkey-registration "options" step: confirms a live grant
+        # exists without consuming it, so the matching verifyOtp call can still
+        # use it to promote the pending secret to active. require_grant() locks the
+        # grant row, which needs an explicit transaction here (unlike the passkey
+        # REST/GraphQL call sites, this validate() isn't already wrapped in one).
+        if _otp_setup_requires_grant(self.context_user):
+            with transaction.atomic():
+                passkey_management.require_grant(self.context["request"], self.context_user, "otp_setup")
+        return attrs
+
+    @transaction.atomic
     def create(self, validated_data):
         otp_base32, otp_auth_url = otp_services.generate_otp(self.context_user)
+        record(
+            'auth_otp_management',
+            request=self.context.get('request'),
+            user=self.context_user,
+            outcome='enrollment_started',
+        )
         return {"base32": otp_base32, "otpauth_url": otp_auth_url}
 
 
@@ -451,8 +614,15 @@ class VerifyOTPSerializer(serializers.Serializer):
     otp_verified = serializers.BooleanField(read_only=True)
     otp_token = serializers.CharField(write_only=True)
 
+    def validate(self, attrs):
+        if _otp_setup_requires_grant(self.context_user):
+            with transaction.atomic():
+                grant = passkey_management.require_grant(self.context["request"], self.context_user, "otp_setup")
+                passkey_management.consume_grant(grant)
+        return attrs
+
     def create(self, validated_data):
-        otp_services.verify_otp(self.context_user, validated_data.get("otp_token", ""))
+        otp_services.verify_otp(self.context_user, validated_data.get("otp_token", ""), self.context.get('request'))
         return {"otp_verified": True}
 
 
@@ -476,27 +646,38 @@ class ValidateOTPSerializer(serializers.Serializer):
         ):
             self.fail("invalid_token")
 
-        try:
-            otp_auth_token = jwt_tokens.AccessToken(raw_otp_auth_token)
-        except (jwt_exceptions.InvalidToken, jwt_exceptions.TokenError):
+        # find_pending_login rejects a missing/expired/used/foreign token, and - since
+        # it was only ever created by begin_otp_login() for this exact account - also
+        # anything that isn't a genuine pending-login proof (an ordinary access/refresh
+        # token cannot satisfy this, unlike the previous self-signed-JWT design). It
+        # also rejects a proof whose credential_version no longer matches: the account
+        # was deactivated, its password changed/reset, or OTP enabled/disabled/replaced
+        # since this proof was issued.
+        pending = find_pending_login(raw_otp_auth_token)
+        if pending is None:
+            self.fail("invalid_token")
+        self.user = pending.user
+        if not self.user.is_active:
             self.fail("invalid_token")
 
-        if not (user_id := otp_auth_token.get("user_id")):
-            self.fail("invalid_token")
-
-        try:
-            self.user = models.User.objects.get(id=user_id)
-        except models.User.DoesNotExist:
-            self.fail("invalid_token")
-
-        otp_services.validate_otp(self.user, attrs.get("otp_token", ""))
+        otp_services.validate_otp(self.user, attrs.get("otp_token", ""), request)
+        self._raw_otp_auth_token = raw_otp_auth_token
 
         return attrs
 
     def create(self, validated_data):
+        # Re-validate and consume under a row lock, in the same transaction as the
+        # session this issues - so a concurrent duplicate submission of this same
+        # proof cannot both succeed, and nothing can complete after credentials
+        # changed between validate() and here.
+        pending = consume_pending_login(self._raw_otp_auth_token)
+        if pending is None:
+            self.fail("invalid_token")
+
+        self.auth_method = pending.auth_method
         refresh = RefreshToken.for_user(self.user)
-        refresh['auth_method'] = 'password'
-        refresh.access_token['auth_method'] = 'password'
+        refresh['auth_method'] = pending.auth_method
+        refresh.access_token['auth_method'] = pending.auth_method
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
@@ -504,8 +685,20 @@ class ValidateOTPSerializer(serializers.Serializer):
 class DisableOTPSerializer(serializers.Serializer):
     ok = serializers.BooleanField(read_only=True)
 
+    def validate(self, attrs):
+        with transaction.atomic():
+            grant = passkey_management.require_grant(self.context["request"], self.context_user, "otp_disable")
+            passkey_management.consume_grant(grant)
+        return attrs
+
+    @transaction.atomic
     def create(self, validated_data):
         otp_services.disable_otp(self.context_user)
+        event = record(
+            'auth_otp_management', request=self.context.get('request'), user=self.context_user, outcome='disabled'
+        )
+        record('otp_disabled', request=self.context.get('request'), user=self.context_user)
+        enqueue_email(self.context_user, 'OTP_DISABLED', event=event)
         return {"ok": True}
 
 

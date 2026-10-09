@@ -4110,7 +4110,7 @@
     "defaultMessage": "Gérer le SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Afficher la configuration de sécurité"
+    "defaultMessage": "Afficher les connexions SSO, les clés d'accès et les configurations de sécurité"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Afficher les paramètres de sécurité"
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Trop de tentatives de vérification. Patientez un instant et réessayez."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Annuler l’association"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "Impossible d’annuler. Veuillez réessayer."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Connectez-vous ci-dessous avec votre mot de passe et un code à deux facteurs si cette option est activée, ou utilisez une clé d’accès."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "La connexion sociale a échoué. Connectez-vous avec votre mot de passe ou une clé d’accès, ou réessayez."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Un compte avec cette adresse e-mail existe déjà, mais n’a pas encore été vérifié."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Si vous n’avez pas créé ce compte, contactez-nous à {supportEmail} pour vérifier que vous en êtes propriétaire."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Si vous n’avez pas créé ce compte, contactez l’assistance pour vérifier que vous en êtes propriétaire."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "S’il s’agit de votre compte, connectez-vous ci-dessous et vérifiez votre adresse e-mail, puis réessayez d’associer Google."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Réinitialiser votre mot de passe"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Si vous n’êtes pas à l’origine de cette action, réinitialisez immédiatement votre mot de passe."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Une nouvelle méthode de connexion a été ajoutée à votre compte"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Vous pouvez maintenant vous connecter avec {provider} en utilisant cette adresse e-mail. Si vous avez effectué ce changement, aucune autre action n’est nécessaire. Si vous n’avez pas associé {provider}, réinitialisez immédiatement votre mot de passe et contactez l’assistance."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "La connexion avec {provider} a été associée à votre compte"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Confirmez avec votre mot de passe et le code à deux facteurs si activé, ou une clé d’accès. La dissociation vous déconnecte de tous vos appareils."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Dissocier la connexion sociale"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Gérez la connexion Google pour votre compte."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Dissocier"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "La connexion sociale a été dissociée. Veuillez vous reconnecter."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "Aucun compte de connexion sociale n’est associé."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Ajoutez un mot de passe ou une clé d’accès avant de dissocier votre dernière méthode de connexion."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "Impossible de charger les comptes associés. Actualisez la page et réessayez."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Chargement des comptes associés…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Utilisez une clé d’accès existante ou définissez un mot de passe via la réinitialisation avant de dissocier le compte."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Comptes sociaux associés"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Connectez Google à votre compte"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "Vous confirmez ainsi que le compte vous appartient et connectez Google pour les prochaines connexions. Vos paramètres d’authentification à deux facteurs restent inchangés."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Vérifiez votre e-mail avant de connecter Google"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "Vérifiez une clé d'accès existante ou saisissez votre mot de passe de compte{otp} pour continuer."
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": " et le code à deux facteurs"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "ou"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "Code à deux facteurs actuel"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "Saisissez votre code à deux facteurs actuel pour continuer."
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "Mot de passe du compte"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "Vérifiez votre identité"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "Vérifier"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "Vérifier avec une clé d'accès existante"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "Vérifier avec le mot de passe"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "Réinitialiser votre mot de passe"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "Si ce n'était pas vous, réinitialisez votre mot de passe immédiatement."
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "L'authentification à deux facteurs a été désactivée sur votre compte"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "L'authentification à deux facteurs vient d'être désactivée pour votre compte. Si vous avez effectué ce changement, aucune action supplémentaire n'est nécessaire. Si ce n'était pas vous, réinitialisez immédiatement votre mot de passe et contactez le support."
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "L'authentification à deux facteurs a été désactivée"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "Vérifier la sécurité du compte"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "Si ce n'était pas vous, vérifiez immédiatement la sécurité de votre compte."
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "L'authentification à deux facteurs a été activée sur votre compte"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "L'authentification à deux facteurs protège désormais votre compte - un code de vérification sera requis en plus de votre mot de passe lors de la connexion. Si vous avez effectué ce changement, aucune action supplémentaire n'est nécessaire. Si ce n'était pas vous, vérifiez immédiatement la sécurité de votre compte et contactez le support."
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "L'authentification à deux facteurs a été activée"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "Désactiver"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "Désactiver l'authentification à deux facteurs ?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "Cela supprimera la couche de sécurité supplémentaire de votre compte - vous pouvez la réactiver à tout moment."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Consultez vos e-mails"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Si cette adresse peut recevoir des e-mails concernant le compte, nous enverrons des instructions. Consultez votre boîte de réception et vos indésirables. Vous pouvez aussi vous connecter ci-dessous."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Retour"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Instructions de connexion au compte"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Un compte utilise déjà cette adresse e-mail. Connectez-vous avec votre mot de passe actuel ou votre clé d’accès. Si vous avez oublié votre mot de passe, réinitialisez-le depuis la page de connexion. Si votre adresse n’est pas encore vérifiée, connectez-vous et demandez un e-mail de vérification avant de connecter Google. Cette demande n’a pas modifié votre compte."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Votre mot de passe a été modifié"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Le mot de passe de votre compte a été modifié ou réinitialisé. Si vous avez effectué ce changement, aucune action n’est nécessaire. Sinon, réinitialisez immédiatement votre mot de passe et contactez l’assistance."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Votre authentification à deux facteurs a été remplacée"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "L’authentificateur qui protège votre compte a été remplacé. Si vous avez effectué ce changement, aucune action n’est nécessaire. Sinon, réinitialisez immédiatement votre mot de passe et contactez l’assistance."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Impossible de démarrer la connexion Google. Réessayez."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Demande d’inscription"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Confirmation de l’e-mail"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Connexion par mot de passe"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Vérification de connexion à deux facteurs"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Vérification à deux facteurs"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Demande de réinitialisation du mot de passe"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Réinitialisation du mot de passe"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Modification du mot de passe"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Modification de l’authentification à deux facteurs"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Code d'authentification"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "La connexion est temporairement indisponible. Veuillez réessayer dans quelques instants."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Envoyez-moi un lien pour définir un mot de passe"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "Ce compte n'a pas encore de mot de passe. Nous allons vous envoyer un lien pour en définir un."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Nous vous avons envoyé un lien pour définir votre mot de passe."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Trop de tentatives. Réessayez plus tard."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Définir le mot de passe"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Ce lien expire dans 1 heure pour votre sécurité"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Définissez votre mot de passe"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Vous avez demandé à définir un mot de passe pour votre compte. Cliquez sur le bouton ci-dessous pour en choisir un. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Définissez votre mot de passe"
   }
 }

@@ -430,13 +430,22 @@ class VerifyPasskeySerializer(serializers.Serializer):
 
 
 class PasskeyManagementOptionsSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=['register', 'delete'])
+    action = serializers.ChoiceField(choices=['register', 'delete', 'otp_setup', 'otp_disable', 'password_set'])
     passkeyId = PasskeyTextField(max_length=255, required=False)
 
 
 class PasskeyPasswordProofSerializer(PasskeyManagementOptionsSerializer):
     password = PasskeyTextField(max_length=4096, trim_whitespace=False)
     otpToken = PasskeyTextField(max_length=16, required=False, allow_blank=True, trim_whitespace=False)
+
+
+class OTPOnlyProofSerializer(PasskeyManagementOptionsSerializer):
+    """Fresh-auth proof for an account with no password and no passkey - the only
+    factor it can possibly prove is its current, already-active OTP code. Only
+    accepted for the otp_setup (replace) / otp_disable / password_set actions; see
+    apps.sso.services.passkey_management.otp_only_grant."""
+
+    otpToken = PasskeyTextField(max_length=16, trim_whitespace=False)
 
 
 class SSOAuditLogSerializer(serializers.ModelSerializer):

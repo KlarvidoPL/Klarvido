@@ -20,11 +20,13 @@ from typing import Optional, Union
 
 from django.conf import settings
 from django.utils.module_loading import import_string
+from django.utils.translation import gettext as _
 
 from django_ratelimit import ALL
 from django_ratelimit.exceptions import Ratelimited
 from django_ratelimit.core import is_ratelimited
 
+from common.graphql.exceptions import GraphQlValidationError
 from .config import get_rate_limit, get_rate_limit_config
 from .constants import RateLimitCategory, RateLimitKey
 
@@ -32,6 +34,10 @@ from .constants import RateLimitCategory, RateLimitKey
 logger = logging.getLogger(__name__)
 
 RATE_LIMIT_EXCEEDED_ERROR_MSG = "Rate limit exceeded. Please try again later."
+
+# Shown instead of silently allowing an unlimited request through when the rate-limit store
+# itself (Redis) is unreachable - only for operations passing fail_closed=True (authentication).
+RATE_LIMIT_UNAVAILABLE_ERROR_MSG = _("Sign-in is temporarily unavailable. Please try again shortly.")
 
 
 def _get_request_from_info(info):
@@ -47,31 +53,31 @@ def _get_request_from_info(info):
 
 def _get_rate_key_identifier(request, key_type: RateLimitKey) -> str:
     """Get the identifier string for rate limiting based on key type."""
-    from .utils import get_client_ip, get_user_id, get_tenant_id
+    from .utils import rate_limit_ip, get_user_id, get_tenant_id
 
     if key_type == RateLimitKey.IP:
-        return get_client_ip(request)
+        return rate_limit_ip(request)
     elif key_type == RateLimitKey.USER:
         user_id = get_user_id(request)
         if user_id:
             return f"user:{user_id}"
-        return f"anon:{get_client_ip(request)}"
+        return f"anon:{rate_limit_ip(request)}"
     elif key_type == RateLimitKey.USER_OR_IP:
         user_id = get_user_id(request)
         if user_id:
             return f"user:{user_id}"
-        return f"ip:{get_client_ip(request)}"
+        return f"ip:{rate_limit_ip(request)}"
     elif key_type == RateLimitKey.TENANT:
         tenant_id = get_tenant_id(request)
         if tenant_id:
             return f"tenant:{tenant_id}"
-        return f"notenant:{get_client_ip(request)}"
+        return f"notenant:{rate_limit_ip(request)}"
     elif key_type == RateLimitKey.USER_TENANT:
-        user_id = get_user_id(request) or f"anon:{get_client_ip(request)}"
+        user_id = get_user_id(request) or f"anon:{rate_limit_ip(request)}"
         tenant_id = get_tenant_id(request) or "notenant"
         return f"{user_id}:{tenant_id}"
     else:
-        return get_client_ip(request)
+        return rate_limit_ip(request)
 
 
 def graphql_ratelimit(
@@ -80,6 +86,7 @@ def graphql_ratelimit(
     group: Optional[str] = None,
     method: str = ALL,
     block: bool = True,
+    fail_closed: bool = False,
 ):
     """
     Rate limit decorator for GraphQL resolvers and mutations.
@@ -96,6 +103,11 @@ def graphql_ratelimit(
         group: Optional group name for the rate limit. Defaults to function name.
         method: HTTP methods to rate limit (default: all).
         block: Whether to raise an exception when limit exceeded (default: True).
+        fail_closed: When the limiter itself cannot be reached (e.g. Redis outage), the default
+            behavior logs the error and lets the operation proceed unlimited. Set True for
+            authentication operations, where that silent fail-open would mean an outage removes
+            all abuse protection instead of just degrading availability - raises a translatable
+            GraphQlValidationError (code "rate_limit_unavailable") instead.
 
     Returns:
         Decorated function with rate limiting applied.
@@ -184,6 +196,14 @@ def graphql_ratelimit(
                 # Re-raise rate limit exceptions
                 raise
             except Exception as e:
+                if fail_closed:
+                    logger.error(
+                        f"Rate limit check failed for {fn.__name__}: {type(e).__name__}: {e}. "
+                        f"Rejecting the request (fail_closed=True) instead of allowing it unlimited."
+                    )
+                    raise GraphQlValidationError(
+                        {"non_field_errors": [RATE_LIMIT_UNAVAILABLE_ERROR_MSG]}, code="rate_limit_unavailable"
+                    ) from e
                 # Log the error but allow the request to proceed
                 # This prevents ratelimit misconfiguration from breaking the app
                 logger.error(

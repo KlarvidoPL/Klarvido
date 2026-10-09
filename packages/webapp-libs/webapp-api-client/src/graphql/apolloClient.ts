@@ -1,4 +1,5 @@
 import { ApolloClient, FetchResult, HttpLink, InMemoryCache, Observable, from, split } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 import { getMainDefinition, relayStylePagination } from '@apollo/client/utilities';
@@ -7,7 +8,6 @@ import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { ToastEmitterActions } from '@sb/webapp-core/toast';
 // @ts-ignore - Type declaration in apollo-upload-client.d.ts
 import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
-import { GraphQLFormattedError } from 'graphql';
 import { Kind, OperationTypeNode } from 'graphql/language';
 
 import { apiURL, auth } from '../api';
@@ -173,33 +173,40 @@ function showNetworkErrorMessage() {
   });
 }
 
-const handleApiErrors = (
-  callRefresh: () => Observable<FetchResult> | void,
-  graphQLErrors?: ReadonlyArray<GraphQLFormattedError>,
-  networkError?: Error | null
-) => {
-  // Check for UNAUTHENTICATED GraphQL errors
-  if (graphQLErrors) {
-    for (const err of graphQLErrors) {
+const handleApiErrors = (callRefresh: () => Observable<FetchResult> | void, error: unknown) => {
+  // Apollo Client 4's ErrorLink hands back a single `error`, not the old v3
+  // `{graphQLErrors, networkError}` pair - a GraphQL-level error (the resolver raised, HTTP
+  // status still 200) comes back as one CombinedGraphQLErrors instance with an `errors` array,
+  // not split out. Checking old-shape `graphQLErrors`/`networkError` fields here always finds
+  // them undefined, so every GraphQL error - including UNAUTHENTICATED/not_authenticated -
+  // silently fell through to the generic network-error branch below and never refreshed.
+  if (CombinedGraphQLErrors.is(error)) {
+    for (const err of error.errors) {
       switch (err.extensions?.['code']) {
         case 'UNAUTHENTICATED':
-          IS_LOCAL_ENV && console.log('[handleApiErrors] UNAUTHENTICATED error, attempting refresh');
+        // Backend's default "must be authenticated" check on a mutation/query field (e.g. an
+        // access token already invalidated by a password change elsewhere, but not yet
+        // naturally expired - see CHECK_REVOKE_TOKEN) - distinct from a genuine, authenticated
+        // permission_denied, which must NOT trigger a refresh (that would just retry forever).
+        case 'not_authenticated':
+          IS_LOCAL_ENV && console.log('[handleApiErrors] unauthenticated error, attempting refresh');
           return callRefresh();
         default:
           IS_LOCAL_ENV && console.log(`[GraphQL error]`, err);
       }
     }
+    return;
   }
 
   // Check for 401 network errors - try refresh instead of immediate redirect
-  if (networkError && is401Error(networkError)) {
+  if (is401Error(error)) {
     IS_LOCAL_ENV && console.log('[handleApiErrors] 401 error detected, attempting token refresh');
     return callRefresh();
   }
 
-  if (networkError) {
+  if (error) {
     // Apollo Client 4: ServerError structure may have changed
-    const serverError = networkError as any;
+    const serverError = error as any;
 
     if (serverError.result && typeof serverError.result !== 'string') {
       if (serverError.result?.['code']?.code === 'token_not_valid') {
@@ -207,17 +214,11 @@ const handleApiErrors = (
         return callRefresh();
       }
     }
-    IS_LOCAL_ENV && console.log(`[Network error]: ${networkError}`);
+    IS_LOCAL_ENV && console.log(`[Network error]: ${error}`);
   }
 };
 
-const refreshTokenLink = onError((error: any) => {
-  let { graphQLErrors, networkError, operation, forward } = error;
-
-  if (!networkError && error.error) {
-    networkError = error.error;
-  }
-
+const refreshTokenLink = onError(({ error, operation, forward }) => {
   const callRefresh = (): Observable<FetchResult> | void =>
     new Observable((observer) => {
       // If we're already refreshing, queue this request
@@ -270,7 +271,7 @@ const refreshTokenLink = onError((error: any) => {
       })();
     });
 
-  return handleApiErrors(callRefresh, graphQLErrors, networkError);
+  return handleApiErrors(callRefresh, error);
 });
 
 const httpContentfulLink = new HttpLink({

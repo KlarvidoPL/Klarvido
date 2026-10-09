@@ -1,0 +1,249 @@
+{
+  "Auth / Signup / Check email title": {
+    "default_message": "Check your email",
+    "values": {
+      "en": "Check your email",
+      "pl": "Sprawdź swoją skrzynkę e-mail",
+      "de": "Prüfe deine E-Mails",
+      "fr": "Consultez vos e-mails",
+      "es": "Revisa tu correo electrónico",
+      "zh": "查看你的电子邮件",
+      "hi": "अपना ईमेल देखें",
+      "ar": "تحقق من بريدك الإلكتروني"
+    }
+  },
+  "Auth / Signup / Check email description": {
+    "default_message": "If this address can receive account emails, we will send instructions. Check your inbox and spam folder. You can also sign in below.",
+    "values": {
+      "en": "If this address can receive account emails, we will send instructions. Check your inbox and spam folder. You can also sign in below.",
+      "pl": "Jeśli na ten adres można wysłać wiadomości dotyczące konta, wyślemy instrukcje. Sprawdź skrzynkę odbiorczą i folder spam. Możesz też zalogować się poniżej.",
+      "de": "Wenn diese Adresse Konto-E-Mails empfangen kann, senden wir dir Anweisungen. Prüfe deinen Posteingang und Spamordner. Du kannst dich auch unten anmelden.",
+      "fr": "Si cette adresse peut recevoir des e-mails concernant le compte, nous enverrons des instructions. Consultez votre boîte de réception et vos indésirables. Vous pouvez aussi vous connecter ci-dessous.",
+      "es": "Si esta dirección puede recibir correos de la cuenta, enviaremos instrucciones. Revisa tu bandeja de entrada y la carpeta de spam. También puedes iniciar sesión abajo.",
+      "zh": "如果此地址可以接收账户邮件，我们将发送操作说明。请查看收件箱和垃圾邮件文件夹。你也可以在下方登录。",
+      "hi": "यदि इस पते पर खाते के ईमेल भेजे जा सकते हैं, तो हम निर्देश भेजेंगे। अपना इनबॉक्स और स्पैम फ़ोल्डर देखें। आप नीचे साइन इन भी कर सकते हैं।",
+      "ar": "إذا كان هذا العنوان يمكنه تلقي رسائل الحساب، فسنرسل التعليمات. تحقق من صندوق الوارد ومجلد الرسائل غير المرغوب فيها. يمكنك أيضًا تسجيل الدخول أدناه."
+    }
+  },
+  "Auth / Signup / Back": {
+    "default_message": "Back",
+    "values": {
+      "en": "Back",
+      "pl": "Wstecz",
+      "de": "Zurück",
+      "fr": "Retour",
+      "es": "Volver",
+      "zh": "返回",
+      "hi": "वापस",
+      "ar": "رجوع"
+    }
+  },
+  "Email / SignupGuidance / Title": {
+    "default_message": "Account sign-in instructions",
+    "values": {
+      "en": "Account sign-in instructions",
+      "pl": "Instrukcje logowania do konta",
+      "de": "Anweisungen zur Kontoanmeldung",
+      "fr": "Instructions de connexion au compte",
+      "es": "Instrucciones para iniciar sesión",
+      "zh": "账户登录说明",
+      "hi": "खाते में साइन इन करने के निर्देश",
+      "ar": "تعليمات تسجيل الدخول إلى الحساب"
+    }
+  },
+  "Email / SignupGuidance / Text": {
+    "default_message": "An account already uses this email address. Sign in with your existing password or passkey. If you forgot your password, use password reset on the sign-in page. If your email is not verified yet, sign in and request a verification email before connecting Google. This request did not change your account.",
+    "values": {
+      "en": "An account already uses this email address. Sign in with your existing password or passkey. If you forgot your password, use password reset on the sign-in page. If your email is not verified yet, sign in and request a verification email before connecting Google. This request did not change your account.",
+      "pl": "Konto z tym adresem e-mail już istnieje. Zaloguj się dotychczasowym hasłem lub kluczem dostępu. Jeśli nie pamiętasz hasła, zresetuj je na stronie logowania. Jeśli adres nie jest jeszcze zweryfikowany, zaloguj się i poproś o wiadomość weryfikacyjną przed połączeniem Google. To zgłoszenie nie zmieniło Twojego konta.",
+      "de": "Für diese E-Mail-Adresse besteht bereits ein Konto. Melde dich mit deinem bisherigen Passwort oder Passkey an. Falls du dein Passwort vergessen hast, setze es auf der Anmeldeseite zurück. Ist deine E-Mail noch nicht bestätigt, melde dich an und fordere eine Bestätigungs-E-Mail an, bevor du Google verbindest. Diese Anfrage hat dein Konto nicht verändert.",
+      "fr": "Un compte utilise déjà cette adresse e-mail. Connectez-vous avec votre mot de passe actuel ou votre clé d’accès. Si vous avez oublié votre mot de passe, réinitialisez-le depuis la page de connexion. Si votre adresse n’est pas encore vérifiée, connectez-vous et demandez un e-mail de vérification avant de connecter Google. Cette demande n’a pas modifié votre compte.",
+      "es": "Ya existe una cuenta con esta dirección. Inicia sesión con tu contraseña actual o clave de acceso. Si olvidaste la contraseña, restablécela en la página de inicio de sesión. Si el correo aún no está verificado, inicia sesión y solicita un correo de verificación antes de conectar Google. Esta solicitud no modificó tu cuenta.",
+      "zh": "此电子邮件地址已有关联账户。请使用原密码或通行密钥登录。如果忘记密码，请在登录页面重置密码。如果邮箱尚未验证，请登录并请求验证邮件，然后再关联 Google。此次请求没有更改你的账户。",
+      "hi": "इस ईमेल पते से पहले से एक खाता जुड़ा है। अपने मौजूदा पासवर्ड या पासकी से साइन इन करें। पासवर्ड भूल गए हैं तो साइन इन पृष्ठ से उसे रीसेट करें। ईमेल अभी सत्यापित नहीं है तो Google जोड़ने से पहले साइन इन करके सत्यापन ईमेल माँगें। इस अनुरोध से आपका खाता नहीं बदला है।",
+      "ar": "يوجد حساب يستخدم هذا البريد الإلكتروني بالفعل. سجّل الدخول بكلمة المرور الحالية أو مفتاح المرور. إذا نسيت كلمة المرور، فأعد تعيينها من صفحة تسجيل الدخول. إذا لم يتم التحقق من بريدك بعد، فسجّل الدخول واطلب رسالة تحقق قبل ربط Google. لم يغيّر هذا الطلب حسابك."
+    }
+  },
+  "Email / PasswordChanged / Title": {
+    "default_message": "Your password was changed",
+    "values": {
+      "en": "Your password was changed",
+      "pl": "Twoje hasło zostało zmienione",
+      "de": "Dein Passwort wurde geändert",
+      "fr": "Votre mot de passe a été modifié",
+      "es": "Tu contraseña ha cambiado",
+      "zh": "你的密码已更改",
+      "hi": "आपका पासवर्ड बदल दिया गया है",
+      "ar": "تم تغيير كلمة مرورك"
+    }
+  },
+  "Email / PasswordChanged / Text": {
+    "default_message": "Your account password was changed or reset. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support.",
+    "values": {
+      "en": "Your account password was changed or reset. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support.",
+      "pl": "Hasło do Twojego konta zostało zmienione lub zresetowane. Jeśli to Twoja zmiana, nie musisz nic robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną.",
+      "de": "Dein Kontopasswort wurde geändert oder zurückgesetzt. Wenn du das warst, musst du nichts weiter tun. Andernfalls setze dein Passwort sofort zurück und kontaktiere den Support.",
+      "fr": "Le mot de passe de votre compte a été modifié ou réinitialisé. Si vous avez effectué ce changement, aucune action n’est nécessaire. Sinon, réinitialisez immédiatement votre mot de passe et contactez l’assistance.",
+      "es": "La contraseña de tu cuenta se cambió o restableció. Si realizaste el cambio, no necesitas hacer nada más. Si no fuiste tú, restablece tu contraseña inmediatamente y contacta con soporte.",
+      "zh": "你的账户密码已更改或重置。如果是你本人操作，无需采取进一步行动。如果不是，请立即重置密码并联系支持团队。",
+      "hi": "आपके खाते का पासवर्ड बदला या रीसेट किया गया है। यदि यह आपने किया है, तो कुछ और करने की जरूरत नहीं है। अन्यथा तुरंत पासवर्ड रीसेट करें और सहायता से संपर्क करें।",
+      "ar": "تم تغيير كلمة مرور حسابك أو إعادة تعيينها. إذا أجريت هذا التغيير، فلا يلزم إجراء آخر. إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا واتصل بالدعم."
+    }
+  },
+  "Email / OtpReplaced / Title": {
+    "default_message": "Your two-factor authentication was replaced",
+    "values": {
+      "en": "Your two-factor authentication was replaced",
+      "pl": "Twoje uwierzytelnianie dwuskładnikowe zostało zastąpione",
+      "de": "Deine Zwei-Faktor-Authentifizierung wurde ersetzt",
+      "fr": "Votre authentification à deux facteurs a été remplacée",
+      "es": "Se reemplazó tu autenticación de dos factores",
+      "zh": "你的双重身份验证方式已替换",
+      "hi": "आपका दो-कारक प्रमाणीकरण बदल दिया गया है",
+      "ar": "تم استبدال المصادقة الثنائية لحسابك"
+    }
+  },
+  "Email / OtpReplaced / Text": {
+    "default_message": "The authenticator protecting your account was replaced. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support.",
+    "values": {
+      "en": "The authenticator protecting your account was replaced. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support.",
+      "pl": "Zastąpiono metodę uwierzytelniania chroniącą Twoje konto. Jeśli to Twoja zmiana, nie musisz nic robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną.",
+      "de": "Der Authenticator zum Schutz deines Kontos wurde ersetzt. Wenn du das warst, musst du nichts weiter tun. Andernfalls setze dein Passwort sofort zurück und kontaktiere den Support.",
+      "fr": "L’authentificateur qui protège votre compte a été remplacé. Si vous avez effectué ce changement, aucune action n’est nécessaire. Sinon, réinitialisez immédiatement votre mot de passe et contactez l’assistance.",
+      "es": "Se reemplazó el autenticador que protege tu cuenta. Si realizaste el cambio, no necesitas hacer nada más. Si no fuiste tú, restablece tu contraseña inmediatamente y contacta con soporte.",
+      "zh": "保护你账户的身份验证器已替换。如果是你本人操作，无需采取进一步行动。如果不是，请立即重置密码并联系支持团队。",
+      "hi": "आपके खाते की सुरक्षा करने वाला प्रमाणक बदल दिया गया है। यदि यह आपने किया है, तो कुछ और करने की जरूरत नहीं है। अन्यथा तुरंत पासवर्ड रीसेट करें और सहायता से संपर्क करें।",
+      "ar": "تم استبدال تطبيق المصادقة الذي يحمي حسابك. إذا أجريت هذا التغيير، فلا يلزم إجراء آخر. إذا لم تكن أنت، فأعد تعيين كلمة المرور فورًا واتصل بالدعم."
+    }
+  },
+  "Auth / Social / Start failed": {
+    "default_message": "Unable to start Google sign-in. Please try again.",
+    "values": {
+      "en": "Unable to start Google sign-in. Please try again.",
+      "pl": "Nie udało się rozpocząć logowania Google. Spróbuj ponownie.",
+      "de": "Die Google-Anmeldung konnte nicht gestartet werden. Bitte versuche es erneut.",
+      "fr": "Impossible de démarrer la connexion Google. Réessayez.",
+      "es": "No se pudo iniciar el acceso con Google. Inténtalo de nuevo.",
+      "zh": "无法开始 Google 登录。请重试。",
+      "hi": "Google साइन इन शुरू नहीं हो सका। कृपया फिर से कोशिश करें।",
+      "ar": "تعذر بدء تسجيل الدخول عبر Google. حاول مرة أخرى."
+    }
+  },
+  "Audit / Event / auth_signup": {
+    "default_message": "Registration request",
+    "values": {
+      "en": "Registration request",
+      "pl": "Zgłoszenie rejestracji",
+      "de": "Registrierungsanfrage",
+      "fr": "Demande d’inscription",
+      "es": "Solicitud de registro",
+      "zh": "注册请求",
+      "hi": "पंजीकरण अनुरोध",
+      "ar": "طلب تسجيل"
+    }
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "default_message": "Email confirmation",
+    "values": {
+      "en": "Email confirmation",
+      "pl": "Potwierdzenie e-maila",
+      "de": "E-Mail-Bestätigung",
+      "fr": "Confirmation de l’e-mail",
+      "es": "Confirmación de correo",
+      "zh": "邮箱确认",
+      "hi": "ईमेल की पुष्टि",
+      "ar": "تأكيد البريد الإلكتروني"
+    }
+  },
+  "Audit / Event / auth_password_login": {
+    "default_message": "Password login",
+    "values": {
+      "en": "Password login",
+      "pl": "Logowanie hasłem",
+      "de": "Passwortanmeldung",
+      "fr": "Connexion par mot de passe",
+      "es": "Acceso con contraseña",
+      "zh": "密码登录",
+      "hi": "पासवर्ड से साइन इन",
+      "ar": "تسجيل الدخول بكلمة المرور"
+    }
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "default_message": "Two-factor login challenge",
+    "values": {
+      "en": "Two-factor login challenge",
+      "pl": "Wymagane uwierzytelnianie dwuskładnikowe",
+      "de": "Zwei-Faktor-Anmeldeprüfung",
+      "fr": "Vérification de connexion à deux facteurs",
+      "es": "Verificación de acceso de dos factores",
+      "zh": "双重登录验证",
+      "hi": "दो-कारक साइन इन चुनौती",
+      "ar": "طلب تحقق ثنائي لتسجيل الدخول"
+    }
+  },
+  "Audit / Event / auth_otp_verification": {
+    "default_message": "Two-factor verification",
+    "values": {
+      "en": "Two-factor verification",
+      "pl": "Weryfikacja dwuskładnikowa",
+      "de": "Zwei-Faktor-Prüfung",
+      "fr": "Vérification à deux facteurs",
+      "es": "Verificación de dos factores",
+      "zh": "双重身份验证",
+      "hi": "दो-कारक सत्यापन",
+      "ar": "التحقق الثنائي"
+    }
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "default_message": "Password reset request",
+    "values": {
+      "en": "Password reset request",
+      "pl": "Prośba o reset hasła",
+      "de": "Anfrage zum Zurücksetzen des Passworts",
+      "fr": "Demande de réinitialisation du mot de passe",
+      "es": "Solicitud de restablecimiento de contraseña",
+      "zh": "密码重置请求",
+      "hi": "पासवर्ड रीसेट अनुरोध",
+      "ar": "طلب إعادة تعيين كلمة المرور"
+    }
+  },
+  "Audit / Event / auth_password_reset": {
+    "default_message": "Password reset",
+    "values": {
+      "en": "Password reset",
+      "pl": "Reset hasła",
+      "de": "Passwort zurückgesetzt",
+      "fr": "Réinitialisation du mot de passe",
+      "es": "Restablecimiento de contraseña",
+      "zh": "密码重置",
+      "hi": "पासवर्ड रीसेट",
+      "ar": "إعادة تعيين كلمة المرور"
+    }
+  },
+  "Audit / Event / auth_password_change": {
+    "default_message": "Password change",
+    "values": {
+      "en": "Password change",
+      "pl": "Zmiana hasła",
+      "de": "Passwortänderung",
+      "fr": "Modification du mot de passe",
+      "es": "Cambio de contraseña",
+      "zh": "密码更改",
+      "hi": "पासवर्ड परिवर्तन",
+      "ar": "تغيير كلمة المرور"
+    }
+  },
+  "Audit / Event / auth_otp_management": {
+    "default_message": "Two-factor authentication change",
+    "values": {
+      "en": "Two-factor authentication change",
+      "pl": "Zmiana uwierzytelniania dwuskładnikowego",
+      "de": "Änderung der Zwei-Faktor-Authentifizierung",
+      "fr": "Modification de l’authentification à deux facteurs",
+      "es": "Cambio de autenticación de dos factores",
+      "zh": "双重身份验证更改",
+      "hi": "दो-कारक प्रमाणीकरण में बदलाव",
+      "ar": "تغيير المصادقة الثنائية"
+    }
+  }
+}

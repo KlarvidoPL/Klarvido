@@ -32,9 +32,11 @@ from django.db import models, transaction
 from graphql_relay import from_global_id
 
 from common.csrf import browser_csrf_binding
+from common.ratelimiting.utils import get_client_ip as _get_client_ip
 
 from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
 from apps.users.utils import set_auth_cookie
+from apps.users.services.social_linking import complete_link, LINK_COOKIE
 
 from apps.multitenancy.models import Tenant, TenantMembership
 from apps.multitenancy.constants import TenantUserRole
@@ -94,11 +96,9 @@ class SCIMApiThrottle(UserRateThrottle):
 
 
 def get_client_ip(request):
-    """Get client IP from request."""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        return x_forwarded_for.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
+    """Get client IP from request - delegates to the single trusted-proxy-aware resolver shared
+    across the codebase (see common.ratelimiting.utils.get_client_ip)."""
+    return _get_client_ip(request)
 
 
 # ==================
@@ -726,9 +726,15 @@ class PasskeyReauthenticationVerifyView(PasskeyAPIView):
             if isinstance(request.data, dict) and request.data.get("challenge"):
                 data = validate_request(passkey_serializers.VerifyPasskeySerializer, request)
                 token = passkey_management.passkey_grant(request.user, data, client_ip(request))
-            else:
+            elif isinstance(request.data, dict) and request.data.get("password"):
                 data = validate_request(passkey_serializers.PasskeyPasswordProofSerializer, request)
                 token = passkey_management.password_grant(request.user, data)
+            else:
+                # No password and no passkey challenge: only a passwordless account
+                # with no passkeys can reach here, and only for an OTP management
+                # action - its current OTP code is the only factor it has.
+                data = validate_request(passkey_serializers.OTPOnlyProofSerializer, request)
+                token = passkey_management.otp_only_grant(request.user, data)
         except (ValueError, PermissionDenied, ValidationError) as error:
             SSOAuditLog.log_event(
                 event_type=SSOAuditEventType.PASSKEY_REAUTH_FAILED,
@@ -747,7 +753,15 @@ class PasskeyReauthenticationVerifyView(PasskeyAPIView):
             user=request.user,
             ip_address=client_ip(request),
             description="Passkey management authentication succeeded",
-            metadata={"method": "passkey" if request.data.get("challenge") else "password"},
+            metadata={
+                "method": (
+                    "passkey"
+                    if request.data.get("challenge")
+                    else "password"
+                    if request.data.get("password")
+                    else "otp_only"
+                )
+            },
         )
         response = Response({"authorization": token})
         response["Cache-Control"] = "no-store"
@@ -917,6 +931,10 @@ class PasskeyAuthenticationVerifyView(PasskeyAPIView):
             if session_id:
                 auth_cookies[settings.SESSION_ID_COOKIE] = session_id
             set_auth_cookie(response, auth_cookies)
+            if complete_link(request, user):
+                response.delete_cookie(LINK_COOKIE, samesite=settings.COOKIE_SAMESITE)
+            if settings.OTP_AUTH_TOKEN_COOKIE in request.COOKIES:
+                response.delete_cookie(settings.OTP_AUTH_TOKEN_COOKIE, samesite=settings.COOKIE_SAMESITE)
             return response
 
         except ValueError as e:

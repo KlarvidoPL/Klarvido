@@ -4314,7 +4314,7 @@
     "defaultMessage": "Zarządzanie SSO"
   },
   "Roles / Permission / security.view / Description": {
-    "defaultMessage": "Wyświetlanie konfiguracji zabezpieczeń"
+    "defaultMessage": "Wyświetlaj połączenia SSO, klucze dostępu i konfiguracje zabezpieczeń"
   },
   "Roles / Permission / security.view / Name": {
     "defaultMessage": "Wyświetlanie ustawień zabezpieczeń"
@@ -5190,7 +5190,7 @@
     "defaultMessage": "Skonfiguruj SSO"
   },
   "Tenant Security Settings / Audit Description": {
-    "defaultMessage": "Przeglądaj ostatnie zdarzenia SSO, SCIM i KSeF w swojej organizacji"
+    "defaultMessage": "Przeglądaj ostatnie zdarzenia bezpieczeństwa w swojej organizacji"
   },
   "Tenant Security Settings / Audit Header": {
     "defaultMessage": "Dziennik zdarzeń bezpieczeństwa"
@@ -5208,7 +5208,7 @@
     "defaultMessage": "Brak zdarzeń zabezpieczeń"
   },
   "Tenant Security Settings / No Audit Events Hint": {
-    "defaultMessage": "Zdarzenia SSO i SCIM, takie jak logowania przez SSO, tworzenie użytkowników i zmiany konfiguracji, oraz zmiany tokenu KSeF, pojawią się tutaj."
+    "defaultMessage": "Zdarzenia zabezpieczeń, takie jak logowania SSO, tworzenie użytkowników i zmiany konfiguracji, pojawią się tutaj."
   },
   "Tenant Security Settings / No Filtered Audit Events": {
     "defaultMessage": "Brak zdarzeń spełniających kryteria filtrów"
@@ -5670,7 +5670,7 @@
     "defaultMessage": "Wybierz organizację, w której chcesz pracować"
   },
   "Companies / Empty": {
-    "defaultMessage": "Dodaj pierwszą organizację, aby rozpocząć pracę w Klarvido."
+    "defaultMessage": "Nie masz jeszcze dostępu do żadnej organizacji. Dodaj organizację lub zaakceptuj zaproszenie poniżej."
   },
   "Companies / Empty title": {
     "defaultMessage": "Nie masz jeszcze organizacji"
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Zbyt wiele prób weryfikacji. Poczekaj chwilę i spróbuj ponownie."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Anuluj łączenie"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "Nie udało się anulować. Spróbuj ponownie."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Zaloguj się poniżej hasłem i kodem dwuskładnikowym, jeśli jest włączony, lub użyj klucza dostępu."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "Nie udało się zakończyć logowania społecznościowego. Zaloguj się hasłem lub kluczem dostępu albo spróbuj ponownie."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "Konto z tym adresem e-mail już istnieje, ale nie zostało jeszcze zweryfikowane."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "Jeśli nie utworzono tego konta, napisz do nas na {supportEmail}, a pomożemy potwierdzić jego własność."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "Jeśli nie utworzono tego konta, skontaktuj się z pomocą techniczną, aby potwierdzić jego własność."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "Jeśli to Twoje konto, zaloguj się poniżej i zweryfikuj adres e-mail, a następnie spróbuj ponownie połączyć Google."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Zresetuj hasło"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "Jeśli to nie Ty, natychmiast zresetuj hasło."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "Dodano nową metodę logowania do Twojego konta"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "Możesz teraz logować się przez {provider}, używając tego adresu e-mail. Jeśli to Twoja zmiana, nie musisz nic więcej robić. Jeśli nie połączono {provider}, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "Logowanie przez {provider} zostało połączone z Twoim kontem"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Potwierdź hasłem do konta i kodem dwuskładnikowym, jeśli jest włączony, lub kluczem dostępu. Odłączenie wyloguje Cię ze wszystkich urządzeń."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Odłącz logowanie społecznościowe"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Zarządzaj logowaniem przez Google do swojego konta."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Odłącz"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "Logowanie społecznościowe zostało odłączone. Zaloguj się ponownie."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "Brak połączonych kont do logowania społecznościowego."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Dodaj hasło lub klucz dostępu przed odłączeniem ostatniej metody logowania."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "Nie udało się wczytać połączonych kont. Odśwież stronę i spróbuj ponownie."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Wczytywanie połączonych kont…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Użyj istniejącego klucza dostępu lub ustaw hasło przez resetowanie hasła przed odłączeniem."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Połączone konta społecznościowe"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Połącz Google ze swoim kontem"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "W ten sposób potwierdzisz, że konto należy do Ciebie, i połączysz Google do kolejnych logowań. Twoje ustawienia uwierzytelniania dwuskładnikowego pozostają bez zmian."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Zweryfikuj e-mail przed połączeniem Google"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "Zweryfikuj istniejący klucz dostępu lub wprowadź hasło do konta{otp}, aby kontynuować."
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": " i kod dwuskładnikowy"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "lub"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "Aktualny kod dwuskładnikowy"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "Wprowadź swój aktualny kod dwuskładnikowy, aby kontynuować."
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "Hasło do konta"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "Zweryfikuj swoją tożsamość"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "Zweryfikuj"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "Zweryfikuj za pomocą istniejącego klucza dostępu"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "Zweryfikuj hasłem"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "Zresetuj hasło"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "Jeśli to nie Ty, natychmiast zresetuj hasło."
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało wyłączone na Twoim koncie"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało właśnie wyłączone na Twoim koncie. Jeśli to Ty dokonałeś tej zmiany, nie musisz nic więcej robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało wyłączone"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "Sprawdź zabezpieczenia konta"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "Jeśli to nie Ty, natychmiast sprawdź zabezpieczenia swojego konta."
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało włączone na Twoim koncie"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe teraz chroni Twoje konto - podczas logowania będzie wymagany kod weryfikacyjny oprócz hasła. Jeśli to Ty dokonałeś tej zmiany, nie musisz nic więcej robić. Jeśli to nie Ty, natychmiast sprawdź zabezpieczenia konta i skontaktuj się z pomocą techniczną."
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe zostało włączone"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "Wyłącz"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "Wyłączyć uwierzytelnianie dwuskładnikowe?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "Spowoduje to usunięcie dodatkowej warstwy zabezpieczeń z Twojego konta - możesz włączyć ją ponownie w dowolnym momencie."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Sprawdź swoją skrzynkę e-mail"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "Jeśli na ten adres można wysłać wiadomości dotyczące konta, wyślemy instrukcje. Sprawdź skrzynkę odbiorczą i folder spam. Możesz też zalogować się poniżej."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Wstecz"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Instrukcje logowania do konta"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "Konto z tym adresem e-mail już istnieje. Zaloguj się dotychczasowym hasłem lub kluczem dostępu. Jeśli nie pamiętasz hasła, zresetuj je na stronie logowania. Jeśli adres nie jest jeszcze zweryfikowany, zaloguj się i poproś o wiadomość weryfikacyjną przed połączeniem Google. To zgłoszenie nie zmieniło Twojego konta."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Twoje hasło zostało zmienione"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Hasło do Twojego konta zostało zmienione lub zresetowane. Jeśli to Twoja zmiana, nie musisz nic robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Twoje uwierzytelnianie dwuskładnikowe zostało zastąpione"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "Zastąpiono metodę uwierzytelniania chroniącą Twoje konto. Jeśli to Twoja zmiana, nie musisz nic robić. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z pomocą techniczną."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Nie udało się rozpocząć logowania Google. Spróbuj ponownie."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Zgłoszenie rejestracji"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Potwierdzenie e-maila"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Logowanie hasłem"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Wymagane uwierzytelnianie dwuskładnikowe"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Weryfikacja dwuskładnikowa"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Prośba o reset hasła"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Reset hasła"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Zmiana hasła"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Zmiana uwierzytelniania dwuskładnikowego"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Kod uwierzytelniający"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "Logowanie jest tymczasowo niedostępne. Spróbuj ponownie za chwilę."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Wyślij mi link do ustawienia hasła"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "To konto nie ma jeszcze hasła. Wyślemy Ci link, aby je ustawić."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Wysłaliśmy Ci link do ustawienia hasła."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Za dużo prób. Spróbuj ponownie później."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Ustaw hasło"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Ten link wygasa za 1 godzinę dla Twojego bezpieczeństwa"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Ustaw swoje hasło"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Poprosiłeś o ustawienie hasła do swojego konta. Kliknij przycisk poniżej, aby je wybrać. Jeśli to nie Ty, możesz bezpiecznie zignorować ten e-mail."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Ustaw swoje hasło"
   }
 }

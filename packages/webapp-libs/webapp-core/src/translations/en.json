@@ -4136,6 +4136,9 @@
   "Roles / Error / Role assigned to members": {
     "defaultMessage": "This role is assigned to {count, plural, one {# member} other {# members}}. Please choose a replacement role."
   },
+  "Roles / Error / Color reserved for owner": {
+    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
+  },
   "Roles / Error / Role name exists": {
     "defaultMessage": "A role named \"{name}\" already exists. Choose a different name."
   },
@@ -5621,20 +5624,20 @@
   "Tenant form / Immutable value": {
     "defaultMessage": "This value can't be changed once saved."
   },
-  "Onboarding / Clear draft": {
-    "defaultMessage": "Clear draft"
-  },
-  "Onboarding / Clear draft confirm": {
-    "defaultMessage": "Clear draft"
+  "Onboarding / Clear draft title": {
+    "defaultMessage": "Clear this draft?"
   },
   "Onboarding / Clear draft description": {
     "defaultMessage": "All answers for this new organization will be deleted. This cannot be undone."
   },
+  "Onboarding / Clear draft confirm": {
+    "defaultMessage": "Clear draft"
+  },
+  "Onboarding / Clear draft": {
+    "defaultMessage": "Clear draft"
+  },
   "Onboarding / Clear draft failed": {
     "defaultMessage": "Could not clear this draft. Please try again."
-  },
-  "Onboarding / Clear draft title": {
-    "defaultMessage": "Clear this draft?"
   },
   "Companies / Add": {
     "defaultMessage": "Add organization"
@@ -5741,9 +5744,6 @@
   "Companies / Clear search": {
     "defaultMessage": "Clear search"
   },
-  "Roles / Error / Color reserved for owner": {
-    "defaultMessage": "This color is reserved for the owner role. Choose a different color."
-  },
   "Passkeys / Reauthentication title": {
     "defaultMessage": "Verify your identity"
   },
@@ -5782,5 +5782,251 @@
   },
   "Passkeys / Verification rate limit": {
     "defaultMessage": "Too many verification attempts. Please wait a moment and try again."
+  },
+  "Auth / Social linking / Cancel": {
+    "defaultMessage": "Cancel linking"
+  },
+  "Auth / Social linking / Cancel failed": {
+    "defaultMessage": "Unable to cancel. Please try again."
+  },
+  "Auth / Social linking / Confirm account": {
+    "defaultMessage": "Sign in below with your password and a two-factor code if enabled, or use a passkey."
+  },
+  "Auth / Social linking / Failed": {
+    "defaultMessage": "Social sign-in could not be completed. Please sign in with your password or passkey, or try again."
+  },
+  "Auth / Social linking / Unconfirmed account": {
+    "defaultMessage": "An account with this email already exists but hasn't been verified yet."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner": {
+    "defaultMessage": "If you didn't create this account, contact us at {supportEmail} and we'll help verify ownership."
+  },
+  "Auth / Social linking / Unconfirmed account - not owner no email": {
+    "defaultMessage": "If you didn't create this account, contact support and we'll help verify ownership."
+  },
+  "Auth / Social linking / Unconfirmed account - owner": {
+    "defaultMessage": "If this is your account, sign in below and verify your email, then try connecting Google again."
+  },
+  "Email / Social Account Linked / Link label": {
+    "defaultMessage": "Reset your password"
+  },
+  "Email / Social Account Linked / Preheader": {
+    "defaultMessage": "If this wasn't you, reset your password right away."
+  },
+  "Email / Social Account Linked / Subject": {
+    "defaultMessage": "A new sign-in method was added to your account"
+  },
+  "Email / Social Account Linked / Text": {
+    "defaultMessage": "You can now sign in with {provider} using this email address. If you made this change, no further action is needed. If you didn't connect {provider}, reset your password immediately and contact support."
+  },
+  "Email / Social Account Linked / Title": {
+    "defaultMessage": "{provider} sign-in was connected to your account"
+  },
+  "Social accounts / Confirm description": {
+    "defaultMessage": "Confirm with your account password and two-factor code if enabled, or a passkey. Disconnecting signs you out on all devices."
+  },
+  "Social accounts / Confirm title": {
+    "defaultMessage": "Disconnect social sign-in"
+  },
+  "Social accounts / Description": {
+    "defaultMessage": "Manage Google and Facebook sign-in for your account."
+  },
+  "Social accounts / Disconnect": {
+    "defaultMessage": "Disconnect"
+  },
+  "Social accounts / Disconnected": {
+    "defaultMessage": "Social sign-in disconnected. Please sign in again."
+  },
+  "Social accounts / Empty": {
+    "defaultMessage": "No social sign-in accounts are connected."
+  },
+  "Social accounts / Last method": {
+    "defaultMessage": "Add a password or passkey before disconnecting your last sign-in method."
+  },
+  "Social accounts / Load failed": {
+    "defaultMessage": "Unable to load connected accounts. Please refresh and try again."
+  },
+  "Social accounts / Loading": {
+    "defaultMessage": "Loading connected accounts…"
+  },
+  "Social accounts / Password needed": {
+    "defaultMessage": "Use an existing passkey, or set a password through password reset before disconnecting."
+  },
+  "Social accounts / Title": {
+    "defaultMessage": "Connected social accounts"
+  },
+  "Auth / Social linking / Heading": {
+    "defaultMessage": "Connect Google to your account"
+  },
+  "Auth / Social linking / Why confirm": {
+    "defaultMessage": "This confirms the account is yours and connects Google for future sign-ins. Your two-factor authentication settings stay unchanged."
+  },
+  "Auth / Social linking / Verify heading": {
+    "defaultMessage": "Verify your email before connecting Google"
+  },
+  "Auth / Two-factor / Reauth description": {
+    "defaultMessage": "Verify an existing passkey or enter your account password{otp} to continue."
+  },
+  "Auth / Two-factor / Reauth description and code": {
+    "defaultMessage": "and two-factor code"
+  },
+  "Auth / Two-factor / Reauth or": {
+    "defaultMessage": "or"
+  },
+  "Auth / Two-factor / Reauth otp label": {
+    "defaultMessage": "Current two-factor code"
+  },
+  "Auth / Two-factor / Reauth otp-only description": {
+    "defaultMessage": "Enter your current two-factor code to continue."
+  },
+  "Auth / Two-factor / Reauth password label": {
+    "defaultMessage": "Account password"
+  },
+  "Auth / Two-factor / Reauth title": {
+    "defaultMessage": "Verify your identity"
+  },
+  "Auth / Two-factor / Reauth verify otp only": {
+    "defaultMessage": "Verify"
+  },
+  "Auth / Two-factor / Reauth verify passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth verify password": {
+    "defaultMessage": "Verify with password"
+  },
+  "Email / OTP Disabled / Link label": {
+    "defaultMessage": "Reset your password"
+  },
+  "Email / OTP Disabled / Preheader": {
+    "defaultMessage": "If this wasn't you, reset your password right away."
+  },
+  "Email / OTP Disabled / Subject": {
+    "defaultMessage": "Two-factor authentication was disabled on your account"
+  },
+  "Email / OTP Disabled / Text": {
+    "defaultMessage": "Two-factor authentication was just turned off for your account. If you made this change, no further action is needed. If you didn't, reset your password immediately and contact support."
+  },
+  "Email / OTP Disabled / Title": {
+    "defaultMessage": "Two-factor authentication was disabled"
+  },
+  "Email / OTP Enabled / Link label": {
+    "defaultMessage": "Review account security"
+  },
+  "Email / OTP Enabled / Preheader": {
+    "defaultMessage": "If this wasn't you, review your account security right away."
+  },
+  "Email / OTP Enabled / Subject": {
+    "defaultMessage": "Two-factor authentication was enabled on your account"
+  },
+  "Email / OTP Enabled / Text": {
+    "defaultMessage": "Two-factor authentication is now protecting your account - a verification code will be required in addition to your password when signing in. If you made this change, no further action is needed. If you didn't, review your account security immediately and contact support."
+  },
+  "Email / OTP Enabled / Title": {
+    "defaultMessage": "Two-factor authentication was enabled"
+  },
+  "Passkeys / Reauthenticate passkey": {
+    "defaultMessage": "Verify with an existing passkey"
+  },
+  "Auth / Two-factor / Reauth disable button": {
+    "defaultMessage": "Disable"
+  },
+  "Auth / Two-factor / Reauth disable title": {
+    "defaultMessage": "Disable two-factor authentication?"
+  },
+  "Auth / Two-factor / Reauth disable warning": {
+    "defaultMessage": "This removes the extra layer of security from your account - you can re-enable it at any time."
+  },
+  "Auth / Signup / Check email title": {
+    "defaultMessage": "Check your email"
+  },
+  "Auth / Signup / Check email description": {
+    "defaultMessage": "If this address can receive account emails, we will send instructions. Check your inbox and spam folder. You can also sign in below."
+  },
+  "Auth / Signup / Back": {
+    "defaultMessage": "Back"
+  },
+  "Email / SignupGuidance / Title": {
+    "defaultMessage": "Account sign-in instructions"
+  },
+  "Email / SignupGuidance / Text": {
+    "defaultMessage": "An account already uses this email address. Sign in with your existing password or passkey. If you forgot your password, use password reset on the sign-in page. If your email is not verified yet, sign in and request a verification email before connecting Google. This request did not change your account."
+  },
+  "Email / PasswordChanged / Title": {
+    "defaultMessage": "Your password was changed"
+  },
+  "Email / PasswordChanged / Text": {
+    "defaultMessage": "Your account password was changed or reset. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support."
+  },
+  "Email / OtpReplaced / Title": {
+    "defaultMessage": "Your two-factor authentication was replaced"
+  },
+  "Email / OtpReplaced / Text": {
+    "defaultMessage": "The authenticator protecting your account was replaced. If you made this change, no further action is needed. If this was not you, reset your password immediately and contact support."
+  },
+  "Auth / Social / Start failed": {
+    "defaultMessage": "Unable to start Google sign-in. Please try again."
+  },
+  "Audit / Event / auth_signup": {
+    "defaultMessage": "Registration request"
+  },
+  "Audit / Event / auth_email_confirmation": {
+    "defaultMessage": "Email confirmation"
+  },
+  "Audit / Event / auth_password_login": {
+    "defaultMessage": "Password login"
+  },
+  "Audit / Event / auth_otp_challenge": {
+    "defaultMessage": "Two-factor login challenge"
+  },
+  "Audit / Event / auth_otp_verification": {
+    "defaultMessage": "Two-factor verification"
+  },
+  "Audit / Event / auth_password_reset_request": {
+    "defaultMessage": "Password reset request"
+  },
+  "Audit / Event / auth_password_reset": {
+    "defaultMessage": "Password reset"
+  },
+  "Audit / Event / auth_password_change": {
+    "defaultMessage": "Password change"
+  },
+  "Audit / Event / auth_otp_management": {
+    "defaultMessage": "Two-factor authentication change"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Authentication code"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "Sign-in is temporarily unavailable. Please try again shortly."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Email me a link to set a password"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "This account doesn't have a password yet. We'll email you a link to set one."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "We've emailed you a link to set your password."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Too many attempts. Try again later."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Set password"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "This link expires in 1 hour for your security"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Set your password"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "You requested to set a password for your account. Click the button below to choose one. If you didn't make this request, you can safely ignore this email."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Set your password"
   }
 }
