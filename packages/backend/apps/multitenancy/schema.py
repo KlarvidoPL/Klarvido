@@ -1,10 +1,7 @@
 from dataclasses import asdict
 
 from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
-import json
 
-from django.contrib.admin.models import LogEntry, DELETION
-from django.contrib.contenttypes.models import ContentType
 
 import graphene
 from graphene import relay
@@ -23,13 +20,10 @@ from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE, permission_
 from common.action_logging.decorators import action_logged
 from common.action_logging.service import get_request_actor, log_action, log_delete
 from common.ratelimiting import graphql_ratelimit, RateLimitKey
-from apps.finances.services import subscriptions
-from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from . import models
-from .cleanup import schedule_resource_cleanup, schedule_organization_prefix_cleanup
-from . import notifications
 from . import serializers
 from .tokens import tenant_invitation_token
+from .services.deletion import delete_organization
 from .services.company_registry import lookup_company
 from .services.onboarding import CHOICES, clear_draft, save_draft_step, save_onboarding_step
 from .validators import validate_tax_id
@@ -572,84 +566,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
         if tenant.type == ConstantsTenantType.DEFAULT:
             raise exceptions.GraphQlValidationError("Cannot delete default type tenant.")
 
-        tenant_pk = str(tenant.pk)
-        deleter = info.context.user
-        with transaction.atomic():
-            # Workers acquire this same lock before encrypting/uploading and recording
-            # file paths. Collect paths only after any in-flight publisher commits.
-            tenant = models.Tenant.objects.select_for_update().filter(pk=tenant_pk).first()
-            if tenant is None:
-                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-            # Acquiring the lock can wait for an upload. Recheck authorization
-            # rather than relying only on the permission check before that wait.
-            if not models.has_tenant_access(deleter, tenant) or not models.user_has_permission(
-                deleter, tenant, 'org.delete'
-            ):
-                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-            tenant_name = tenant.name
-            members = [
-                membership.user
-                for membership in tenant.user_memberships.filter(is_accepted=True, user__isnull=False).select_related(
-                    "user__profile"
-                )
-            ]
-            file_paths = [
-                *tenant.backuprecord_set.exclude(file_path="").values_list("file_path", flat=True),
-                *tenant.action_log_exports.exclude(file_path="").values_list("file_path", flat=True),
-            ]
-
-            log_delete(
-                tenant_id=tenant.pk,
-                entity_type="tenant",
-                instance=tenant,
-                actor_user=info.context.user,
-                actor_type=get_request_actor(info.context),
-            )
-
-            try:
-                schedule = subscriptions.get_schedule(tenant)
-                if schedule:
-                    cancel_subscription_serializer = CancelTenantActiveSubscriptionSerializer(
-                        instance=schedule, data={}
-                    )
-                    if cancel_subscription_serializer.is_valid():
-                        cancel_subscription_serializer.save()
-            except Exception as e:
-                import logging
-
-                logger = logging.getLogger(__name__)
-                logger.warning(f"Failed to cancel subscription for tenant {tenant.pk} during deletion: {e}")
-
-            LogEntry.objects.create(
-                user_id=info.context.user.pk,
-                content_type=ContentType.objects.get_for_model(models.Tenant),
-                object_id=tenant_pk,
-                object_repr=tenant_name[:200],
-                action_flag=DELETION,
-                change_message=json.dumps(
-                    {
-                        "operation": "organization_deleted",
-                        "organization_id": tenant_pk,
-                        "organization_name": tenant_name,
-                        "actor_email": deleter.email,
-                        "actor_type": get_request_actor(info.context),
-                    }
-                ),
-            )
-            for file_path in file_paths:
-                schedule_resource_cleanup(
-                    models.ResourceCleanup.ResourceType.EXPORT_FILE,
-                    organization_id=tenant_pk,
-                    resource_path=file_path,
-                )
-            schedule_resource_cleanup(models.ResourceCleanup.ResourceType.BACKUP_KEY, organization_id=tenant_pk)
-            schedule_organization_prefix_cleanup(tenant_pk)
-            tenant.delete()
-
-            # Only once the delete is committed: remove its files from storage and tell the members
-            transaction.on_commit(
-                lambda: notifications.send_tenant_deleted_notifications(tenant_name, deleter, members)
-            )
+        delete_organization(tenant.pk, info.context)
 
         close_old_connections()
 

@@ -23,7 +23,7 @@ pytestmark = pytest.mark.django_db(transaction=True)
 def isolate_external_services(mocker, tmp_path):
     mocker.patch.object(DocumentDemoItem._meta.get_field('file'), 'storage', FileSystemStorage(location=tmp_path))
     mocker.patch('apps.multitenancy.schema.close_old_connections')
-    mocker.patch('apps.multitenancy.schema.subscriptions.get_schedule', return_value=None)
+    mocker.patch('apps.multitenancy.services.deletion.subscriptions.get_schedule', return_value=None)
     mocker.patch('apps.multitenancy.notifications.TenantDeletedEmail')
     mocker.patch('apps.multitenancy.cleanup.current_app.send_task')
     service = mocker.patch('apps.multitenancy.cleanup.get_backup_encryption_service').return_value
