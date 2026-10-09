@@ -153,7 +153,7 @@ class TestOutstandingProofsFailAfterReclaim:
         # authentication loads the current account, not when constructing AccessToken.
         with pytest.raises(AuthenticationFailed) as failure:
             SupportedJWTAuthentication().get_user(AccessToken(access_cookie))
-        assert failure.value.get_codes() == 'password_changed'
+        assert failure.value.detail['code'] == 'password_changed'
 
         stale_client = APIClient()
         stale_client.cookies[settings.ACCESS_TOKEN_COOKIE] = access_cookie

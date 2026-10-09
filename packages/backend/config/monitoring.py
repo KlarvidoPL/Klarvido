@@ -12,11 +12,14 @@ __all__ = ['processor', 'init', 'CredentialSafeFormatter']
 ignore_logger('graphql.execution.utils')
 
 
-@add_global_event_processor
 def processor(event, hint):
     if event.get('type') == 'transaction' and event.get('transaction') == '/lbcheck':
         return None
     return _redact(event)
+
+
+# Registration returns None; keep the function callable for the export callbacks.
+add_global_event_processor(processor)
 
 
 def init(dsn, environment_name, traces_sample_rate):
