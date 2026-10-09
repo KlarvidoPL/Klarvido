@@ -212,7 +212,7 @@ class PasswordResetMutation(mutations.SerializerMutation):
         return super().mutate_and_get_payload(root, info, **input)
 
 
-class PasswordResetConfirmationMutation(mutations.SerializerMutation):
+class PasswordResetConfirmationMutation(CookieAuthenticationMutation):
     class Meta:
         serializer_class = serializers.PasswordResetConfirmationSerializer
 
@@ -220,6 +220,31 @@ class PasswordResetConfirmationMutation(mutations.SerializerMutation):
     @audit_failures('auth_password_reset')
     def mutate_and_get_payload(cls, root, info, **input):
         return super().mutate_and_get_payload(root, info, **input)
+
+    @classmethod
+    def perform_mutate(cls, serializer, info):
+        # Completing a reset - whether the ordinary "forgot password" flow or the emailed
+        # "set your first password" link (E04) - previously left the browser that completed it
+        # with no working session at all: the old access token stops authenticating the moment
+        # the password changes (its embedded password-hash fingerprint no longer matches) and
+        # the old refresh token is blacklisted below, but nothing replaced them. The app looked
+        # logged in (stale client-side cache) until the next reload, which then failed outright.
+        # A session proven by a validated password-reset token is exactly as trustworthy as one
+        # proven by a password, so mint this browser a fresh one immediately, and properly
+        # revoke every other still-active session (not just blacklist their tokens) so the
+        # Active Sessions list doesn't keep showing an already-dead entry as current.
+        with transaction.atomic():
+            mutation = super().perform_mutate(serializer, info)
+            session_id = _create_session_for_user(serializer.user, info.context._request, mutation.refresh)
+            SessionService(serializer.user).revoke_all_sessions(except_session_id=session_id)
+
+        info.context._request.set_auth_cookie = {
+            settings.SESSION_ID_COOKIE: session_id,
+            settings.ACCESS_TOKEN_COOKIE: mutation.access,
+            settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
+        }
+
+        return mutation
 
 
 class GenerateOTPMutation(mutations.SerializerMutation):
@@ -523,6 +548,9 @@ class ChangePasswordMutation(CookieAuthenticationMutation):
         with transaction.atomic():
             mutation = super().perform_mutate(serializer, info)
             session_id = _create_session_for_user(info.context.user, info.context._request, mutation.refresh)
+            # Keep this session (just minted above) working; properly revoke every other one -
+            # same reasoning as PasswordResetConfirmationMutation.perform_mutate.
+            SessionService(info.context.user).revoke_all_sessions(except_session_id=session_id)
         info.context._request.set_auth_cookie = {
             settings.SESSION_ID_COOKIE: session_id,
             settings.ACCESS_TOKEN_COOKIE: mutation.access,

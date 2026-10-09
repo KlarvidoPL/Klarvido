@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client/react';
 import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
 import { useApiForm } from '@sb/webapp-api-client/hooks';
+import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
 import { useToast } from '@sb/webapp-core/toast/useToast';
@@ -16,6 +17,7 @@ export const usePasswordResetConfirmForm = (user: string, token: string) => {
   const navigate = useNavigate();
   const generateLocalePath = useGenerateLocalePath();
   const intl = useIntl();
+  const { reload: reloadCommonQuery } = useCommonQuery();
 
   const form = useApiForm<ResetPasswordFormFields>({
     defaultValues: {
@@ -53,7 +55,7 @@ export const usePasswordResetConfirmForm = (user: string, token: string) => {
   const { handleSubmit, setApolloGraphQLResponseErrors } = form;
 
   const [commitPasswordResetConfirm, { loading }] = useMutation(authRequestPasswordResetConfirmMutation, {
-    onCompleted: () => {
+    onCompleted: async () => {
       trackEvent('auth', 'reset-password-confirm');
 
       toast({
@@ -64,7 +66,18 @@ export const usePasswordResetConfirmForm = (user: string, token: string) => {
         variant: 'success',
       });
 
-      navigate(generateLocalePath(RoutesConfig.login));
+      // Completing this (an emailed, one-time-use token) is exactly as strong a proof as a
+      // password, so the backend already signs this browser in - no need to also make the
+      // user type their brand-new password straight back in on the login page. Refetch
+      // currentUser so the rest of the app (AuthRoute, etc.) sees the fresh session before we
+      // navigate - same reasoning as signupForm/loginForm.
+      try {
+        await reloadCommonQuery();
+      } catch (error) {
+        console.error('Failed to refresh current user after password reset:', error);
+      }
+
+      navigate(generateLocalePath(RoutesConfig.home));
     },
     onError: (error) => {
       const graphQLErrors = extractGraphQLErrors(error);

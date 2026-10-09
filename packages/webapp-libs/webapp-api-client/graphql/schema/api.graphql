@@ -1843,6 +1843,9 @@ type PasswordResetMutationPayload {
 }
 type PasswordResetConfirmationMutationPayload {
   ok: Boolean
+  refresh: String
+  access: String
+  authenticated: Boolean!
   clientMutationId: String
 }
 type ValidateOTPMutationPayload {

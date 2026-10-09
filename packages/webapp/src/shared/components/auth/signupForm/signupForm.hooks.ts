@@ -20,6 +20,14 @@ export const useSignupForm = (args?: UseApiFormArgs<SignupFormFields>) => {
   const form = useApiForm<SignupFormFields>({
     ...args,
     errorMessages: {
+      nonFieldErrors: {
+        // Same id/translation as changePasswordForm's identical code (E06) - signup also
+        // fails closed if the rate limiter itself is unreachable.
+        rate_limit_unavailable: intl.formatMessage({
+          defaultMessage: 'Sign-in is temporarily unavailable. Please try again shortly.',
+          id: 'Auth / Change password / Rate limit unavailable',
+        }),
+      },
       email: {
         unique: intl.formatMessage({
           defaultMessage: 'The email address is already taken',

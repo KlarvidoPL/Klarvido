@@ -139,7 +139,7 @@ type Documents = {
     "\n  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {\n    requestPasswordSetLink(input: $input) {\n      ok\n    }\n  }\n": typeof types.RequestPasswordSetLinkMutationDocument,
     "\n  mutation authUpdateUserProfileMutation($input: UpdateCurrentUserMutationInput!) {\n    updateCurrentUser(input: $input) {\n      userProfile {\n        id\n        user {\n          ...commonQueryCurrentUserFragment\n        }\n      }\n    }\n  }\n": typeof types.AuthUpdateUserProfileMutationDocument,
     "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n": typeof types.LoginFormMutationDocument,
-    "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n": typeof types.AuthRequestPasswordResetConfirmMutationDocument,
+    "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n      authenticated\n    }\n  }\n": typeof types.AuthRequestPasswordResetConfirmMutationDocument,
     "\n  mutation authRequestPasswordResetMutation($input: PasswordResetMutationInput!) {\n    passwordReset(input: $input) {\n      ok\n    }\n  }\n": typeof types.AuthRequestPasswordResetMutationDocument,
     "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      ok\n    }\n  }\n": typeof types.AuthSignupMutationDocument,
     "\n  mutation generateOtp($input: GenerateOTPMutationInput!) {\n    generateOtp(input: $input) {\n      base32\n      otpauthUrl\n    }\n  }\n": typeof types.GenerateOtpDocument,
@@ -274,7 +274,7 @@ const documents: Documents = {
     "\n  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {\n    requestPasswordSetLink(input: $input) {\n      ok\n    }\n  }\n": types.RequestPasswordSetLinkMutationDocument,
     "\n  mutation authUpdateUserProfileMutation($input: UpdateCurrentUserMutationInput!) {\n    updateCurrentUser(input: $input) {\n      userProfile {\n        id\n        user {\n          ...commonQueryCurrentUserFragment\n        }\n      }\n    }\n  }\n": types.AuthUpdateUserProfileMutationDocument,
     "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n": types.LoginFormMutationDocument,
-    "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n": types.AuthRequestPasswordResetConfirmMutationDocument,
+    "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n      authenticated\n    }\n  }\n": types.AuthRequestPasswordResetConfirmMutationDocument,
     "\n  mutation authRequestPasswordResetMutation($input: PasswordResetMutationInput!) {\n    passwordReset(input: $input) {\n      ok\n    }\n  }\n": types.AuthRequestPasswordResetMutationDocument,
     "\n  mutation authSignupMutation($input: SingUpMutationInput!) {\n    signUp(input: $input) {\n      ok\n    }\n  }\n": types.AuthSignupMutationDocument,
     "\n  mutation generateOtp($input: GenerateOTPMutationInput!) {\n    generateOtp(input: $input) {\n      base32\n      otpauthUrl\n    }\n  }\n": types.GenerateOtpDocument,
@@ -801,7 +801,7 @@ export function gql(source: "\n  mutation loginFormMutation($input: ObtainTokenM
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n"): (typeof documents)["\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n"];
+export function gql(source: "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n      authenticated\n    }\n  }\n"): (typeof documents)["\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n      authenticated\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

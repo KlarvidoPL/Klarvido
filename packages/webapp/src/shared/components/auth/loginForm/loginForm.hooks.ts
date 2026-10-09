@@ -31,6 +31,17 @@ export const useLoginForm = () => {
           defaultMessage: 'Incorrect authentication credentials.',
           id: 'Login form / error / authentication failed',
         }),
+        // Same ids/translations as changePasswordForm's identical codes (E05/E06) - reused
+        // rather than duplicated, since the account-wide password budget and the rate-limiter
+        // fail-closed error apply identically here.
+        too_many_attempts: intl.formatMessage({
+          defaultMessage: 'Too many attempts. Try again later.',
+          id: 'Auth / Change password / Too many attempts',
+        }),
+        rate_limit_unavailable: intl.formatMessage({
+          defaultMessage: 'Sign-in is temporarily unavailable. Please try again shortly.',
+          id: 'Auth / Change password / Rate limit unavailable',
+        }),
       },
     },
     defaultValues: {

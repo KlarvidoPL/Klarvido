@@ -339,6 +339,8 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
     token = serializers.CharField(write_only=True, help_text=_("Token"))
 
     ok = serializers.BooleanField(read_only=True)
+    refresh = serializers.CharField(read_only=True)
+    access = serializers.CharField(read_only=True)
 
     def validate(self, attrs):
         token = attrs["token"]
@@ -372,11 +374,21 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
                 {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
             )
         user.set_password(validated_data['new_password'])
+        # Blacklist every outstanding token minted before this point - the browser that
+        # completed this reset gets a brand-new one below instead (not blacklisted, since it
+        # doesn't exist yet). Any other logged-in session's SSOSession row is separately
+        # revoked in ChangePasswordMutation/PasswordResetConfirmationMutation.perform_mutate,
+        # once the new session's ID is known to exclude from it.
         jwt.blacklist_user_tokens(user)
         user.save(update_fields=['password'])
+        clear_password_budget(user.email)
         event = record('auth_password_reset', request=self.context.get('request'), user=user)
         enqueue_email(user, 'PASSWORD_CHANGED', event=event)
-        return {"ok": True}
+
+        self.user = user
+        refresh = jwt_tokens.RefreshToken.for_user(user)
+        refresh['auth_method'] = 'password'
+        return {"ok": True, "access": str(refresh.access_token), "refresh": str(refresh)}
 
 
 class CookieTokenObtainPairSerializer(jwt_serializers.TokenObtainPairSerializer):
