@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 from apps.sso.models import SSOAuditLog, SSOSession
 from apps.users import tokens
 from apps.users.exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure
-from apps.users.models import User, SecurityEmailOutbox, SignupEmailCooldown
+from apps.users.models import User, SecurityEmailOutbox
 from apps.users.services import otp
 from apps.users.services.security import client_ip, record, enqueue_email, process_outbox
 from apps.users.tasks import cleanup_authentication_records
@@ -277,8 +277,6 @@ def test_google_initiation_requires_csrf_protected_post():
     csrf = client.get('/api/auth/csrf/').json()['csrfToken']
     with patch('apps.users.views.do_auth') as auth:
         auth.return_value = client.get('/api/auth/csrf/')
-        response = client.post(
-            url, {'csrfmiddlewaretoken': csrf, 'locale': 'pl'}, HTTP_ORIGIN='http://testserver'
-        )
+        response = client.post(url, {'csrfmiddlewaretoken': csrf, 'locale': 'pl'}, HTTP_ORIGIN='http://testserver')
     assert response.status_code == 200
     assert auth.call_args.kwargs['user'] is None

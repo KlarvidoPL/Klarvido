@@ -261,6 +261,9 @@ class SecurityEmailOutbox(models.Model):
             )
         ]
 
+    def __str__(self) -> str:
+        return f"{self.kind} -> {self.recipient}"
+
 
 class SignupEmailCooldown(models.Model):
     recipient_hash = models.CharField(max_length=64, primary_key=True)
@@ -268,12 +271,18 @@ class SignupEmailCooldown(models.Model):
     day_started_at = models.DateTimeField(default=timezone.now)
     daily_count = models.PositiveSmallIntegerField(default=0)
 
+    def __str__(self) -> str:
+        return self.recipient_hash
+
 
 class ResetEmailLimit(models.Model):
     key = models.CharField(max_length=64, primary_key=True)
     window_started_at = models.DateTimeField(default=timezone.now)
     last_queued_at = models.DateTimeField(null=True, blank=True)
     count = models.PositiveIntegerField(default=0)
+
+    def __str__(self) -> str:
+        return self.key
 
 
 class PasswordFailureBudget(models.Model):

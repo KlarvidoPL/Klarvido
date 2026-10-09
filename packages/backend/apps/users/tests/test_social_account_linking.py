@@ -169,7 +169,6 @@ def test_pipeline_has_no_implicit_email_association_or_legacy_creation():
     assert 'apps.users.pipeline.create_social_user' in settings.SOCIAL_AUTH_PIPELINE
 
 
-
 def test_new_verified_provider_signup_has_recorded_ownership_proof(social_backend):
     result = run_social_pipeline(social_backend, 'new-verified-owner@example.com')
     assert result['user'].is_confirmed
