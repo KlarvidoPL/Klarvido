@@ -17,7 +17,7 @@ describe('TenantSwitchSidebar: Component', () => {
   });
   const user = currentUserFactory({ tenants: [orgTenant] });
 
-  const Component = (props: { collapsed?: boolean } = {}) => (
+  const Component = (props: { collapsed?: boolean; onNavigate?: () => void } = {}) => (
     <CurrentTenantRouteWrapper>
       <TenantSwitchSidebar {...props} />
     </CurrentTenantRouteWrapper>
@@ -47,6 +47,42 @@ describe('TenantSwitchSidebar: Component', () => {
     await userEvent.click(trigger);
 
     expect(screen.getByText(/create new organization/i)).toBeInTheDocument();
+  });
+
+  it('keeps the sidebar trigger interactive when opening the menu and closes the sidebar only after selection', async () => {
+    const onNavigate = jest.fn();
+    const routerProps = createMockRouterProps(RoutesConfig.home, { tenantId: orgTenant.id });
+    render(<Component onNavigate={onNavigate} />, {
+      apolloMocks: [fillCommonQueryWithUser(user)],
+      routerProps,
+    });
+
+    const trigger = await screen.findByRole('button');
+    await userEvent.click(trigger);
+
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    // Modal Radix menus set pointer-events:none on the body, causing a mobile
+    // tap to fall through the trigger to the explicitly interactive backdrop.
+    expect(document.body).not.toHaveStyle({ pointerEvents: 'none' });
+    expect(trigger).not.toHaveAttribute('aria-hidden', 'true');
+    expect(onNavigate).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole('menuitemcheckbox', { name: /org one/i }));
+    expect(onNavigate).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('dismisses the organization menu with Escape without closing the sidebar', async () => {
+    const onNavigate = jest.fn();
+    render(<Component onNavigate={onNavigate} />, { apolloMocks: [fillCommonQueryWithUser(user)] });
+    const trigger = await screen.findByRole('button');
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByPlaceholderText(/search organizations/i));
+    await userEvent.keyboard('{Escape}');
+
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+    expect(onNavigate).not.toHaveBeenCalled();
   });
 
   describe('superuser cross-tenant access', () => {

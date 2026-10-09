@@ -113,6 +113,10 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
 
   const content = (
     <DropdownMenu
+      // Keep the trigger interactive for the full touch gesture. A modal menu
+      // disables outside pointer events on pointer-down, letting the subsequent
+      // tap hit the mobile sidebar's backdrop and close the sidebar.
+      modal={false}
       onOpenChange={(open) => {
         if (!open) setSearchQuery('');
       }}
@@ -120,7 +124,11 @@ export const TenantSwitchSidebar = ({ collapsed = false, onNavigate }: TenantSwi
       <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
       <DropdownMenuContent
         align={collapsed ? 'end' : 'start'}
-        className={cn(collapsed ? 'w-56' : 'w-[var(--radix-dropdown-menu-trigger-width)]')}
+        collisionPadding={12}
+        className={cn(
+          'z-[70] max-h-[var(--radix-dropdown-menu-content-available-height)] max-w-[var(--radix-dropdown-menu-content-available-width)] overflow-y-auto',
+          collapsed ? 'w-56' : 'w-[var(--radix-dropdown-menu-trigger-width)]'
+        )}
       >
         {/* <DropdownMenuLabel>
           <FormattedMessage defaultMessage="Personal account" id="TenantSwitch / Personal account" />
