@@ -1,8 +1,8 @@
-name: "Backend"
+name: 'Backend'
 
 on:
   push:
-    branches: [ '**' ]
+    branches: ['**']
     paths:
       - 'packages/backend/**'
       - 'docker-compose.yml'
@@ -10,10 +10,13 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/backend.yml'
+      - '.github/docker/**'
       - '.github/workflows/actions/setup/**'
 
 env:
   SB_BACKEND_BASE_IMAGE: python:3.11-slim-bullseye
+  SB_MIRROR_REPOSITORY: mirror.gcr.io/
+  SB_PULL_THROUGH_CACHE_REPOSITORY: mirror.gcr.io/library/
 
 jobs:
   test:
@@ -28,9 +31,9 @@ jobs:
 
       - shell: bash
         run: pnpm install
-            --include-workspace-root
-            --frozen-lockfile
-            --filter=backend...
+          --include-workspace-root
+          --frozen-lockfile
+          --filter=backend...
 
       - name: Lint infra
         shell: bash
@@ -49,4 +52,4 @@ jobs:
           SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
           SONAR_BACKEND_PROJECT_KEY: ${{ vars.SONAR_BACKEND_PROJECT_KEY }}
         with:
-            projectBaseDir: packages/backend
+          projectBaseDir: packages/backend

@@ -1,16 +1,21 @@
-name: "Workers"
-
+name: 'Workers'
 
 on:
   push:
-    branches: [ '**' ]
+    branches: ['**']
     paths:
       - 'packages/workers/**'
       - 'packages/webapp-libs/webapp-emails/**'
+      - 'docker-compose.ci.yml'
+      - '.github/docker/**'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/workers.yml'
       - '.github/workflows/actions/setup/**'
+
+env:
+  SB_MIRROR_REPOSITORY: mirror.gcr.io/
+  SB_PULL_THROUGH_CACHE_REPOSITORY: mirror.gcr.io/library/
 
 jobs:
   build:
@@ -50,9 +55,9 @@ jobs:
 
       - shell: bash
         run: pnpm install
-            --include-workspace-root
-            --frozen-lockfile
-            --filter=workers...
+          --include-workspace-root
+          --frozen-lockfile
+          --filter=workers...
 
       - name: Lint workers
         shell: bash

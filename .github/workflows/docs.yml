@@ -1,18 +1,22 @@
-name: "Docs"
+name: 'Docs'
 
 on:
   push:
-    branches: [ '**' ]
+    branches: ['**']
     paths:
       - 'packages/internal/docs/**'
       - 'packages/backend/**'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/docs.yml'
+      - 'docker-compose.ci.yml'
+      - '.github/docker/**'
       - '.github/workflows/actions/setup/**'
 
 env:
   SB_BACKEND_BASE_IMAGE: python:3.11-slim-bullseye
+  SB_MIRROR_REPOSITORY: mirror.gcr.io/
+  SB_PULL_THROUGH_CACHE_REPOSITORY: mirror.gcr.io/library/
 
 jobs:
   build:
@@ -27,10 +31,10 @@ jobs:
 
       - shell: bash
         run: pnpm install
-            --include-workspace-root
-            --frozen-lockfile
-            --filter=docs...
-            --filter=backend...
+          --include-workspace-root
+          --frozen-lockfile
+          --filter=docs...
+          --filter=backend...
 
       - name: Lint
         shell: bash
@@ -40,4 +44,4 @@ jobs:
         shell: bash
         run: pnpm nx run docs:build
         env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: '--max-old-space-size=4096'
