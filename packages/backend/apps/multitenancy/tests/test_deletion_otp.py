@@ -49,12 +49,18 @@ def test_failed_otp_counters_persist_and_lock_out_deletion(otp_owner):
     actor, tenant = otp_owner
     for _ in range(5):
         with pytest.raises(GraphQlValidationError):
-            delete_organization(tenant.pk, SimpleNamespace(user=actor), otp_token='invalid')
+            delete_organization(
+                tenant.pk, SimpleNamespace(user=actor, META={'REMOTE_ADDR': '127.0.0.1'}), otp_token='invalid'
+            )
     actor.refresh_from_db()
     assert actor.otp_failed_attempts == 5
     assert actor.otp_locked_until is not None
     with pytest.raises(GraphQlValidationError):
-        delete_organization(tenant.pk, SimpleNamespace(user=actor), otp_token=pyotp.TOTP(actor.otp_base32).now())
+        delete_organization(
+            tenant.pk,
+            SimpleNamespace(user=actor, META={'REMOTE_ADDR': '127.0.0.1'}),
+            otp_token=pyotp.TOTP(actor.otp_base32).now(),
+        )
     assert Tenant.objects.filter(pk=tenant.pk).exists()
 
 
@@ -63,9 +69,9 @@ def test_used_otp_cannot_delete_another_organization(otp_owner, tenant_factory, 
     second = tenant_factory(type='organization')
     tenant_membership_factory(tenant=second, user=actor, role='OWNER')
     token = pyotp.TOTP(actor.otp_base32).now()
-    delete_organization(first.pk, SimpleNamespace(user=actor), otp_token=token)
+    delete_organization(first.pk, SimpleNamespace(user=actor, META={'REMOTE_ADDR': '127.0.0.1'}), otp_token=token)
     with pytest.raises(GraphQlValidationError):
-        delete_organization(second.pk, SimpleNamespace(user=actor), otp_token=token)
+        delete_organization(second.pk, SimpleNamespace(user=actor, META={'REMOTE_ADDR': '127.0.0.1'}), otp_token=token)
     assert Tenant.objects.filter(pk=second.pk).exists()
 
 

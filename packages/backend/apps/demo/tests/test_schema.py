@@ -874,7 +874,7 @@ class TestCreateDocumentDemoItemMutation:
         assert executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["file"]
         assert executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["file"]["name"] == self.TEST_FILENAME
         assert executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["file"]["url"].startswith(
-            f"https://cdn.example.com/documents/a1b2/{self.TEST_FILENAME}"
+            f"https://cdn.example.com/documents/organizations/{self.tenant.pk}/a1b2/{self.TEST_FILENAME}"
         )
 
         item_global_id = executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["id"]
@@ -882,8 +882,10 @@ class TestCreateDocumentDemoItemMutation:
         item = models.DocumentDemoItem.objects.get(pk=pk)
 
         assert item.created_by == user
-        assert item.file.name == f"documents/a1b2/{self.TEST_FILENAME}"
-        assert item.file.url.startswith(f"https://cdn.example.com/documents/a1b2/{self.TEST_FILENAME}")
+        assert item.file.name == f"documents/organizations/{self.tenant.pk}/a1b2/{self.TEST_FILENAME}"
+        assert item.file.url.startswith(
+            f"https://cdn.example.com/documents/organizations/{self.tenant.pk}/a1b2/{self.TEST_FILENAME}"
+        )
 
     def test_create_new_item_when_limit_already_reached(self, user, api_client, document_demo_item_factory):
         api_client.force_authenticate(user)

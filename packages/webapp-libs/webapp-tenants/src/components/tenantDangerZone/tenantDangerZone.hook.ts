@@ -67,7 +67,7 @@ export const useTenantDelete = () => {
 
   const deleteTenant = async (otpToken?: string) => {
     if (!currentTenant) return false;
-    form.clearErrors();
+    form.form.clearErrors();
 
     try {
       const result = await commitRemoveMutation({
@@ -86,5 +86,5 @@ export const useTenantDelete = () => {
     }
   };
 
-  return { deleteTenant, loading, form };
+  return { deleteTenant, loading, form: form.form };
 };

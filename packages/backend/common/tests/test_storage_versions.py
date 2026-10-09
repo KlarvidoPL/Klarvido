@@ -1,9 +1,38 @@
 from unittest.mock import Mock, call
 
 import pytest
+import boto3
+from moto import mock_s3
 from storages.backends.s3boto3 import S3Boto3Storage
 
 from common.storages import delete_storage_file, delete_storage_prefix
+
+pytestmark = pytest.mark.django_db
+
+
+@pytest.mark.parametrize('suspended', [False, True])
+def test_versioned_bucket_cleanup_removes_real_versions_and_preserves_neighbors(suspended):
+    with mock_s3():
+        client = boto3.client('s3', region_name='us-east-1')
+        bucket = 'organization-version-cleanup'
+        client.create_bucket(Bucket=bucket)
+        client.put_bucket_versioning(Bucket=bucket, VersioningConfiguration={'Status': 'Enabled'})
+        target = 'exports/tenant_backups/abc/backup.xml'
+        neighbor = 'exports/tenant_backups/abcd/keep.xml'
+        for content in (b'old', b'new'):
+            client.put_object(Bucket=bucket, Key=target, Body=content)
+        client.delete_object(Bucket=bucket, Key=target)
+        client.put_object(Bucket=bucket, Key=neighbor, Body=b'keep')
+        if suspended:
+            client.put_bucket_versioning(Bucket=bucket, VersioningConfiguration={'Status': 'Suspended'})
+            client.put_object(Bucket=bucket, Key=target, Body=b'null version')
+        storage = S3Boto3Storage(bucket_name=bucket, location='exports', region_name='us-east-1')
+        delete_storage_prefix(storage, 'tenant_backups/abc/')
+        delete_storage_prefix(storage, 'tenant_backups/abc/')  # A repeated cleanup is harmless.
+        remaining = client.list_object_versions(Bucket=bucket, Prefix='exports/tenant_backups/abc/')
+        assert not remaining.get('Versions')
+        assert not remaining.get('DeleteMarkers')
+        assert client.get_object(Bucket=bucket, Key=neighbor)['Body'].read() == b'keep'
 
 
 @pytest.fixture

@@ -65,11 +65,17 @@ class TenantAdmin(admin.ModelAdmin):
             except GraphQlValidationError as exc:
                 context['otp_error'] = str(exc.detail['otp_token'][0])
                 original_method = request.method
+                original_post = request.POST
                 request.method = 'GET'
+                # Django's internal delete view checks request.POST itself,
+                # rather than request.method, when deciding to execute deletion.
+                request.POST = request.POST.copy()
+                request.POST.clear()
                 try:
                     return super().delete_view(request, object_id, extra_context=context)
                 finally:
                     request.method = original_method
+                    request.POST = original_post
         return super().delete_view(request, object_id, extra_context=context)
 
     @admin.action(description=django_delete_selected.short_description, permissions=['delete'])
