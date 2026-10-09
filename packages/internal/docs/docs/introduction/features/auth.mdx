@@ -98,6 +98,27 @@ New passwords retain the eight-character minimum by product decision. Server che
 account email/profile names and a local common-password corpus plus application-specific predictable
 choices. Existing passwords still work. No external password-check service or forced password resets are used.
 
+### Password failure budget and proxy trust
+
+Every password check - login, changing a password, and the fresh-authentication password proof used by
+passkey/2FA management - shares one account-wide failure budget, independent of the per-IP login limit.
+After 10 consecutive failures the account locks for a progressive cooldown (1, 5, 15, then 60 minutes,
+repeating), during which even the correct password is rejected with a generic message - the budget would
+not be real otherwise. A successful check, or completing a password reset, clears it. The budget is keyed
+by a salted hash of the attempted email address rather than an account row, so an unregistered address is
+rate-limited identically to a registered one.
+
+`TRUSTED_PROXIES` (a comma-separated CIDR list) is the one setting every IP resolver in the backend reads
+to decide whether to trust a forwarded client address - set it to your reverse proxy's network (e.g. the
+Traefik Docker network on a VPS) or every client appears to share the proxy's own address for rate
+limiting, passkey throttling and audit logging. Leaving it unset is safe (not a bypass) but means those
+controls can't distinguish clients. `AUTH_AUDIT_TRUSTED_PROXIES` is an older name for the same setting,
+still read as a fallback.
+
+If the rate-limit store (Redis) itself becomes unreachable, authentication operations (sign-in, signup,
+2FA, password changes) reject the request with a translated "temporarily unavailable" message rather than
+proceeding unlimited; non-authentication operations keep running without a limit during such an outage.
+
 ### OTP encryption deployment requirement
 
 **Before merging this branch to master or deploying to the VPS, add `OTP_ENCRYPTION_KEYS` to the private
@@ -173,6 +194,11 @@ yet (e.g. a Google-only sign-in) would otherwise have no way to ever turn 2FA on
 replacing the secret or disabling 2FA - always requires fresh proof: your password plus your current code, a
 verified passkey, or, only for an account with neither, that current code by itself. Every enable, replace or
 disable sends a notification email, so an unexpected one is a signal to review your account.
+
+Setting your *first* password works the same way, in reverse: if your account already has a passkey or 2FA,
+the password form asks you to verify with one of those before it lets you set a password. If it has neither,
+the form instead emails you a one-time link to set one, since a bare logged-in session isn't enough proof on
+its own.
 :::
 
 <p align="center">

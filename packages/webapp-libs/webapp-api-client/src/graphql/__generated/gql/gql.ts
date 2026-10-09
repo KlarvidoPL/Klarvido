@@ -136,6 +136,7 @@ type Documents = {
     "\n  mutation RevokeSessionMutation($sessionId: String!, $reason: String) {\n    revokeSession(sessionId: $sessionId, reason: $reason) {\n      ok\n    }\n  }\n": typeof types.RevokeSessionMutationDocument,
     "\n  mutation RevokeAllSessionsMutation {\n    revokeAllSessions {\n      ok\n      revokedCount\n    }\n  }\n": typeof types.RevokeAllSessionsMutationDocument,
     "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n": typeof types.AuthChangePasswordMutationDocument,
+    "\n  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {\n    requestPasswordSetLink(input: $input) {\n      ok\n    }\n  }\n": typeof types.RequestPasswordSetLinkMutationDocument,
     "\n  mutation authUpdateUserProfileMutation($input: UpdateCurrentUserMutationInput!) {\n    updateCurrentUser(input: $input) {\n      userProfile {\n        id\n        user {\n          ...commonQueryCurrentUserFragment\n        }\n      }\n    }\n  }\n": typeof types.AuthUpdateUserProfileMutationDocument,
     "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n": typeof types.LoginFormMutationDocument,
     "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n": typeof types.AuthRequestPasswordResetConfirmMutationDocument,
@@ -270,6 +271,7 @@ const documents: Documents = {
     "\n  mutation RevokeSessionMutation($sessionId: String!, $reason: String) {\n    revokeSession(sessionId: $sessionId, reason: $reason) {\n      ok\n    }\n  }\n": types.RevokeSessionMutationDocument,
     "\n  mutation RevokeAllSessionsMutation {\n    revokeAllSessions {\n      ok\n      revokedCount\n    }\n  }\n": types.RevokeAllSessionsMutationDocument,
     "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n": types.AuthChangePasswordMutationDocument,
+    "\n  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {\n    requestPasswordSetLink(input: $input) {\n      ok\n    }\n  }\n": types.RequestPasswordSetLinkMutationDocument,
     "\n  mutation authUpdateUserProfileMutation($input: UpdateCurrentUserMutationInput!) {\n    updateCurrentUser(input: $input) {\n      userProfile {\n        id\n        user {\n          ...commonQueryCurrentUserFragment\n        }\n      }\n    }\n  }\n": types.AuthUpdateUserProfileMutationDocument,
     "\n  mutation loginFormMutation($input: ObtainTokenMutationInput!) {\n    tokenAuth(input: $input) {\n      authenticated\n      otpRequired\n    }\n  }\n": types.LoginFormMutationDocument,
     "\n  mutation authRequestPasswordResetConfirmMutation($input: PasswordResetConfirmationMutationInput!) {\n    passwordResetConfirm(input: $input) {\n      ok\n    }\n  }\n": types.AuthRequestPasswordResetConfirmMutationDocument,
@@ -784,6 +786,10 @@ export function gql(source: "\n  mutation RevokeAllSessionsMutation {\n    revok
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n"): (typeof documents)["\n  mutation authChangePasswordMutation($input: ChangePasswordMutationInput!) {\n    changePassword(input: $input) {\n      authenticated\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {\n    requestPasswordSetLink(input: $input) {\n      ok\n    }\n  }\n"): (typeof documents)["\n  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {\n    requestPasswordSetLink(input: $input) {\n      ok\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

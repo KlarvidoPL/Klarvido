@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "تغيير المصادقة الثنائية"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "رمز المصادقة"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "تسجيل الدخول غير متاح مؤقتًا. حاول مرة أخرى قريبًا."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "أرسل لي رابطًا لتعيين كلمة مرور"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "لا يحتوي هذا الحساب على كلمة مرور بعد. سنرسل لك رابطًا لتعيين واحدة."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "حدث خطأ ما. حاول مرة أخرى."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "لقد أرسلنا لك رابطًا لتعيين كلمة المرور الخاصة بك."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "عدد المحاولات كبير جدًا. حاول مرة أخرى لاحقًا."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "تعيين كلمة المرور"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "ينتهي صلاحية هذا الرابط في غضون ساعة واحدة لأمانك"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "قم بتعيين كلمة مرورك"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "لقد طلبت تعيين كلمة مرور لحسابك. انقر على الزر أدناه لاختيار واحدة. إذا لم تقم بهذا الطلب، يمكنك تجاهل هذا البريد الإلكتروني بأمان."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "قم بتعيين كلمة مرورك"
   }
 }

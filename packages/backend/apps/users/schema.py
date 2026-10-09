@@ -14,6 +14,7 @@ from common.acl import policies
 from common.graphql import mutations
 from common.graphql import ratelimit
 from common.graphql.acl.decorators import permission_classes
+from common.ratelimiting import RateLimitCategory, RateLimitKey
 from apps.multitenancy.schema import TenantType
 from .jwt import get_jti_from_refresh_token
 from . import models
@@ -78,52 +79,69 @@ class ObtainTokenMutation(CookieAuthenticationMutation):
         serializer_class = serializers.CookieTokenObtainPairSerializer
 
     @classmethod
-    @ratelimit.ratelimit(key="ip", rate="30/min")
+    @ratelimit.ratelimit(key="ip", rate="30/min", fail_closed=True)
     @audit_failures('auth_password_login')
     def mutate_and_get_payload(cls, root, info, **input):
+        # A validation failure here (wrong password / locked budget) has no other side effect
+        # that needs rolling back: CookieTokenObtainPairSerializer.validate() raises before any
+        # token is minted, so the only write involved is the password failure budget's counter
+        # (E05), committed from its own nested atomic block inside .validate(). That commit must
+        # survive the ValidationError .validate() then raises - so it is caught *inside* the
+        # `with` block below (letting the block exit normally and commit) and re-raised only
+        # once we are safely outside it, instead of letting the exception propagate through the
+        # `with` statement itself and roll everything in it back. A session-creation failure
+        # below, by contrast, must still roll back the just-minted tokens together with it - so
+        # it is deliberately NOT given the same treatment.
+        failure = None
         with transaction.atomic():
-            mutation = super().mutate_and_get_payload(root, info, **input)
-
-            if mutation.otp_auth_token:
-                account = models.User.objects.get(email__iexact=input['email'])
-                record(
-                    'auth_otp_challenge',
-                    request=info.context._request,
-                    user=account,
-                    outcome='first_factor_verified',
-                    method='password',
-                )
-                otp_cookies = {
-                    settings.OTP_AUTH_TOKEN_COOKIE: mutation.otp_auth_token,
-                }
+            try:
+                mutation = super().mutate_and_get_payload(root, info, **input)
+            except ValidationError as exc:
+                failure = exc
             else:
-                # Create session for tracking
-                user = getattr(mutation, "_user", None)
-                if not user:
-                    # Try to get user from serializer
-                    serializer = cls._meta.serializer_class
-                    if hasattr(serializer, "user"):
-                        user = serializer.user
+                if mutation.otp_auth_token:
+                    account = models.User.objects.get(email__iexact=input['email'])
+                    record(
+                        'auth_otp_challenge',
+                        request=info.context._request,
+                        user=account,
+                        outcome='first_factor_verified',
+                        method='password',
+                    )
+                    otp_cookies = {
+                        settings.OTP_AUTH_TOKEN_COOKIE: mutation.otp_auth_token,
+                    }
+                else:
+                    # Create session for tracking
+                    user = getattr(mutation, "_user", None)
+                    if not user:
+                        # Try to get user from serializer
+                        serializer = cls._meta.serializer_class
+                        if hasattr(serializer, "user"):
+                            user = serializer.user
 
-                # Get user from validated data - need to look it up by email
-                email = input.get("email")
-                if email and not user:
-                    try:
-                        user = models.User.objects.get(email__iexact=email)
-                    except models.User.DoesNotExist:
-                        user = None
+                    # Get user from validated data - need to look it up by email
+                    email = input.get("email")
+                    if email and not user:
+                        try:
+                            user = models.User.objects.get(email__iexact=email)
+                        except models.User.DoesNotExist:
+                            user = None
 
-                session_id = _create_session_for_user(
-                    user, info.context._request, refresh_token=mutation.refresh, link_social=True
-                )
+                    session_id = _create_session_for_user(
+                        user, info.context._request, refresh_token=mutation.refresh, link_social=True
+                    )
 
-                record('auth_password_login', request=info.context._request, user=user, method='password')
-                auth_cookies = {
-                    settings.ACCESS_TOKEN_COOKIE: mutation.access,
-                    settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
-                }
+                    record('auth_password_login', request=info.context._request, user=user, method='password')
+                    auth_cookies = {
+                        settings.ACCESS_TOKEN_COOKIE: mutation.access,
+                        settings.REFRESH_TOKEN_COOKIE: mutation.refresh,
+                    }
 
-                auth_cookies[settings.SESSION_ID_COOKIE] = session_id
+                    auth_cookies[settings.SESSION_ID_COOKIE] = session_id
+
+        if failure is not None:
+            raise failure
 
         if mutation.otp_auth_token:
             info.context._request.set_cookies = otp_cookies
@@ -140,7 +158,7 @@ class SingUpMutation(CookieAuthenticationMutation):
         serializer_class = serializers.UserSignupSerializer
 
     @classmethod
-    @ratelimit.ratelimit(key="ip", rate="10/min")
+    @ratelimit.ratelimit(key="ip", rate="10/min", fail_closed=True)
     @audit_failures('auth_signup')
     def mutate_and_get_payload(cls, root, info, **input):
         with transaction.atomic():
@@ -229,7 +247,7 @@ class ValidateOTPMutation(CookieAuthenticationMutation):
         serializer_class = serializers.ValidateOTPSerializer
 
     @classmethod
-    @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate)
+    @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate, fail_closed=True)
     @audit_failures('auth_otp_verification')
     def mutate_and_get_payload(cls, root, info, **input):
         # Failed OTP checks must commit their account-wide attempt counters.
@@ -301,7 +319,18 @@ class ResendConfirmationEmailMutation(mutations.SerializerMutation):
         serializer_class = serializers.ResendConfirmationEmailSerializer
 
     @classmethod
-    @ratelimit.ratelimit(key="ip", rate="10/min")
+    @ratelimit.ratelimit(key="ip", rate="10/min", fail_closed=True)
+    def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
+
+class RequestPasswordSetLinkMutation(mutations.SerializerMutation):
+    class Meta:
+        serializer_class = serializers.RequestPasswordSetLinkSerializer
+
+    @classmethod
+    @ratelimit.ratelimit(rate="3/hour", key=RateLimitKey.USER, fail_closed=True)
+    @audit_failures('auth_password_set_link')
     def mutate_and_get_payload(cls, root, info, **input):
         return super().mutate_and_get_payload(root, info, **input)
 
@@ -334,6 +363,7 @@ class AuthenticatedMutation(graphene.ObjectType):
     disable_otp = DisableOTPMutation.Field()
     mark_welcome_modal_seen = MarkWelcomeModalSeenMutation.Field()
     resend_confirmation_email = ResendConfirmationEmailMutation.Field()
+    request_password_set_link = RequestPasswordSetLinkMutation.Field()
 
 
 class CurrentUserType(DjangoObjectType):
@@ -478,10 +508,20 @@ class ChangePasswordMutation(CookieAuthenticationMutation):
         exclude = ("user",)
 
     @classmethod
+    @ratelimit.ratelimit(rate=RateLimitCategory.AUTH_PASSWORD_CHANGE, key=RateLimitKey.USER, fail_closed=True)
     @audit_failures('auth_password_change')
     def mutate_and_get_payload(cls, root, info, **input):
+        return super().mutate_and_get_payload(root, info, **input)
+
+    @classmethod
+    def perform_mutate(cls, serializer, info):
+        # Only perform_mutate (called once is_valid() already succeeded) is atomic, together
+        # with session creation - never .validate() itself. See the matching comment on
+        # ObtainTokenMutation.perform_mutate: the password failure budget (E05) must commit even
+        # when validation ultimately raises (wrong old password), but a successful password
+        # change must still roll back together with session creation if that fails.
         with transaction.atomic():
-            mutation = super().mutate_and_get_payload(root, info, **input)
+            mutation = super().perform_mutate(serializer, info)
             session_id = _create_session_for_user(info.context.user, info.context._request, mutation.refresh)
         info.context._request.set_auth_cookie = {
             settings.SESSION_ID_COOKIE: session_id,

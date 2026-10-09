@@ -19,7 +19,7 @@ from rest_framework.request import Request
 
 from .config import get_rate_limit, get_rate_limit_config
 from .constants import RateLimitCategory, RateLimitKey, UserTier
-from .utils import get_client_ip, get_user_id, get_tenant_id
+from .utils import rate_limit_ip, get_user_id, get_tenant_id
 
 
 logger = logging.getLogger(__name__)
@@ -64,24 +64,24 @@ class ConfigurableThrottle(SimpleRateThrottle):
 
         # Determine identifier based on key type
         if key_type == RateLimitKey.IP:
-            ident = get_client_ip(request)
+            ident = rate_limit_ip(request)
         elif key_type == RateLimitKey.USER:
             ident = get_user_id(request)
             if not ident:
-                ident = f"anon_{get_client_ip(request)}"
+                ident = f"anon_{rate_limit_ip(request)}"
         elif key_type == RateLimitKey.USER_OR_IP:
             ident = get_user_id(request)
-            ident = f"ip_{get_client_ip(request)}" if not ident else f"user_{ident}"
+            ident = f"ip_{rate_limit_ip(request)}" if not ident else f"user_{ident}"
         elif key_type == RateLimitKey.TENANT:
             ident = get_tenant_id(request)
             if not ident:
-                ident = f"notenant_{get_client_ip(request)}"
+                ident = f"notenant_{rate_limit_ip(request)}"
         elif key_type == RateLimitKey.USER_TENANT:
-            user_id = get_user_id(request) or f"anon_{get_client_ip(request)}"
+            user_id = get_user_id(request) or f"anon_{rate_limit_ip(request)}"
             tenant_id = get_tenant_id(request) or "notenant"
             ident = f"{user_id}_{tenant_id}"
         else:
-            ident = get_client_ip(request)
+            ident = rate_limit_ip(request)
 
         return self.cache_format % {
             "scope": self.scope,
@@ -162,7 +162,7 @@ class TieredAnonThrottle(TieredThrottle):
 
         return self.cache_format % {
             "scope": self.scope,
-            "ident": get_client_ip(request),
+            "ident": rate_limit_ip(request),
         }
 
 
@@ -235,7 +235,7 @@ class AuthenticationThrottle(ConfigurableThrottle):
         # Always use IP for auth operations
         return self.cache_format % {
             "scope": self.scope,
-            "ident": get_client_ip(request),
+            "ident": rate_limit_ip(request),
         }
 
 
@@ -262,7 +262,7 @@ class SSOLoginThrottle(ConfigurableThrottle):
     def get_cache_key(self, request: Request, view) -> Optional[str]:
         return self.cache_format % {
             "scope": self.scope,
-            "ident": get_client_ip(request),
+            "ident": rate_limit_ip(request),
         }
 
 
@@ -275,7 +275,7 @@ class SSODiscoveryThrottle(ConfigurableThrottle):
     def get_cache_key(self, request: Request, view) -> Optional[str]:
         return self.cache_format % {
             "scope": self.scope,
-            "ident": get_client_ip(request),
+            "ident": rate_limit_ip(request),
         }
 
 

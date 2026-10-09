@@ -7,3 +7,11 @@ export const authChangePasswordMutation = gql(/* GraphQL */ `
     }
   }
 `);
+
+export const requestPasswordSetLinkMutation = gql(/* GraphQL */ `
+  mutation requestPasswordSetLinkMutation($input: RequestPasswordSetLinkMutationInput!) {
+    requestPasswordSetLink(input: $input) {
+      ok
+    }
+  }
+`);

@@ -8,6 +8,7 @@ from typing import Optional, Tuple
 from django.conf import settings
 from django.utils import timezone
 
+from common.ratelimiting.utils import get_client_ip as _get_client_ip
 from ..models import SSOSession
 
 
@@ -81,11 +82,9 @@ def parse_user_agent(user_agent: str) -> dict:
 
 
 def get_client_ip(request) -> Optional[str]:
-    """Extract client IP from request."""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        return x_forwarded_for.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
+    """Extract client IP from request - delegates to the single trusted-proxy-aware resolver
+    shared across the codebase (see common.ratelimiting.utils.get_client_ip)."""
+    return _get_client_ip(request)
 
 
 class SessionService:

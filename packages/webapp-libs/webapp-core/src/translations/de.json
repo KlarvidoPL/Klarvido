@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "Änderung der Zwei-Faktor-Authentifizierung"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Authentifizierungscode"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "Die Anmeldung ist vorübergehend nicht verfügbar. Bitte versuche es in Kürze erneut."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Sende mir einen Link zum Festlegen eines Passworts"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "Dieses Konto hat noch kein Passwort. Wir senden dir einen Link, um eines festzulegen."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Wir haben dir einen Link zum Festlegen deines Passworts gesendet."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Zu viele Versuche. Bitte später erneut versuchen."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Passwort festlegen"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Dieser Link läuft aus Sicherheitsgründen in 1 Stunde ab"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Lege dein Passwort fest"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Du hast angefordert, ein Passwort für dein Konto festzulegen. Klicke auf die Schaltfläche unten, um eines auszuwählen. Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Lege dein Passwort fest"
   }
 }

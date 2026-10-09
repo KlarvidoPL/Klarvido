@@ -56,6 +56,14 @@ class PasswordResetEmail(UserEmail):
     serializer_class = email_serializers.PasswordResetEmailSerializer
 
 
+class PasswordSetEmail(UserEmail):
+    """First password on a passwordless account (E04) - same token/data shape as a normal
+    reset (the confirm link is the same route), different copy ("set" rather than "reset")."""
+
+    name = "PASSWORD_SET"
+    serializer_class = email_serializers.PasswordResetEmailSerializer
+
+
 class SocialAccountLinkedEmail(UserEmail):
     name = "SOCIAL_ACCOUNT_LINKED"
     serializer_class = email_serializers.SocialAccountLinkedEmailSerializer

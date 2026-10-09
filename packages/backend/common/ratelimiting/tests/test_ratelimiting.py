@@ -123,25 +123,30 @@ class TestRateLimitConfig:
 class TestRateLimitUtils:
     """Tests for rate limiting utilities."""
 
-    def test_get_client_ip_direct(self, request_factory):
+    def test_get_client_ip_direct(self, request_factory, settings):
         """Should get IP from REMOTE_ADDR."""
+        settings.TRUSTED_PROXIES = []
         request = request_factory.get('/')
         request.META['REMOTE_ADDR'] = '192.168.1.1'
         assert get_client_ip(request) == '192.168.1.1'
 
-    def test_get_client_ip_x_forwarded_for(self, request_factory):
-        """Should prefer X-Forwarded-For header."""
+    def test_get_client_ip_x_forwarded_for_is_ignored_without_trusted_proxy(self, request_factory, settings):
+        """E06: an attacker-controlled browser can set X-Forwarded-For to anything - it must
+        be ignored unless the peer is a configured trusted proxy (see TRUSTED_PROXIES)."""
+        settings.TRUSTED_PROXIES = []
         request = request_factory.get('/')
         request.META['HTTP_X_FORWARDED_FOR'] = '10.0.0.1, 192.168.1.1'
         request.META['REMOTE_ADDR'] = '127.0.0.1'
-        assert get_client_ip(request) == '10.0.0.1'
+        assert get_client_ip(request) == '127.0.0.1'
 
-    def test_get_client_ip_cf_connecting_ip(self, request_factory):
-        """Should handle Cloudflare header."""
+    def test_get_client_ip_x_forwarded_for_through_trusted_proxy(self, request_factory, settings):
+        settings.TRUSTED_PROXIES = ['127.0.0.0/8']
         request = request_factory.get('/')
-        request.META['HTTP_CF_CONNECTING_IP'] = '203.0.113.1'
+        request.META['HTTP_X_FORWARDED_FOR'] = '10.0.0.1, 192.168.1.1'
         request.META['REMOTE_ADDR'] = '127.0.0.1'
-        assert get_client_ip(request) == '203.0.113.1'
+        # Walked right-to-left (closest hop first): 192.168.1.1 is itself not trusted, so the
+        # walk stops there rather than reaching the leftmost, client-supplied entry.
+        assert get_client_ip(request) == '192.168.1.1'
 
     def test_parse_rate_string_minutes(self):
         """Should parse minute-based rates."""

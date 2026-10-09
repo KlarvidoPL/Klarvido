@@ -22,6 +22,15 @@ class TestValidateOTPSerializer:
         def _factory(cookies: Optional[dict] = None):
             request = mocker.Mock()
             request.COOKIES = cookies if cookies else {}
+            request.META = {}
+            # security.record() does getattr(request, 'attr', default)-style presence checks
+            # for several attributes it may set lazily (_request, _security_correlation_id,
+            # user) - on a bare Mock, any attribute access auto-vivifies a new, truthy child
+            # Mock instead of raising AttributeError, so those checks need the real attributes
+            # pre-set here or they silently read nonsense instead of this object's own state.
+            request._request = request
+            request._security_correlation_id = None
+            request.user = None
             context = {"request": request}
 
             return context

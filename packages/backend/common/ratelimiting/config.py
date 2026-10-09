@@ -83,6 +83,11 @@ DEFAULT_RATE_LIMITS: Dict[str, RateLimitConfig] = {
         key=RateLimitKey.IP,
         description="Passkey authentication attempts",
     ),
+    RateLimitCategory.AUTH_PASSWORD_CHANGE: RateLimitConfig(
+        rate="10/min",
+        key=RateLimitKey.USER,
+        description="Password change/set attempts per authenticated user",
+    ),
     # ===================
     # GraphQL Global
     # ===================

@@ -43,6 +43,7 @@ class RateLimitCategory(str, Enum):
     AUTH_PASSWORD_RESET = "auth.password_reset"
     AUTH_OTP = "auth.otp"
     AUTH_PASSKEY = "auth.passkey"
+    AUTH_PASSWORD_CHANGE = "auth.password_change"
 
     # GraphQL operations
     GRAPHQL_GLOBAL_ANON = "graphql.global.anon"

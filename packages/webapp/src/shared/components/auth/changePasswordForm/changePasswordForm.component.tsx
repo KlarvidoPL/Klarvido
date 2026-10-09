@@ -1,3 +1,6 @@
+import { useMutation } from '@apollo/client/react';
+import { getFragmentData } from '@sb/webapp-api-client/graphql';
+import { commonQueryCurrentUserFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { Button } from '@sb/webapp-core/components/buttons';
 import { Input } from '@sb/webapp-core/components/forms';
 import {
@@ -6,8 +9,14 @@ import {
   validatePassword,
 } from '@sb/webapp-core/components/passwordStrength';
 import { Small } from '@sb/webapp-core/components/typography';
+import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
+import { useToast } from '@sb/webapp-core/toast/useToast';
+import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
+import { BaseSyntheticEvent, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { OtpReauthDialog } from '../twoFactorAuthForm/otpReauthDialog.component';
+import { requestPasswordSetLinkMutation } from './changePasswordForm.graphql';
 import { useChangePasswordForm } from './changePasswordForm.hooks';
 
 export type ChangePasswordFormProps = {
@@ -16,6 +25,21 @@ export type ChangePasswordFormProps = {
 
 export const ChangePasswordForm = ({ hasUsablePassword }: ChangePasswordFormProps) => {
   const intl = useIntl();
+  const { toast } = useToast();
+  const { data: commonData } = useCommonQuery();
+  const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser);
+  const otpEnabled = currentUser?.otpEnabled === true;
+  const { passkeys } = useTenantPasskeys();
+
+  // E04: a bare session is not fresh-auth proof for setting a first password on a
+  // passwordless account. An account with a passkey or 2FA proves freshness through the
+  // same grant 2FA setup/disable already uses; an account with neither has no stronger
+  // factor and gets an emailed one-time link instead (see requestPasswordSetLinkMutation).
+  const canUseGrant = !hasUsablePassword && (passkeys.length > 0 || otpEnabled);
+  const needsEmailLink = !hasUsablePassword && !canUseGrant;
+
+  const [pendingReauth, setPendingReauth] = useState(false);
+  const [requestingLink, setRequestingLink] = useState(false);
 
   const {
     form: {
@@ -23,18 +47,75 @@ export const ChangePasswordForm = ({ hasUsablePassword }: ChangePasswordFormProp
       register,
       getValues,
       watch,
+      setValue,
     },
     genericError,
     hasGenericErrorOnly,
     loading,
     handleChangePassword,
-  } = useChangePasswordForm(hasUsablePassword);
+  } = useChangePasswordForm(hasUsablePassword, otpEnabled);
+
+  const [commitRequestPasswordSetLinkMutation] = useMutation(requestPasswordSetLinkMutation, {
+    variables: { input: {} },
+  });
 
   const newPassword = watch('newPassword') || '';
 
+  const handleRequestLink = async () => {
+    setRequestingLink(true);
+    try {
+      await commitRequestPasswordSetLinkMutation();
+      toast({
+        description: intl.formatMessage({
+          defaultMessage: "We've emailed you a link to set your password.",
+          id: 'Auth / Change password / Set link sent',
+        }),
+        variant: 'success',
+      });
+    } catch {
+      toast({
+        description: intl.formatMessage({
+          defaultMessage: 'Something went wrong. Please try again.',
+          id: 'Auth / Change password / Set link failed',
+        }),
+        variant: 'destructive',
+      });
+    } finally {
+      setRequestingLink(false);
+    }
+  };
+
+  if (needsEmailLink) {
+    return (
+      <div className="w-full space-y-4">
+        <p className="text-sm text-muted-foreground">
+          <FormattedMessage
+            defaultMessage="This account doesn't have a password yet. We'll email you a link to set one."
+            id="Auth / Change password / Set link description"
+          />
+        </p>
+        <Button disabled={requestingLink} onClick={handleRequestLink} className="w-full sm:w-fit">
+          <FormattedMessage
+            defaultMessage="Email me a link to set a password"
+            id="Auth / Change password / Request set link button"
+          />
+        </Button>
+      </div>
+    );
+  }
+
+  const onSubmit = (event?: BaseSyntheticEvent) => {
+    if (canUseGrant) {
+      event?.preventDefault();
+      setPendingReauth(true);
+      return;
+    }
+    return handleChangePassword()(event);
+  };
+
   return (
     <div className="w-full">
-      <form noValidate onSubmit={handleChangePassword} className="flex w-full flex-col gap-6">
+      <form noValidate onSubmit={onSubmit} className="flex w-full flex-col gap-6">
         {hasUsablePassword && (
           <div className="w-full">
             <Input
@@ -54,6 +135,25 @@ export const ChangePasswordForm = ({ hasUsablePassword }: ChangePasswordFormProp
               })}
               error={errors.oldPassword?.message}
             />
+          </div>
+        )}
+
+        {hasUsablePassword && otpEnabled && (
+          <div className="w-full">
+            <OtpInput
+              value={watch('otpToken') || ''}
+              onValueChange={(value) => setValue('otpToken', value)}
+              disabled={loading}
+              label={intl.formatMessage({
+                defaultMessage: 'Authentication code',
+                id: 'Auth / Change password / OTP label',
+              })}
+            />
+            {errors.otpToken?.message && (
+              <div className="mt-1 text-sm text-destructive dark:text-red-400">
+                <Small>{errors.otpToken.message}</Small>
+              </div>
+            )}
           </div>
         )}
 
@@ -160,6 +260,16 @@ export const ChangePasswordForm = ({ hasUsablePassword }: ChangePasswordFormProp
           </Button>
         </div>
       </form>
+
+      <OtpReauthDialog
+        open={pendingReauth}
+        action="password_set"
+        onClose={() => setPendingReauth(false)}
+        onAuthorized={(authorization) => {
+          setPendingReauth(false);
+          handleChangePassword(authorization)();
+        }}
+      />
     </div>
   );
 };

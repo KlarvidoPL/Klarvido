@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "Zmiana uwierzytelniania dwuskładnikowego"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Kod uwierzytelniający"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "Logowanie jest tymczasowo niedostępne. Spróbuj ponownie za chwilę."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Wyślij mi link do ustawienia hasła"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "To konto nie ma jeszcze hasła. Wyślemy Ci link, aby je ustawić."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Wysłaliśmy Ci link do ustawienia hasła."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Za dużo prób. Spróbuj ponownie później."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Ustaw hasło"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Ten link wygasa za 1 godzinę dla Twojego bezpieczeństwa"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Ustaw swoje hasło"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Poprosiłeś o ustawienie hasła do swojego konta. Kliknij przycisk poniżej, aby je wybrać. Jeśli to nie Ty, możesz bezpiecznie zignorować ten e-mail."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Ustaw swoje hasło"
   }
 }

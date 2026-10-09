@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "Cambio de autenticación de dos factores"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Código de autenticación"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "El inicio de sesión no está disponible temporalmente. Vuelve a intentarlo en breve."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Envíame un enlace para configurar una contraseña"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "Esta cuenta aún no tiene contraseña. Te enviaremos un enlace para configurar una."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Algo salió mal. Vuelve a intentarlo."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Te hemos enviado un enlace para configurar tu contraseña."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Demasiados intentos. Vuelve a intentarlo más tarde."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Configurar contraseña"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Este enlace caduca en 1 hora por tu seguridad"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Configura tu contraseña"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Has solicitado configurar una contraseña para tu cuenta. Haz clic en el botón de abajo para elegir una. Si no has realizado esta solicitud, puedes ignorar este correo de forma segura."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Configura tu contraseña"
   }
 }

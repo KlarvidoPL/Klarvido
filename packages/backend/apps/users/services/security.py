@@ -1,12 +1,10 @@
 """Account security records and retryable notification delivery."""
 
 import functools
-import ipaddress
 import logging
 import uuid
 from datetime import timedelta
 
-from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
@@ -16,6 +14,7 @@ from apps.sso.services.sessions import parse_user_agent
 from apps.users.models import SecurityEmailOutbox, User
 from apps.users import tokens
 from common.emails import deliver_email_message
+from common.ratelimiting.utils import get_client_ip as _get_client_ip
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +28,7 @@ AUTH_EVENTS = (
     'auth_password_reset',
     'auth_password_change',
     'auth_otp_management',
+    'auth_password_set_link',
 )
 
 
@@ -37,24 +37,10 @@ def email_identifier(email):
 
 
 def client_ip(request):
-    """Only accept forwarded chains from configured trusted proxy networks."""
-    if request is None:
-        return None
-    request = getattr(request, '_request', request)
-    try:
-        peer = ipaddress.ip_address(request.META.get('REMOTE_ADDR', ''))
-        networks = [ipaddress.ip_network(value) for value in settings.AUTH_AUDIT_TRUSTED_PROXIES]
-        if any(peer in network for network in networks):
-            chain = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-            for raw in reversed(chain):
-                if not raw.strip():
-                    continue
-                peer = ipaddress.ip_address(raw.strip())
-                if not any(peer in network for network in networks):
-                    break
-        return str(peer)
-    except ValueError:
-        return None
+    """Delegates to the single trusted-proxy-aware resolver shared across the codebase (see
+    common.ratelimiting.utils.get_client_ip); only accepts forwarded chains from networks
+    configured in settings.TRUSTED_PROXIES."""
+    return _get_client_ip(request)
 
 
 def record(event, *, request=None, user=None, email='', success=True, outcome='completed', method='', actor=None):
@@ -183,7 +169,7 @@ def deliver_email(row):
     user = User.objects.get(pk=row.user_id)
     if user.email.casefold() != row.recipient.casefold():
         return False
-    if not user.is_active and row.kind in ('ACCOUNT_ACTIVATION', 'SIGNUP_GUIDANCE', 'PASSWORD_RESET'):
+    if not user.is_active and row.kind in ('ACCOUNT_ACTIVATION', 'SIGNUP_GUIDANCE', 'PASSWORD_RESET', 'PASSWORD_SET'):
         return False
     data = {}
     if row.kind == 'ACCOUNT_ACTIVATION':
@@ -191,6 +177,14 @@ def deliver_email(row):
             return False
         data = {'user_id': str(user.pk), 'token': tokens.account_activation_token.make_token(user)}
     elif row.kind == 'PASSWORD_RESET':
+        data = {'user_id': str(user.pk), 'token': tokens.password_reset_token.make_token(user)}
+    elif row.kind == 'PASSWORD_SET':
+        # The account may have gained a password another way (passkey/2FA grant path, or a
+        # concurrent reset) between the request and this delivery - a stale "set your
+        # password" link would be confusing, and the token still works to overwrite whatever
+        # password now exists, so skip it rather than send a misleading email.
+        if user.has_usable_password():
+            return False
         data = {'user_id': str(user.pk), 'token': tokens.password_reset_token.make_token(user)}
     result = deliver_email_message(row.recipient, row.kind, data, row.language)
     if not result or not result.get('sent_emails_count'):

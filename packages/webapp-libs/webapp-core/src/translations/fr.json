@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "Modification de l’authentification à deux facteurs"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Code d'authentification"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "La connexion est temporairement indisponible. Veuillez réessayer dans quelques instants."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Envoyez-moi un lien pour définir un mot de passe"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "Ce compte n'a pas encore de mot de passe. Nous allons vous envoyer un lien pour en définir un."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "Nous vous avons envoyé un lien pour définir votre mot de passe."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Trop de tentatives. Réessayez plus tard."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Définir le mot de passe"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "Ce lien expire dans 1 heure pour votre sécurité"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Définissez votre mot de passe"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "Vous avez demandé à définir un mot de passe pour votre compte. Cliquez sur le bouton ci-dessous pour en choisir un. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Définissez votre mot de passe"
   }
 }

@@ -1403,6 +1403,7 @@ type ApiMutation {
   disableOtp(input: DisableOTPMutationInput!): DisableOTPMutationPayload
   markWelcomeModalSeen(input: MarkWelcomeModalSeenMutationInput!): MarkWelcomeModalSeenMutationPayload
   resendConfirmationEmail(input: ResendConfirmationEmailMutationInput!): ResendConfirmationEmailMutationPayload
+  requestPasswordSetLink(input: RequestPasswordSetLinkMutationInput!): RequestPasswordSetLinkMutationPayload
   tokenAuth(input: ObtainTokenMutationInput!): ObtainTokenMutationPayload
   signUp(input: SingUpMutationInput!): SingUpMutationPayload
   confirm(input: ConfirmEmailMutationInput!): ConfirmEmailMutationPayload
@@ -1811,6 +1812,10 @@ type ResendConfirmationEmailMutationPayload {
   ok: Boolean
   clientMutationId: String
 }
+type RequestPasswordSetLinkMutationPayload {
+  ok: Boolean
+  clientMutationId: String
+}
 type ObtainTokenMutationPayload {
   access: String
   refresh: String
@@ -1822,9 +1827,9 @@ type ObtainTokenMutationPayload {
 type SingUpMutationPayload {
   id: String
   email: String
-  ok: Boolean!
   access: String
   refresh: String
+  ok: Boolean!
   authenticated: Boolean!
   clientMutationId: String
 }
@@ -2760,6 +2765,7 @@ input ChangePasswordMutationInput {
   oldPassword: String
   "New password"
   newPassword: String!
+  otpToken: String
   clientMutationId: String
 }
 input UpdateCurrentUserMutationInput {
@@ -2789,12 +2795,16 @@ input MarkWelcomeModalSeenMutationInput {
 input ResendConfirmationEmailMutationInput {
   clientMutationId: String
 }
+input RequestPasswordSetLinkMutationInput {
+  clientMutationId: String
+}
 input ObtainTokenMutationInput {
   email: String!
   password: String!
   clientMutationId: String
 }
 input SingUpMutationInput {
+  id: String
   email: String!
   password: String!
   language: String

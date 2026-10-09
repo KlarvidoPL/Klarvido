@@ -32,6 +32,7 @@ from django.db import models, transaction
 from graphql_relay import from_global_id
 
 from common.csrf import browser_csrf_binding
+from common.ratelimiting.utils import get_client_ip as _get_client_ip
 
 from apps.users.jwt import create_jwt_tokens, get_jti_from_refresh_token
 from apps.users.utils import set_auth_cookie
@@ -95,11 +96,9 @@ class SCIMApiThrottle(UserRateThrottle):
 
 
 def get_client_ip(request):
-    """Get client IP from request."""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        return x_forwarded_for.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
+    """Get client IP from request - delegates to the single trusted-proxy-aware resolver shared
+    across the codebase (see common.ratelimiting.utils.get_client_ip)."""
+    return _get_client_ip(request)
 
 
 # ==================

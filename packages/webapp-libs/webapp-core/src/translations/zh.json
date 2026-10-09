@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "双重身份验证更改"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "验证码"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "登录暂时不可用，请稍后重试。"
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "给我发送设置密码的链接"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "该账户尚未设置密码。我们将向您发送一个链接以设置密码。"
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "出了点问题，请重试。"
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "我们已向您发送了设置密码的链接。"
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "尝试次数过多，请稍后再试。"
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "设置密码"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "为了您的安全，此链接将在1小时后失效"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "设置您的密码"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "您请求为您的账户设置密码。点击下面的按钮选择密码。如果这不是您本人的请求，可以安全地忽略此邮件。"
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "设置您的密码"
   }
 }

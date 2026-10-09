@@ -25,9 +25,11 @@ from common.decorators import context_user_required
 from apps.sso.services import passkey_management
 
 from . import models, tokens, jwt, notifications
+from .exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure, PasswordBudgetExceeded
 from .services.security import enqueue_email, record
 from .services.password_recovery import admit_reset
 from .services.password_policy import validate_password
+from .services.password_budget import check_password as check_password_budget, clear as clear_password_budget
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
@@ -187,27 +189,82 @@ class ResendConfirmationEmailSerializer(serializers.Serializer):
         return {"ok": True}
 
 
+class RequestPasswordSetLinkSerializer(serializers.Serializer):
+    """First password on a passwordless account with no passkey and no 2FA (E04) - the only
+    case with no stronger factor available to prove freshness with a grant, so it gets a
+    one-time emailed link instead, reusing the existing password-reset token/confirmation flow
+    (the token is bound to the account's current - unusable - password hash exactly like a
+    normal reset, so it works identically and dies the moment a password exists)."""
+
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ok = serializers.BooleanField(read_only=True)
+
+    def validate(self, attrs):
+        if attrs["user"].has_usable_password():
+            raise exceptions.ValidationError(_("This account already has a password."))
+        return attrs
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+        event = record('auth_password_set_link', request=self.context.get('request'), user=user)
+        enqueue_email(user, 'PASSWORD_SET', event=event)
+        return {"ok": True}
+
+
 class UserAccountChangePasswordSerializer(serializers.Serializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     old_password = serializers.CharField(write_only=True, required=False, allow_blank=True, help_text=_("Old password"))
     new_password = serializers.CharField(write_only=True, help_text=_("New password"))
+    # Only meaningful when changing an *already-set* password on an account with 2FA enabled
+    # (E04) - the old password alone is exactly what a hijacked session or a phished credential
+    # already has; the current OTP code is the second factor that proves this is really the
+    # account owner, not just whoever holds the old password.
+    otp_token = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     refresh = serializers.CharField(read_only=True)
     access = serializers.CharField(read_only=True)
 
     def validate(self, attrs):
         user = attrs["user"]
+        request = self.context.get("request")
 
         # An OAuth-only account has no password to check against - Django sets it
         # "unusable" on signup, and check_password() would always return False for
-        # it, so a first-time password set must skip this rather than being
-        # permanently locked out of ever adding one.
+        # it, so this is a first-time password *set*, not a change.
         if user.has_usable_password():
             old_password = attrs.get("old_password")
             if not old_password:
                 raise exceptions.ValidationError({"old_password": _("This field is required.")}, "required")
-            if not user.check_password(old_password):
+
+            # Account-wide failure budget (E05), shared with login - guessing the old password
+            # here is exactly as much a brute-force avenue as the login form itself.
+            try:
+                correct = check_password_budget(user.email, lambda: user.check_password(old_password))
+            except PasswordBudgetExceeded as exc:
+                raise exceptions.ValidationError({"old_password": str(exc)}, code="too_many_attempts")
+            if not correct:
                 raise exceptions.ValidationError({"old_password": _("Wrong old password")}, "wrong_password")
+
+            if user.otp_enabled and user.otp_verified:
+                otp_token = attrs.get("otp_token")
+                if not otp_token:
+                    raise exceptions.ValidationError({"otp_token": _("This field is required.")}, "required")
+                try:
+                    otp_services.validate_otp(user, otp_token, request)
+                except (OTPVerificationFailure, OTPAttemptLimitExceeded) as exc:
+                    raise exceptions.ValidationError({"otp_token": str(exc)}, code=exc.code)
+        else:
+            # First-ever password on a passwordless account (E04): a bare session is not
+            # fresh-auth proof - a hijacked/left-open session could otherwise plant a
+            # permanent password on an account the attacker doesn't actually own. Reuses the
+            # same one-use, action-bound grant 2FA setup/disable already requires (passkey
+            # ceremony, or - only when the account has no passkey either - its current OTP
+            # code). An account with none of those (no password, no passkey, no 2FA) cannot
+            # produce any grant and must use the emailed set-password link instead
+            # (RequestPasswordSetLinkSerializer / the existing password-reset-confirm flow).
+            with transaction.atomic():
+                grant = passkey_management.require_grant(request, user, "password_set")
+                passkey_management.consume_grant(grant)
 
         try:
             validate_password(attrs['new_password'], user)
@@ -221,9 +278,17 @@ class UserAccountChangePasswordSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = validated_data.pop("user")
         new_password = validated_data.pop("new_password")
+        validated_data.pop("otp_token", None)
+        was_passwordless = not user.has_usable_password()
         user.set_password(new_password)
         user.save()
-        event = record('auth_password_change', request=self.context.get('request'), user=user)
+        clear_password_budget(user.email)
+        event = record(
+            'auth_password_change',
+            request=self.context.get('request'),
+            user=user,
+            outcome='password_set' if was_passwordless else 'changed',
+        )
         enqueue_email(user, 'PASSWORD_CHANGED', event=event)
 
         refresh = jwt_tokens.RefreshToken.for_user(user)
@@ -336,10 +401,27 @@ class CookieTokenObtainPairSerializer(jwt_serializers.TokenObtainPairSerializer)
     refresh = serializers.CharField(read_only=True, default=None)
 
     def validate(self, attrs):
+        email = attrs.get(self.username_field, "")
+
+        def attempt():
+            try:
+                return super(CookieTokenObtainPairSerializer, self).validate(attrs)
+            except exceptions.AuthenticationFailed:
+                return None
+
+        # Account-wide failure budget (E05): the per-IP limit on this mutation lets a
+        # distributed attacker spread guesses across many source addresses, never exhausting a
+        # shared counter against one account. A locked account is rejected (generically) before
+        # the real check runs at all - including a correct password, which is the whole point of
+        # a real budget - and a failure's counter update commits independently of whatever the
+        # calling mutation's transaction does afterward (see password_budget.check_password).
         try:
-            data = super().validate(attrs)
-        except exceptions.AuthenticationFailed as e:
-            raise exceptions.ValidationError(e.detail)
+            data = check_password_budget(email, attempt)
+        except PasswordBudgetExceeded as exc:
+            raise exceptions.ValidationError({"non_field_errors": str(exc)}, code="too_many_attempts")
+
+        if data is None:
+            raise exceptions.ValidationError(self.error_messages["no_active_account"], code="no_active_account")
 
         return data
 

@@ -335,7 +335,7 @@ export function useWebAuthn() {
 
   const authorizePasskeyChange = useCallback(
     async (
-      action: 'register' | 'delete' | 'otp_setup' | 'otp_disable',
+      action: 'register' | 'delete' | 'otp_setup' | 'otp_disable' | 'password_set',
       passkeyId?: string,
       password?: string,
       otpToken?: string,
@@ -358,7 +358,7 @@ export function useWebAuthn() {
   // to replace/disable an already-active 2FA secret is that secret's current code -
   // there is no "options" step (no passkey challenge, no password check) for this.
   const authorizeOtpOnly = useCallback(
-    async (action: 'otp_setup' | 'otp_disable', otpToken: string): Promise<string> => {
+    async (action: 'otp_setup' | 'otp_disable' | 'password_set', otpToken: string): Promise<string> => {
       const response = await csrfFetch(`${API_BASE}/passkeys/reauthenticate/verify`, {
         method: 'POST',
         credentials: 'include',

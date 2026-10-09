@@ -4,6 +4,7 @@ import os
 import warnings
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 # Suppress pkg_resources deprecation warnings from third-party packages
 # (docutils, etc.) until they release fixes
@@ -413,6 +414,7 @@ RATE_LIMITS = {
     "auth.password_reset": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_RESET", default="30/hour")},
     "auth.otp": {"rate": env("RATE_LIMIT_AUTH_OTP", default="10/min")},
     "auth.passkey": {"rate": env("RATE_LIMIT_AUTH_PASSKEY", default="10/min")},
+    "auth.password_change": {"rate": env("RATE_LIMIT_AUTH_PASSWORD_CHANGE", default="10/min")},
     # GraphQL - global limits
     "graphql.global.anon": {"rate": env("RATE_LIMIT_GQL_ANON", default="60/min")},
     "graphql.global.user": {
@@ -702,9 +704,8 @@ API_URL = env("API_URL", default="http://localhost:5001")
 # Signature verification is mandatory; no compatibility bypass is supported.
 # Allow origin mismatch during development only
 WEBAUTHN_ALLOW_ORIGIN_MISMATCH = env.bool("WEBAUTHN_ALLOW_ORIGIN_MISMATCH", default=IS_LOCAL_DEBUG)
-# Trust forwarded client IPs only when ingress sanitizes X-Forwarded-For.
-# Zero ignores forwarded headers; set the known number of trusted proxy hops.
-PASSKEY_TRUSTED_PROXY_COUNT = env.int("PASSKEY_TRUSTED_PROXY_COUNT", default=0)
+# Passkey request IPs are resolved through TRUSTED_PROXIES (see above), the same CIDR allow-list
+# used by every other IP resolver in the app - not a passkey-specific setting.
 PASSKEY_MAX_CHALLENGES = env.int("PASSKEY_MAX_CHALLENGES", default=100000)
 PASSKEY_MAX_USER_CHALLENGES = env.int("PASSKEY_MAX_USER_CHALLENGES", default=100)
 # Strict sign count verification (detects cloned authenticators)
@@ -814,7 +815,26 @@ EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 
 # Privacy defaults for account authentication records (separate from tenant audit retention).
 AUTH_AUDIT_RETENTION_DAYS = env.int("AUTH_AUDIT_RETENTION_DAYS", default=90)
+
+# Single source of truth for which reverse-proxy hops are allowed to supply a client IP via
+# X-Forwarded-For (CIDR list, e.g. the Docker network the Traefik/VPS proxy runs on). Used by
+# every IP resolver in the codebase (common.ratelimiting.utils.get_client_ip and its callers,
+# via _trusted_proxy_networks() there) - an empty list means forwarded headers are never
+# trusted and REMOTE_ADDR (the proxy itself) is used as-is. AUTH_AUDIT_TRUSTED_PROXIES is the
+# older, audit-only name; the resolver checks TRUSTED_PROXIES first and falls back to it live at
+# call time (not aliased once here) so a deployment - or a test overriding either setting - only
+# has to set the one it means. New configuration should set TRUSTED_PROXIES.
+TRUSTED_PROXIES = env.list("TRUSTED_PROXIES", default=[])
 AUTH_AUDIT_TRUSTED_PROXIES = env.list("AUTH_AUDIT_TRUSTED_PROXIES", default=[])
+
+# Replaced by TRUSTED_PROXIES above (a CIDR allow-list, consistent with every other IP resolver)
+# rather than a hop count specific to passkeys. Fail loudly instead of silently ignoring it if a
+# deployment still sets it, so a stale env var doesn't look like it's doing something it isn't.
+if env.str("PASSKEY_TRUSTED_PROXY_COUNT", default=None) is not None:
+    raise ImproperlyConfigured(
+        "PASSKEY_TRUSTED_PROXY_COUNT was replaced by TRUSTED_PROXIES (a CIDR allow-list shared by "
+        "all IP resolvers). Remove it from your environment and set TRUSTED_PROXIES instead."
+    )
 CELERY_BEAT_SCHEDULE.update(
     {
         "deliver-security-emails": {"task": "apps.users.tasks.deliver_security_emails", "schedule": 30},

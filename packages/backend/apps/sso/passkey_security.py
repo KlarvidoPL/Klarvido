@@ -2,7 +2,6 @@
 
 from io import BytesIO
 
-import ipaddress
 import logging
 import re
 import time
@@ -18,6 +17,7 @@ from rest_framework.throttling import SimpleRateThrottle
 
 from common.ratelimiting.config import get_rate_limit
 from common.ratelimiting.constants import RateLimitCategory
+from common.ratelimiting.utils import get_client_ip as _get_client_ip, rate_limit_ip
 from .constants import SSOAuditEventType
 from .models import SSOAuditLog, UserPasskey
 
@@ -33,14 +33,10 @@ class PasskeyJSONParser(JSONParser):
 
 
 def client_ip(request):
-    """Ignore forwarded addresses unless the deployment explicitly trusts N proxy hops."""
-    count = getattr(settings, 'PASSKEY_TRUSTED_PROXY_COUNT', 0)
-    forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-    value = forwarded[-count].strip() if count and len(forwarded) >= count else request.META.get('REMOTE_ADDR')
-    try:
-        return str(ipaddress.ip_address(value))
-    except (ValueError, TypeError):
-        return None
+    """Delegates to the single trusted-proxy-aware resolver shared across the codebase (see
+    common.ratelimiting.utils.get_client_ip); only trusts X-Forwarded-For through hops that
+    match settings.TRUSTED_PROXIES."""
+    return _get_client_ip(request)
 
 
 def validate_request(serializer_class, request):
@@ -75,7 +71,7 @@ class PasskeyIPThrottle(SimpleRateThrottle):
         return get_rate_limit(RateLimitCategory.AUTH_PASSKEY)
 
     def identifier(self, request):
-        return client_ip(request) or 'unknown'
+        return rate_limit_ip(request)
 
     def allow_request(self, request, view):
         identifier = self.identifier(request)
@@ -171,7 +167,13 @@ def validate_configuration():
             raise ImproperlyConfigured('Passkeys accept only the configured frontend origin and RP hostname')
     if settings.PASSKEY_MAX_CHALLENGES < 1 or settings.PASSKEY_MAX_USER_CHALLENGES < 1:
         raise ImproperlyConfigured('Passkey challenge limits must be positive')
-    if getattr(settings, 'PASSKEY_TRUSTED_PROXY_COUNT', 0) < 0:
-        raise ImproperlyConfigured('PASSKEY_TRUSTED_PROXY_COUNT must not be negative')
     if deployed and 'redis' not in settings.CACHES['default']['BACKEND'].lower():
         raise ImproperlyConfigured('Deployed passkey throttling requires a shared Redis cache')
+    if deployed and not getattr(settings, 'TRUSTED_PROXIES', None):
+        # Not fatal: without it, every client behind the deployment's reverse proxy shares one
+        # IP-based rate-limit bucket (and one passkey throttle bucket) instead of being
+        # distinguished - a real availability risk, but not a bypass, so this only warns.
+        logger.warning(
+            'TRUSTED_PROXIES is empty in a deployed environment - IP-based rate limiting and '
+            'passkey throttling will bucket every client behind the reverse proxy together.'
+        )

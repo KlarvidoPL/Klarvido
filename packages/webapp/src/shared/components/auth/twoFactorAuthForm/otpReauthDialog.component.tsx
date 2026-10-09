@@ -18,7 +18,7 @@ import { useTenantPasskeys } from '@sb/webapp-tenants/hooks';
 import { useId, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-export type OtpManagementAction = 'otp_setup' | 'otp_disable';
+export type OtpManagementAction = 'otp_setup' | 'otp_disable' | 'password_set';
 
 export type OtpReauthDialogProps = {
   open: boolean;

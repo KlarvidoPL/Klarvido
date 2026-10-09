@@ -274,3 +274,20 @@ class ResetEmailLimit(models.Model):
     window_started_at = models.DateTimeField(default=timezone.now)
     last_queued_at = models.DateTimeField(null=True, blank=True)
     count = models.PositiveIntegerField(default=0)
+
+
+class PasswordFailureBudget(models.Model):
+    """Account-wide failed-password budget (E05): the IP-based login rate limit alone lets a
+    distributed attacker spread guesses across many source addresses with no shared counter.
+    Keyed by a salted hash of the attempted email (apps.users.services.security.email_identifier)
+    rather than a User foreign key, so an unregistered email locks out exactly like a real
+    account and the key itself never discloses whether the account exists."""
+
+    key = models.CharField(max_length=64, primary_key=True)
+    failures = models.PositiveSmallIntegerField(default=0)
+    level = models.PositiveSmallIntegerField(default=0)
+    locked_until = models.DateTimeField(null=True, blank=True, db_index=True)
+    last_failure_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'Password failure budget ({self.pk})'

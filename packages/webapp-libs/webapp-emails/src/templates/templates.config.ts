@@ -11,6 +11,7 @@ import * as OtpEnabled from './otpEnabled';
 import * as OtpReplaced from './otpReplaced';
 import * as PasswordChanged from './passwordChanged';
 import * as PasswordReset from './passwordReset';
+import * as PasswordSet from './passwordSet';
 import * as ProjectNoteMention from './projectNoteMention';
 import * as SignupGuidance from './signupGuidance';
 import * as SocialAccountLinked from './socialAccountLinked';
@@ -45,5 +46,6 @@ export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
   [EmailTemplateType.SIGNUP_GUIDANCE]: SignupGuidance,
   [EmailTemplateType.PASSWORD_CHANGED]: PasswordChanged,
   [EmailTemplateType.OTP_REPLACED]: OtpReplaced,
+  [EmailTemplateType.PASSWORD_SET]: PasswordSet,
   //<-- INJECT EMAIL TEMPLATE -->
 };

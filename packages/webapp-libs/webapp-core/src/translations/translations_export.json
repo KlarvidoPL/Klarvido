@@ -2056,7 +2056,19 @@
       "Audit / Event / auth_password_reset_request": "Password reset request",
       "Audit / Event / auth_password_reset": "Password reset",
       "Audit / Event / auth_password_change": "Password change",
-      "Audit / Event / auth_otp_management": "Two-factor authentication change"
+      "Audit / Event / auth_otp_management": "Two-factor authentication change",
+      "Auth / Change password / OTP label": "Authentication code",
+      "Auth / Change password / Rate limit unavailable": "Sign-in is temporarily unavailable. Please try again shortly.",
+      "Auth / Change password / Request set link button": "Email me a link to set a password",
+      "Auth / Change password / Set link description": "This account doesn't have a password yet. We'll email you a link to set one.",
+      "Auth / Change password / Set link failed": "Something went wrong. Please try again.",
+      "Auth / Change password / Set link sent": "We've emailed you a link to set your password.",
+      "Auth / Change password / Too many attempts": "Too many attempts. Try again later.",
+      "Email / Set Password / Link label": "Set password",
+      "Email / Set Password / Preheader": "This link expires in 1 hour for your security",
+      "Email / Set Password / Subject": "Set your password",
+      "Email / Set Password / Text": "You requested to set a password for your account. Click the button below to choose one. If you didn't make this request, you can safely ignore this email.",
+      "Email / Set Password / Title": "Set your password"
     },
     "pl": {
       "Tenant invitation form / Email invalid": "Wprowadź poprawny adres e-mail",
@@ -4056,7 +4068,19 @@
       "Audit / Event / auth_password_reset_request": "Prośba o reset hasła",
       "Audit / Event / auth_password_reset": "Reset hasła",
       "Audit / Event / auth_password_change": "Zmiana hasła",
-      "Audit / Event / auth_otp_management": "Zmiana uwierzytelniania dwuskładnikowego"
+      "Audit / Event / auth_otp_management": "Zmiana uwierzytelniania dwuskładnikowego",
+      "Auth / Change password / OTP label": "Kod uwierzytelniający",
+      "Auth / Change password / Rate limit unavailable": "Logowanie jest tymczasowo niedostępne. Spróbuj ponownie za chwilę.",
+      "Auth / Change password / Request set link button": "Wyślij mi link do ustawienia hasła",
+      "Auth / Change password / Set link description": "To konto nie ma jeszcze hasła. Wyślemy Ci link, aby je ustawić.",
+      "Auth / Change password / Set link failed": "Coś poszło nie tak. Spróbuj ponownie.",
+      "Auth / Change password / Set link sent": "Wysłaliśmy Ci link do ustawienia hasła.",
+      "Auth / Change password / Too many attempts": "Za dużo prób. Spróbuj ponownie później.",
+      "Email / Set Password / Link label": "Ustaw hasło",
+      "Email / Set Password / Preheader": "Ten link wygasa za 1 godzinę dla Twojego bezpieczeństwa",
+      "Email / Set Password / Subject": "Ustaw swoje hasło",
+      "Email / Set Password / Text": "Poprosiłeś o ustawienie hasła do swojego konta. Kliknij przycisk poniżej, aby je wybrać. Jeśli to nie Ty, możesz bezpiecznie zignorować ten e-mail.",
+      "Email / Set Password / Title": "Ustaw swoje hasło"
     },
     "de": {
       "Tenant invitation form / Email invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
@@ -6056,7 +6080,19 @@
       "Audit / Event / auth_password_reset_request": "Anfrage zum Zurücksetzen des Passworts",
       "Audit / Event / auth_password_reset": "Passwort zurückgesetzt",
       "Audit / Event / auth_password_change": "Passwortänderung",
-      "Audit / Event / auth_otp_management": "Änderung der Zwei-Faktor-Authentifizierung"
+      "Audit / Event / auth_otp_management": "Änderung der Zwei-Faktor-Authentifizierung",
+      "Auth / Change password / OTP label": "Authentifizierungscode",
+      "Auth / Change password / Rate limit unavailable": "Die Anmeldung ist vorübergehend nicht verfügbar. Bitte versuche es in Kürze erneut.",
+      "Auth / Change password / Request set link button": "Sende mir einen Link zum Festlegen eines Passworts",
+      "Auth / Change password / Set link description": "Dieses Konto hat noch kein Passwort. Wir senden dir einen Link, um eines festzulegen.",
+      "Auth / Change password / Set link failed": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "Auth / Change password / Set link sent": "Wir haben dir einen Link zum Festlegen deines Passworts gesendet.",
+      "Auth / Change password / Too many attempts": "Zu viele Versuche. Bitte später erneut versuchen.",
+      "Email / Set Password / Link label": "Passwort festlegen",
+      "Email / Set Password / Preheader": "Dieser Link läuft aus Sicherheitsgründen in 1 Stunde ab",
+      "Email / Set Password / Subject": "Lege dein Passwort fest",
+      "Email / Set Password / Text": "Du hast angefordert, ein Passwort für dein Konto festzulegen. Klicke auf die Schaltfläche unten, um eines auszuwählen. Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.",
+      "Email / Set Password / Title": "Lege dein Passwort fest"
     },
     "es": {
       "Tenant invitation form / Email invalid": "Introduce una dirección de correo electrónico válida",
@@ -8056,7 +8092,19 @@
       "Audit / Event / auth_password_reset_request": "Solicitud de restablecimiento de contraseña",
       "Audit / Event / auth_password_reset": "Restablecimiento de contraseña",
       "Audit / Event / auth_password_change": "Cambio de contraseña",
-      "Audit / Event / auth_otp_management": "Cambio de autenticación de dos factores"
+      "Audit / Event / auth_otp_management": "Cambio de autenticación de dos factores",
+      "Auth / Change password / OTP label": "Código de autenticación",
+      "Auth / Change password / Rate limit unavailable": "El inicio de sesión no está disponible temporalmente. Vuelve a intentarlo en breve.",
+      "Auth / Change password / Request set link button": "Envíame un enlace para configurar una contraseña",
+      "Auth / Change password / Set link description": "Esta cuenta aún no tiene contraseña. Te enviaremos un enlace para configurar una.",
+      "Auth / Change password / Set link failed": "Algo salió mal. Vuelve a intentarlo.",
+      "Auth / Change password / Set link sent": "Te hemos enviado un enlace para configurar tu contraseña.",
+      "Auth / Change password / Too many attempts": "Demasiados intentos. Vuelve a intentarlo más tarde.",
+      "Email / Set Password / Link label": "Configurar contraseña",
+      "Email / Set Password / Preheader": "Este enlace caduca en 1 hora por tu seguridad",
+      "Email / Set Password / Subject": "Configura tu contraseña",
+      "Email / Set Password / Text": "Has solicitado configurar una contraseña para tu cuenta. Haz clic en el botón de abajo para elegir una. Si no has realizado esta solicitud, puedes ignorar este correo de forma segura.",
+      "Email / Set Password / Title": "Configura tu contraseña"
     },
     "zh": {
       "Tenant invitation form / Email invalid": "请输入有效的电子邮件地址",
@@ -10056,7 +10104,19 @@
       "Audit / Event / auth_password_reset_request": "密码重置请求",
       "Audit / Event / auth_password_reset": "密码重置",
       "Audit / Event / auth_password_change": "密码更改",
-      "Audit / Event / auth_otp_management": "双重身份验证更改"
+      "Audit / Event / auth_otp_management": "双重身份验证更改",
+      "Auth / Change password / OTP label": "验证码",
+      "Auth / Change password / Rate limit unavailable": "登录暂时不可用，请稍后重试。",
+      "Auth / Change password / Request set link button": "给我发送设置密码的链接",
+      "Auth / Change password / Set link description": "该账户尚未设置密码。我们将向您发送一个链接以设置密码。",
+      "Auth / Change password / Set link failed": "出了点问题，请重试。",
+      "Auth / Change password / Set link sent": "我们已向您发送了设置密码的链接。",
+      "Auth / Change password / Too many attempts": "尝试次数过多，请稍后再试。",
+      "Email / Set Password / Link label": "设置密码",
+      "Email / Set Password / Preheader": "为了您的安全，此链接将在1小时后失效",
+      "Email / Set Password / Subject": "设置您的密码",
+      "Email / Set Password / Text": "您请求为您的账户设置密码。点击下面的按钮选择密码。如果这不是您本人的请求，可以安全地忽略此邮件。",
+      "Email / Set Password / Title": "设置您的密码"
     },
     "hi": {
       "Tenant invitation form / Email invalid": "कृपया एक मान्य ईमेल पता दर्ज करें",
@@ -12056,7 +12116,19 @@
       "Audit / Event / auth_password_reset_request": "पासवर्ड रीसेट अनुरोध",
       "Audit / Event / auth_password_reset": "पासवर्ड रीसेट",
       "Audit / Event / auth_password_change": "पासवर्ड परिवर्तन",
-      "Audit / Event / auth_otp_management": "दो-कारक प्रमाणीकरण में बदलाव"
+      "Audit / Event / auth_otp_management": "दो-कारक प्रमाणीकरण में बदलाव",
+      "Auth / Change password / OTP label": "प्रमाणीकरण कोड",
+      "Auth / Change password / Rate limit unavailable": "साइन-इन अभी अस्थायी रूप से अनुपलब्ध है। कृपया कुछ समय बाद पुनः प्रयास करें।",
+      "Auth / Change password / Request set link button": "मुझे पासवर्ड सेट करने के लिए लिंक भेजें",
+      "Auth / Change password / Set link description": "इस खाते में अभी तक पासवर्ड नहीं है। हम आपको एक सेट करने के लिए लिंक भेजेंगे।",
+      "Auth / Change password / Set link failed": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+      "Auth / Change password / Set link sent": "हमने आपको आपका पासवर्ड सेट करने के लिए एक लिंक भेजा है।",
+      "Auth / Change password / Too many attempts": "बहुत अधिक प्रयास। बाद में पुनः प्रयास करें।",
+      "Email / Set Password / Link label": "पासवर्ड सेट करें",
+      "Email / Set Password / Preheader": "आपकी सुरक्षा के लिए यह लिंक 1 घंटे में समाप्त हो जाएगा",
+      "Email / Set Password / Subject": "अपना पासवर्ड सेट करें",
+      "Email / Set Password / Text": "आपने अपने खाते के लिए पासवर्ड सेट करने का अनुरोध किया है। एक चुनने के लिए नीचे दिए गए बटन पर क्लिक करें। यदि आपने यह अनुरोध नहीं किया है, तो आप इस ईमेल को सुरक्षित रूप से अनदेखा कर सकते हैं।",
+      "Email / Set Password / Title": "अपना पासवर्ड सेट करें"
     },
     "ar": {
       "Tenant invitation form / Email invalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
@@ -14056,7 +14128,19 @@
       "Audit / Event / auth_password_reset_request": "طلب إعادة تعيين كلمة المرور",
       "Audit / Event / auth_password_reset": "إعادة تعيين كلمة المرور",
       "Audit / Event / auth_password_change": "تغيير كلمة المرور",
-      "Audit / Event / auth_otp_management": "تغيير المصادقة الثنائية"
+      "Audit / Event / auth_otp_management": "تغيير المصادقة الثنائية",
+      "Auth / Change password / OTP label": "رمز المصادقة",
+      "Auth / Change password / Rate limit unavailable": "تسجيل الدخول غير متاح مؤقتًا. حاول مرة أخرى قريبًا.",
+      "Auth / Change password / Request set link button": "أرسل لي رابطًا لتعيين كلمة مرور",
+      "Auth / Change password / Set link description": "لا يحتوي هذا الحساب على كلمة مرور بعد. سنرسل لك رابطًا لتعيين واحدة.",
+      "Auth / Change password / Set link failed": "حدث خطأ ما. حاول مرة أخرى.",
+      "Auth / Change password / Set link sent": "لقد أرسلنا لك رابطًا لتعيين كلمة المرور الخاصة بك.",
+      "Auth / Change password / Too many attempts": "عدد المحاولات كبير جدًا. حاول مرة أخرى لاحقًا.",
+      "Email / Set Password / Link label": "تعيين كلمة المرور",
+      "Email / Set Password / Preheader": "ينتهي صلاحية هذا الرابط في غضون ساعة واحدة لأمانك",
+      "Email / Set Password / Subject": "قم بتعيين كلمة مرورك",
+      "Email / Set Password / Text": "لقد طلبت تعيين كلمة مرور لحسابك. انقر على الزر أدناه لاختيار واحدة. إذا لم تقم بهذا الطلب، يمكنك تجاهل هذا البريد الإلكتروني بأمان.",
+      "Email / Set Password / Title": "قم بتعيين كلمة مرورك"
     },
     "fr": {
       "Tenant invitation form / Email invalid": "Veuillez saisir une adresse e-mail valide",
@@ -16056,7 +16140,19 @@
       "Audit / Event / auth_password_reset_request": "Demande de réinitialisation du mot de passe",
       "Audit / Event / auth_password_reset": "Réinitialisation du mot de passe",
       "Audit / Event / auth_password_change": "Modification du mot de passe",
-      "Audit / Event / auth_otp_management": "Modification de l’authentification à deux facteurs"
+      "Audit / Event / auth_otp_management": "Modification de l’authentification à deux facteurs",
+      "Auth / Change password / OTP label": "Code d'authentification",
+      "Auth / Change password / Rate limit unavailable": "La connexion est temporairement indisponible. Veuillez réessayer dans quelques instants.",
+      "Auth / Change password / Request set link button": "Envoyez-moi un lien pour définir un mot de passe",
+      "Auth / Change password / Set link description": "Ce compte n'a pas encore de mot de passe. Nous allons vous envoyer un lien pour en définir un.",
+      "Auth / Change password / Set link failed": "Une erreur s'est produite. Veuillez réessayer.",
+      "Auth / Change password / Set link sent": "Nous vous avons envoyé un lien pour définir votre mot de passe.",
+      "Auth / Change password / Too many attempts": "Trop de tentatives. Réessayez plus tard.",
+      "Email / Set Password / Link label": "Définir le mot de passe",
+      "Email / Set Password / Preheader": "Ce lien expire dans 1 heure pour votre sécurité",
+      "Email / Set Password / Subject": "Définissez votre mot de passe",
+      "Email / Set Password / Text": "Vous avez demandé à définir un mot de passe pour votre compte. Cliquez sur le bouton ci-dessous pour en choisir un. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité.",
+      "Email / Set Password / Title": "Définissez votre mot de passe"
     }
   }
 }

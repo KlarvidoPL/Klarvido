@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "दो-कारक प्रमाणीकरण में बदलाव"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "प्रमाणीकरण कोड"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "साइन-इन अभी अस्थायी रूप से अनुपलब्ध है। कृपया कुछ समय बाद पुनः प्रयास करें।"
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "मुझे पासवर्ड सेट करने के लिए लिंक भेजें"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "इस खाते में अभी तक पासवर्ड नहीं है। हम आपको एक सेट करने के लिए लिंक भेजेंगे।"
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।"
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "हमने आपको आपका पासवर्ड सेट करने के लिए एक लिंक भेजा है।"
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "बहुत अधिक प्रयास। बाद में पुनः प्रयास करें।"
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "पासवर्ड सेट करें"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "आपकी सुरक्षा के लिए यह लिंक 1 घंटे में समाप्त हो जाएगा"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "अपना पासवर्ड सेट करें"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "आपने अपने खाते के लिए पासवर्ड सेट करने का अनुरोध किया है। एक चुनने के लिए नीचे दिए गए बटन पर क्लिक करें। यदि आपने यह अनुरोध नहीं किया है, तो आप इस ईमेल को सुरक्षित रूप से अनदेखा कर सकते हैं।"
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "अपना पासवर्ड सेट करें"
   }
 }

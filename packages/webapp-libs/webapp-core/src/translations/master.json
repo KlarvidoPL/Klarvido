@@ -5992,5 +5992,41 @@
   },
   "Audit / Event / auth_otp_management": {
     "defaultMessage": "Two-factor authentication change"
+  },
+  "Auth / Change password / OTP label": {
+    "defaultMessage": "Authentication code"
+  },
+  "Auth / Change password / Rate limit unavailable": {
+    "defaultMessage": "Sign-in is temporarily unavailable. Please try again shortly."
+  },
+  "Auth / Change password / Request set link button": {
+    "defaultMessage": "Email me a link to set a password"
+  },
+  "Auth / Change password / Set link description": {
+    "defaultMessage": "This account doesn't have a password yet. We'll email you a link to set one."
+  },
+  "Auth / Change password / Set link failed": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
+  "Auth / Change password / Set link sent": {
+    "defaultMessage": "We've emailed you a link to set your password."
+  },
+  "Auth / Change password / Too many attempts": {
+    "defaultMessage": "Too many attempts. Try again later."
+  },
+  "Email / Set Password / Link label": {
+    "defaultMessage": "Set password"
+  },
+  "Email / Set Password / Preheader": {
+    "defaultMessage": "This link expires in 1 hour for your security"
+  },
+  "Email / Set Password / Subject": {
+    "defaultMessage": "Set your password"
+  },
+  "Email / Set Password / Text": {
+    "defaultMessage": "You requested to set a password for your account. Click the button below to choose one. If you didn't make this request, you can safely ignore this email."
+  },
+  "Email / Set Password / Title": {
+    "defaultMessage": "Set your password"
   }
 }

@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import { authChangePasswordMutation } from './changePasswordForm.graphql';
 import { ChangePasswordFormFields } from './changePasswordForm.types';
 
-export const useChangePasswordForm = (hasUsablePassword: boolean) => {
+export const useChangePasswordForm = (hasUsablePassword: boolean, otpEnabled: boolean) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { reload: reloadCommonQuery } = useCommonQuery();
@@ -19,12 +19,41 @@ export const useChangePasswordForm = (hasUsablePassword: boolean) => {
       oldPassword: '',
       newPassword: '',
       confirmNewPassword: '',
+      otpToken: '',
     },
     errorMessages: {
+      nonFieldErrors: {
+        too_many_attempts: intl.formatMessage({
+          defaultMessage: 'Too many attempts. Try again later.',
+          id: 'Auth / Change password / Too many attempts',
+        }),
+        rate_limit_unavailable: intl.formatMessage({
+          defaultMessage: 'Sign-in is temporarily unavailable. Please try again shortly.',
+          id: 'Auth / Change password / Rate limit unavailable',
+        }),
+      },
       oldPassword: {
         wrong_password: intl.formatMessage({
           defaultMessage: 'The current password is incorrect.',
           id: 'Auth / Change password / wrong old password',
+        }),
+        too_many_attempts: intl.formatMessage({
+          defaultMessage: 'Too many attempts. Try again later.',
+          id: 'Auth / Change password / Too many attempts',
+        }),
+      },
+      otpToken: {
+        required: intl.formatMessage({
+          defaultMessage: 'The authentication code is required',
+          id: 'Auth / Validate OTP / Auth code required',
+        }),
+        otp_verification_failure: intl.formatMessage({
+          defaultMessage: 'The verification code is invalid.',
+          id: 'Auth / OTP / Invalid code',
+        }),
+        otp_attempt_limit_exceeded: intl.formatMessage({
+          defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
+          id: 'Auth / OTP / Attempt limit',
         }),
       },
       newPassword: {
@@ -92,20 +121,27 @@ export const useChangePasswordForm = (hasUsablePassword: boolean) => {
     },
   });
 
-  const handleChangePassword = handleSubmit(async ({ newPassword, oldPassword }: ChangePasswordFormFields) => {
-    try {
-      await commitChangePasswordMutation({
-        variables: {
-          input: {
-            newPassword,
-            ...(hasUsablePassword ? { oldPassword } : {}),
+  // Takes the fresh-auth grant token explicitly (rather than from a hook-level prop/state) so a
+  // caller that just obtained one through OtpReauthDialog - used only for the first password on
+  // a passwordless account with a passkey or 2FA, E04 - can re-invoke this immediately with it,
+  // without waiting on a state update/re-render to see the new value.
+  const handleChangePassword = (authorization?: string) =>
+    handleSubmit(async ({ newPassword, oldPassword, otpToken }: ChangePasswordFormFields) => {
+      try {
+        await commitChangePasswordMutation({
+          variables: {
+            input: {
+              newPassword,
+              ...(hasUsablePassword ? { oldPassword } : {}),
+              ...(hasUsablePassword && otpEnabled ? { otpToken } : {}),
+            },
           },
-        },
-      });
-    } catch (error) {
-      // Error is handled by onError callback
-      // This catch prevents unhandled promise rejection
-    }
-  });
+          context: authorization ? { headers: { 'X-Passkey-Authorization': authorization } } : undefined,
+        });
+      } catch (error) {
+        // Error is handled by onError callback
+        // This catch prevents unhandled promise rejection
+      }
+    });
   return { ...form, loading, handleChangePassword };
 };

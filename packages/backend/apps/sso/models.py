@@ -683,6 +683,7 @@ class PasskeyManagementGrant(TimestampedMixin, models.Model):
             ("delete", "Delete"),
             ("otp_setup", "OTP Setup"),
             ("otp_disable", "OTP Disable"),
+            ("password_set", "Password Set"),
         ],
     )
     passkey = models.ForeignKey(UserPasskey, on_delete=models.CASCADE, null=True, blank=True)
