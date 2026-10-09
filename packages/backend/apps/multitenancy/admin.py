@@ -6,6 +6,20 @@ from .constants import TenantType
 from .services.deletion import delete_organization
 
 
+@admin.register(models.OrganizationDeletionDelivery)
+class OrganizationDeletionDeliveryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'organization_id', 'channel', 'attempts', 'next_attempt_at', 'completed_at', 'last_error')
+    list_filter = ('channel', 'completed_at')
+    search_fields = ('organization_id', 'recipient_email')
+    readonly_fields = [field.name for field in models.OrganizationDeletionDelivery._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(models.ResourceCleanup)
 class ResourceCleanupAdmin(admin.ModelAdmin):
     list_display = (

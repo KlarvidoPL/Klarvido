@@ -12,6 +12,7 @@ from common.storages import get_exports_storage
 from ..constants import Notification as NotificationType, TenantType, TenantUserRole
 from ..models import ActionLogExport, ResourceCleanup
 from ..tasks import delete_tenant_files
+from ..deletion_notifications import process_due_deletion_notifications
 
 pytestmark = pytest.mark.django_db
 
@@ -42,6 +43,10 @@ def keep_test_connection(mocker):
 
 @pytest.fixture
 def email_mock(mocker):
+    mocker.patch(
+        'apps.multitenancy.deletion_notifications.enqueue_deletion_notifications',
+        side_effect=lambda ids: process_due_deletion_notifications(),
+    )
     return mocker.patch("apps.multitenancy.notifications.TenantDeletedEmail")
 
 
@@ -83,9 +88,9 @@ class TestTenantDeletedNotifications:
         email_mock.assert_has_calls(
             [
                 call(member, data={"tenant_name": "Acme", "deleted_by": deleted_by, "is_deleter": False}),
-                call().send(),
+                call().deliver(),
                 call(user, data={"tenant_name": "Acme", "deleted_by": deleted_by, "is_deleter": True}),
-                call().send(),
+                call().deliver(),
             ]
         )
         assert email_mock.call_count == 2

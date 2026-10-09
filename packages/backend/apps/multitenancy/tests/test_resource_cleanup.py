@@ -16,6 +16,7 @@ from common.storages import get_exports_storage
 from ..cleanup import LEASE_DURATION, process_resource_cleanup, schedule_resource_cleanup
 from ..models import ActionLogExport, ResourceCleanup, Tenant
 from ..tasks import process_due_resource_cleanups
+from ..deletion_notifications import process_due_deletion_notifications
 from .test_tenant_deletion import delete_tenant
 
 pytestmark = pytest.mark.django_db
@@ -70,6 +71,8 @@ def test_queue_failure_preserves_cleanup_and_does_not_fail_deletion_or_notificat
     jobs = ResourceCleanup.objects.filter(organization_id=tenant_pk)
     assert jobs.count() == 7
     assert set(jobs.values_list('last_error', flat=True)) == {'queue_submission_failed'}
+    email.assert_not_called()  # Notifications survive the broker failure too.
+    process_due_deletion_notifications()
     assert email.call_count == 2
     assert LogEntry.objects.filter(object_id=tenant_pk, action_flag=3).exists()
 

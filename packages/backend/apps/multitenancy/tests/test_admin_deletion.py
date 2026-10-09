@@ -15,6 +15,7 @@ from ..admin import TenantAdmin
 from ..constants import Notification as NotificationType
 from ..models import ActionLogExport, ResourceCleanup, Tenant
 from ..services.deletion import delete_organization
+from ..deletion_notifications import process_due_deletion_notifications
 
 pytestmark = pytest.mark.django_db
 
@@ -31,6 +32,10 @@ def deletion_admin(user_factory, settings, mocker):
     mocker.patch('apps.multitenancy.services.deletion.subscriptions.get_schedule', return_value=None)
     queue = mocker.patch('apps.multitenancy.cleanup.current_app.send_task')
     email = mocker.patch('apps.multitenancy.notifications.TenantDeletedEmail')
+    mocker.patch(
+        'apps.multitenancy.deletion_notifications.enqueue_deletion_notifications',
+        side_effect=lambda ids: process_due_deletion_notifications(),
+    )
     return client, actor, queue, email
 
 

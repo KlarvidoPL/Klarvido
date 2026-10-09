@@ -14,6 +14,45 @@ from .managers import TenantManager, TenantMembershipManager
 from common.models import TimestampedMixin
 
 
+class OrganizationDeletionDelivery(TimestampedMixin, models.Model):
+    """Independent per-recipient/channel outbox, surviving organization deletion."""
+
+    class Channel(models.TextChoices):
+        EMAIL = 'email', 'Email'
+        IN_APP = 'in_app', 'In-app notification'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization_id = models.CharField(max_length=64)
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='organization_deletion_deliveries'
+    )
+    issuer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='organization_deletion_deliveries_issued',
+    )
+    channel = models.CharField(max_length=16, choices=Channel.choices)
+    recipient_email = models.EmailField(blank=True)
+    language = models.CharField(max_length=16, default='en')
+    payload = models.JSONField(default=dict)
+    attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    lease_token = models.UUIDField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['next_attempt_at'], name='org_delivery_due_idx', condition=models.Q(completed_at__isnull=True)
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.organization_id}: {self.channel}'
+
+
 class ResourceCleanup(TimestampedMixin, models.Model):
     """Durable deletion work and outcome history, independent of a deleted organization."""
 

@@ -737,6 +737,10 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Don't prefetch tasks (reduces memory us
 
 # Celery Beat Schedule for periodic tasks
 CELERY_BEAT_SCHEDULE = {
+    'retry-deletion-notifications-every-minute': {
+        'task': 'apps.multitenancy.tasks.process_due_deletion_notifications',
+        'schedule': 60,
+    },
     'retry-resource-cleanup-every-minute': {
         'task': 'apps.multitenancy.tasks.process_due_resource_cleanups',
         'schedule': 60,

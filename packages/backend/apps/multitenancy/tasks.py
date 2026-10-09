@@ -19,6 +19,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from . import cleanup
+from . import deletion_notifications
 from .models import ResourceCleanup, Tenant, ActionLogExport, ActionLog, has_tenant_access, user_has_permission
 from apps.notifications.models import Notification
 from common.action_logging.service import log_action
@@ -351,3 +352,14 @@ def process_resource_cleanup(cleanup_id: str):
 @shared_task(ignore_result=True)
 def process_due_resource_cleanups():
     cleanup.process_due_resource_cleanups()
+
+
+@shared_task(ignore_result=True)
+def process_deletion_notifications(delivery_ids):
+    for delivery_id in delivery_ids:
+        deletion_notifications.process_deletion_delivery(delivery_id)
+
+
+@shared_task(ignore_result=True)
+def process_due_deletion_notifications():
+    deletion_notifications.process_due_deletion_notifications()

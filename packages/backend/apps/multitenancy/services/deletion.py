@@ -13,7 +13,8 @@ from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from common.action_logging.service import get_request_actor, log_delete
 from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE
-from .. import models, notifications
+from .. import models
+from ..deletion_notifications import schedule_deletion_notifications
 from ..cleanup import schedule_organization_prefix_cleanup, schedule_resource_cleanup
 from ..constants import ActionActorType, TenantType
 
@@ -99,7 +100,5 @@ def delete_organization(tenant_id, request, *, via_admin=False):
             )
         schedule_resource_cleanup(models.ResourceCleanup.ResourceType.BACKUP_KEY, organization_id=tenant_pk)
         schedule_organization_prefix_cleanup(tenant_pk)
+        schedule_deletion_notifications(tenant_pk, tenant_name, deleter, members)
         tenant.delete()
-
-        # Only once the delete is committed: remove its files from storage and tell the members
-        transaction.on_commit(lambda: notifications.send_tenant_deleted_notifications(tenant_name, deleter, members))
