@@ -4,9 +4,11 @@ from zipfile import ZipFile
 
 import pytest
 from django.db import connection, connections
+from django.core.files.storage import FileSystemStorage
 
 from apps.backup.models import BackupRecord
 from apps.backup.tasks import create_backup
+from apps.demo.models import DocumentDemoItem
 from common.storages import get_exports_storage
 from ..models import ActionLogExport, ResourceCleanup, Tenant
 from ..permissions import seed_permissions
@@ -18,7 +20,8 @@ pytestmark = pytest.mark.django_db(transaction=True)
 
 
 @pytest.fixture(autouse=True)
-def isolate_external_services(mocker):
+def isolate_external_services(mocker, tmp_path):
+    mocker.patch.object(DocumentDemoItem._meta.get_field('file'), 'storage', FileSystemStorage(location=tmp_path))
     mocker.patch('apps.multitenancy.schema.close_old_connections')
     mocker.patch('apps.multitenancy.schema.subscriptions.get_schedule', return_value=None)
     mocker.patch('apps.multitenancy.notifications.TenantDeletedEmail')

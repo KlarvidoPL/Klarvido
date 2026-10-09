@@ -1,4 +1,5 @@
 import os
+import re
 import secrets
 from tempfile import SpooledTemporaryFile
 
@@ -15,6 +16,90 @@ class UniqueFilePathGenerator:
 
     def __call__(self, _, filename, *args, **kwargs):
         return f"{self.path_prefix}/{secrets.token_hex(8)}/{filename}"
+
+
+def organization_document_prefix(organization_id):
+    organization_id = str(organization_id)
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', organization_id):
+        raise ValueError('Invalid organization storage identifier')
+    return f'documents/organizations/{organization_id}/'
+
+
+@deconstructible
+class OrganizationDocumentPathGenerator:
+    def __call__(self, instance, filename):
+        if instance.tenant_id is None:
+            # Unassigned legacy documents have no organization to clean up.
+            return UniqueFilePathGenerator('documents')(instance, filename)
+        # Normalize raw integer FK assignments to the same hashid used by deletion.
+        organization_id = instance._meta.get_field('tenant').target_field.to_python(instance.tenant_id)
+        return f'{organization_document_prefix(organization_id)}{secrets.token_hex(8)}/{filename}'
+
+
+def delete_storage_prefix(storage, prefix, *, progress=None):
+    """Delete current objects under an exact directory prefix, including unrecorded files.
+
+    S3-compatible storage is streamed through ListObjectsV2 pagination. The caller
+    may renew its durable cleanup lease while a large scan is in progress.
+    """
+    if (
+        not prefix
+        or not prefix.endswith('/')
+        or prefix.startswith('/')
+        or any(part in ('', '.', '..') for part in prefix[:-1].split('/'))
+    ):
+        raise ValueError('Cleanup requires an exact, nonempty directory prefix')
+
+    def heartbeat():
+        if progress is not None:
+            progress()
+
+    if isinstance(storage, S3Boto3Storage):
+        location = storage.location.strip('/')
+        full_prefix = f'{location}/{prefix}' if location else prefix
+        client = storage.connection.meta.client
+        pages = client.get_paginator('list_objects_v2').paginate(
+            Bucket=storage.bucket_name, Prefix=full_prefix, PaginationConfig={'PageSize': 1000}
+        )
+        for page in pages:
+            heartbeat()
+            for index, item in enumerate(page.get('Contents', [])):
+                key = item['Key']
+                if not key.startswith(full_prefix):
+                    raise ValueError('Storage listing returned an object outside the cleanup prefix')
+                if index % 100 == 0:
+                    heartbeat()
+                # Use the exact listed key. Django's path normalization could change
+                # unusual object names containing ../ and delete a different object.
+                client.delete_object(Bucket=storage.bucket_name, Key=key)
+        return
+
+    if isinstance(storage, FileSystemStorage):
+        root = storage.path(prefix)
+        ancestor = root
+        while ancestor != storage.location:
+            if os.path.islink(ancestor):
+                raise ValueError('Cleanup cannot follow a symlinked organization directory')
+            ancestor = os.path.dirname(ancestor)
+            if ancestor == os.path.dirname(ancestor):
+                raise ValueError('Cleanup directory escaped the storage root')
+
+        def raise_listing_error(error):
+            if not isinstance(error, FileNotFoundError):
+                raise error
+
+        count = 0
+        for directory, _, filenames in os.walk(root, followlinks=False, onerror=raise_listing_error):
+            heartbeat()
+            for filename in filenames:
+                if count % 100 == 0:
+                    heartbeat()
+                relative_path = os.path.relpath(os.path.join(directory, filename), root).replace(os.sep, '/')
+                storage.delete(f'{prefix}{relative_path}')
+                count += 1
+        return
+
+    raise NotImplementedError('Prefix cleanup is unsupported by this storage backend')
 
 
 class CustomS3Boto3Storage(S3Boto3Storage):

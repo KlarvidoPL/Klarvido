@@ -10,11 +10,49 @@ from django.utils import timezone
 
 from apps.backup.encryption import get_backup_encryption_service
 from apps.demo.models import DocumentDemoItem
-from common.storages import get_exports_storage
-from .models import ResourceCleanup
+from common.storages import get_exports_storage, delete_storage_prefix, organization_document_prefix
+from .models import ResourceCleanup, Tenant
 
 logger = logging.getLogger(__name__)
 LEASE_DURATION = timedelta(minutes=10)
+
+
+class CleanupLeaseLost(Exception):
+    """A recovered worker now owns this cleanup job."""
+
+
+def schedule_organization_prefix_cleanup(organization_id):
+    # Validation also ensures that an identifier cannot escape its directory.
+    document_prefix = organization_document_prefix(organization_id)
+    for prefix in (f'tenant_backups/{organization_id}/', f'action_logs/{organization_id}/'):
+        schedule_resource_cleanup(
+            ResourceCleanup.ResourceType.EXPORT_PREFIX, organization_id=organization_id, resource_path=prefix
+        )
+    schedule_resource_cleanup(
+        ResourceCleanup.ResourceType.DOCUMENT_PREFIX, organization_id=organization_id, resource_path=document_prefix
+    )
+
+
+def clean_organization_prefix(cleanup, token):
+    document_prefix = organization_document_prefix(cleanup.organization_id)
+    if cleanup.resource_type == ResourceCleanup.ResourceType.EXPORT_PREFIX:
+        allowed_prefixes = (f'tenant_backups/{cleanup.organization_id}/', f'action_logs/{cleanup.organization_id}/')
+        storage = get_exports_storage()
+    else:
+        allowed_prefixes = (document_prefix,)
+        storage = DocumentDemoItem._meta.get_field('file').storage
+    if cleanup.resource_path not in allowed_prefixes:
+        raise ValueError('Cleanup prefix does not match its organization')
+    if Tenant.objects.filter(pk=cleanup.organization_id).exists():
+        raise ValueError('Cannot scan storage for an existing organization')
+
+    def renew_lease():
+        if not ResourceCleanup.objects.filter(pk=cleanup.pk, lease_token=token, completed_at__isnull=True).update(
+            next_attempt_at=timezone.now() + LEASE_DURATION, updated_at=timezone.now()
+        ):
+            raise CleanupLeaseLost()
+
+    delete_storage_prefix(storage, cleanup.resource_path, progress=renew_lease)
 
 
 def schedule_resource_cleanup(resource_type, *, organization_id='', resource_path=''):
@@ -70,8 +108,15 @@ def process_resource_cleanup(cleanup_id):
         elif cleanup.resource_type == ResourceCleanup.ResourceType.BACKUP_KEY:
             if not get_backup_encryption_service().delete_tenant_key(cleanup.organization_id, strict=True):
                 raise RuntimeError('Backup key deletion was not confirmed')
+        elif cleanup.resource_type in (
+            ResourceCleanup.ResourceType.EXPORT_PREFIX,
+            ResourceCleanup.ResourceType.DOCUMENT_PREFIX,
+        ):
+            clean_organization_prefix(cleanup, token)
         else:
             raise ValueError('Unknown cleanup resource type')
+    except CleanupLeaseLost:
+        return False
     except Exception as exc:
         # Keep only the exception type: provider messages can contain credentials or signed URLs.
         retry_delay = min(3600, 30 * 2 ** min(cleanup.attempts - 1, 7))

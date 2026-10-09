@@ -26,7 +26,7 @@ from common.ratelimiting import graphql_ratelimit, RateLimitKey
 from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from . import models
-from .cleanup import schedule_resource_cleanup
+from .cleanup import schedule_resource_cleanup, schedule_organization_prefix_cleanup
 from . import notifications
 from . import serializers
 from .tokens import tenant_invitation_token
@@ -643,6 +643,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
                     resource_path=file_path,
                 )
             schedule_resource_cleanup(models.ResourceCleanup.ResourceType.BACKUP_KEY, organization_id=tenant_pk)
+            schedule_organization_prefix_cleanup(tenant_pk)
             tenant.delete()
 
             # Only once the delete is committed: remove its files from storage and tell the members

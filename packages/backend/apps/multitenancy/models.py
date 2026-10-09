@@ -21,6 +21,8 @@ class ResourceCleanup(TimestampedMixin, models.Model):
         EXPORT_FILE = 'export_file', 'Backup or activity export file'
         DOCUMENT_FILE = 'document_file', 'Document file'
         BACKUP_KEY = 'backup_key', 'Backup encryption key'
+        EXPORT_PREFIX = 'export_prefix', 'Organization backup or export directory'
+        DOCUMENT_PREFIX = 'document_prefix', 'Organization document directory'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # Deliberately no FK: deleting the organization must never delete its cleanup work.

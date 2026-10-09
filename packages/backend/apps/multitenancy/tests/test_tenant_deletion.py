@@ -115,8 +115,11 @@ class TestTenantDeletedNotifications:
             (ResourceCleanup.ResourceType.EXPORT_FILE, 'backups/acme.xml.enc'),
             (ResourceCleanup.ResourceType.EXPORT_FILE, 'exports/acme-logs.zip'),
             (ResourceCleanup.ResourceType.BACKUP_KEY, ''),
+            (ResourceCleanup.ResourceType.EXPORT_PREFIX, f'tenant_backups/{tenant_pk}/'),
+            (ResourceCleanup.ResourceType.EXPORT_PREFIX, f'action_logs/{tenant_pk}/'),
+            (ResourceCleanup.ResourceType.DOCUMENT_PREFIX, f'documents/organizations/{tenant_pk}/'),
         }
-        assert delete_files_mock.call_count == 3
+        assert delete_files_mock.call_count == 6
         for job in jobs:
             assert (
                 call('apps.multitenancy.tasks.process_resource_cleanup', args=[str(job.pk)], retry=False)

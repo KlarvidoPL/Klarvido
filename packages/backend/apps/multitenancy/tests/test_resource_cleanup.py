@@ -68,7 +68,7 @@ def test_queue_failure_preserves_cleanup_and_does_not_fail_deletion_or_notificat
     assert not result.get('errors'), result
     assert not Tenant.objects.filter(pk=tenant_pk).exists()
     jobs = ResourceCleanup.objects.filter(organization_id=tenant_pk)
-    assert jobs.count() == 4
+    assert jobs.count() == 7
     assert set(jobs.values_list('last_error', flat=True)) == {'queue_submission_failed'}
     assert email.call_count == 2
     assert LogEntry.objects.filter(object_id=tenant_pk, action_flag=3).exists()
@@ -77,11 +77,13 @@ def test_queue_failure_preserves_cleanup_and_does_not_fail_deletion_or_notificat
     document_storage = mocker.patch.object(DocumentDemoItem._meta.get_field('file'), 'storage')
     key = mocker.patch('apps.multitenancy.cleanup.get_backup_encryption_service').return_value
     key.delete_tenant_key.return_value = True
+    prefixes = mocker.patch('apps.multitenancy.cleanup.delete_storage_prefix')
     # No successful enqueue is needed: the periodic task processes the persisted work.
     process_due_resource_cleanups.run()
     assert jobs.filter(completed_at__isnull=True).count() == 0
     assert storage.delete.call_count == 2
     assert document_storage.delete.call_count == 1
+    assert prefixes.call_count == 3
     key.delete_tenant_key.assert_called_once_with(tenant_pk, strict=True)
 
 
