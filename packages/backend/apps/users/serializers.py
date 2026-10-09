@@ -1,6 +1,7 @@
 import copy
 
 from django.db import transaction
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from apps.sso.models import SSOSession
 
@@ -8,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.conf import settings
 from django.contrib import auth as dj_auth
-from django.contrib.auth import password_validation, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
 from django.utils.translation import gettext as _
 from graphql_relay import from_global_id, to_global_id
@@ -25,6 +26,8 @@ from apps.sso.services import passkey_management
 
 from . import models, tokens, jwt, notifications
 from .services.security import enqueue_email, record
+from .services.password_recovery import admit_reset
+from .services.password_policy import validate_password
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
 from .services import otp as otp_services
@@ -89,9 +92,12 @@ class UserSignupSerializer(serializers.ModelSerializer):
         model = dj_auth.get_user_model()
         fields = ("id", "email", "password", "language", "access", "refresh", "ok")
 
-    def validate_password(self, password):
-        password_validation.validate_password(password)
-        return password
+    def validate(self, attrs):
+        try:
+            validate_password(attrs['password'], models.User(email=attrs['email']))
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError({'password': serializers.as_serializer_error(error)['non_field_errors']})
+        return attrs
 
     def create(self, validated_data):
         language = validated_data.get("language") or ""
@@ -189,10 +195,6 @@ class UserAccountChangePasswordSerializer(serializers.Serializer):
     refresh = serializers.CharField(read_only=True)
     access = serializers.CharField(read_only=True)
 
-    def validate_new_password(self, new_password):
-        password_validation.validate_password(new_password)
-        return new_password
-
     def validate(self, attrs):
         user = attrs["user"]
 
@@ -207,6 +209,12 @@ class UserAccountChangePasswordSerializer(serializers.Serializer):
             if not user.check_password(old_password):
                 raise exceptions.ValidationError({"old_password": _("Wrong old password")}, "wrong_password")
 
+        try:
+            validate_password(attrs['new_password'], user)
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError(
+                {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
+            )
         return attrs
 
     @transaction.atomic
@@ -243,14 +251,17 @@ class PasswordResetSerializer(serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         user = validated_data['user']
+        outcome = admit_reset(
+            self.context.get('request'), validated_data['email'], deliverable=bool(user and user.is_active)
+        )
         event = record(
             'auth_password_reset_request',
             request=self.context.get('request'),
             user=user,
             email=validated_data.get('email', ''),
-            outcome='accepted',
+            outcome=outcome,
         )
-        if user and user.is_active:
+        if outcome == 'accepted' and user and user.is_active:
             enqueue_email(user, 'PASSWORD_RESET', event=event)
         return {"ok": True}
 
@@ -264,10 +275,6 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
 
     ok = serializers.BooleanField(read_only=True)
 
-    def validate_new_password(self, new_password):
-        password_validation.validate_password(new_password)
-        return new_password
-
     def validate(self, attrs):
         token = attrs["token"]
         user_id = attrs["user"]
@@ -280,6 +287,12 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
         if not tokens.password_reset_token.check_token(user, token):
             raise exceptions.ValidationError(_("Malformed password reset token"), "invalid_token")
 
+        try:
+            validate_password(attrs['new_password'], user)
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError(
+                {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
+            )
         return {**attrs, "user": user}
 
     @transaction.atomic
@@ -287,6 +300,12 @@ class PasswordResetConfirmationSerializer(serializers.Serializer):
         user = models.User.objects.select_for_update().get(pk=validated_data['user'].pk)
         if not tokens.password_reset_token.check_token(user, validated_data['token']):
             raise exceptions.ValidationError(_("Malformed password reset token"), "invalid_token")
+        try:
+            validate_password(validated_data['new_password'], user)
+        except DjangoValidationError as error:
+            raise exceptions.ValidationError(
+                {'new_password': serializers.as_serializer_error(error)['non_field_errors']}
+            )
         user.set_password(validated_data['new_password'])
         jwt.blacklist_user_tokens(user)
         user.save(update_fields=['password'])

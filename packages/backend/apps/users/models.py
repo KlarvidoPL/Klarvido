@@ -1,7 +1,10 @@
 import hashid_field
+import pyotp
+from django.conf import settings
+from .services.otp_crypto import decrypt_seed, encrypt_seed
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from django.contrib.auth.models import BaseUserManager
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 
 from common.acl.helpers import CommonGroups
@@ -60,13 +63,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     otp_enabled = models.BooleanField(default=False)
     otp_verified = models.BooleanField(default=False)
-    otp_base32 = models.CharField(max_length=255, blank=True, default="")
-    otp_auth_url = models.CharField(max_length=255, blank=True, default="")
-    # Holds a newly generated secret during setup/replacement, kept out of otp_base32
-    # (the active secret used for login) until the user proves they can produce a code
-    # from it - a failed or abandoned setup must never affect the currently active factor.
-    otp_pending_base32 = models.CharField(max_length=255, blank=True, default="")
-    otp_pending_auth_url = models.CharField(max_length=255, blank=True, default="")
+    otp_seed_encrypted = models.TextField(blank=True, default='', editable=False)
+    otp_pending_seed_encrypted = models.TextField(blank=True, default='', editable=False)
     otp_failed_attempts = models.PositiveSmallIntegerField(default=0, editable=False)
     otp_locked_until = models.DateTimeField(null=True, blank=True, editable=False)
     # Hash of the most recently accepted login TOTP code. Submitting that exact code
@@ -77,6 +75,64 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
+
+    def _get_otp_seed(self, purpose):
+        cached = f'_otp_write_{purpose}'
+        if cached in self.__dict__:
+            return self.__dict__[cached]
+        field = 'otp_seed_encrypted' if purpose == 'active' else 'otp_pending_seed_encrypted'
+        return decrypt_seed(self.pk, purpose, getattr(self, field))
+
+    def _set_otp_seed(self, purpose, value):
+        self.__dict__[f'_otp_write_{purpose}'] = value
+
+    otp_base32 = property(
+        lambda self: self._get_otp_seed('active'), lambda self, value: self._set_otp_seed('active', value)
+    )
+    otp_pending_base32 = property(
+        lambda self: self._get_otp_seed('pending'), lambda self, value: self._set_otp_seed('pending', value)
+    )
+
+    def _otp_url(self, purpose):
+        seed = self._get_otp_seed(purpose)
+        return (
+            pyotp.TOTP(seed).provisioning_uri(name=self.email.lower(), issuer_name=settings.OTP_AUTH_ISSUER_NAME)
+            if seed
+            else ''
+        )
+
+    # Compatibility for setup services: derive URLs, never retain a second seed copy.
+    otp_auth_url = property(lambda self: self._otp_url('active'), lambda self, value: None)
+    otp_pending_auth_url = property(lambda self: self._otp_url('pending'), lambda self, value: None)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        aliases = {'otp_base32': 'otp_seed_encrypted', 'otp_pending_base32': 'otp_pending_seed_encrypted'}
+        update_fields = kwargs.get('update_fields')
+        if update_fields is not None:
+            kwargs['update_fields'] = list(
+                {
+                    aliases.get(field, field)
+                    for field in update_fields
+                    if field not in ('otp_auth_url', 'otp_pending_auth_url')
+                }
+            )
+        pending = [
+            (purpose, f'_otp_write_{purpose}')
+            for purpose in ('active', 'pending')
+            if f'_otp_write_{purpose}' in self.__dict__
+        ]
+        if pending and self.pk is None:
+            # Allocate the identity before constructing account-bound associated data.
+            super().save(*args, **kwargs)
+            kwargs.pop('force_insert', None)
+            args = ()
+        for purpose, cached in pending:
+            field = 'otp_seed_encrypted' if purpose == 'active' else 'otp_pending_seed_encrypted'
+            if kwargs.get('update_fields') is None or field in kwargs['update_fields']:
+                setattr(self, field, encrypt_seed(self.pk, purpose, self.__dict__[cached]))
+                del self.__dict__[cached]
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.email
@@ -211,3 +267,10 @@ class SignupEmailCooldown(models.Model):
     last_sent_at = models.DateTimeField(null=True)
     day_started_at = models.DateTimeField(default=timezone.now)
     daily_count = models.PositiveSmallIntegerField(default=0)
+
+
+class ResetEmailLimit(models.Model):
+    key = models.CharField(max_length=64, primary_key=True)
+    window_started_at = models.DateTimeField(default=timezone.now)
+    last_queued_at = models.DateTimeField(null=True, blank=True)
+    count = models.PositiveIntegerField(default=0)

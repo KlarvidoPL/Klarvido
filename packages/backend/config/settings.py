@@ -164,8 +164,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {"credential_safe": {"()": "config.redaction.CredentialSafeFormatter"}},
     "handlers": {
         "console": {
+            "formatter": "credential_safe",
             "class": "logging.StreamHandler",
         },
     },
@@ -274,8 +276,9 @@ CACHES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "apps.users.services.password_policy.ApplicationPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
@@ -824,3 +827,13 @@ CELERY_BEAT_SCHEDULE.update(
 
 # Bound synchronous SMTP delivery in the durable security-email worker.
 EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=15)
+
+# Authentication secrets are independent of DJANGO_SECRET_KEY and database backups.
+OTP_ENCRYPTION_KEYS = env("OTP_ENCRYPTION_KEYS", default="")
+OTP_ENCRYPTION_KEYS_FILE = env("OTP_ENCRYPTION_KEYS_FILE", default="")
+AUTH_PASSWORD_RESET_TIMEOUT = env.int("AUTH_PASSWORD_RESET_TIMEOUT", default=3600)
+RESET_EMAIL_COOLDOWN_SECONDS = env.int("RESET_EMAIL_COOLDOWN_SECONDS", default=300)
+RESET_EMAIL_DAILY_LIMIT = env.int("RESET_EMAIL_DAILY_LIMIT", default=5)
+RESET_EMAIL_GLOBAL_HOURLY_LIMIT = env.int("RESET_EMAIL_GLOBAL_HOURLY_LIMIT", default=500)
+
+SECURE_REFERRER_POLICY = "no-referrer"

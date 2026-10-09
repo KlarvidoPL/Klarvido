@@ -1,4 +1,5 @@
 import hashlib
+import logging
 from typing import Tuple
 from datetime import timedelta
 
@@ -10,6 +11,9 @@ from apps.users.constants import OTPErrors
 from apps.users.models import User
 from config import settings
 from .security import record, enqueue_email
+from .otp_crypto import OTPDecryptionError
+
+logger = logging.getLogger(__name__)
 
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_DURATION = timedelta(minutes=15)
@@ -50,12 +54,21 @@ def _check_otp(user: User, otp_token: str, *, setup: bool, request=None):
     # The row lock serializes guesses across processes, IPs and newly issued login tokens.
     request = getattr(request, '_request', request)
     error = None
+    credential_unavailable = False
     with transaction.atomic():
         account = User.objects.select_for_update().get(pk=user.pk)
         was_enabled = account.otp_enabled
         now = timezone.now()
-        secret = account.otp_pending_base32 if setup else account.otp_base32
-        if account.otp_locked_until and account.otp_locked_until > now:
+        try:
+            secret = account.otp_pending_base32 if setup else account.otp_base32
+        except OTPDecryptionError:
+            credential_unavailable = True
+            logger.error('OTP credential unavailable: account_id=%s', account.pk)
+            error = OTPVerificationFailure('Authentication is temporarily unavailable. Please contact support.')
+            secret = ''
+        if error:
+            pass
+        elif account.otp_locked_until and account.otp_locked_until > now:
             error = OTPAttemptLimitExceeded("Too many incorrect codes. Try again in 15 minutes.")
         elif not setup and not account.otp_verified:
             error = OTPVerificationFailure(OTPErrors.OTP_NOT_VERIFIED.value)
@@ -116,7 +129,13 @@ def _check_otp(user: User, otp_token: str, *, setup: bool, request=None):
                 request=request,
                 user=account,
                 success=False,
-                outcome='locked' if isinstance(error, OTPAttemptLimitExceeded) else 'invalid_code',
+                outcome=(
+                    'credential_unavailable'
+                    if credential_unavailable
+                    else 'locked'
+                    if isinstance(error, OTPAttemptLimitExceeded)
+                    else 'invalid_code'
+                ),
                 method='otp',
             )
         elif setup:

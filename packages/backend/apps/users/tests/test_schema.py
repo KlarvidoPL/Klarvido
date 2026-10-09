@@ -1087,7 +1087,7 @@ class TestDisableOTPMutation:
 
         assert executed['data']['disableOtp']['ok'] is True
         assert models.User.objects.filter(
-            id=user.id, otp_enabled=False, otp_verified=False, otp_base32="", otp_auth_url=""
+            id=user.id, otp_enabled=False, otp_verified=False, otp_seed_encrypted=""
         ).exists()
 
     def test_requires_fresh_proof(self, api_client, user_factory):

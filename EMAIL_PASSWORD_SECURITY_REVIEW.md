@@ -2,7 +2,7 @@
 
 Reviewed 2026-10-08 against master `a4690b1bd5c6bc5daa9ade6cd683b52e7883f647`.
 
-This is a defensive source review with isolated Docker verification, not a production penetration test or a guarantee of complete security. The original audit did not modify application behavior. Findings distinguish reproduced behavior from code observations and deployment-dependent risks. E01, E02, E03 and the replay portion of E07 are addressed by the subsequent local implementation described below; E14 and E15 are implemented locally but await final verification. E13 requires no action: the current signup behavior and its account-enumeration risk are accepted as an intentional product decision. E04–E06, E08–E12 and the remainder of E07 remain open.
+This is a defensive source review with isolated Docker verification, not a production penetration test or a guarantee of complete security. The original audit did not modify application behavior. Findings distinguish reproduced behavior from code observations and deployment-dependent risks. E01, E02, E03 and the replay portion of E07 are addressed by the subsequent local implementation described below; E14 and E15 are implemented locally but await final verification. E13 requires no action: the current signup behavior and its account-enumeration risk are accepted as an intentional product decision. E09, E11 and E12 are implemented locally with verification deferred; E10 contextual validation is implemented with the eight-character minimum retained by product decision. E04–E06, E08 and the remainder of E07 remain open.
 
 ## Scope and trust boundaries
 
@@ -14,23 +14,23 @@ No live customer accounts, production credentials, email delivery or production 
 
 ## Prioritized findings
 
-| ID  | Severity                                    | Finding                                                                                                                      | Evidence                                                              |
-| --- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| E01 | High — addressed locally                    | Password-created accounts can be preregistered and later confirmed through social login while retaining attacker credentials | Source, state-transition probe and remediation regressions            |
-| E02 | High — addressed locally                    | 2FA removal/replacement requires no fresh authentication                                                                     | HTTP removal and service replacement probes; remediation regressions  |
-| E03 | High — addressed locally                    | Pending OTP login survives password changes and lacks account-state binding                                                  | Serializer probe; remediation regressions                             |
-| E04 | High                                        | First password can be set on a passwordless account using only an existing session                                           | Serializer probe                                                      |
-| E05 | High                                        | Password guessing has no account-wide failure budget                                                                         | Source                                                                |
-| E06 | Medium                                      | Rate-limit enforcement has inconsistent proxy trust and operation-level fail-open behavior                                   | Helper/decorator probes; proxy exposure conditional                   |
-| E07 | Medium — partially addressed locally        | OTP login proof lacks purpose separation and one-time consumption; TOTP codes are reusable                                   | Serializer/service probes; replay fix shipped with E02/E03, see below |
-| E08 | Medium — partially addressed locally        | Reset completion now locks/rechecks; broader reset/session recovery verification is deferred                                 | Original probe; new recovery-race regression prepared                 |
-| E09 | Medium                                      | Reset-email throttling does not implement the configured policy or recipient limits                                          | Source                                                                |
-| E10 | Medium                                      | Password validation is weaker than the recommended policy and omits user context                                             | Source                                                                |
-| E11 | Medium                                      | Monitoring does not comprehensively redact authentication URLs, serialized bodies or OTP secrets                             | Redaction probes; actual export conditional                           |
-| E12 | Medium                                      | TOTP secrets are stored in plaintext                                                                                         | Source                                                                |
-| E13 | Medium — no action needed                   | Signup reveals whether an email is registered                                                                                | Source and existing test expectation                                  |
-| E14 | Medium — implemented, verification deferred | Authentication dependency is in a published vulnerable version range                                                         | Lockfile and maintainer advisory; exploitability conditional          |
-| E15 | Low — implemented, verification deferred    | Email/password security events lack a durable audit trail and credential-change notifications                                | Source                                                                |
+| ID  | Severity                                       | Finding                                                                                                                      | Evidence                                                              |
+| --- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| E01 | High — addressed locally                       | Password-created accounts can be preregistered and later confirmed through social login while retaining attacker credentials | Source, state-transition probe and remediation regressions            |
+| E02 | High — addressed locally                       | 2FA removal/replacement requires no fresh authentication                                                                     | HTTP removal and service replacement probes; remediation regressions  |
+| E03 | High — addressed locally                       | Pending OTP login survives password changes and lacks account-state binding                                                  | Serializer probe; remediation regressions                             |
+| E04 | High                                           | First password can be set on a passwordless account using only an existing session                                           | Serializer probe                                                      |
+| E05 | High                                           | Password guessing has no account-wide failure budget                                                                         | Source                                                                |
+| E06 | Medium                                         | Rate-limit enforcement has inconsistent proxy trust and operation-level fail-open behavior                                   | Helper/decorator probes; proxy exposure conditional                   |
+| E07 | Medium — partially addressed locally           | OTP login proof lacks purpose separation and one-time consumption; TOTP codes are reusable                                   | Serializer/service probes; replay fix shipped with E02/E03, see below |
+| E08 | Medium — partially addressed locally           | Reset completion now locks/rechecks; broader reset/session recovery verification is deferred                                 | Original probe; new recovery-race regression prepared                 |
+| E09 | Medium — implemented; verification deferred    | Reset-email throttling does not implement the configured policy or recipient limits                                          | Source                                                                |
+| E10 | Medium — partial; 8-character minimum accepted | Password validation is weaker than the recommended policy and omits user context                                             | Source                                                                |
+| E11 | Medium — implemented; verification deferred    | Monitoring does not comprehensively redact authentication URLs, serialized bodies or OTP secrets                             | Redaction probes; actual export conditional                           |
+| E12 | Medium — implemented; verification deferred    | TOTP secrets are stored in plaintext                                                                                         | Source                                                                |
+| E13 | Medium — no action needed                      | Signup reveals whether an email is registered                                                                                | Source and existing test expectation                                  |
+| E14 | Medium — implemented, verification deferred    | Authentication dependency is in a published vulnerable version range                                                         | Lockfile and maintainer advisory; exploitability conditional          |
+| E15 | Low — implemented, verification deferred       | Email/password security events lack a durable audit trail and credential-change notifications                                | Source                                                                |
 
 ### E01 — Account preregistration and automatic social linking
 
@@ -164,38 +164,35 @@ the original audit behavior.
 - Fix: lock/reload the user, validate the token against the current row, update credentials and revoke sessions/pending proofs in one transaction. Commit notifications after success.
 - Tests: concurrent token use must produce one success; notification/storage failures must not leave partial state; normal sequential replay must remain rejected.
 
-### E09 — Reset-email abuse controls are not wired to policy
+### E09 — Reset-email abuse controls
 
-- Likelihood: High; impact: Medium. Type: email flooding/resource abuse.
-- Components: [reset mutation](packages/backend/apps/users/schema.py:165), [configured auth rates](packages/backend/config/settings.py:410), [reset email issuance](packages/backend/apps/users/serializers.py:227).
-- Settings advertise `auth.password_reset=5/hour`, but the mutation uses legacy `ip_throttle_rate`, which returns `60/min`. No recipient/account cooldown exists. The response remains generic, which is good, but repeated requests can enqueue repeated emails for one account.
-- Fix: apply the configured policy plus a normalized-recipient cooldown and global send budget, without disclosing account existence. Consider a shorter explicitly configured reset expiry; no override is present, so Django's default is three days.
-- Tests: configured values actually alter behavior; distributed requests cannot flood one recipient; known/unknown accounts have equivalent public results; failed delivery does not expose account existence.
+- Implemented, verification deferred: reset requests use the configured `auth.password_reset` rate (default five/IP/hour), trusted-proxy IP resolution, and atomic HMAC-keyed database recipient counters. A global row serializes budget admission across workers.
+- Accepted behavior change: one email/address per five minutes, five/address per UTC day, and 500 newly queued reset emails/hour globally. Limits are configurable; retries do not consume additional admission budget. Known, unknown, inactive, throttled and limiter-failure requests retain the generic success result. Failed limit checks never bypass sending controls.
+- Reset proofs expire after one hour, including previously issued proofs. Activation proofs retain their independent existing lifetime. Tokens are generated at outbox delivery, so the reset lifetime starts when the message is rendered.
+- Added deferred tests: configured limits, recipient/case/IP boundaries, concurrent admission, suppression, unavailable limiter, and separate reset/activation expiry.
 
 ### E10 — Password policy and contextual validation
 
-- Likelihood: Medium; impact: Medium. Type: weak credential policy.
-- Components: [validators](packages/backend/config/settings.py:275), signup/change/reset password validators in [serializers](packages/backend/apps/users/serializers.py:88).
-- Django's default minimum length is eight. All three serializer calls invoke `validate_password(password)` without `user`, so the configured user-attribute similarity validator cannot compare the password with the account's email/name. Frontend strength indicators are not server enforcement.
-- Fix: adopt an explicit passphrase policy; NIST's current guidance uses at least 15 characters for password-only authentication and permits eight with mandatory MFA. Pass actual/prospective account context to validation, allow password-manager/autofill and sufficiently long passwords, and use an appropriate compromised-password blocklist. Avoid adding arbitrary complexity rules.
-- Tests: email/name similarity, minimum policy by intended authentication mode, long/Unicode passwords, whitespace consistency, and equivalent signup/change/reset enforcement.
+- Partially addressed, verification deferred. Signup uses prospective account email context; changes/resets use actual email and profile names. Reset proof validity is checked before contextual validation, then proof and validation are rechecked against the locked account before saving.
+- Local blocklist: Django's dependency-versioned common-password corpus plus application-specific predictable choices. No password or hash prefix is sent to an external service. This is a finite blocklist, not an exhaustive breach-password database.
+- Accepted product decision: minimum length remains eight characters, including password-only accounts. The recommended 15-character minimum is not adopted. Existing passwords continue to work; no forced resets or new composition requirements. Current trimming/Unicode behavior is retained.
+- Added deferred tests: prospective email, profile names, reset validation ordering/recheck and accepted eight-character passwords. Existing frontend translations already cover these rejection codes.
 
-### E11 — Monitoring can retain authentication material
+### E11 — Authentication monitoring redaction
 
-- Likelihood: Low; impact: High. Type: sensitive data exposure; deployment-dependent.
-- Components: [backend monitoring](packages/backend/config/monitoring.py:10), [frontend monitoring](packages/webapp/src/app/providers/sentry.tsx:7), [reset route](packages/webapp/src/routes/auth/passwordReset/passwordResetConfirm/passwordResetConfirm.component.tsx:16).
-- Backend filtering covers dictionary keys containing `token`, `password` or `secret`, but preserves serialized JSON strings and OTP keys such as `otpBase32`/`otpauth_url`. It does not scrub request URL paths. The reset route carries the reset token in its path; frontend Sentry has no application-specific URL/breadcrumb scrubber. Backend monitoring enables default PII collection.
-- Evidence: redaction probes preserved serialized credential strings and a representative OTP-secret key. Source shows missing URL filtering. Actual exported events depend on Sentry enablement, SDK capture shape and server-side scrubbing; no live leak is asserted.
-- Fix: scrub authentication URL segments, breadcrumbs, headers/cookies and structured or serialized request/response data before export. Explicitly include OTP enrollment material. Minimize PII; evaluate whether any auth bodies should be collected. Clear reset tokens from the browser address once safely captured and enforce a no-referrer policy on sensitive routes.
-- Tests: synthetic frontend/backend events with reset URLs, raw JSON, GraphQL variables, OTP enrollment responses and cookies must contain no authentication material.
+- Implemented, verification deferred: error/transaction/breadcrumb hooks sanitize nested and serialized data in backend and frontend. Credential-bearing URL segments/query values are filtered. Bodies, headers and GraphQL variables are discarded; OTP seeds, codes and provisioning material are explicitly sensitive. Default PII collection is disabled and stack locals remain disabled.
+- Django/server log formatting and the X-Ray export emitter sanitize output. Unparseable trace documents are dropped without an unredacted fallback. Frontend nginx access logging omits query strings/referrers and replaces credential-bearing paths. Browser documents and supported response headers use `no-referrer`.
+- Reset URL routes and refresh behavior remain unchanged; no browser token persistence or extra recovery screen is introduced. These controls govern future application exports. Historical monitoring data, external proxy logs and provider retention require separate operational review.
+- Added deferred synthetic tests for structured/serialized bodies, URL tokens, cookies, OAuth codes, enrollment URLs, malformed documents, logging and tracing boundaries.
 
-### E12 — Plaintext TOTP seed storage
+### E12 — Encrypted TOTP seed storage
 
-- Likelihood: Low; impact: High. Type: secret disclosure at rest.
-- Components: [user model](packages/backend/apps/users/models.py:62), [OTP setup](packages/backend/apps/users/services/otp.py:22).
-- `otp_base32` and `otp_auth_url` store the same reusable OTP secret without field-level encryption. A database/backup disclosure can expose the possession factor. Passwords are hashed correctly; TOTP seeds cannot be hashed because verification needs the original seed.
-- Fix: encrypt seeds using a separately managed application/KMS key with rotation/version support. Avoid duplicating the seed in a stored URL; derive enrollment URLs only when needed. Restrict exports, administrative access and logs.
-- Tests: no plaintext seeds in database dumps/serialized output; migration of existing seeds; decrypt/verify after key rotation; fail safely without encryption configuration.
+- Implemented, verification deferred: versioned AES-256-GCM encrypts active and pending seeds with a dedicated key, binding ciphertext to numeric account identity and active/pending purpose. Plaintext seed and duplicate provisioning-URL columns are removed after conversion; enrollment URLs are derived only when needed.
+- Existing seed values, counters/replay state and authenticator registrations are preserved. Credential-version fingerprints use decrypted seeds, so encryption/rotation alone does not invalidate pending proofs. Corrupted ciphertext never bypasses OTP. Secrets are excluded from exports, admin forms, GraphQL user fields and action logs.
+- **REQUIRED BEFORE MERGING THIS BRANCH TO MASTER / VPS DEPLOYMENT:** configure a unique `OTP_ENCRYPTION_KEYS` value in the private VPS environment. API, migration, worker and Beat services all receive it. Generate a base64-encoded random 32-byte key and back it up separately from PostgreSQL. Never deploy the public test key or reuse another encryption key.
+- VPS CI/CLI deployment now stops old backend/worker/Beat authentication writers before migration; Compose refuses a missing OTP key before starting deployment. Other deployments must also pause old authentication writers during migration. The conversion runs transactionally and has no plaintext reverse migration. Roll back through a coordinated application/database backup restore; do not deploy old code against the new schema. Existing plaintext backups, historical PostgreSQL pages and WAL remain sensitive; this conversion is not a secure erase of past storage.
+- Rotation: prepend a new key to the comma-separated keyring, deploy to all services, run `python manage.py rotate_otp_keys`, then remove retired keys from the live keyring only after all rows have converted. Keep older keys offline for encrypted backup restoration. The command is resumable and reports counts only.
+- A private development key was generated in the ignored backend `.env`; migration 0013 applied locally. Added deferred tests cover SQL at-rest values, conversion, account/purpose tampering, key rotation, proof stability, missing keys and disable cleanup. Deployed startup requires valid key configuration.
 
 ### E13 — Signup account enumeration
 

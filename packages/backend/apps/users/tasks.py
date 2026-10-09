@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.conf import settings
 from celery import shared_task
 from django.utils import timezone
-from .models import PendingOTPLogin, PendingSocialAccountLink, SecurityEmailOutbox, SignupEmailCooldown
+from .models import PendingOTPLogin, PendingSocialAccountLink, SecurityEmailOutbox, SignupEmailCooldown, ResetEmailLimit
 from apps.sso.models import SSOAuditLog
 from .services.security import AUTH_EVENTS, process_outbox
 from .services.export.services import user as user_services
@@ -52,6 +52,7 @@ def cleanup_authentication_records():
         (SSOAuditLog, SSOAuditLog.objects.filter(event_type__in=AUTH_EVENTS, created_at__lt=cutoff)),
         (SecurityEmailOutbox, SecurityEmailOutbox.objects.filter(created_at__lt=cutoff)),
         (SignupEmailCooldown, SignupEmailCooldown.objects.filter(day_started_at__lt=cutoff)),
+        (ResetEmailLimit, ResetEmailLimit.objects.exclude(key="global").filter(window_started_at__lt=cutoff)),
     ):
         for _ in range(10):
             ids = list(query.values_list('pk', flat=True)[:1000])

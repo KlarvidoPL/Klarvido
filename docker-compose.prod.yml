@@ -137,6 +137,12 @@ services:
       - ENVIRONMENT_NAME=production
       - WEB_APP_URL=https://${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - OTP_ENCRYPTION_KEYS=${OTP_ENCRYPTION_KEYS:?OTP_ENCRYPTION_KEYS must be configured before deploying encrypted OTP storage}
+      - AUTH_PASSWORD_RESET_TIMEOUT=${AUTH_PASSWORD_RESET_TIMEOUT:-3600}
+      - RESET_EMAIL_COOLDOWN_SECONDS=${RESET_EMAIL_COOLDOWN_SECONDS:-300}
+      - RESET_EMAIL_DAILY_LIMIT=${RESET_EMAIL_DAILY_LIMIT:-5}
+      - RESET_EMAIL_GLOBAL_HOURLY_LIMIT=${RESET_EMAIL_GLOBAL_HOURLY_LIMIT:-500}
+      - RATE_LIMIT_AUTH_PASSWORD_RESET=${RATE_LIMIT_AUTH_PASSWORD_RESET:-5/hour}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
       - REDIS_CONNECTION=redis://redis:6379
@@ -177,6 +183,12 @@ services:
       - ENVIRONMENT_NAME=production
       - DJANGO_ALLOWED_HOSTS=${DOMAIN},api.${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - OTP_ENCRYPTION_KEYS=${OTP_ENCRYPTION_KEYS:?OTP_ENCRYPTION_KEYS must be configured before deploying encrypted OTP storage}
+      - AUTH_PASSWORD_RESET_TIMEOUT=${AUTH_PASSWORD_RESET_TIMEOUT:-3600}
+      - RESET_EMAIL_COOLDOWN_SECONDS=${RESET_EMAIL_COOLDOWN_SECONDS:-300}
+      - RESET_EMAIL_DAILY_LIMIT=${RESET_EMAIL_DAILY_LIMIT:-5}
+      - RESET_EMAIL_GLOBAL_HOURLY_LIMIT=${RESET_EMAIL_GLOBAL_HOURLY_LIMIT:-500}
+      - RATE_LIMIT_AUTH_PASSWORD_RESET=${RATE_LIMIT_AUTH_PASSWORD_RESET:-5/hour}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
 
       # Database
@@ -290,6 +302,7 @@ services:
       - "traefik.http.middlewares.webapp-headers.headers.stsIncludeSubdomains=true"
       - "traefik.http.middlewares.webapp-headers.headers.contentTypeNosniff=true"
       - "traefik.http.middlewares.webapp-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.webapp-headers.headers.referrerPolicy=no-referrer"
       - "traefik.http.routers.webapp.middlewares=webapp-headers"
       # www.DOMAIN -> 301 redirect to bare DOMAIN (same cert resolver, same service)
       - "traefik.http.routers.webapp-www.rule=Host(`www.${DOMAIN}`)"
@@ -325,6 +338,12 @@ services:
       - ENVIRONMENT_NAME=production
       - WEB_APP_URL=https://${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - OTP_ENCRYPTION_KEYS=${OTP_ENCRYPTION_KEYS:?OTP_ENCRYPTION_KEYS must be configured before deploying encrypted OTP storage}
+      - AUTH_PASSWORD_RESET_TIMEOUT=${AUTH_PASSWORD_RESET_TIMEOUT:-3600}
+      - RESET_EMAIL_COOLDOWN_SECONDS=${RESET_EMAIL_COOLDOWN_SECONDS:-300}
+      - RESET_EMAIL_DAILY_LIMIT=${RESET_EMAIL_DAILY_LIMIT:-5}
+      - RESET_EMAIL_GLOBAL_HOURLY_LIMIT=${RESET_EMAIL_GLOBAL_HOURLY_LIMIT:-500}
+      - RATE_LIMIT_AUTH_PASSWORD_RESET=${RATE_LIMIT_AUTH_PASSWORD_RESET:-5/hour}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
       - REDIS_CONNECTION=redis://redis:6379
@@ -383,6 +402,12 @@ services:
       - ENVIRONMENT_NAME=production
       - WEB_APP_URL=https://${DOMAIN}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - OTP_ENCRYPTION_KEYS=${OTP_ENCRYPTION_KEYS:?OTP_ENCRYPTION_KEYS must be configured before deploying encrypted OTP storage}
+      - AUTH_PASSWORD_RESET_TIMEOUT=${AUTH_PASSWORD_RESET_TIMEOUT:-3600}
+      - RESET_EMAIL_COOLDOWN_SECONDS=${RESET_EMAIL_COOLDOWN_SECONDS:-300}
+      - RESET_EMAIL_DAILY_LIMIT=${RESET_EMAIL_DAILY_LIMIT:-5}
+      - RESET_EMAIL_GLOBAL_HOURLY_LIMIT=${RESET_EMAIL_GLOBAL_HOURLY_LIMIT:-500}
+      - RATE_LIMIT_AUTH_PASSWORD_RESET=${RATE_LIMIT_AUTH_PASSWORD_RESET:-5/hour}
       - HASHID_FIELD_SALT=${HASHID_FIELD_SALT}
       - DATABASE_URL=postgresql://backend:${POSTGRES_PASSWORD}@db:5432/backend
       - REDIS_CONNECTION=redis://redis:6379

@@ -131,6 +131,18 @@ export default class VPSDeploy extends BaseCommand<typeof VPSDeploy> {
         this.log(color.green('✓ Images pulled\n'));
       }
 
+      // Old authentication writers must stop before the encrypted-OTP schema migration.
+      this.log('⏳ Pausing backend services for migrations...');
+      const stopResult = await ssh.execCommand(
+        'docker compose stop backend celery_worker celery_beat',
+        { cwd: deployPath },
+      );
+      if (stopResult.code !== 0) {
+        throw new Error(
+          `Cannot safely pause backend services: ${stopResult.stderr}`,
+        );
+      }
+
       // Deploy
       this.log('⏳ Starting services...');
       const upResult = await ssh.execCommand(

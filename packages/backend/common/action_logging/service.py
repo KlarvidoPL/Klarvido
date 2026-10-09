@@ -32,6 +32,12 @@ logger = logging.getLogger(__name__)
 
 
 SENSITIVE_FIELDS = {
+    "otp_base32",
+    "otp_auth_url",
+    "otp_pending_base32",
+    "otp_pending_auth_url",
+    "otp_seed_encrypted",
+    "otp_pending_seed_encrypted",
     "password",
     "secret_key",
     "api_key",

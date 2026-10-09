@@ -189,7 +189,6 @@ class PasswordResetMutation(mutations.SerializerMutation):
         serializer_class = serializers.PasswordResetSerializer
 
     @classmethod
-    @ratelimit.ratelimit(key="ip", rate=ratelimit.ip_throttle_rate)
     @audit_failures('auth_password_reset_request')
     def mutate_and_get_payload(cls, root, info, **input):
         return super().mutate_and_get_payload(root, info, **input)

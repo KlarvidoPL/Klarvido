@@ -12,6 +12,7 @@ from apps.multitenancy.models import TenantMembership
 from . import tasks
 from . import models
 from .services.account_reclaim import reclaim_unconfirmed_account
+from .services.password_policy import validate_password
 
 admin.site.unregister(token_models.OutstandingToken)
 
@@ -35,6 +36,8 @@ class UserCreationForm(forms.ModelForm):
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords don't match")
+        if password2:
+            validate_password(password2, models.User(email=self.cleaned_data.get('email', '')))
         return password2
 
     def save(self, commit=True):
