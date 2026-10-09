@@ -1,15 +1,16 @@
 import graphene
 from django.shortcuts import get_object_or_404
 from graphene import relay
-from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType
+from common.graphql.authorization import AuthorizedDjangoObjectType as DjangoObjectType, authorized_tenant
 from graphql_relay import to_global_id, from_global_id
 
 from apps.content import models as content_models
 from common.graphql import mutations
 from common.action_logging.decorators import action_logged
-from apps.multitenancy.constants import ActionType
-from common.acl.policies import IsTenantMemberAccess, IsAuthenticatedFullAccess
-from common.graphql.acl import permission_classes, permission_required
+from apps.multitenancy.constants import ActionType, TenantType
+from rest_framework.exceptions import PermissionDenied
+from common.acl.policies import IsTenantMemberAccess
+from common.graphql.acl import permission_classes, permission_required, requires
 from common.graphql.pagination.fields import UIPagedConnection, UIPagedConnectionField
 from . import models, serializers
 
@@ -68,11 +69,19 @@ class DocumentDemoItemConnection(graphene.Connection):
         node = DocumentDemoItemType
 
 
-@permission_classes(IsAuthenticatedFullAccess)
-class CreateDocumentDemoItemMutation(mutations.CreateModelMutation):
+@permission_classes(IsTenantMemberAccess, requires("features.documents.manage"))
+@action_logged(entity_type="document", action_type=ActionType.CREATE, name_field="file")
+class CreateDocumentDemoItemMutation(mutations.CreateTenantDependentModelMutation):
     class Meta:
         serializer_class = serializers.DocumentDemoItemSerializer
         edge_class = DocumentDemoItemConnection.Edge
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        tenant = authorized_tenant(info, input.get('tenant_id'), 'features.documents.manage')
+        if tenant.type != TenantType.ORGANIZATION:
+            raise PermissionDenied('Documents require an organization.')
+        return super().mutate_and_get_payload(root, info, **input)
 
 
 class CreateFavoriteContentfulDemoItemMutation(mutations.CreateModelMutation):
@@ -101,16 +110,16 @@ class DeleteFavoriteContentfulDemoItemMutation(mutations.DeleteModelMutation):
         return cls(deleted_ids=[to_global_id("ContentfulDemoItemFavoriteType", deleted_id)])
 
 
-@permission_classes(IsAuthenticatedFullAccess)
-class DeleteDocumentDemoItemMutation(mutations.DeleteModelMutation):
+@permission_classes(IsTenantMemberAccess, requires("features.documents.manage"))
+@action_logged(entity_type="document", action_type=ActionType.DELETE, name_field="file")
+class DeleteDocumentDemoItemMutation(mutations.DeleteTenantDependentModelMutation):
     class Meta:
         model = models.DocumentDemoItem
 
     @classmethod
-    def mutate_and_get_payload(cls, root, info, id):
-        obj = cls.get_object(id, created_by=info.context.user)
-        obj.delete()
-        return cls(deleted_ids=[id])
+    def mutate_and_get_payload(cls, root, info, id, **input):
+        authorized_tenant(info, input.get('tenant_id'), 'features.documents.manage')
+        return super().mutate_and_get_payload(root, info, id, **input)
 
 
 @permission_required("features.crud.manage")
@@ -132,7 +141,9 @@ class Query(graphene.ObjectType):
     crud_demo_item = graphene.Field(CrudDemoItemType, id=graphene.ID(), tenant_id=graphene.ID())
     all_crud_demo_items = UIPagedConnectionField(CrudDemoItemConnection, tenant_id=graphene.ID())
     all_contentful_demo_item_favorites = graphene.relay.ConnectionField(ContentfulDemoItemFavoriteConnection)
-    all_document_demo_items = graphene.relay.ConnectionField(DocumentDemoItemConnection)
+    all_document_demo_items = graphene.relay.ConnectionField(
+        DocumentDemoItemConnection, tenant_id=graphene.ID(required=True)
+    )
 
     @staticmethod
     @permission_classes(IsTenantMemberAccess)
@@ -146,9 +157,10 @@ class Query(graphene.ObjectType):
         return models.ContentfulDemoItemFavorite.objects.filter(user=info.context.user)
 
     @staticmethod
-    @permission_classes(IsAuthenticatedFullAccess)
-    def resolve_all_document_demo_items(root, info, **kwargs):
-        return info.context.user.documents.all()
+    @permission_classes(IsTenantMemberAccess, requires("features.documents.view"))
+    def resolve_all_document_demo_items(root, info, tenant_id, **kwargs):
+        tenant = authorized_tenant(info, tenant_id, 'features.documents.view')
+        return models.DocumentDemoItem.objects.filter(tenant=tenant)
 
     @staticmethod
     @permission_classes(IsTenantMemberAccess)

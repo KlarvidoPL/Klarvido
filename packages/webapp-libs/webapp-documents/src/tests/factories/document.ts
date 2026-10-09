@@ -18,8 +18,8 @@ export const documentFactory = createDeepFactory<Partial<DocumentDemoItemType>>(
   },
 }));
 
-export const fillDocumentsListQuery = (data = times(() => documentFactory(), 3)) => {
-  return composeMockedListQueryResult(documentsListQuery, 'allDocumentDemoItems', 'DocumentDemoItemType', { data });
+export const fillDocumentsListQuery = (data = times(() => documentFactory(), 3), tenantId = 'org-1') => {
+  return composeMockedListQueryResult(documentsListQuery, 'allDocumentDemoItems', 'DocumentDemoItemType', { data, variables: { tenantId } });
 };
 
 export const fillDocumentDeleteQuery = (id: string, data: DocumentsDeleteMutationMutation) =>
@@ -27,6 +27,7 @@ export const fillDocumentDeleteQuery = (id: string, data: DocumentsDeleteMutatio
     variables: {
       input: {
         id,
+        tenantId: 'org-1',
       },
     },
     data,

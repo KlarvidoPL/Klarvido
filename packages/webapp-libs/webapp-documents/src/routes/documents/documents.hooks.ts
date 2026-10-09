@@ -1,14 +1,16 @@
 import { useMutation } from '@apollo/client/react';
 import { trackEvent } from '@sb/webapp-core/services/analytics';
+import { useCurrentTenant } from '@sb/webapp-tenants/providers';
 
 import {
-  documentListItemFragment,
   documentsListCreateMutation,
   documentsListDeleteMutation,
   documentsListQuery,
 } from './documents.graphql';
 
 export const useHandleDrop = () => {
+  const { data: tenant } = useCurrentTenant();
+  const tenantId = tenant?.id ?? '';
   const [commitMutation] = useMutation(documentsListCreateMutation, {
     update(cache, { data }) {
       const node = data?.createDocumentDemoItem?.documentDemoItemEdge?.node;
@@ -16,26 +18,20 @@ export const useHandleDrop = () => {
         return;
       }
 
-      const { allDocumentDemoItems } = cache.readQuery({ query: documentsListQuery }) ?? {};
+      const variables = { tenantId };
+      const { allDocumentDemoItems } = cache.readQuery({ query: documentsListQuery, variables }) ?? {};
       const isAlreadyInConnection = allDocumentDemoItems?.edges?.some((edge) => edge?.node?.id === node?.id);
       if (isAlreadyInConnection) {
         return;
       }
 
-      const newEdge = {
-        node: cache.writeFragment({
-          data: node as any,
-          fragment: documentListItemFragment,
-        }),
-      };
-
-      cache.modify({
-        fields: {
-          allDocumentDemoItems(existingConnection) {
-            return { ...existingConnection, edges: [...(existingConnection?.edges ?? []), newEdge] };
-          },
+      cache.updateQuery({ query: documentsListQuery, variables }, (existing) => existing ? {
+        ...existing,
+        allDocumentDemoItems: {
+          ...existing.allDocumentDemoItems,
+          edges: [...(existing.allDocumentDemoItems?.edges ?? []), { node }],
         },
-      });
+      } : existing);
     },
     onCompleted: (data) => {
       trackEvent('document', 'upload', data.createDocumentDemoItem?.documentDemoItemEdge?.node?.id);
@@ -43,10 +39,12 @@ export const useHandleDrop = () => {
   });
 
   return async (files: File[]) => {
+    if (!tenantId) return;
     for (const file of files) {
       await commitMutation({
         variables: {
           input: {
+            tenantId,
             file,
           },
         },
@@ -56,6 +54,7 @@ export const useHandleDrop = () => {
 };
 
 export const useHandleDelete = () => {
+  const { data: tenant } = useCurrentTenant();
   const [commitDeleteMutation] = useMutation(documentsListDeleteMutation, {
     update(cache, { data }) {
       const deletedId = data?.deleteDocumentDemoItem?.deletedIds?.[0];
@@ -68,9 +67,11 @@ export const useHandleDelete = () => {
   });
 
   return async (id: string) => {
+    if (!tenant?.id) return;
     await commitDeleteMutation({
       variables: {
         input: {
+          tenantId: tenant.id,
           id,
         },
       },

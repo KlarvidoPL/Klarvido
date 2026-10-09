@@ -106,7 +106,7 @@ type Query {
   crudDemoItem(id: ID, tenantId: ID): CrudDemoItemType
   allCrudDemoItems(tenantId: ID, before: String, after: String, first: Int, last: Int): CrudDemoItemConnection
   allContentfulDemoItemFavorites(before: String, after: String, first: Int, last: Int): ContentfulDemoItemFavoriteConnection
-  allDocumentDemoItems(before: String, after: String, first: Int, last: Int): DocumentDemoItemConnection
+  allDocumentDemoItems(tenantId: ID!, before: String, after: String, first: Int, last: Int): DocumentDemoItemConnection
   node(
     "The ID of the object"
     id: ID!
@@ -1254,6 +1254,7 @@ type DocumentDemoItemEdge {
 type DocumentDemoItemType implements Node {
   "The ID of the object"
   id: ID!
+  tenant: TenantType
   file: FileFieldType
   createdBy: CurrentUserType
   createdAt: DateTime!
@@ -2861,11 +2862,13 @@ input DeleteCrudDemoItemMutationInput {
   clientMutationId: String
 }
 input CreateDocumentDemoItemMutationInput {
+  tenantId: String!
   file: Upload
   clientMutationId: String
 }
 input DeleteDocumentDemoItemMutationInput {
   id: String
+  tenantId: String!
   clientMutationId: String
 }
 input CreateFavoriteContentfulDemoItemMutationInput {

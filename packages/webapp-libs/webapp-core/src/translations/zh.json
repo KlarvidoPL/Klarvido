@@ -6037,5 +6037,14 @@
   },
   "Roles / Permission dependencies missing": {
     "defaultMessage": "此角色缺少所需权限。"
+  },
+  "Activity Logs / Entity / document": {
+    "defaultMessage": "文档"
+  },
+  "Documents / Organization list title": {
+    "defaultMessage": "组织文档"
+  },
+  "Documents / Organization list description": {
+    "defaultMessage": "查看和管理与您的组织共享的文档"
   }
 }

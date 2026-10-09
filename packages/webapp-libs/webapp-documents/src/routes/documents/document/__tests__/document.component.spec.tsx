@@ -4,6 +4,11 @@ import { documentFactory } from '../../../../tests/factories';
 import { render } from '../../../../tests/utils/rendering';
 import { Document } from '../document.component';
 
+jest.mock('@sb/webapp-tenants/providers', () => ({
+  ...jest.requireActual('@sb/webapp-tenants/providers'),
+  useCurrentTenant: () => ({ data: { id: 'org-1' } }),
+}));
+
 describe('Document: Component', () => {
   it('should render file link', async () => {
     const { file, createdAt } = documentFactory();

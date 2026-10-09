@@ -13,7 +13,7 @@ export const dashboardStatsQuery = gql(/* GraphQL */ `
         }
       }
     }
-    allDocumentDemoItems(first: 100) {
+    allDocumentDemoItems(tenantId: $tenantId, first: 100) {
       edges {
         node {
           id

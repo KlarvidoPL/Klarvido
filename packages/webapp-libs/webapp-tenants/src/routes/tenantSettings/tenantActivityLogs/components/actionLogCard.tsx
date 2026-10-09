@@ -100,6 +100,7 @@ const ENTITY_TYPE_LABELS = defineMessages({
   backup_restore: { id: 'Activity Logs / Entity / backup_restore', defaultMessage: 'Backup restore' },
   activity_log_export: { id: 'Activity Logs / Entity / activity_log_export', defaultMessage: 'Activity log export' },
   crud_item: { id: 'Activity Logs / Entity / crud_item', defaultMessage: 'CRUD item' },
+  document: { id: 'Activity Logs / Entity / document', defaultMessage: 'Document' },
   tenant: { id: 'Activity Logs / Entity / tenant', defaultMessage: 'Organization' },
   organization_role: { id: 'Activity Logs / Entity / organization_role', defaultMessage: 'Organization role' },
   tenant_membership: { id: 'Activity Logs / Entity / tenant_membership', defaultMessage: 'Organization member' },

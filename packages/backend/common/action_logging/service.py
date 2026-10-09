@@ -11,6 +11,7 @@ from decimal import Decimal
 from typing import Any, Dict, List, Optional, Union
 
 from django.db import models
+from django.db.models.fields.files import FieldFile
 from django.conf import settings
 from apps.multitenancy.constants import ActionActorType
 
@@ -74,6 +75,9 @@ def serialize_value(value: Any) -> Any:
     """
     if value is None:
         return None
+
+    if isinstance(value, FieldFile):
+        return value.name
 
     if isinstance(value, Decimal):
         return str(value)

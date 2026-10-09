@@ -11,7 +11,7 @@ from graphql import GraphQLError
 
 from apps.demo.models import CrudDemoItem, DocumentDemoItem
 from apps.notifications.models import Notification
-from apps.multitenancy.constants import TenantUserRole
+from apps.multitenancy.constants import TenantUserRole, TenantType
 from apps.multitenancy.models import ActionLogExport, OrganizationRole
 from common.graphql.acl import permission_classes, requires, permission_required
 from common.graphql.acl.decorators import RBACPermission
@@ -63,7 +63,7 @@ def test_node_access(resource, access, user_factory, tenant_factory, tenant_memb
         obj = Notification.objects.create(user=owner, type='security_test', data={'private': 'synthetic'})
         kind, fields = 'NotificationType', 'data'
     elif resource == 'document':
-        obj = DocumentDemoItem.objects.create(created_by=owner, file='documents/synthetic.txt')
+        obj = DocumentDemoItem.objects.create(created_by=owner, tenant=tenant, file='documents/synthetic.txt')
         kind, fields = 'DocumentDemoItemType', 'file { url }'
     elif resource == 'crud':
         obj = CrudDemoItem.objects.create(tenant=tenant, created_by=owner, name='Synthetic confidential item')
@@ -87,7 +87,7 @@ def test_node_access(resource, access, user_factory, tenant_factory, tenant_memb
         obj = PaymentMethodFactory(customer=CustomerFactory(subscriber=tenant))
         kind, fields = 'StripePaymentMethodType', 'billingDetails'
     result = node(requester, kind, obj, fields)
-    allowed = access == 'owner' or (access == 'member' and resource in {'crud', 'role'})
+    allowed = access == 'owner' or (access == 'member' and resource in {'crud', 'role', 'document'})
     if allowed:
         assert not result.get('errors'), result
         assert result['data']['node'] is not None, result
@@ -228,12 +228,17 @@ def test_queued_export_requires_current_authorization(access, user, tenant_facto
     assert not Notification.objects.filter(user=user, type='ACTION_LOG_EXPORT_READY').exists()
 
 
-def test_personal_documents_work_without_tenant(user):
-    document = DocumentDemoItem.objects.create(created_by=user, file='documents/own.txt')
-    result = execute(user, '{ allDocumentDemoItems { edges { node { file { url } } } } }')
+def test_unassigned_legacy_documents_are_not_exposed(user, tenant_factory, tenant_membership_factory):
+    tenant = tenant_factory(type=TenantType.ORGANIZATION)
+    tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER)
+    DocumentDemoItem.objects.create(created_by=user, file='documents/legacy.txt')
+    result = execute(
+        user,
+        'query($tenantId: ID!) { allDocumentDemoItems(tenantId: $tenantId) { edges { node { id } } } }',
+        {'tenantId': to_global_id('TenantType', tenant.pk)},
+    )
     assert not result.get('errors'), result
-    assert len(result['data']['allDocumentDemoItems']['edges']) == 1
-    assert document.created_by == user
+    assert result['data']['allDocumentDemoItems']['edges'] == []
 
 
 def test_class_and_field_permissions_accumulate():

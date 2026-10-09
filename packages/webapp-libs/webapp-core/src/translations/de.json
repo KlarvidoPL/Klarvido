@@ -6037,5 +6037,14 @@
   },
   "Roles / Permission dependencies missing": {
     "defaultMessage": "Fehlt in dieser Rolle."
+  },
+  "Activity Logs / Entity / document": {
+    "defaultMessage": "Dokument"
+  },
+  "Documents / Organization list title": {
+    "defaultMessage": "Organisationsdokumente"
+  },
+  "Documents / Organization list description": {
+    "defaultMessage": "Dokumente anzeigen und verwalten, die mit Ihrer Organisation geteilt werden"
   }
 }

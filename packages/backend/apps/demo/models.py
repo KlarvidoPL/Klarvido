@@ -37,16 +37,12 @@ class ContentfulDemoItemFavorite(TimestampedMixin, models.Model):
         return str(self.id)
 
 
-class DocumentDemoItem(models.Model):
+class DocumentDemoItem(TenantDependentModelMixin, models.Model):
     file = models.FileField(upload_to=UniqueFilePathGenerator("documents"))
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, related_name="documents"
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="documents"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return str(self.id)
-
-    def delete(self, *args, **kwargs):
-        self.file.delete()
-        super().delete(*args, **kwargs)

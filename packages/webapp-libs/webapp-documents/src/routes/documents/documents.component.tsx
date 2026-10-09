@@ -6,6 +6,7 @@ import { Paragraph } from '@sb/webapp-core/components/typography';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sb/webapp-core/components/ui/card';
 import { useMappedConnection } from '@sb/webapp-core/hooks';
 import { PermissionGate } from '@sb/webapp-tenants/hooks';
+import { useCurrentTenant } from '@sb/webapp-tenants/providers';
 import { FileText, Upload } from 'lucide-react';
 import { isEmpty } from 'ramda';
 import { Helmet } from 'react-helmet-async';
@@ -67,12 +68,12 @@ export const ListContent = ({ data }: ListContentProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            <FormattedMessage defaultMessage="Your documents" id="Documents / List title" />
+            <FormattedMessage defaultMessage="Organization documents" id="Documents / Organization list title" />
           </CardTitle>
           <CardDescription>
             <FormattedMessage
-              defaultMessage="Manage and view your uploaded documents"
-              id="Documents / List description"
+              defaultMessage="View and manage documents shared with your organization"
+              id="Documents / Organization list description"
             />
           </CardDescription>
         </CardHeader>
@@ -105,7 +106,11 @@ export const ListContent = ({ data }: ListContentProps) => {
 
 export const Documents = () => {
   const intl = useIntl();
-  const { data, loading } = useQuery(documentsListQuery);
+  const { data: tenant } = useCurrentTenant();
+  const { data, loading } = useQuery(documentsListQuery, {
+    variables: { tenantId: tenant?.id ?? '' },
+    skip: !tenant?.id,
+  });
 
   return (
     <PageLayout>
@@ -164,12 +169,12 @@ export const Documents = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  <FormattedMessage defaultMessage="Your documents" id="Documents / List title" />
+                  <FormattedMessage defaultMessage="Organization documents" id="Documents / Organization list title" />
                 </CardTitle>
                 <CardDescription>
                   <FormattedMessage
-                    defaultMessage="Manage and view your uploaded documents"
-                    id="Documents / List description"
+                    defaultMessage="View and manage documents shared with your organization"
+                    id="Documents / Organization list description"
                   />
                 </CardDescription>
               </CardHeader>
