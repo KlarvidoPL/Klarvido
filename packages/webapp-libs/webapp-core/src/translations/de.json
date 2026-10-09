@@ -6028,5 +6028,14 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "Lege dein Passwort fest"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "Erforderliche Berechtigungen können aus dieser Rolle oder einer anderen dem Mitglied zugewiesenen Rolle stammen."
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "Erfordert: {permissions}."
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "Fehlt in dieser Rolle."
   }
 }

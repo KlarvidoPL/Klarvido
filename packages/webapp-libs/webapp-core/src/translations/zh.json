@@ -6028,5 +6028,14 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "设置您的密码"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "所需权限可以来自此角色或分配给成员的其他角色。"
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "需要：{permissions}。"
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "此角色缺少所需权限。"
   }
 }

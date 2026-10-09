@@ -6028,5 +6028,14 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "Définissez votre mot de passe"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "Les autorisations requises peuvent provenir de ce rôle ou d’un autre rôle attribué au membre."
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "Nécessite : {permissions}."
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "Manquantes dans ce rôle."
   }
 }

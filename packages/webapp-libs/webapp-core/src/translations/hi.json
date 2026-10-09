@@ -6028,5 +6028,14 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "अपना पासवर्ड सेट करें"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "आवश्यक अनुमतियाँ इस भूमिका या सदस्य को दी गई किसी अन्य भूमिका से मिल सकती हैं।"
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "आवश्यक अनुमतियाँ: {permissions}।"
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "इस भूमिका में मौजूद नहीं हैं।"
   }
 }

@@ -489,6 +489,23 @@ const RoleCard = ({
   );
 };
 
+// Prerequisites for using actions in the app UI. Members can receive these
+// permissions from another assigned role, so the picker keeps every option selectable.
+const PERMISSION_DEPENDENCIES: Record<string, string[]> = {
+  'members.roles.edit': ['members.view', 'org.roles.view'],
+  'members.invite': ['members.view', 'org.roles.view'],
+  'members.remove': ['members.view'],
+  'org.roles.manage': ['org.roles.view'],
+  'org.settings.edit': ['org.settings.view'],
+  'org.delete': ['org.settings.view'],
+  'billing.manage': ['billing.view'],
+  'features.documents.manage': ['features.documents.view'],
+  'features.crud.manage': ['features.crud.view'],
+  'security.logs.export': ['security.logs.view'],
+  'backup.manage': ['backup.view'],
+  'security.ksef.manage': ['security.ksef.view'],
+};
+
 // Enhanced Permission picker component
 const PermissionPicker = ({
   allPermissions,
@@ -503,6 +520,9 @@ const PermissionPicker = ({
 }) => {
   const intl = useIntl();
   const categoryConfig = useMemo(() => getCategoryConfig(intl), [intl]);
+  const selectedPermissionCodes = new Set(
+    allPermissions.filter((permission) => selectedPermissionIds.has(permission.id)).map((permission) => permission.code)
+  );
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['ORGANIZATION', 'MEMBERS', 'FEATURES'])
   );
@@ -563,6 +583,12 @@ const PermissionPicker = ({
 
   return (
     <div className="rounded-lg border bg-card">
+      <p className="border-b px-3 py-2 text-xs text-muted-foreground">
+        <FormattedMessage
+          defaultMessage="Required permissions can come from this role or another role assigned to the member."
+          id="Roles / Permission dependencies hint"
+        />
+      </p>
       <div className="h-[400px] overflow-y-auto">
         <div className="p-1">
           {orderedCategories.map((category, index) => {
@@ -639,6 +665,13 @@ const PermissionPicker = ({
                   <div className="ml-3 pl-3 border-l-2 border-border/50 space-y-0.5 py-1">
                     {permissions.map((perm) => {
                       const permDisplay = getPermissionDisplay(intl, perm.code, perm.name, perm.description);
+                      const dependencies = PERMISSION_DEPENDENCIES[perm.code] ?? [];
+                      const hasMissingDependencies = selectedPermissionIds.has(perm.id) &&
+                        dependencies.some((code) => !selectedPermissionCodes.has(code));
+                      const dependencyNames = dependencies.map((code) => {
+                        const permission = allPermissions.find((item) => item.code === code);
+                        return getPermissionDisplay(intl, code, permission?.name ?? code).name;
+                      });
                       return (
                         <label
                           key={perm.id}
@@ -660,6 +693,27 @@ const PermissionPicker = ({
                             {permDisplay.description && (
                               <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                                 {permDisplay.description}
+                              </p>
+                            )}
+                            {dependencies.length > 0 && (
+                              <p className={cn(
+                                'text-xs mt-1',
+                                hasMissingDependencies ? 'text-amber-700 dark:text-amber-400' : 'text-muted-foreground'
+                              )}>
+                                <FormattedMessage
+                                  defaultMessage="Requires: {permissions}."
+                                  id="Roles / Permission dependencies"
+                                  values={{ permissions: intl.formatList(dependencyNames, { type: 'conjunction' }) }}
+                                />
+                                {hasMissingDependencies && (
+                                  <>
+                                    {' '}
+                                    <FormattedMessage
+                                      defaultMessage="Missing from this role."
+                                      id="Roles / Permission dependencies missing"
+                                    />
+                                  </>
+                                )}
                               </p>
                             )}
                           </div>

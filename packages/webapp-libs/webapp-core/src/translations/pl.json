@@ -6028,5 +6028,14 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "Ustaw swoje hasło"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "Wymagane uprawnienia mogą pochodzić z tej roli lub innej roli przypisanej członkowi."
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "Wymaga: {permissions}."
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "Brak w tej roli."
   }
 }

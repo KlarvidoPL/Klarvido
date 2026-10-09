@@ -6028,5 +6028,14 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "Configura tu contraseña"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "Los permisos necesarios pueden proceder de este rol o de otro rol asignado al miembro."
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "Requiere: {permissions}."
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "Faltan en este rol."
   }
 }
