@@ -62,9 +62,11 @@ class SecretsService:
         """Generate a standardized secret name."""
         return f"{self.prefix}/{tenant_id}/{secret_type}"
 
-    def delete_secret_by_name(self, tenant_id: str, secret_type: str, force: bool = False) -> bool:
+    def delete_secret_by_name(
+        self, tenant_id: str, secret_type: str, force: bool = False, strict: bool = False
+    ) -> bool:
         """Delete a secret by tenant ID and secret type (convenience method, see delete_secret)."""
-        return self.delete_secret(self._get_secret_name(tenant_id, secret_type), force=force)
+        return self.delete_secret(self._get_secret_name(tenant_id, secret_type), force=force, strict=strict)
 
     def store_secret(
         self,
@@ -169,7 +171,7 @@ class SecretsService:
         secret_name = self._get_secret_name(tenant_id, secret_type)
         return self.get_secret(secret_name)
 
-    def delete_secret(self, secret_arn: str, force: bool = False) -> bool:
+    def delete_secret(self, secret_arn: str, force: bool = False, strict: bool = False) -> bool:
         """
         Delete a secret from AWS Secrets Manager.
 
@@ -181,6 +183,8 @@ class SecretsService:
             True if deleted successfully
         """
         if not self.client:
+            if strict:
+                raise RuntimeError('Secrets Manager client unavailable')
             logger.warning("AWS Secrets Manager client not available, cannot delete secret")
             return False
 
@@ -191,6 +195,10 @@ class SecretsService:
             )
             return True
         except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                return True  # Repeated cleanup after a crash is safe.
+            if strict:
+                raise
             logger.error(f"Error deleting secret: {e}")
             return False
 

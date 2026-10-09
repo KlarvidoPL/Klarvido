@@ -26,9 +26,9 @@ from common.ratelimiting import graphql_ratelimit, RateLimitKey
 from apps.finances.services import subscriptions
 from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from . import models
+from .cleanup import schedule_resource_cleanup
 from . import notifications
 from . import serializers
-from . import tasks
 from .tokens import tenant_invitation_token
 from .services.company_registry import lookup_company
 from .services.onboarding import CHOICES, clear_draft, save_draft_step, save_onboarding_step
@@ -626,10 +626,16 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
                     }
                 ),
             )
+            for file_path in file_paths:
+                schedule_resource_cleanup(
+                    models.ResourceCleanup.ResourceType.EXPORT_FILE,
+                    organization_id=tenant_pk,
+                    resource_path=file_path,
+                )
+            schedule_resource_cleanup(models.ResourceCleanup.ResourceType.BACKUP_KEY, organization_id=tenant_pk)
             tenant.delete()
 
             # Only once the delete is committed: remove its files from storage and tell the members
-            transaction.on_commit(lambda: tasks.delete_tenant_files.delay(file_paths, tenant_pk))
             transaction.on_commit(
                 lambda: notifications.send_tenant_deleted_notifications(tenant_name, deleter, members)
             )

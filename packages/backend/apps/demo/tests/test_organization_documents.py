@@ -7,7 +7,7 @@ from graphql_relay import to_global_id
 
 from apps.backup.registry import BackupModelRegistry
 from apps.multitenancy.constants import TenantType, TenantUserRole
-from apps.multitenancy.models import ActionLog
+from apps.multitenancy.models import ActionLog, ResourceCleanup
 from ..models import DocumentDemoItem
 from ..tasks import delete_document_file
 
@@ -43,7 +43,9 @@ def test_document_manager_can_delete_another_members_document_and_logs_it(
     graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
     graphene_client.force_authenticate(user)
     result = graphene_client.mutate(
-        'mutation($input: DeleteDocumentDemoItemMutationInput!) { deleteDocumentDemoItem(input: $input) { deletedIds } }',
+        '''mutation($input: DeleteDocumentDemoItemMutationInput!) {
+            deleteDocumentDemoItem(input: $input) { deletedIds }
+        }''',
         variable_values={
             'input': {'id': to_global_id('DocumentDemoItemType', pk), 'tenantId': to_global_id('TenantType', tenant.pk)}
         },
@@ -62,11 +64,13 @@ def test_organization_deletion_queues_document_file_cleanup_after_commit(
     document = document_demo_item_factory(tenant=tenant)
     other = document_demo_item_factory(tenant=tenant_factory())
     path = document.file.name
-    cleanup = mocker.patch('apps.demo.signals.delete_document_file.delay')
+    cleanup = mocker.patch('apps.multitenancy.cleanup.current_app.send_task')
     with django_capture_on_commit_callbacks(execute=True):
         tenant.delete()
         cleanup.assert_not_called()
-    cleanup.assert_called_once_with(path)
+    job = ResourceCleanup.objects.get(resource_type=ResourceCleanup.ResourceType.DOCUMENT_FILE)
+    assert job.resource_path == path
+    cleanup.assert_called_once_with('apps.multitenancy.tasks.process_resource_cleanup', args=[str(job.pk)], retry=False)
     assert not DocumentDemoItem.objects.filter(pk=document.pk).exists()
     assert DocumentDemoItem.objects.filter(pk=other.pk).exists()
 
@@ -76,12 +80,12 @@ def test_rolled_back_deletion_does_not_remove_document_file(
 ):
     document = document_demo_item_factory()
     pk = document.pk
-    cleanup = mocker.patch('apps.demo.signals.delete_document_file.delay')
-    with django_capture_on_commit_callbacks(execute=True):
-        with pytest.raises(RuntimeError), transaction.atomic():
-            document.delete()
-            raise RuntimeError('rollback')
+    cleanup = mocker.patch('apps.multitenancy.cleanup.current_app.send_task')
+    with django_capture_on_commit_callbacks(execute=True), pytest.raises(RuntimeError), transaction.atomic():
+        document.delete()
+        raise RuntimeError('rollback')
     assert DocumentDemoItem.objects.filter(pk=pk).exists()
+    assert not ResourceCleanup.objects.exists()
     cleanup.assert_not_called()
 
 

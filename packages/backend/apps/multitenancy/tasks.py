@@ -14,9 +14,11 @@ from datetime import datetime
 
 from celery import shared_task
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.utils import timezone
 
-from apps.backup.encryption import get_backup_encryption_service
+from . import cleanup
+from .models import ResourceCleanup
 from common.action_logging.service import log_action
 from .constants import ActionActorType
 from common.storages import get_exports_storage
@@ -280,22 +282,28 @@ def export_action_logs(self, export_id: str):
         raise self.retry(exc=exc)
 
 
-@shared_task(ignore_result=True)
+@shared_task(autoretry_for=(Exception,), retry_backoff=True, max_retries=5, ignore_result=True)
 def delete_tenant_files(file_paths: list[str], tenant_id: str):
-    """
-    Remove a deleted organization's files from storage: its backups and activity log exports. The database only stored
-    their paths, so they'd otherwise stay in S3 / local storage forever (and the exports aren't encrypted).
-    Also removes its backup encryption key from AWS Secrets Manager, if one was kept there.
-    """
-    storage = get_exports_storage()
-    for file_path in file_paths:
-        try:
-            if storage.exists(file_path):
-                storage.delete(file_path)
-        except Exception as e:
-            logger.warning(f"Failed to delete file {file_path} of deleted tenant {tenant_id}: {e}")
+    """Compatibility for queued tasks from before the transactional cleanup outbox."""
+    with transaction.atomic():
+        jobs = [
+            cleanup.schedule_resource_cleanup(
+                ResourceCleanup.ResourceType.EXPORT_FILE, organization_id=tenant_id, resource_path=path
+            )
+            for path in file_paths
+        ]
+        jobs.append(
+            cleanup.schedule_resource_cleanup(ResourceCleanup.ResourceType.BACKUP_KEY, organization_id=tenant_id)
+        )
+    for job in jobs:
+        cleanup.process_resource_cleanup(job.pk)
 
-    try:
-        get_backup_encryption_service().delete_tenant_key(str(tenant_id))
-    except Exception as e:
-        logger.warning(f"Failed to delete the backup encryption key of deleted tenant {tenant_id}: {e}")
+
+@shared_task(ignore_result=True)
+def process_resource_cleanup(cleanup_id: str):
+    return cleanup.process_resource_cleanup(cleanup_id)
+
+
+@shared_task(ignore_result=True)
+def process_due_resource_cleanups():
+    cleanup.process_due_resource_cleanups()

@@ -1,15 +1,49 @@
 import hashid_field
+import uuid
 
 from django.db import models, IntegrityError, transaction
 from django.conf import settings
 from django.utils.text import slugify
 from django.db.models import UniqueConstraint, Q
 from django.core.cache import cache
+from django.utils import timezone
 
 from . import constants
 from .disabled_permissions import DISABLED_PERMISSION_CODES
 from .managers import TenantManager, TenantMembershipManager
 from common.models import TimestampedMixin
+
+
+class ResourceCleanup(TimestampedMixin, models.Model):
+    """Durable deletion work and outcome history, independent of a deleted organization."""
+
+    class ResourceType(models.TextChoices):
+        EXPORT_FILE = 'export_file', 'Backup or activity export file'
+        DOCUMENT_FILE = 'document_file', 'Document file'
+        BACKUP_KEY = 'backup_key', 'Backup encryption key'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Deliberately no FK: deleting the organization must never delete its cleanup work.
+    organization_id = models.CharField(max_length=64, blank=True)
+    resource_type = models.CharField(max_length=20, choices=ResourceType.choices)
+    resource_path = models.TextField(blank=True)
+    attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    lease_token = models.UUIDField(null=True, blank=True, editable=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['next_attempt_at'],
+                name='resource_cleanup_due_idx',
+                condition=models.Q(completed_at__isnull=True),
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.resource_type} cleanup {self.pk}'
 
 
 class Tenant(TimestampedMixin, models.Model):
