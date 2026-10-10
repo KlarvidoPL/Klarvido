@@ -121,14 +121,6 @@ export const AccountDeletion = () => {
                     defaultMessage="Permanently delete your account and personal files. Shared organization content and historical attribution remain. Historical backups expire according to the backup retention policy."
                   />
                 </p>
-                {!loading && !canAuthenticate && (
-                  <p>
-                    <FormattedMessage
-                      id="Account deletion / Set password"
-                      defaultMessage="Set a password using the verified password setup flow above before deleting your account."
-                    />
-                  </p>
-                )}
                 {eligibilityError && (
                   <p role="alert">
                     <FormattedMessage
@@ -260,6 +252,19 @@ export const AccountDeletion = () => {
                 </Button>
               </ConfirmDialog>
             </div>
+            {!loading && !canAuthenticate && (
+              <div className="mt-5 rounded-lg border bg-background/60 p-4">
+                <div className="flex items-start gap-3">
+                  <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    <FormattedMessage
+                      id="Account deletion / Set password"
+                      defaultMessage="Set a password using the verified password setup flow above before deleting your account."
+                    />
+                  </p>
+                </div>
+              </div>
+            )}
             {blockers.length > 0 && (
               <div className="mt-5 rounded-lg border bg-background/60 p-4">
                 <div className="flex items-start gap-3">
