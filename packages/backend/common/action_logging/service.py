@@ -40,6 +40,9 @@ SENSITIVE_FIELDS = {
     "otp_seed_encrypted",
     "otp_pending_seed_encrypted",
     "password",
+    "credential_version",
+    "otp_token",
+    "confirmation",
     "secret_key",
     "api_key",
     "token",
@@ -243,6 +246,8 @@ def log_action(
             actor_type=actor_type,
             actor_user=actor_user if should_store_user else None,
             actor_email=actor_email,
+            actor_id_snapshot=str(actor_user.pk) if actor_user else '',
+            actor_name_snapshot=str(actor_user.profile) if actor_user and hasattr(actor_user, 'profile') else '',
             changes=changes or {},
             metadata=metadata or {},
         )

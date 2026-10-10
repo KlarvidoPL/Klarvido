@@ -6046,5 +6046,50 @@
   },
   "Documents / Organization list title": {
     "defaultMessage": "Organization documents"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "Delete account"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "Permanently delete your account and personal files. Shared organization content and historical attribution remain. Historical backups expire according to the backup retention policy."
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "Transfer ownership to another accepted member or delete these organizations first:"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "Set a password using the verified password setup flow above before deleting your account."
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "Could not check account deletion eligibility. Please reload and try again."
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "Permanently delete your account?"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "This cannot be undone. You will lose access on all devices. Enter your email and confirm your identity to continue."
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "Your email address"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "Current password"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "Confirm deletion with a passkey"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "Your Klarvido account was deleted"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "Account deleted"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "Your account has been permanently deleted and its access revoked. Personal file cleanup is being processed. Shared organization content and historical attribution remain. If you did not request this, contact support."
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} deleted their account and left {tenant_name}."
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "Account deletion"
   }
 }

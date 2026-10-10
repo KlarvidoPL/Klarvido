@@ -6046,5 +6046,50 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "Consulta y gestiona los documentos compartidos con tu organización"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "Eliminar cuenta"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "Elimina permanentemente tu cuenta y archivos personales. El contenido compartido de las organizaciones y la atribución histórica se conservan. Las copias históricas caducan según la política de retención."
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "Transfiere la propiedad a un miembro que haya aceptado su invitación o elimina estas organizaciones primero:"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "Configura una contraseña mediante el proceso verificado anterior antes de eliminar tu cuenta."
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "No se pudo comprobar si la cuenta puede eliminarse. Recarga la página e inténtalo de nuevo."
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "¿Eliminar tu cuenta permanentemente?"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "Esta acción no se puede deshacer. Perderás el acceso en todos tus dispositivos. Introduce tu correo y confirma tu identidad."
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "Tu dirección de correo"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "Contraseña actual"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "Confirmar eliminación con una clave de acceso"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "Tu cuenta de Klarvido fue eliminada"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "Cuenta eliminada"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "Tu cuenta se eliminó permanentemente y se revocó su acceso. Se están eliminando los archivos personales. El contenido compartido de las organizaciones y la atribución histórica se conservan. Si no lo solicitaste, contacta con soporte."
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} eliminó su cuenta y salió de {tenant_name}."
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "Eliminación de cuenta"
   }
 }

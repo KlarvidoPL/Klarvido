@@ -12,6 +12,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from apps.users.exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure, PasswordBudgetExceeded
 from apps.users.services import password_budget
 from apps.users.services.otp import validate_otp
+from apps.users.services.credentials import credential_version
 from apps.sso.models import PasskeyManagementGrant, UserPasskey, WebAuthnChallenge
 from apps.sso.exceptions import PasskeyReauthenticationError
 from .webauthn import WebAuthnService
@@ -19,7 +20,7 @@ from .webauthn import WebAuthnService
 
 GRANT_TTL = timedelta(minutes=5)
 
-MANAGEMENT_ACTIONS = {"register", "delete", "otp_setup", "otp_disable", "password_set"}
+MANAGEMENT_ACTIONS = {"register", "delete", "otp_setup", "otp_disable", "password_set", "account_delete"}
 
 
 def action_target(user, data):
@@ -50,8 +51,9 @@ def user_can_reauthenticate(user):
 def issue_grant(grant):
     token = secrets.token_urlsafe(32)
     grant.token_hash = hashlib.sha256(token.encode()).hexdigest()
+    grant.credential_version = credential_version(grant.user)
     grant.expires_at = timezone.now() + GRANT_TTL
-    grant.save(update_fields=["token_hash", "expires_at"])
+    grant.save(update_fields=["token_hash", "expires_at", "credential_version"])
     return token
 
 
@@ -69,7 +71,7 @@ def validate_password_proof(user, data):
         raise PasskeyReauthenticationError('password_locked')
     if not correct:
         raise PasskeyReauthenticationError('incorrect_password')
-    if user.otp_enabled:
+    if user.otp_enabled and data.get("action") != "account_delete":
         if not isinstance(data.get("otpToken", ""), str):
             raise PermissionDenied("Fresh authentication failed")
         try:
@@ -181,7 +183,7 @@ def require_grant(request, user, action, passkey=None, challenge=None):
         )
         .first()
     )
-    if grant is None or not user.is_active:
+    if grant is None or not user.is_active or grant.credential_version != credential_version(user):
         raise PermissionDenied("Fresh authentication required")
     if challenge is not None and (
         grant.registration_challenge is None or grant.registration_challenge.challenge != challenge

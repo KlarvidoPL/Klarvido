@@ -13,6 +13,10 @@ from . import tasks
 from . import models
 from .services.account_reclaim import reclaim_unconfirmed_account
 from .services.password_policy import validate_password
+from .services.deletion import delete_account, deletion_blockers
+from .services.otp import validate_otp
+from .exceptions import OTPVerificationFailure, OTPAttemptLimitExceeded
+from apps.sso.services import passkey_management
 
 admin.site.unregister(token_models.OutstandingToken)
 
@@ -95,9 +99,49 @@ class UserAdmin(BaseUserAdmin):
         UserProfileInline,
     ]
     actions = ["export_user_data", "reclaim_unconfirmed_account"]
+    delete_confirmation_template = 'admin/users/user/delete_confirmation.html'
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_active and request.user.is_superuser
+
+    def delete_view(self, request, object_id, extra_context=None):
+        context = dict(extra_context or {})
+        if request.method == 'POST':
+            obj = self.get_object(request, object_id)
+            try:
+                if obj is None or not self.has_delete_permission(request, obj):
+                    raise PermissionDenied('permission_denied')
+                if deletion_blockers(obj):
+                    raise ValidationError('Transfer ownership or delete the organizations first.')
+                token = passkey_management.password_grant(
+                    request.user, {'action': 'account_delete', 'password': request.POST.get('password', '')}
+                )
+                request.META['HTTP_X_PASSKEY_AUTHORIZATION'] = token
+                if request.user.otp_enabled and request.user.otp_verified:
+                    validate_otp(request.user, request.POST.get('otp_token', ''), request)
+                    request._account_deletion_otp = (str(request.user.pk), request.user.otp_last_used_code_hash)
+                return super().delete_view(request, object_id, extra_context=context)
+            except (PermissionDenied, ValidationError, OTPVerificationFailure, OTPAttemptLimitExceeded) as exc:
+                context['deletion_error'] = str(exc)
+                method, post = request.method, request.POST
+                request.method, request.POST = 'GET', request.POST.copy()
+                request.POST.clear()
+                try:
+                    return super().delete_view(request, object_id, extra_context=context)
+                finally:
+                    request.method, request.POST = method, post
+        return super().delete_view(request, object_id, extra_context=context)
+
+    def delete_model(self, request, obj):
+        delete_account(obj.pk, request, via_admin=True)
+
+    def delete_queryset(self, request, queryset):
+        raise PermissionDenied('Delete accounts individually with fresh authentication.')
 
     def get_actions(self, request):
         actions = super().get_actions(request)
+        # Django's default bulk action bypasses per-account fresh confirmation.
+        actions.pop('delete_selected', None)
         if not request.user.is_superuser:
             actions.pop("reclaim_unconfirmed_account", None)
         return actions
@@ -192,3 +236,10 @@ class SecurityEmailOutboxAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(models.AccountDeletion)
+class AccountDeletionAdmin(SecurityEmailOutboxAdmin):
+    list_display = ('account_id', 'actor_id', 'deleted_at')
+    list_filter = ()
+    readonly_fields = [field.name for field in models.AccountDeletion._meta.fields]

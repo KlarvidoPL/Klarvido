@@ -6046,5 +6046,50 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "Consultez et gérez les documents partagés avec votre organisation"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "Supprimer le compte"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "Supprimez définitivement votre compte et vos fichiers personnels. Les contenus partagés des organisations et les attributions historiques restent conservés. Les sauvegardes historiques expirent selon la politique de conservation."
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "Transférez la propriété à un membre ayant accepté son invitation ou supprimez ces organisations :"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "Définissez un mot de passe via la procédure de vérification ci-dessus avant de supprimer votre compte."
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "Impossible de vérifier si le compte peut être supprimé. Rechargez la page et réessayez."
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "Supprimer définitivement votre compte ?"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "Cette action est irréversible. Vous perdrez l’accès sur tous vos appareils. Saisissez votre adresse e-mail et confirmez votre identité."
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "Votre adresse e-mail"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "Mot de passe actuel"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "Confirmer la suppression avec une clé d’accès"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "Votre compte Klarvido a été supprimé"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "Compte supprimé"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "Votre compte a été définitivement supprimé et son accès révoqué. La suppression des fichiers personnels est en cours. Les contenus partagés des organisations et les attributions historiques restent conservés. Si vous n’avez pas demandé cette action, contactez l’assistance."
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} a supprimé son compte et quitté {tenant_name}."
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "Suppression du compte"
   }
 }

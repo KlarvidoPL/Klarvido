@@ -69,7 +69,10 @@ def export_action_logs(self, export_id: str):
     def requester_is_authorized():
         user = export_job.requested_by
         if user:
-            user.refresh_from_db(fields=["is_active"])
+            try:
+                user.refresh_from_db(fields=["is_active"])
+            except user.DoesNotExist:
+                return False
         return bool(
             user
             and user.is_active
@@ -203,7 +206,7 @@ def export_action_logs(self, export_id: str):
                     "tenant_id": str(export_job.tenant_id),
                     "tenant_name": export_job.tenant.name,
                     "exported_at": timezone.now().isoformat(),
-                    "exported_by": export_job.requested_by.email,
+                    "exported_by": export_job.requested_by.email if export_job.requested_by else "",
                     "filters": filters,
                     "total_logs": log_count,
                 },

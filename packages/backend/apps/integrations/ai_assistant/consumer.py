@@ -121,7 +121,9 @@ class AiAssistantConsumer(AsyncJsonWebsocketConsumer):
             except Exception:
                 raw_tenant_id = self.tenant_id
 
-            return TenantMembership.objects.filter(user=self.user, tenant_id=raw_tenant_id, is_accepted=True).exists()
+            return TenantMembership.objects.filter(
+                user=self.user, user__is_active=True, tenant_id=raw_tenant_id, is_accepted=True
+            ).exists()
         except Exception as e:
             logger.error(f"Error validating tenant access: {e}")
             return False
@@ -160,6 +162,9 @@ class AiAssistantConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content):
         """Handle incoming JSON messages."""
+        if not await self.validate_tenant_access():
+            await self.close(code=4003)
+            return
         message_type = content.get("type", "message")
 
         if message_type == "message":

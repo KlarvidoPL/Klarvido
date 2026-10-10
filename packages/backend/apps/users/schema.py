@@ -23,6 +23,7 @@ from .services.security import audit_failures, record
 from .services.default_organization import default_organization_id
 from .services.users import get_user_from_resolver, get_role_names, get_user_avatar_url
 from .services.social_linking import complete_link
+from .services.deletion import deletion_blockers
 
 
 logger = logging.getLogger(__name__)
@@ -563,12 +564,32 @@ class ChangePasswordMutation(CookieAuthenticationMutation):
 @permission_classes(policies.AnyoneFullAccess)
 class Query(graphene.ObjectType):
     current_user = graphene.Field(CurrentUserType)
+    account_deletion_blockers = graphene.List(TenantType)
+
+    @staticmethod
+    def resolve_account_deletion_blockers(root, info):
+        user = info.context.user
+        return deletion_blockers(user) if user.is_authenticated else []
 
     @staticmethod
     def resolve_current_user(root, info, **kwargs):
         return info.context.user if info.context.user.is_authenticated else None
 
 
+class DeleteAccountMutation(mutations.SerializerMutation):
+    class Meta:
+        serializer_class = serializers.DeleteAccountSerializer
+
+    @classmethod
+    @ratelimit.ratelimit(rate=RateLimitCategory.AUTH_PASSWORD_CHANGE, key=RateLimitKey.USER, fail_closed=True)
+    @audit_failures('auth_account_deletion')
+    def mutate_and_get_payload(cls, root, info, **input):
+        if getattr(info.context, 'is_ai_agent_request', False):
+            raise ValidationError('Account deletion requires an interactive confirmation.')
+        return super().mutate_and_get_payload(root, info, **input)
+
+
 class Mutation(graphene.ObjectType):
+    delete_account = permission_classes(policies.IsAuthenticatedFullAccess)(DeleteAccountMutation.Field())
     change_password = ChangePasswordMutation.Field()
     update_current_user = UpdateCurrentUserMutation.Field()

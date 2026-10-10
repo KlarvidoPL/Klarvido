@@ -43,7 +43,7 @@ def require_deletion_otp(request, otp_token=None):
     request._organization_deletion_otp_verified = (str(account.pk), account.otp_last_used_code_hash)
 
 
-def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None):
+def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None, private_account_id=None):
     """Lock, authorize, snapshot cleanup/audit work and delete in one transaction."""
     actor_type = (
         (ActionActorType.SUPERUSER if request.user.is_superuser else ActionActorType.USER)
@@ -57,14 +57,23 @@ def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None):
     target = models.Tenant.objects.filter(pk=tenant_pk).first()
     if target is None:
         raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-    if via_admin:
+    if private_account_id is not None:
+        if (
+            target.type != TenantType.DEFAULT
+            or str(target.creator_id) != private_account_id
+            or not deleter.is_active
+            or (str(deleter.pk) != private_account_id and not deleter.is_superuser)
+        ):
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+    elif via_admin:
         if not (deleter.is_active and deleter.is_staff and deleter.has_perm('multitenancy.delete_tenant')):
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
     elif not models.has_tenant_access(deleter, target) or not models.user_has_permission(deleter, target, 'org.delete'):
         raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
-    if target.type == TenantType.DEFAULT:
+    if target.type == TenantType.DEFAULT and private_account_id is None:
         raise ValidationError('Cannot delete default type tenant.')
-    require_deletion_otp(request, otp_token)
+    if private_account_id is None:
+        require_deletion_otp(request, otp_token)
     with transaction.atomic():
         # Workers acquire this same lock before encrypting/uploading and recording
         # file paths. Collect paths only after any in-flight publisher commits.
@@ -73,19 +82,25 @@ def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None):
             raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
         # Acquiring the lock can wait for an upload. Recheck authorization
         # rather than relying only on the permission check before that wait.
-        if tenant.type == TenantType.DEFAULT:
+        if tenant.type == TenantType.DEFAULT and private_account_id is None:
             raise ValidationError('Cannot delete default type tenant.')
         # An upload may have delayed this lock. Recheck the account's current
         # factor state without consuming another code inside the transaction.
         account = User.objects.get(pk=deleter.pk)
         if (
-            account.otp_enabled
+            private_account_id is None
+            and account.otp_enabled
             and account.otp_verified
             and getattr(request, '_organization_deletion_otp_verified', None)
             != (str(account.pk), account.otp_last_used_code_hash)
         ):
             raise GraphQlValidationError({'otp_token': ['This field is required.']}, code='required')
-        if via_admin:
+        if private_account_id is not None:
+            if tenant.type != TenantType.DEFAULT or str(tenant.creator_id) != private_account_id:
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+            if tenant.user_memberships.exclude(user_id=tenant.creator_id).exists():
+                raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
+        elif via_admin:
             if not (deleter.is_active and deleter.is_staff and deleter.has_perm('multitenancy.delete_tenant')):
                 raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
         elif not models.has_tenant_access(deleter, tenant) or not models.user_has_permission(
@@ -113,7 +128,7 @@ def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None):
         )
 
         try:
-            schedule = subscriptions.get_schedule(tenant)
+            schedule = subscriptions.get_schedule(tenant) if private_account_id is None else None
             if schedule:
                 cancel_subscription_serializer = CancelTenantActiveSubscriptionSerializer(instance=schedule, data={})
                 if cancel_subscription_serializer.is_valid():
@@ -145,5 +160,6 @@ def delete_organization(tenant_id, request, *, via_admin=False, otp_token=None):
             )
         schedule_resource_cleanup(models.ResourceCleanup.ResourceType.BACKUP_KEY, organization_id=tenant_pk)
         schedule_organization_prefix_cleanup(tenant_pk)
-        schedule_deletion_notifications(tenant_pk, tenant_name, deleter, members)
+        if private_account_id is None:
+            schedule_deletion_notifications(tenant_pk, tenant_name, deleter, members)
         tenant.delete()

@@ -6046,5 +6046,50 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "عرض المستندات المشتركة مع مؤسستك وإدارتها"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "حذف الحساب"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "احذف حسابك وملفاتك الشخصية نهائيًا. سيبقى المحتوى المشترك للمؤسسات وبيانات نسب الأنشطة السابقة. تنتهي صلاحية النسخ الاحتياطية التاريخية وفقًا لسياسة الاحتفاظ بها."
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "انقل الملكية أولًا إلى عضو قبل الدعوة أو احذف هذه المؤسسات:"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "عيّن كلمة مرور باستخدام إجراء التحقق أعلاه قبل حذف حسابك."
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "تعذر التحقق من إمكانية حذف الحساب. أعد تحميل الصفحة وحاول مجددًا."
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "هل تريد حذف حسابك نهائيًا؟"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "لا يمكن التراجع عن هذا الإجراء. ستفقد الوصول على جميع أجهزتك. أدخل بريدك الإلكتروني وأكّد هويتك للمتابعة."
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "عنوان بريدك الإلكتروني"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "كلمة المرور الحالية"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "تأكيد الحذف باستخدام مفتاح مرور"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "تم حذف حسابك في Klarvido"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "تم حذف الحساب"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "تم حذف حسابك نهائيًا وإلغاء الوصول إليه. تجري إزالة الملفات الشخصية. سيبقى المحتوى المشترك للمؤسسات وبيانات نسب الأنشطة السابقة. إذا لم تطلب ذلك، فاتصل بالدعم."
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "حذف {name} حسابه وغادر {tenant_name}."
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "حذف الحساب"
   }
 }

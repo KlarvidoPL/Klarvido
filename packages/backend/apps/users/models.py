@@ -9,8 +9,19 @@ from django.utils import timezone
 
 from common.acl.helpers import CommonGroups
 from common.models import ImageWithThumbnailMixin
-from common.storages import UniqueFilePathGenerator, get_public_storage
+from common.storages import UserAvatarPathGenerator, get_public_storage
 from apps.multitenancy.models import TenantMembership
+
+
+class AccountDeletion(models.Model):
+    """Minimal identity tombstone; never use it to reconnect a new registration."""
+
+    account_id = models.CharField(max_length=64, unique=True)
+    actor_id = models.CharField(max_length=64)
+    deleted_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Deleted account {self.account_id}'
 
 
 class UserManager(BaseUserManager):
@@ -190,9 +201,10 @@ class SocialAccountUnlinkChallenge(models.Model):
 
 
 class UserAvatar(ImageWithThumbnailMixin, models.Model):
-    original = models.ImageField(storage=get_public_storage(), upload_to=UniqueFilePathGenerator("avatars"), null=True)
+    account_id = models.CharField(max_length=64, blank=True, db_index=True)
+    original = models.ImageField(storage=get_public_storage(), upload_to=UserAvatarPathGenerator("original"), null=True)
     thumbnail = models.ImageField(
-        storage=get_public_storage(), upload_to=UniqueFilePathGenerator("avatars/thumbnails"), null=True
+        storage=get_public_storage(), upload_to=UserAvatarPathGenerator("thumbnails"), null=True
     )
 
     THUMBNAIL_SIZE = (128, 128)

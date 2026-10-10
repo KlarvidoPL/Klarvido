@@ -6046,5 +6046,50 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "Przeglądaj dokumenty udostępnione organizacji i zarządzaj nimi"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "Usuń konto"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "Trwale usuń konto i pliki osobiste. Wspólne dane organizacji i historyczne informacje o autorach pozostaną. Historyczne kopie zapasowe wygasają zgodnie z zasadami ich przechowywania."
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "Najpierw przekaż uprawnienia właściciela innemu członkowi, który przyjął zaproszenie, lub usuń te organizacje:"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "Przed usunięciem konta ustaw hasło, korzystając z powyższej procedury z weryfikacją tożsamości."
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "Nie udało się sprawdzić możliwości usunięcia konta. Odśwież stronę i spróbuj ponownie."
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "Trwale usunąć konto?"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "Tej operacji nie można cofnąć. Utracisz dostęp na wszystkich urządzeniach. Wpisz swój adres e-mail i potwierdź tożsamość, aby kontynuować."
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "Twój adres e-mail"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "Obecne hasło"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "Potwierdź usunięcie kluczem dostępu"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "Twoje konto Klarvido zostało usunięte"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "Konto usunięte"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "Twoje konto zostało trwale usunięte, a dostęp cofnięty. Trwa usuwanie plików osobistych. Wspólne dane organizacji i historyczne informacje o autorach pozostaną. Jeśli nie zlecono tej operacji, skontaktuj się z pomocą techniczną."
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} usunął(-ęła) konto i opuścił(-a) organizację {tenant_name}."
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "Usunięcie konta"
   }
 }

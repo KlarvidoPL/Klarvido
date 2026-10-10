@@ -1,13 +1,15 @@
-import datetime
-import io
 import json
+import os
+import tempfile
+import uuid
 import zipfile
 from typing import Union
-from django.conf import settings
+from django.db import transaction
+from django.core.files import File
 
-import boto3
+from apps.demo.models import DocumentDemoItem
+from common.storages import get_user_exports_storage
 from ..protocols import UserDataExportable, UserFilesExportable
-from ..constants import ExportUserArchiveRootPaths
 from ....models import User
 from utils import hashid
 
@@ -69,13 +71,14 @@ class ExportUserArchive:
         return hashid.encode(self._user.id)
 
     def run(self) -> str:
-        user_data = self._export_user_data()
-        user_files = self._export_user_files()
-
-        archive_filename = self._export_user_archive_to_zip(user_data, user_files)
-        export_url = self._export_zip_archive_to_s3(archive_filename)
-
-        return export_url
+        with transaction.atomic():
+            # Deletion takes this lock before collecting paths and deleting the account.
+            self._user = User.objects.select_for_update().get(pk=self._user.pk)
+            archive_filename = self._export_user_archive_to_zip(self._export_user_data(), self._export_user_files())
+            try:
+                return self._export_zip_archive_to_s3(archive_filename)
+            finally:
+                os.unlink(archive_filename)
 
     def _export_user_data(self) -> dict:
         export_data = {}
@@ -94,33 +97,29 @@ class ExportUserArchive:
         return export_files_paths
 
     def _export_user_archive_to_zip(self, user_data: dict, user_files: list[str]) -> str:
-        s3 = boto3.client("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
-        archive_filename = f"/{ExportUserArchiveRootPaths.LOCAL_ROOT.value}/{self._user_id}.zip"
+        descriptor, archive_filename = tempfile.mkstemp(suffix='.zip')
+        os.close(descriptor)
 
-        with zipfile.ZipFile(archive_filename, "w", zipfile.ZIP_DEFLATED) as zf:
-            json_data_filename = f"{self._user_id}/{self._user_id}.json"
-            zf.writestr(json_data_filename, json.dumps(user_data).encode("utf-8"))
+        try:
+            with zipfile.ZipFile(archive_filename, "w", zipfile.ZIP_DEFLATED) as zf:
+                json_data_filename = f"{self._user_id}/{self._user_id}.json"
+                zf.writestr(json_data_filename, json.dumps(user_data).encode("utf-8"))
 
-            for file_path in user_files:
-                with io.BytesIO() as buffer:
-                    s3.download_fileobj(settings.AWS_STORAGE_BUCKET_NAME, file_path.name, buffer)
-                    zf.writestr(f"{self._user_id}/{file_path}", buffer.getvalue())
+                for file_path in user_files:
+                    with DocumentDemoItem._meta.get_field('file').storage.open(file_path, 'rb') as source:
+                        zf.writestr(f"{self._user_id}/{file_path}", source.read())
+        except Exception:
+            os.unlink(archive_filename)
+            raise
 
         return archive_filename
 
     def _export_zip_archive_to_s3(self, user_archive_filename: str) -> str:
-        s3 = boto3.client("s3", endpoint_url=settings.AWS_S3_ENDPOINT_URL)
+        storage = get_user_exports_storage()
         user_archive_obj_key = self._get_user_archive_obj_key()
-
-        s3.upload_file(user_archive_filename, settings.AWS_EXPORTS_STORAGE_BUCKET_NAME, user_archive_obj_key)
-        export_url = s3.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": settings.AWS_EXPORTS_STORAGE_BUCKET_NAME, "Key": user_archive_obj_key},
-            ExpiresIn=settings.USER_DATA_EXPORT_EXPIRY_SECONDS,
-        )
-
-        return export_url
+        with open(user_archive_filename, 'rb') as source:
+            path = storage.save(user_archive_obj_key, File(source))
+        return storage.url(path)
 
     def _get_user_archive_obj_key(self) -> str:
-        timestamp = datetime.datetime.now().strftime("%d-%m-%y_%H-%M-%S")
-        return f"{ExportUserArchiveRootPaths.S3_ROOT.value}/{self._user_id}_{timestamp}.zip"
+        return f"users/{self._user_id}/{uuid.uuid4()}.zip"

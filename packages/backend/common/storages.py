@@ -37,6 +37,19 @@ class OrganizationDocumentPathGenerator:
         return f'{organization_document_prefix(organization_id)}{secrets.token_hex(8)}/{filename}'
 
 
+@deconstructible
+class UserAvatarPathGenerator:
+    def __init__(self, kind):
+        self.kind = kind
+
+    def __call__(self, instance, filename):
+        if not instance.account_id:
+            return UniqueFilePathGenerator(f'avatars/{self.kind}')(instance, filename)
+        if not re.fullmatch(r'[A-Za-z0-9_-]+', instance.account_id):
+            raise ValueError('Invalid avatar owner')
+        return f'avatars/users/{instance.account_id}/{self.kind}/{secrets.token_hex(8)}/{filename}'
+
+
 def delete_storage_file(storage, path):
     """Permanently remove a recorded file, including historical S3 versions."""
     if isinstance(storage, S3Boto3Storage) and _has_storage_versions(storage):
@@ -473,3 +486,45 @@ def get_exports_storage():
     # For cloud backends, use the private storage class with exports location
     storage_class = PRIVATE_STORAGE_BACKENDS.get(backend, CustomS3Boto3Storage)
     return storage_class(location="exports")
+
+
+def get_user_exports_storage():
+    """Personal exports historically use a separate bucket on the AWS storage path."""
+    if os.environ.get('STORAGE_BACKEND', 's3') == 's3':
+        return CustomS3Boto3Storage(
+            bucket_name=settings.AWS_EXPORTS_STORAGE_BUCKET_NAME,
+            location='',
+            custom_domain=None,
+            querystring_auth=True,
+            default_acl=None,
+            querystring_expire=settings.USER_DATA_EXPORT_EXPIRY_SECONDS,
+        )
+    return get_exports_storage()
+
+
+def delete_user_exports(account_id, *, legacy=False):
+    account_id = str(account_id)
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', account_id):
+        raise ValueError('Invalid account identifier')
+    storage = get_user_exports_storage()
+    if not legacy:
+        delete_storage_prefix(storage, f'users/{account_id}/')
+        return
+    # The underscore delimiter is part of the old filename format. Never scan by ID alone.
+    prefix = f'exports/{account_id}_'
+    if isinstance(storage, S3Boto3Storage):
+        key_prefix = storage._normalize_name(prefix)
+        if _has_storage_versions(storage):
+            _delete_storage_versions(storage, key_prefix)
+        else:
+            client = storage.connection.meta.client
+            for page in client.get_paginator('list_objects_v2').paginate(Bucket=storage.bucket_name, Prefix=key_prefix):
+                for item in page.get('Contents', []):
+                    if not item['Key'].startswith(key_prefix):
+                        raise ValueError('Export listing escaped account prefix')
+                    client.delete_object(Bucket=storage.bucket_name, Key=item['Key'])
+    elif storage.exists('exports'):
+        _, files = storage.listdir('exports')
+        for name in files:
+            if name.startswith(f'{account_id}_'):
+                delete_storage_file(storage, f'exports/{name}')

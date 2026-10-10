@@ -430,7 +430,9 @@ class VerifyPasskeySerializer(serializers.Serializer):
 
 
 class PasskeyManagementOptionsSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=['register', 'delete', 'otp_setup', 'otp_disable', 'password_set'])
+    action = serializers.ChoiceField(
+        choices=['register', 'delete', 'otp_setup', 'otp_disable', 'password_set', 'account_delete']
+    )
     passkeyId = PasskeyTextField(max_length=255, required=False)
 
 

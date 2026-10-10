@@ -1,3 +1,4 @@
+from .services.ownership import owner_memberships
 from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
 from hashid_field import rest as hidrest
 from rest_framework import serializers, exceptions
@@ -552,31 +553,15 @@ class UpdateTenantMembershipSerializer(serializers.ModelSerializer):
                 raise exceptions.PermissionDenied("Only organization owners can assign the Owner role.")
 
         # SECURITY: Prevent demoting the last owner
-        if is_currently_owner and new_role != TenantUserRole.OWNER:
-            # Count legacy owners
-            legacy_owner_count = models.TenantMembership.objects.filter(
-                tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True
-            ).count()
-
-            # Count RBAC owners
-            rbac_owner_count = models.TenantMembershipRole.objects.filter(
-                membership__tenant=tenant, role__system_role_type=SystemRoleType.OWNER, membership__is_accepted=True
-            ).count()
-
-            # Determine if this membership will remain as an RBAC owner
-            will_remain_rbac_owner = is_currently_rbac_owner
-
-            # Calculate remaining owners after this change
-            remaining_owners = legacy_owner_count - 1 if is_currently_legacy_owner else legacy_owner_count
-
-            # Add RBAC owners (minus this one if applicable)
-            if will_remain_rbac_owner:
-                remaining_owners += rbac_owner_count
-            else:
-                remaining_owners += rbac_owner_count - (1 if is_currently_rbac_owner else 0)
-
-            if remaining_owners < 1:
-                raise exceptions.ValidationError("There must be at least one owner in the organization.")
+        if (
+            is_currently_owner
+            and new_role != TenantUserRole.OWNER
+            and (
+                not is_currently_rbac_owner
+                and not owner_memberships(tenant.pk).exclude(user_id=membership.user_id).exists()
+            )
+        ):
+            raise exceptions.ValidationError("There must be at least one owner in the organization.")
 
         return super().validate(attrs)
 
