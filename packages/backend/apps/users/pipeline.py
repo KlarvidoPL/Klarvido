@@ -88,7 +88,8 @@ def populate_profile_from_social(
     already set or deliberately cleared."""
     if not user:
         return
-    user = User.objects.select_for_update().get(pk=user.pk)
+    User.objects.select_for_update().get(pk=user.pk)
+    user.refresh_from_db()
 
     provider_email = (details.get("email") or response.get("email") or "").lower()
     email_confirmed_by_provider = (

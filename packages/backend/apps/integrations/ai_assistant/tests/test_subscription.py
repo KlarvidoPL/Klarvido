@@ -9,7 +9,6 @@ from unittest.mock import patch, MagicMock
 from apps.integrations.ai_assistant.subscription import (
     AiChatSubscription,
     SendAiMessageMutation,
-    AiChatEventType,
 )
 
 
@@ -37,15 +36,29 @@ class TestAiChatSubscription:
         result = AiChatSubscription.subscribe(None, info, "conv-123")
         assert result == [f"ai_chat_{user.id}_conv-123"]
 
-    def test_publish_returns_event(self):
+    @pytest.mark.django_db(transaction=True)
+    def test_publish_returns_event(self, user):
         payload = {
             "event_type": "status",
             "message": "Connecting...",
         }
-        result = asyncio.run(AiChatSubscription.publish(payload, None, "conv-123"))
+        info = MagicMock()
+        info.context.channels_scope = {"user": user}
+        result = asyncio.run(AiChatSubscription.publish(payload, info, "conv-123"))
         assert result.event is not None
         assert result.event.event_type == "status"
         assert result.event.message == "Connecting..."
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.parametrize('deleted', [False, True])
+    def test_publish_drops_events_for_revoked_accounts(self, user, deleted):
+        info = MagicMock()
+        info.context.channels_scope = {'user': user}
+        if deleted:
+            user.__class__.objects.filter(pk=user.pk).delete()
+        else:
+            user.__class__.objects.filter(pk=user.pk).update(is_active=False)
+        assert asyncio.run(AiChatSubscription.publish({'event_type': 'status'}, info, 'conv-123')) is None
 
 
 @pytest.mark.django_db
