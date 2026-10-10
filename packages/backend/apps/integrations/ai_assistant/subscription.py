@@ -11,6 +11,7 @@ import channels_graphql_ws
 import graphene
 from django.conf import settings
 from asgiref.sync import sync_to_async
+from apps.users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,9 @@ class AiChatSubscription(channels_graphql_ws.Subscription):
     @staticmethod
     async def publish(payload, info, conversation_id):
         """Publish event to subscribers."""
+        user = info.context.channels_scope.get('user')
+        if not user or not await sync_to_async(User.objects.filter(pk=user.pk, is_active=True).exists)():
+            return None
         return AiChatSubscription(event=AiChatEventType(**payload))
 
 

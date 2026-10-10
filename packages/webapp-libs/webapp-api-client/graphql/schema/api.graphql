@@ -100,6 +100,7 @@ type Query {
   charge(id: ID, tenantId: ID): StripeChargeType
   paymentIntent(id: ID, tenantId: ID): StripePaymentIntentType
   currentUser: CurrentUserType
+  accountDeletionBlockers: [TenantType]
   hasUnreadNotifications: Boolean
   unreadNotificationsCount: Int
   allNotifications(before: String, after: String, first: Int, last: Int): NotificationConnection
@@ -557,6 +558,8 @@ type ActionLogType implements Node {
   actorType: MultitenancyActionLogActorTypeChoices!
   "User who performed the action (null for system actions)"
   actorUser: CurrentUserType
+  actorIdSnapshot: String!
+  actorNameSnapshot: String!
   "Email of the actor (stored for historical reference)"
   actorEmail: String!
   changes: GenericScalar
@@ -1396,6 +1399,7 @@ type ApiMutation {
   createPaymentIntent(input: CreatePaymentIntentMutationInput!): CreatePaymentIntentMutationPayload
   updatePaymentIntent(input: UpdatePaymentIntentMutationInput!): UpdatePaymentIntentMutationPayload
   createSetupIntent(input: CreateSetupIntentMutationInput!): CreateSetupIntentMutationPayload
+  deleteAccount(input: DeleteAccountMutationInput!): DeleteAccountMutationPayload
   changePassword(input: ChangePasswordMutationInput!): ChangePasswordMutationPayload
   updateCurrentUser(input: UpdateCurrentUserMutationInput!): UpdateCurrentUserMutationPayload
   setDefaultOrganization(input: SetDefaultOrganizationMutationInput!): SetDefaultOrganizationMutationPayload
@@ -1561,7 +1565,7 @@ type ActionLogExportType implements Node {
   "The ID of the object"
   id: ID!
   tenant: TenantType!
-  requestedBy: CurrentUserType!
+  requestedBy: CurrentUserType
   status: MultitenancyActionLogExportStatusChoices!
   errorMessage: String!
   startedAt: DateTime
@@ -1755,6 +1759,10 @@ type StripeSetupIntentType implements Node {
   "Indicates how the payment method is intended to be used in the future."
   usage: DjstripeSetupIntentUsageChoices!
   pk: String
+}
+type DeleteAccountMutationPayload {
+  ok: Boolean
+  clientMutationId: String
 }
 type ChangePasswordMutationPayload {
   refresh: String
@@ -2020,6 +2028,8 @@ enum SsoSSOAuditLogEventTypeChoices {
   AUTH_PASSWORD_RESET
   "Password change"
   AUTH_PASSWORD_CHANGE
+  "Account deletion"
+  AUTH_ACCOUNT_DELETION
   "Two-factor authentication change"
   AUTH_OTP_MANAGEMENT
   "IdP Configuration Created"
@@ -2763,6 +2773,11 @@ input UpdatePaymentIntentMutationInput {
 }
 input CreateSetupIntentMutationInput {
   tenantId: String!
+  clientMutationId: String
+}
+input DeleteAccountMutationInput {
+  confirmation: String!
+  otpToken: String
   clientMutationId: String
 }
 input ChangePasswordMutationInput {

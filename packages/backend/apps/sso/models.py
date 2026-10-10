@@ -684,9 +684,11 @@ class PasskeyManagementGrant(TimestampedMixin, models.Model):
             ("otp_setup", "OTP Setup"),
             ("otp_disable", "OTP Disable"),
             ("password_set", "Password Set"),
+            ("account_delete", "Delete Account"),
         ],
     )
     passkey = models.ForeignKey(UserPasskey, on_delete=models.CASCADE, null=True, blank=True)
+    credential_version = models.CharField(max_length=64, blank=True)
     token_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
     authentication_challenge = models.OneToOneField(
         WebAuthnChallenge, on_delete=models.CASCADE, null=True, blank=True, related_name="management_grant"

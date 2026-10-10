@@ -164,7 +164,7 @@ class NotificationCreatedSubscription(channels_graphql_ws.Subscription):
         """
         notification = (
             models.Notification.objects.prefetch_related("issuer", "issuer__profile", "issuer__profile__avatar")
-            .filter(id=id, user_id=user_id)
+            .filter(id=id, user_id=user_id, user__is_active=True)
             .first()
         )
 

@@ -15,7 +15,7 @@ User = get_user_model()
 class CrudDemoItem(TenantDependentModelMixin, models.Model):
     id = hashid_field.HashidAutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
         return self.name

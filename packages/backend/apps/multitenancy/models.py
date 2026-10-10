@@ -62,10 +62,16 @@ class ResourceCleanup(TimestampedMixin, models.Model):
         BACKUP_KEY = 'backup_key', 'Backup encryption key'
         EXPORT_PREFIX = 'export_prefix', 'Organization backup or export directory'
         DOCUMENT_PREFIX = 'document_prefix', 'Organization document directory'
+        AVATAR_FILE = 'avatar_file', 'Personal avatar file'
+        USER_AVATAR_PREFIX = 'user_avatar_prefix', 'Personal avatar directory'
+        ACCOUNT_MARKER = 'account_marker', 'External account deletion marker'
+        USER_EXPORT_PREFIX = 'user_export_prefix', 'Personal export directory'
+        LEGACY_USER_EXPORT = 'legacy_user_export', 'Legacy personal exports'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # Deliberately no FK: deleting the organization must never delete its cleanup work.
     organization_id = models.CharField(max_length=64, blank=True)
+    account_id = models.CharField(max_length=64, blank=True)
     resource_type = models.CharField(max_length=20, choices=ResourceType.choices)
     resource_path = models.TextField(blank=True)
     attempts = models.PositiveIntegerField(default=0)
@@ -116,7 +122,9 @@ class Tenant(TimestampedMixin, models.Model):
     """
 
     id: str = hashid_field.HashidAutoField(primary_key=True)
-    creator: settings.AUTH_USER_MODEL = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    creator: settings.AUTH_USER_MODEL = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
     name: str = models.CharField(max_length=100, unique=False)
     slug: str = models.SlugField(max_length=100, unique=True)
     type: str = models.CharField(choices=constants.TenantType.choices)
@@ -182,7 +190,7 @@ class Tenant(TimestampedMixin, models.Model):
 
     @property
     def email(self):
-        return self.billing_email if self.billing_email else self.creator.email
+        return self.billing_email or (self.creator.email if self.creator else '')
 
     @property
     def owners_count(self):
@@ -350,6 +358,8 @@ class ActionLog(TimestampedMixin, models.Model):
         related_name="action_logs",
         help_text="User who performed the action (null for system actions)",
     )
+    actor_id_snapshot = models.CharField(max_length=64, blank=True)
+    actor_name_snapshot = models.CharField(max_length=255, blank=True)
     actor_email = models.EmailField(
         blank=True,
         help_text="Email of the actor (stored for historical reference)",
@@ -407,7 +417,8 @@ class ActionLogExport(TimestampedMixin, models.Model):
     )
     requested_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name="action_log_exports",
     )
 

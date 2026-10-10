@@ -1,5 +1,6 @@
 import { EmailTemplateDefinition, EmailTemplateType } from '../types';
 import * as AccountActivation from './accountActivation';
+import * as AccountDeleted from './accountDeleted';
 import * as BackupReady from './backupReady';
 import * as InvoiceCreated from './invoiceCreated';
 import * as InvoiceFileAdded from './invoiceFileAdded';
@@ -25,6 +26,7 @@ import * as UserExportAdmin from './userExportAdmin';
 //<-- INJECT EMAIL TEMPLATE IMPORT -->
 
 export const templates: Record<EmailTemplateType, EmailTemplateDefinition> = {
+  [EmailTemplateType.ACCOUNT_DELETED]: AccountDeleted,
   [EmailTemplateType.ACCOUNT_ACTIVATION]: AccountActivation,
   [EmailTemplateType.PASSWORD_RESET]: PasswordReset,
   [EmailTemplateType.SUBSCRIPTION_ERROR]: SubscriptionError,

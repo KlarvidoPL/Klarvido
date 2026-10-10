@@ -21,6 +21,10 @@ import { Label } from '../ui/label';
 export interface ConfirmDialogProps extends PropsWithChildren {
   onContinue: (e: MouseEvent<HTMLButtonElement>) => void | Promise<boolean | void>;
   content?: ReactNode;
+  additionalAction?: ReactNode;
+  additionalActionSeparator?: ReactNode;
+  feedback?: ReactNode;
+  hideContinue?: boolean;
   continueDisabled?: boolean;
   closeOnContinue?: boolean;
   onCancel?: (e: MouseEvent<HTMLButtonElement>) => void;
@@ -56,6 +60,10 @@ export const ConfirmDialog = ({
   confirmationText,
   confirmationLabel,
   content,
+  additionalAction,
+  additionalActionSeparator,
+  feedback,
+  hideContinue = false,
   continueDisabled = false,
   closeOnContinue = true,
 }: ConfirmDialogProps) => {
@@ -142,17 +150,32 @@ export const ConfirmDialog = ({
           </div>
         )}
         {content}
+        {additionalAction && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3" aria-hidden={!additionalActionSeparator}>
+              <span className="bg-border h-px flex-1" />
+              {additionalActionSeparator && (
+                <span className="text-muted-foreground text-sm">{additionalActionSeparator}</span>
+              )}
+              <span className="bg-border h-px flex-1" />
+            </div>
+            {additionalAction}
+          </div>
+        )}
+        {feedback}
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>
             {cancelLabel ?? <FormattedMessage id="Confirm Dialog / Cancel label" defaultMessage="Cancel" />}
           </AlertDialogCancel>
-          <AlertDialogAction
-            className={buttonVariants({ variant })}
-            onClick={handleContinue}
-            disabled={!isConfirmed || continueDisabled}
-          >
-            {continueLabel ?? <FormattedMessage id="Confirm Dialog / Continue label" defaultMessage="Continue" />}
-          </AlertDialogAction>
+          {!hideContinue && (
+            <AlertDialogAction
+              className={buttonVariants({ variant })}
+              onClick={handleContinue}
+              disabled={!isConfirmed || continueDisabled}
+            >
+              {continueLabel ?? <FormattedMessage id="Confirm Dialog / Continue label" defaultMessage="Continue" />}
+            </AlertDialogAction>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -21,8 +21,11 @@ from rest_framework_simplejwt.settings import api_settings as jwt_api_settings
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.utils import get_md5_hash_password
 from common.decorators import context_user_required
+from common.graphql.exceptions import GraphQlValidationError
 
 from apps.sso.services import passkey_management
+from apps.multitenancy.cleanup import schedule_resource_cleanup
+from apps.multitenancy.models import ResourceCleanup
 
 from . import models, tokens, jwt, notifications
 from .exceptions import OTPAttemptLimitExceeded, OTPVerificationFailure, PasswordBudgetExceeded
@@ -32,6 +35,7 @@ from .services.password_policy import validate_password
 from .services.password_budget import check_password as check_password_budget, clear as clear_password_budget
 from .services.default_organization import accessible_organization
 from .services.users import get_role_names
+from .services.deletion import delete_account
 from .services import otp as otp_services
 from .services.otp_login import begin_otp_login, consume_pending_login, find_pending_login
 
@@ -66,11 +70,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
         self.fields["avatar"] = serializers.FileField(source="avatar.thumbnail", default="")
         return super().to_representation(instance)
 
+    @transaction.atomic
     def update(self, instance, validated_data):
+        models.User.objects.select_for_update().get(pk=instance.user_id)
+        instance.refresh_from_db()
         avatar = validated_data.pop("avatar", None)
         if avatar:
             if not instance.avatar:
-                instance.avatar = models.UserAvatar()
+                instance.avatar = models.UserAvatar(account_id=str(instance.user_id))
+            else:
+                for old_file in (instance.avatar.original, instance.avatar.thumbnail):
+                    if old_file.name:
+                        schedule_resource_cleanup(ResourceCleanup.ResourceType.AVATAR_FILE, resource_path=old_file.name)
+            instance.avatar.account_id = str(instance.user_id)
             instance.avatar.original = avatar
             instance.avatar.save()
         return super().update(instance, validated_data)
@@ -732,3 +744,33 @@ class SetDefaultOrganizationSerializer(serializers.Serializer):
                 else None
             )
         }
+
+
+class DeleteAccountSerializer(serializers.Serializer):
+    confirmation = serializers.CharField(write_only=True)
+    otp_token = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    ok = serializers.BooleanField(read_only=True)
+
+    def validate(self, attrs):
+        request = self.context['request']
+        user = request.user
+        if not user.is_authenticated or not user.is_active:
+            raise exceptions.PermissionDenied('permission_denied')
+        if user.is_superuser:
+            raise exceptions.PermissionDenied('permission_denied')
+        if attrs['confirmation'] != user.email:
+            raise GraphQlValidationError(
+                {'confirmation': ['Enter your email address to confirm.']}, code='confirmation_mismatch'
+            )
+        if user.otp_enabled and user.otp_verified:
+            try:
+                otp_services.validate_otp(user, attrs.get('otp_token', ''), request)
+            except (OTPVerificationFailure, OTPAttemptLimitExceeded) as exc:
+                raise GraphQlValidationError({'otp_token': [str(exc)]}, code=exc.code)
+            request._account_deletion_otp = (str(user.pk), user.otp_last_used_code_hash)
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context['request']
+        delete_account(request.user.pk, request)
+        return {'ok': True}

@@ -1,17 +1,23 @@
 """Transactional cleanup outbox. Remote I/O never runs in the deletion transaction."""
 
 import logging
+import json
 import uuid
 from datetime import timedelta
 
 from celery import current_app
 from django.db import transaction
 from django.utils import timezone
+from django.apps import apps
+from django.core.files.base import ContentFile
 
 from apps.backup.encryption import get_backup_encryption_service
 from apps.demo.models import DocumentDemoItem
 from common.storages import (
     get_exports_storage,
+    get_public_storage,
+    get_user_exports_storage,
+    delete_user_exports,
     delete_storage_file,
     delete_storage_prefix,
     organization_document_prefix,
@@ -60,10 +66,13 @@ def clean_organization_prefix(cleanup, token):
     delete_storage_prefix(storage, cleanup.resource_path, progress=renew_lease)
 
 
-def schedule_resource_cleanup(resource_type, *, organization_id='', resource_path=''):
+def schedule_resource_cleanup(resource_type, *, organization_id='', account_id='', resource_path=''):
     """Call inside the deletion transaction so rollback also discards cleanup work."""
     cleanup = ResourceCleanup.objects.create(
-        resource_type=resource_type, organization_id=str(organization_id or ''), resource_path=resource_path
+        resource_type=resource_type,
+        organization_id=str(organization_id or ''),
+        account_id=str(account_id or ''),
+        resource_path=resource_path,
     )
     transaction.on_commit(lambda: enqueue_resource_cleanup(str(cleanup.pk)))
     return cleanup
@@ -106,7 +115,41 @@ def process_resource_cleanup(cleanup_id):
         cleanup.save(update_fields=['attempts', 'lease_token', 'next_attempt_at', 'updated_at'])
 
     try:
-        if cleanup.resource_type == ResourceCleanup.ResourceType.EXPORT_FILE:
+        if (
+            cleanup.resource_type
+            in (
+                ResourceCleanup.ResourceType.USER_AVATAR_PREFIX,
+                ResourceCleanup.ResourceType.USER_EXPORT_PREFIX,
+                ResourceCleanup.ResourceType.LEGACY_USER_EXPORT,
+            )
+            and apps.get_model('users', 'User').objects.filter(pk=cleanup.account_id).exists()
+        ):
+            raise ValueError('Cannot scan storage for an existing account')
+        if cleanup.resource_type == ResourceCleanup.ResourceType.ACCOUNT_MARKER:
+            marker = apps.get_model('users', 'AccountDeletion').objects.get(account_id=cleanup.account_id)
+            storage = get_user_exports_storage()
+            path = f'account-deletions/{marker.account_id}.json'
+            if not storage.exists(path):
+                storage.save(
+                    path,
+                    ContentFile(
+                        json.dumps(
+                            {'account_id': marker.account_id, 'deleted_at': marker.deleted_at.isoformat()}
+                        ).encode()
+                    ),
+                )
+        elif cleanup.resource_type == ResourceCleanup.ResourceType.AVATAR_FILE:
+            delete_storage_file(get_public_storage(), cleanup.resource_path)
+        elif cleanup.resource_type == ResourceCleanup.ResourceType.USER_AVATAR_PREFIX:
+            delete_storage_prefix(get_public_storage(), f'avatars/users/{cleanup.account_id}/')
+        elif cleanup.resource_type in (
+            ResourceCleanup.ResourceType.USER_EXPORT_PREFIX,
+            ResourceCleanup.ResourceType.LEGACY_USER_EXPORT,
+        ):
+            delete_user_exports(
+                cleanup.account_id, legacy=cleanup.resource_type == ResourceCleanup.ResourceType.LEGACY_USER_EXPORT
+            )
+        elif cleanup.resource_type == ResourceCleanup.ResourceType.EXPORT_FILE:
             delete_storage_file(get_exports_storage(), cleanup.resource_path)
         elif cleanup.resource_type == ResourceCleanup.ResourceType.DOCUMENT_FILE:
             delete_storage_file(DocumentDemoItem._meta.get_field('file').storage, cleanup.resource_path)

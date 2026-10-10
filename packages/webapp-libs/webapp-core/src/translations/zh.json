@@ -6046,5 +6046,59 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "查看和管理与您的组织共享的文档"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "删除账户"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "永久删除您的账户和个人文件。组织共享内容及历史操作归属信息将保留。历史备份按照备份保留政策到期。"
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "请先将所有权转让给已接受邀请的成员，或删除以下组织："
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "删除账户前，请通过上方的身份验证流程设置密码。"
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "无法检查账户删除条件。请刷新页面后重试。"
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "永久删除您的账户？"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "此操作无法撤销。您将在所有设备上失去访问权限。请输入电子邮箱并验证身份以继续。"
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "您的电子邮箱"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "当前密码"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "使用通行密钥确认删除"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "您的 Klarvido 账户已删除"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "账户已删除"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "您的账户已永久删除，访问权限已撤销。个人文件正在清理。组织共享内容及历史操作归属信息将保留。如果您未申请此操作，请联系支持团队。"
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} 已删除账户并退出 {tenant_name}。"
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "账户删除"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "最后一位活跃管理员无法删除自己的账户。"
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "删除账户前，您的个人组织需要管理员审核。"
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "请输入账户的完整电子邮件地址以确认删除。"
   }
 }

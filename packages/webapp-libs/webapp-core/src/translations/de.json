@@ -6046,5 +6046,59 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "Dokumente anzeigen und verwalten, die mit Ihrer Organisation geteilt werden"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "Konto löschen"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "Lösche dein Konto und persönliche Dateien dauerhaft. Gemeinsame Organisationsinhalte und historische Urheberangaben bleiben erhalten. Historische Sicherungen laufen gemäß der Aufbewahrungsrichtlinie ab."
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "Übertrage zuerst die Eigentümerschaft an ein bestätigtes Mitglied oder lösche diese Organisationen:"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "Lege vor der Kontolöschung über den oben stehenden verifizierten Ablauf ein Passwort fest."
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "Die Voraussetzungen für die Kontolöschung konnten nicht geprüft werden. Lade die Seite neu und versuche es erneut."
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "Dein Konto dauerhaft löschen?"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "Dies kann nicht rückgängig gemacht werden. Du verlierst den Zugriff auf allen Geräten. Gib deine E-Mail-Adresse ein und bestätige deine Identität."
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "Deine E-Mail-Adresse"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "Aktuelles Passwort"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "Löschung mit einem Passkey bestätigen"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "Dein Klarvido-Konto wurde gelöscht"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "Konto gelöscht"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "Dein Konto wurde dauerhaft gelöscht und der Zugriff widerrufen. Persönliche Dateien werden entfernt. Gemeinsame Organisationsinhalte und historische Urheberangaben bleiben erhalten. Falls du dies nicht angefordert hast, kontaktiere den Support."
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} hat das Konto gelöscht und {tenant_name} verlassen."
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "Kontolöschung"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "Der letzte aktive Administrator kann sein Konto nicht löschen."
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "Ihre persönliche Organisation muss vor der Kontolöschung von einem Administrator geprüft werden."
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "Geben Sie zur Bestätigung die genaue E-Mail-Adresse Ihres Kontos ein."
   }
 }

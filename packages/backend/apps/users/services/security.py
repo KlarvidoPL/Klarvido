@@ -19,6 +19,7 @@ from common.ratelimiting.utils import get_client_ip as _get_client_ip
 logger = logging.getLogger(__name__)
 
 AUTH_EVENTS = (
+    'auth_account_deletion',
     'auth_signup',
     'auth_email_confirmation',
     'auth_password_login',
@@ -144,7 +145,7 @@ def process_outbox():
             )
             if row is None or row.next_attempt_at > timezone.now():
                 continue
-            row.attempts += 1
+            row.attempts = min(row.attempts + 1, 32767)
             try:
                 if deliver_email(row):
                     row.sent_at = timezone.now()
@@ -154,16 +155,21 @@ def process_outbox():
             except Exception:
                 # Never persist renderer output, provider errors, or token-bearing payloads.
                 row.last_error = 'delivery_failed'
-                if row.attempts >= 8:
+                if row.attempts >= 8 and row.kind != 'ACCOUNT_DELETED':
                     row.failed_at = timezone.now()
                     logger.error('Security email retries exhausted: outbox_id=%s', row.pk)
-                row.next_attempt_at = timezone.now() + timedelta(seconds=min(3600, 30 * 2**row.attempts))
+                row.next_attempt_at = timezone.now() + timedelta(seconds=min(3600, 30 * 2 ** min(row.attempts, 7)))
             row.save(
                 update_fields=['attempts', 'sent_at', 'failed_at', 'cancelled_at', 'last_error', 'next_attempt_at']
             )
 
 
 def deliver_email(row):
+    if row.kind == 'ACCOUNT_DELETED' and row.user_id is None:
+        result = deliver_email_message(row.recipient, row.kind, {}, row.language)
+        if not result or not result.get('sent_emails_count'):
+            raise RuntimeError('delivery_failed')
+        return True
     if row.user_id is None:
         return False  # Deleted accounts must not receive fresh account proofs.
     user = User.objects.get(pk=row.user_id)

@@ -6046,5 +6046,59 @@
   },
   "Documents / Organization list description": {
     "defaultMessage": "अपने संगठन के साथ साझा किए गए दस्तावेज़ देखें और प्रबंधित करें"
+  },
+  "Account deletion / Title": {
+    "defaultMessage": "खाता हटाएँ"
+  },
+  "Account deletion / Description": {
+    "defaultMessage": "अपना खाता और व्यक्तिगत फ़ाइलें स्थायी रूप से हटाएँ। संगठन की साझा सामग्री और ऐतिहासिक कर्ता जानकारी बनी रहेगी। पुराने बैकअप उनकी प्रतिधारण नीति के अनुसार समाप्त होंगे।"
+  },
+  "Account deletion / Ownership blocker": {
+    "defaultMessage": "पहले स्वामित्व किसी ऐसे सदस्य को दें जिसने निमंत्रण स्वीकार किया हो, या इन संगठनों को हटाएँ:"
+  },
+  "Account deletion / Set password": {
+    "defaultMessage": "खाता हटाने से पहले ऊपर दी गई सत्यापित प्रक्रिया से पासवर्ड सेट करें।"
+  },
+  "Account deletion / Eligibility error": {
+    "defaultMessage": "खाता हटाने की पात्रता जाँची नहीं जा सकी। पेज फिर लोड करके कोशिश करें।"
+  },
+  "Account deletion / Confirm title": {
+    "defaultMessage": "अपना खाता स्थायी रूप से हटाएँ?"
+  },
+  "Account deletion / Confirm description": {
+    "defaultMessage": "यह कार्रवाई वापस नहीं ली जा सकती। सभी उपकरणों पर आपकी पहुँच समाप्त हो जाएगी। जारी रखने के लिए ईमेल दर्ज करें और पहचान सत्यापित करें।"
+  },
+  "Account deletion / Email": {
+    "defaultMessage": "आपका ईमेल पता"
+  },
+  "Account deletion / Password": {
+    "defaultMessage": "वर्तमान पासवर्ड"
+  },
+  "Account deletion / Passkey": {
+    "defaultMessage": "पासकी से हटाने की पुष्टि करें"
+  },
+  "Email / AccountDeleted / Subject": {
+    "defaultMessage": "आपका Klarvido खाता हटा दिया गया"
+  },
+  "Email / AccountDeleted / Title": {
+    "defaultMessage": "खाता हटा दिया गया"
+  },
+  "Email / AccountDeleted / Text": {
+    "defaultMessage": "आपका खाता स्थायी रूप से हटा दिया गया है और पहुँच रद्द कर दी गई है। व्यक्तिगत फ़ाइलों की सफ़ाई जारी है। संगठन की साझा सामग्री और ऐतिहासिक कर्ता जानकारी बनी रहेगी। यदि आपने यह अनुरोध नहीं किया था, तो सहायता से संपर्क करें।"
+  },
+  "Notifications / Member account deleted": {
+    "defaultMessage": "{name} ने अपना खाता हटा दिया और {tenant_name} छोड़ दिया।"
+  },
+  "Audit / Event / Account deletion": {
+    "defaultMessage": "खाता हटाना"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "अंतिम सक्रिय व्यवस्थापक अपना खाता नहीं हटा सकता।"
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "खाता हटाने से पहले व्यवस्थापक को आपके व्यक्तिगत संगठन की समीक्षा करनी होगी।"
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "हटाने की पुष्टि के लिए अपने खाते का सटीक ईमेल पता दर्ज करें।"
   }
 }

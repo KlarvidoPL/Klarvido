@@ -138,6 +138,7 @@ const getEventIcon = (eventType: string) => {
 
 // Labels for event types that are translated in the frontend. Other types fall back to the label sent by the backend.
 const EVENT_TYPE_MESSAGES = defineMessages({
+  auth_account_deletion: { id: 'Audit / Event / Account deletion', defaultMessage: 'Account deletion' },
   auth_signup: { id: 'Audit / Event / auth_signup', defaultMessage: 'Registration request' },
   auth_email_confirmation: { id: 'Audit / Event / auth_email_confirmation', defaultMessage: 'Email confirmation' },
   auth_password_login: { id: 'Audit / Event / auth_password_login', defaultMessage: 'Password login' },

@@ -21,6 +21,7 @@ from django.apps import apps
 from django.db import models, transaction, IntegrityError
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from apps.users.models import AccountDeletion, User
 
 logger = logging.getLogger(__name__)
 
@@ -377,6 +378,11 @@ class RestoreService:
             and m2m_data is a dict of field_name -> list of related PKs
         """
         model_name = model_class.__name__
+        if model_class._meta.app_label == 'users' or model_class._meta.label_lower in (
+            'multitenancy.tenantmembership',
+            'multitenancy.tenantmembershiprole',
+        ):
+            raise RestoreValidationError('Organization backups cannot restore accounts, profiles, or access grants.')
         field_map = {f.name: f for f in model_class._meta.get_fields() if hasattr(f, 'column') or f.many_to_many}
 
         # Separate regular fields from M2M fields
@@ -415,6 +421,13 @@ class RestoreService:
                 continue
 
         field_values['tenant_id'] = self.tenant_id
+        for field in model_class._meta.fields:
+            if isinstance(field, models.ForeignKey) and field.related_model == User:
+                value = field_values.get(field.name)
+                if value and AccountDeletion.objects.filter(account_id=str(value)).exists():
+                    if not field.null:
+                        return 'skipped', {}
+                    field_values[field.name] = None
         pk_value = field_values.pop('id', None)
 
         if pk_value is None:

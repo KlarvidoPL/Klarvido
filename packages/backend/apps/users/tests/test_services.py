@@ -1,5 +1,4 @@
 import pytest
-import datetime
 import io
 import os
 import json
@@ -12,6 +11,7 @@ from django.conf import settings
 from apps.users.exceptions import OTPVerificationFailure
 from apps.users.models import User
 from utils import hashid
+from common.storages import get_user_exports_storage
 from ..services.otp import validate_otp
 from ..services.export.services.export import ExportUserArchive
 
@@ -51,12 +51,6 @@ class TestExportUserArchive:
         mocked_zip_file = zip_file_mock.__enter__.return_value = mocker.Mock()
 
         return mocked_zip_file
-
-    @pytest.fixture
-    def file_cleanup(self, user):
-        hashed_user_id = hashid.encode(user.id)
-        yield
-        os.remove(f"/tmp/{hashed_user_id}.zip")
 
     def test_user_data_is_exported(self, user, export_user_archive):
         data = export_user_archive._export_user_data()
@@ -100,22 +94,25 @@ class TestExportUserArchive:
         hashed_user_id = hashid.encode(user.id)
 
         archive_file_path = export_user_archive._export_user_archive_to_zip(
-            user_data=user_data, user_files=[document_item.file]
+            user_data=user_data, user_files=[document_item.file.name]
         )
 
-        assert archive_file_path == f"/tmp/{hashed_user_id}.zip"
+        assert archive_file_path.endswith('.zip')
+        os.remove(archive_file_path)
         assert [
             call.writestr(f'{hashed_user_id}/{hashed_user_id}.json', json.dumps(user_data).encode('utf-8')),
             call.writestr(f'{hashed_user_id}/{document_item.file}', document_content),
         ] in mocked_zip_file.mock_calls
 
-    @pytest.mark.usefixtures('file_cleanup', 's3_exports_bucket')
-    @pytest.mark.freeze_time
+    @pytest.mark.usefixtures('s3_exports_bucket')
     def test_user_archive_export_url_is_generated(self, user, export_user_archive):
-        timestamp = datetime.datetime.now().strftime("%d-%m-%y_%H-%M-%S")
-        expected_obj_key = f"exports/{hashid.encode(user.id)}_{timestamp}.zip"
+        expected_prefix = f"users/{hashid.encode(user.id)}/"
 
         export_url = export_user_archive.run()
 
-        assert settings.AWS_EXPORTS_STORAGE_BUCKET_NAME in export_url
-        assert expected_obj_key in export_url
+        storage = get_user_exports_storage()
+        assert storage.bucket_name == settings.AWS_EXPORTS_STORAGE_BUCKET_NAME
+        # The shared S3 fixture replaces bucket objects with test-bucket.
+        assert storage.bucket.name in export_url
+        assert 'Signature=' in export_url
+        assert expected_prefix in export_url

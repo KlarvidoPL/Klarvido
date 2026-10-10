@@ -30,6 +30,7 @@ import { PasskeysForm } from '../../shared/components/auth/passkeysForm';
 import { SocialAccounts } from '../../shared/components/auth/socialAccounts/socialAccounts.component';
 import { TwoFactorAuthForm } from '../../shared/components/auth/twoFactorAuthForm';
 import { useAuth } from '../../shared/hooks';
+import { AccountDeletion } from './accountDeletion.component';
 import { profileResendConfirmationEmailMutation } from './profile.graphql';
 
 export const Profile = () => {
@@ -278,6 +279,7 @@ export const Profile = () => {
             <ActiveSessions />
           </CardContent>
         </Card>
+        {!currentUser?.isSuperuser && <AccountDeletion />}
       </div>
     </PageLayout>
   );

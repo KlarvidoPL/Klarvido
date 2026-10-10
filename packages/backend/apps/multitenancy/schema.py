@@ -1,3 +1,4 @@
+from .services.ownership import lock_ownership_change, owner_memberships
 from dataclasses import asdict
 
 from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
@@ -619,6 +620,7 @@ class DeleteTenantMembershipMutation(mutations.DeleteModelMutation):
         return get_object_or_404(model.objects.get_all(), pk=pk, tenant=tenant)
 
     @classmethod
+    @lock_ownership_change
     def mutate_and_get_payload(cls, root, info, id, **kwargs):
         obj = cls.get_object(id, info.context.tenant)
         user = info.context.user
@@ -664,22 +666,10 @@ class DeleteTenantMembershipMutation(mutations.DeleteModelMutation):
             raise PermissionDenied("Only organization owners can remove other owners.")
 
         # SECURITY CHECK 3: Cannot remove the last owner
-        if target_is_owner:
-            # Count owners (both legacy and RBAC)
-            owner_count = models.TenantMembershipRole.objects.filter(
-                membership__tenant=tenant, role__system_role_type=SystemRoleType.OWNER, membership__is_accepted=True
-            ).count()
-
-            legacy_owner_count = models.TenantMembership.objects.filter(
-                tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True
-            ).count()
-
-            total_owners = max(owner_count, legacy_owner_count)
-
-            if total_owners <= 1:
-                raise exceptions.GraphQlValidationError(
-                    "Cannot remove the last owner. Transfer ownership first or delete the organization."
-                )
+        if target_is_owner and not owner_memberships(tenant.pk).exclude(user_id=obj.user_id).exists():
+            raise exceptions.GraphQlValidationError(
+                "Cannot remove the last owner. Transfer ownership first or delete the organization."
+            )
 
         # Log the membership deletion
         log_delete(
@@ -715,6 +705,7 @@ class UpdateTenantMembershipMutation(mutations.UpdateModelMutation):
         return get_object_or_404(model_class.objects.get_all(), pk=input["id"], tenant=info.context.tenant)
 
     @classmethod
+    @lock_ownership_change
     def mutate_and_get_payload(cls, root, info, **input):
         if "id" in input:
             _, input["id"] = from_global_id(input["id"])
@@ -1253,6 +1244,7 @@ class AssignRolesToMemberMutation(graphene.Mutation):
     ok = graphene.Boolean()
 
     @classmethod
+    @lock_ownership_change
     def mutate(cls, root, info, membership_id, tenant_id, role_ids):
         _, membership_pk = from_global_id(membership_id)
         _, tenant_pk = from_global_id(tenant_id)
@@ -1323,19 +1315,11 @@ class AssignRolesToMemberMutation(graphene.Mutation):
 
         # SECURITY CHECK 4: Prevent removing owner role if this would leave no owners
         if target_has_owner_role and not will_have_owner_role:
-            # Count how many owners the tenant has
-            owner_count = models.TenantMembershipRole.objects.filter(
-                membership__tenant=tenant, role__system_role_type=SystemRoleType.OWNER, membership__is_accepted=True
-            ).count()
-
-            # Also count legacy owners
-            legacy_owner_count = (
-                models.TenantMembership.objects.filter(tenant=tenant, role=TenantUserRole.OWNER, is_accepted=True)
-                .exclude(pk=membership.pk)
-                .count()
-            )  # Exclude target if they're legacy owner
-
-            if owner_count <= 1 and legacy_owner_count == 0:
+            remains_legacy_owner = membership.role == TenantUserRole.OWNER
+            if (
+                not remains_legacy_owner
+                and not owner_memberships(tenant.pk).exclude(user_id=membership.user_id).exists()
+            ):
                 raise exceptions.GraphQlValidationError(
                     "Cannot remove the Owner role: there must be at least one owner in the organization."
                 )
@@ -1401,6 +1385,7 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
     ok = graphene.Boolean()
 
     @classmethod
+    @lock_ownership_change
     def mutate(cls, root, info, membership_id, tenant_id, role_id):
         _, membership_pk = from_global_id(membership_id)
         _, tenant_pk = from_global_id(tenant_id)
@@ -1451,11 +1436,11 @@ class RemoveRoleFromMemberMutation(graphene.Mutation):
 
         # SECURITY CHECK 4: Cannot remove the last owner's owner role
         if mr.role.is_owner_role:
-            owner_count = models.TenantMembershipRole.objects.filter(
-                membership__tenant=tenant, role__system_role_type=SystemRoleType.OWNER, membership__is_accepted=True
-            ).count()
-
-            if owner_count <= 1:
+            remains_legacy_owner = membership.role == TenantUserRole.OWNER
+            if (
+                not remains_legacy_owner
+                and not owner_memberships(tenant.pk).exclude(user_id=membership.user_id).exists()
+            ):
                 raise exceptions.GraphQlValidationError(
                     "Cannot remove the Owner role: there must be at least one owner in the organization."
                 )

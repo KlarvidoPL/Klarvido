@@ -1,10 +1,10 @@
-import { CrudItemCreated, CrudItemUpdated } from '@sb/webapp-crud-demo/notifications';
-
-import { NotificationTypes } from '@sb/webapp-notifications';
 import { backupNotificationTemplates } from '@sb/webapp-backup';
+import { CrudItemCreated, CrudItemUpdated } from '@sb/webapp-crud-demo/notifications';
+import { NotificationTypes } from '@sb/webapp-notifications';
 import {
   ActionLogExportFailed,
   ActionLogExportReady,
+  MemberAccountDeleted,
   PasskeyRegistered,
   TenantDeleted,
   TenantInvitationAccepted,
@@ -22,6 +22,7 @@ const templates: Record<NotificationTypes, ElementType> = {
   [NotificationTypes.ACTION_LOG_EXPORT_READY]: ActionLogExportReady,
   [NotificationTypes.ACTION_LOG_EXPORT_FAILED]: ActionLogExportFailed,
   [NotificationTypes.PASSKEY_REGISTERED]: PasskeyRegistered,
+  [NotificationTypes.MEMBER_ACCOUNT_DELETED]: MemberAccountDeleted,
   [NotificationTypes.TENANT_DELETED]: TenantDeleted,
   // Backup notifications
   ...backupNotificationTemplates,

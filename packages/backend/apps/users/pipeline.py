@@ -71,6 +71,7 @@ def create_social_user(backend, details, response=None, user=None, social=None, 
     return {"is_new": True, "user": account}
 
 
+@transaction.atomic
 def populate_profile_from_social(
     details, response, user=None, is_new=False, backend=None, social=None, *args, **kwargs
 ):
@@ -87,6 +88,8 @@ def populate_profile_from_social(
     already set or deliberately cleared."""
     if not user:
         return
+    User.objects.select_for_update().get(pk=user.pk)
+    user.refresh_from_db()
 
     provider_email = (details.get("email") or response.get("email") or "").lower()
     email_confirmed_by_provider = (
@@ -127,7 +130,7 @@ def populate_profile_from_social(
     if is_new or not profile.avatar:
         picture_url = _get_picture_url(response)
         if picture_url:
-            avatar = _download_avatar(picture_url)
+            avatar = _download_avatar(picture_url, account_id=str(user.pk))
             if avatar:
                 profile.avatar = avatar
                 changed_fields.append("avatar")
@@ -147,7 +150,7 @@ def _get_picture_url(response):
     return None
 
 
-def _download_avatar(url):
+def _download_avatar(url, account_id=''):
     try:
         image_response = requests.get(url, timeout=AVATAR_DOWNLOAD_TIMEOUT_SECONDS)
         image_response.raise_for_status()
@@ -159,7 +162,7 @@ def _download_avatar(url):
     if "." not in file_name:
         file_name += ".jpg"
 
-    avatar = UserAvatar()
+    avatar = UserAvatar(account_id=account_id)
     avatar.original.save(file_name, ContentFile(image_response.content), save=False)
     try:
         # Also generates the thumbnail (ImageWithThumbnailMixin.save()) - raises

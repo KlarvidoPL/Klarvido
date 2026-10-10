@@ -7,3 +7,4 @@ export * from './actionLogExportFailed';
 // Enterprise SSO/SCIM disabled: export * from './ssoConnectionDeactivated';
 export * from './passkeyRegistered';
 export * from './tenantDeleted';
+export * from './memberAccountDeleted';
