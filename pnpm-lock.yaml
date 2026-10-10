@@ -1042,6 +1042,9 @@ importers:
       '@sb/webapp-core':
         specifier: workspace:*
         version: link:../webapp-core
+      '@sb/webapp-tenants':
+        specifier: workspace:*
+        version: link:../webapp-tenants
       lucide-react:
         specifier: ^0.378.0
         version: 0.378.0(react@19.2.3)

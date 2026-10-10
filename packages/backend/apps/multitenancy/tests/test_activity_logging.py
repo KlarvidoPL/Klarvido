@@ -219,7 +219,7 @@ def test_default_payment_method_change_is_logged(activity_request, organization,
 
 
 def test_organization_deletion_has_durable_admin_audit(activity_request, organization, mocker):
-    mocker.patch('apps.multitenancy.schema.subscriptions.get_schedule', return_value=None)
+    mocker.patch('apps.multitenancy.services.deletion.subscriptions.get_schedule', return_value=None)
     mocker.patch('apps.multitenancy.schema.close_old_connections')
     pk = str(organization.pk)
     gid = to_global_id('TenantType', pk)

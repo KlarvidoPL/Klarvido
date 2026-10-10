@@ -1,4 +1,18 @@
 services:
+  # Pull cached public images directly to avoid shared-runner Docker Hub limits.
+  # https://cloud.google.com/artifact-registry/docs/pull-cached-dockerhub-images
+  db:
+    image: mirror.gcr.io/library/postgres:16.1-alpine
+
+  redis:
+    image: mirror.gcr.io/library/redis:7.2.4-alpine
+
+  stripemock:
+    image: stripe-mock-ci:0.170.0
+    pull_policy: build
+    build:
+      context: .github/docker/stripe-mock
+
   backend:
     volumes:
       - ${PWD}/packages/webapp-libs/webapp-emails/build/email-renderer:/app/scripts/email/renderer:ro

@@ -1,4 +1,6 @@
 import { useMutation } from '@apollo/client/react';
+import { extractGraphQLErrors } from '@sb/webapp-api-client/api';
+import { useApiForm } from '@sb/webapp-api-client/hooks';
 import { useCommonQuery } from '@sb/webapp-api-client/providers';
 import { RoutesConfig } from '@sb/webapp-core/config/routes';
 import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
@@ -16,6 +18,25 @@ export const useTenantDelete = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const intl = useIntl();
+  const form = useApiForm<{ otpToken: string }>({
+    defaultValues: { otpToken: '' },
+    errorMessages: {
+      otpToken: {
+        required: intl.formatMessage({
+          id: 'Auth / Validate OTP / Auth code required',
+          defaultMessage: 'The authentication code is required',
+        }),
+        otp_verification_failure: intl.formatMessage({
+          id: 'Auth / OTP / Invalid code',
+          defaultMessage: 'The verification code is invalid.',
+        }),
+        otp_attempt_limit_exceeded: intl.formatMessage({
+          id: 'Auth / OTP / Attempt limit',
+          defaultMessage: 'Too many incorrect codes. Try again in 15 minutes.',
+        }),
+      },
+    },
+  });
 
   const generateLocalePath = useGenerateLocalePath();
 
@@ -37,24 +58,33 @@ export const useTenantDelete = () => {
       toast({ description: successDeleteMessage, variant: 'success' });
       navigate(generateLocalePath(RoutesConfig.home), { replace: true });
     },
-    onError: () => {
+    onError: (error) => {
+      const errors = extractGraphQLErrors(error);
+      if (errors) form.setApolloGraphQLResponseErrors(errors);
       toast({ description: failDeleteMessage, variant: 'destructive' });
     },
   });
 
-  const deleteTenant = () => {
-    if (!currentTenant) return;
+  const deleteTenant = async (otpToken?: string) => {
+    if (!currentTenant) return false;
+    form.form.clearErrors();
 
-    commitRemoveMutation({
-      variables: {
-        input: {
-          id: currentTenant.id,
-          // The backend resolves (and permission-checks) the organization from tenantId only, never from id
-          tenantId: currentTenant.id,
+    try {
+      const result = await commitRemoveMutation({
+        variables: {
+          input: {
+            id: currentTenant.id,
+            // The backend resolves (and permission-checks) the organization from tenantId only, never from id
+            tenantId: currentTenant.id,
+            ...(otpToken !== undefined ? { otpToken } : {}),
+          },
         },
-      },
-    });
+      });
+      return !!result.data?.deleteTenant?.deletedIds?.length;
+    } catch {
+      return false;
+    }
   };
 
-  return { deleteTenant, loading };
+  return { deleteTenant, loading, form: form.form };
 };

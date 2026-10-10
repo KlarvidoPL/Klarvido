@@ -6028,5 +6028,23 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "Lege dein Passwort fest"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "Erforderliche Berechtigungen können aus dieser Rolle oder einer anderen dem Mitglied zugewiesenen Rolle stammen."
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "Erfordert: {permissions}."
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "Fehlt in dieser Rolle."
+  },
+  "Activity Logs / Entity / document": {
+    "defaultMessage": "Dokument"
+  },
+  "Documents / Organization list title": {
+    "defaultMessage": "Organisationsdokumente"
+  },
+  "Documents / Organization list description": {
+    "defaultMessage": "Dokumente anzeigen und verwalten, die mit Ihrer Organisation geteilt werden"
   }
 }

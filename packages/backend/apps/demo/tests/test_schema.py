@@ -798,14 +798,20 @@ class TestDeleteCrudDemoItemMutation:
 
 
 class TestAllDocumentDemoItemsQuery:
+    @pytest.fixture(autouse=True)
+    def organization(self, user, tenant_factory, tenant_membership_factory, graphene_client):
+        self.tenant = tenant_factory(type=TenantType.ORGANIZATION)
+        tenant_membership_factory(user=user, tenant=self.tenant, role=TenantUserRole.OWNER)
+        graphene_client.set_tenant_dependent_context(self.tenant, TenantUserRole.OWNER)
+
     def test_returns_all_user_items(self, graphene_client, document_demo_item_factory, user):
         graphene_client.force_authenticate(user)
-        items = document_demo_item_factory.create_batch(3, created_by=user)
+        items = document_demo_item_factory.create_batch(3, created_by=user, tenant=self.tenant)
 
         executed = graphene_client.query(
             """
-            query  {
-              allDocumentDemoItems {
+            query($tenantId: ID!) {
+              allDocumentDemoItems(tenantId: $tenantId) {
                 edges {
                   node {
                     id
@@ -813,7 +819,8 @@ class TestAllDocumentDemoItemsQuery:
                 }
               }
             }
-        """
+        """,
+            variable_values={"tenantId": to_global_id("TenantType", self.tenant.id)},
         )
 
         returned_documents = executed["data"]["allDocumentDemoItems"]["edges"]
@@ -822,6 +829,12 @@ class TestAllDocumentDemoItemsQuery:
 
 
 class TestCreateDocumentDemoItemMutation:
+    @pytest.fixture(autouse=True)
+    def organization(self, user, tenant_factory, tenant_membership_factory, graphene_client):
+        self.tenant = tenant_factory(type=TenantType.ORGANIZATION)
+        tenant_membership_factory(user=user, tenant=self.tenant, role=TenantUserRole.OWNER)
+        graphene_client.set_tenant_dependent_context(self.tenant, TenantUserRole.OWNER)
+
     CREATE_MUTATION = """
         mutation($input: CreateDocumentDemoItemMutationInput!)  {
           createDocumentDemoItem(input: $input) {
@@ -844,7 +857,7 @@ class TestCreateDocumentDemoItemMutation:
         response = file_graphql_query(
             self.CREATE_MUTATION,
             client=api_client,
-            variables={"input": input_data if input_data else {}},
+            variables={"input": {"tenantId": to_global_id("TenantType", self.tenant.id), **(input_data or {})}},
             files={"file": test_file},
             graphql_url="/api/graphql/",
         )
@@ -861,7 +874,7 @@ class TestCreateDocumentDemoItemMutation:
         assert executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["file"]
         assert executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["file"]["name"] == self.TEST_FILENAME
         assert executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["file"]["url"].startswith(
-            f"https://cdn.example.com/documents/a1b2/{self.TEST_FILENAME}"
+            f"https://cdn.example.com/documents/organizations/{self.tenant.pk}/a1b2/{self.TEST_FILENAME}"
         )
 
         item_global_id = executed["data"]["createDocumentDemoItem"]["documentDemoItem"]["id"]
@@ -869,12 +882,14 @@ class TestCreateDocumentDemoItemMutation:
         item = models.DocumentDemoItem.objects.get(pk=pk)
 
         assert item.created_by == user
-        assert item.file.name == f"documents/a1b2/{self.TEST_FILENAME}"
-        assert item.file.url.startswith(f"https://cdn.example.com/documents/a1b2/{self.TEST_FILENAME}")
+        assert item.file.name == f"documents/organizations/{self.tenant.pk}/a1b2/{self.TEST_FILENAME}"
+        assert item.file.url.startswith(
+            f"https://cdn.example.com/documents/organizations/{self.tenant.pk}/a1b2/{self.TEST_FILENAME}"
+        )
 
     def test_create_new_item_when_limit_already_reached(self, user, api_client, document_demo_item_factory):
         api_client.force_authenticate(user)
-        document_demo_item_factory.create_batch(10, created_by=user)
+        document_demo_item_factory.create_batch(10, created_by=user, tenant=self.tenant)
 
         executed = self.execute_create_document_mutation(api_client)
 
@@ -882,7 +897,7 @@ class TestCreateDocumentDemoItemMutation:
         error = executed["errors"][0]
         assert error["path"] == ["createDocumentDemoItem"]
         assert error["extensions"]["non_field_errors"] == [
-            {"message": "User has reached documents number limit.", "code": "invalid"}
+            {"message": "Organization has reached documents number limit.", "code": "invalid"}
         ]
         assert models.DocumentDemoItem.objects.count() == 10
 
@@ -900,6 +915,12 @@ class TestCreateDocumentDemoItemMutation:
 
 
 class TestDeleteDocumentDemoItemMutation:
+    @pytest.fixture(autouse=True)
+    def organization(self, user, tenant_factory, tenant_membership_factory, graphene_client):
+        self.tenant = tenant_factory(type=TenantType.ORGANIZATION)
+        tenant_membership_factory(user=user, tenant=self.tenant, role=TenantUserRole.OWNER)
+        graphene_client.set_tenant_dependent_context(self.tenant, TenantUserRole.OWNER)
+
     DELETE_MUTATION = """
         mutation($input: DeleteDocumentDemoItemMutationInput!) {
           deleteDocumentDemoItem(input: $input) {
@@ -909,13 +930,13 @@ class TestDeleteDocumentDemoItemMutation:
     """
 
     def test_deleting_item(self, graphene_client, document_demo_item_factory, user):
-        document_demo_item = document_demo_item_factory(created_by=user)
+        document_demo_item = document_demo_item_factory(created_by=user, tenant=self.tenant)
         item_global_id = to_global_id("DocumentDemoItemType", str(document_demo_item.id))
         graphene_client.force_authenticate(user)
 
         executed = graphene_client.mutate(
             self.DELETE_MUTATION,
-            variable_values={"input": {"id": item_global_id}},
+            variable_values={"input": {"id": item_global_id, "tenantId": to_global_id("TenantType", self.tenant.id)}},
         )
 
         assert executed == {"data": {"deleteDocumentDemoItem": {"deletedIds": [item_global_id]}}}
@@ -930,11 +951,11 @@ class TestDeleteDocumentDemoItemMutation:
 
         executed = graphene_client.mutate(
             self.DELETE_MUTATION,
-            variable_values={"input": {"id": item_global_id}},
+            variable_values={"input": {"id": item_global_id, "tenantId": to_global_id("TenantType", self.tenant.id)}},
         )
         assert len(executed["errors"]) == 1
         error = executed["errors"][0]
-        assert error["message"] == "No DocumentDemoItem matches the given query."
+        assert error["message"] == "permission_denied"
 
         assert models.DocumentDemoItem.objects.filter(id=document_demo_item.id).exists()
 
@@ -943,7 +964,7 @@ class TestDeleteDocumentDemoItemMutation:
 
         executed = graphene_client.mutate(
             self.DELETE_MUTATION,
-            variable_values={"input": {"id": item_global_id}},
+            variable_values={"input": {"id": item_global_id, "tenantId": to_global_id("TenantType", self.tenant.id)}},
         )
 
         assert len(executed["errors"]) == 1

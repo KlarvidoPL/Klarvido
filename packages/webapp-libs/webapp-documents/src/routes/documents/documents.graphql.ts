@@ -12,8 +12,8 @@ export const documentListItemFragment = gql(/* GraphQL */ `
 `);
 
 export const documentsListQuery = gql(/* GraphQL */ `
-  query documentsListQuery {
-    allDocumentDemoItems(first: 10) {
+  query documentsListQuery($tenantId: ID!) {
+    allDocumentDemoItems(tenantId: $tenantId, first: 10) {
       edges {
         node {
           id

@@ -1,18 +1,14 @@
 import { currentUserFactory, fillCommonQueryWithUser } from '@sb/webapp-api-client/tests/factories';
 import { composeMockedQueryResult } from '@sb/webapp-api-client/tests/utils';
 import { Tabs } from '@sb/webapp-core/components/ui/tabs';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { RoutesConfig } from '../../../../config/routes';
 import { membershipFactory, tenantFactory } from '../../../../tests/factories/tenant';
 import { createMockRouterProps, render } from '../../../../tests/utils/rendering';
 import { TenantRoles } from '../tenantRoles.component';
-import {
-  allOrganizationRolesQuery,
-  allPermissionsQuery,
-  deleteOrganizationRoleMutation,
-} from '../tenantRoles.graphql';
+import { allOrganizationRolesQuery, allPermissionsQuery, deleteOrganizationRoleMutation } from '../tenantRoles.graphql';
 
 jest.mock('@sb/webapp-tenants/hooks', () => ({
   ...jest.requireActual('@sb/webapp-tenants/hooks'),
@@ -31,12 +27,34 @@ const createPermissionsMock = (permissions: string[] = []) =>
     data: {
       allPermissions: {
         edges: [
-          ...(permissions.includes('security.sso.manage') ? [{
-            node: {
-              id: 'legacy-sso', code: 'security.sso.manage', name: 'Manage SSO',
-              description: 'Configure SSO and SCIM', category: 'SECURITY', sortOrder: 20,
-            },
-          }] : []),
+          ...(permissions.includes('members.remove')
+            ? [
+                {
+                  node: {
+                    id: 'members-remove',
+                    code: 'members.remove',
+                    name: 'Remove Members',
+                    description: 'Remove members',
+                    category: 'MEMBERS',
+                    sortOrder: 3,
+                  },
+                },
+              ]
+            : []),
+          ...(permissions.includes('security.sso.manage')
+            ? [
+                {
+                  node: {
+                    id: 'legacy-sso',
+                    code: 'security.sso.manage',
+                    name: 'Manage SSO',
+                    description: 'Configure SSO and SCIM',
+                    category: 'SECURITY',
+                    sortOrder: 20,
+                  },
+                },
+              ]
+            : []),
           {
             node: {
               id: 'perm-1',
@@ -125,6 +143,27 @@ describe('TenantRoles: Component', () => {
     });
   };
 
+  it('explains permission prerequisites while keeping actions selectable', async () => {
+    renderComponent([createPermissionsMock(['members.remove']), createRolesMock([])]);
+    const createButton = await screen.findByRole('button', { name: /create role/i });
+    await waitFor(() => expect(createButton).toBeEnabled());
+    await userEvent.click(createButton);
+    expect(
+      await screen.findByText('Required permissions can come from this role or another role assigned to the member.')
+    ).toBeInTheDocument();
+    const actionRow = screen.getByText('Remove Members').closest('label')!;
+    const action = within(actionRow).getByRole('checkbox');
+    expect(action).toBeEnabled();
+    expect(within(actionRow).getByText(/Requires: View Members/)).toBeInTheDocument();
+    await userEvent.click(action);
+    expect(action).toBeChecked();
+    expect(within(actionRow).getByText(/Missing from this role\./)).toBeInTheDocument();
+    const viewRow = screen.getByText('View Members').closest('label')!;
+    await userEvent.click(within(viewRow).getByRole('checkbox'));
+    expect(within(actionRow).queryByText(/Missing from this role\./)).not.toBeInTheDocument();
+    expect(action).toBeChecked();
+  });
+
   it('hides a legacy SSO permission from the role editor', async () => {
     const permissionsMock = createPermissionsMock(['security.sso.manage']);
     renderComponent([permissionsMock, createRolesMock([])]);
@@ -186,9 +225,7 @@ describe('TenantRoles: Component', () => {
 
   it('should render empty state when no custom roles', async () => {
     const permissionsMock = createPermissionsMock();
-    const rolesMock = createRolesMock([
-      { id: 'role-1', name: 'Owner', isSystemRole: true, isOwnerRole: true },
-    ]);
+    const rolesMock = createRolesMock([{ id: 'role-1', name: 'Owner', isSystemRole: true, isOwnerRole: true }]);
 
     renderComponent([permissionsMock, rolesMock]);
 

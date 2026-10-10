@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from apps.content import models as content_models
-from common.storages import UniqueFilePathGenerator
+from common.storages import OrganizationDocumentPathGenerator
 from common.models import TimestampedMixin, TenantDependentModelMixin
 
 User = get_user_model()
@@ -37,16 +37,12 @@ class ContentfulDemoItemFavorite(TimestampedMixin, models.Model):
         return str(self.id)
 
 
-class DocumentDemoItem(models.Model):
-    file = models.FileField(upload_to=UniqueFilePathGenerator("documents"))
+class DocumentDemoItem(TenantDependentModelMixin, models.Model):
+    file = models.FileField(upload_to=OrganizationDocumentPathGenerator(), max_length=255)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, related_name="documents"
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="documents"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return str(self.id)
-
-    def delete(self, *args, **kwargs):
-        self.file.delete()
-        super().delete(*args, **kwargs)

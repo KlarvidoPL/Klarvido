@@ -10,8 +10,9 @@ from apps.notifications.models import Notification
 from common.storages import get_exports_storage
 
 from ..constants import Notification as NotificationType, TenantType, TenantUserRole
-from ..models import ActionLogExport
+from ..models import ActionLogExport, ResourceCleanup
 from ..tasks import delete_tenant_files
+from ..deletion_notifications import process_due_deletion_notifications
 
 pytestmark = pytest.mark.django_db
 
@@ -24,13 +25,14 @@ MUTATION = '''
 '''
 
 
-def delete_tenant(graphene_client, user, tenant):
+def delete_tenant(graphene_client, user, tenant, otp_token=None):
     graphene_client.force_authenticate(user)
     graphene_client.set_tenant_dependent_context(tenant, TenantUserRole.OWNER)
     tenant_global_id = to_global_id("TenantType", tenant.id)
-    return graphene_client.mutate(
-        MUTATION, variable_values={"input": {"id": tenant_global_id, "tenantId": tenant_global_id}}
-    )
+    input_data = {"id": tenant_global_id, "tenantId": tenant_global_id}
+    if otp_token is not None:
+        input_data['otpToken'] = otp_token
+    return graphene_client.mutate(MUTATION, variable_values={"input": input_data})
 
 
 @pytest.fixture(autouse=True)
@@ -42,12 +44,16 @@ def keep_test_connection(mocker):
 
 @pytest.fixture
 def email_mock(mocker):
+    mocker.patch(
+        'apps.multitenancy.deletion_notifications.enqueue_deletion_notifications',
+        side_effect=lambda ids: process_due_deletion_notifications(),
+    )
     return mocker.patch("apps.multitenancy.notifications.TenantDeletedEmail")
 
 
 @pytest.fixture
 def delete_files_mock(mocker):
-    return mocker.patch("apps.multitenancy.schema.tasks.delete_tenant_files.delay")
+    return mocker.patch("apps.multitenancy.cleanup.current_app.send_task")
 
 
 class TestTenantDeletedNotifications:
@@ -83,9 +89,9 @@ class TestTenantDeletedNotifications:
         email_mock.assert_has_calls(
             [
                 call(member, data={"tenant_name": "Acme", "deleted_by": deleted_by, "is_deleter": False}),
-                call().send(),
+                call().deliver(),
                 call(user, data={"tenant_name": "Acme", "deleted_by": deleted_by, "is_deleter": True}),
-                call().send(),
+                call().deliver(),
             ]
         )
         assert email_mock.call_count == 2
@@ -110,7 +116,21 @@ class TestTenantDeletedNotifications:
         with django_capture_on_commit_callbacks(execute=True):
             delete_tenant(graphene_client, user, tenant)
 
-        delete_files_mock.assert_called_once_with(["backups/acme.xml.enc", "exports/acme-logs.zip"], tenant_pk)
+        jobs = ResourceCleanup.objects.filter(organization_id=tenant_pk)
+        assert set(jobs.values_list('resource_type', 'resource_path')) == {
+            (ResourceCleanup.ResourceType.EXPORT_FILE, 'backups/acme.xml.enc'),
+            (ResourceCleanup.ResourceType.EXPORT_FILE, 'exports/acme-logs.zip'),
+            (ResourceCleanup.ResourceType.BACKUP_KEY, ''),
+            (ResourceCleanup.ResourceType.EXPORT_PREFIX, f'tenant_backups/{tenant_pk}/'),
+            (ResourceCleanup.ResourceType.EXPORT_PREFIX, f'action_logs/{tenant_pk}/'),
+            (ResourceCleanup.ResourceType.DOCUMENT_PREFIX, f'documents/organizations/{tenant_pk}/'),
+        }
+        assert delete_files_mock.call_count == 6
+        for job in jobs:
+            assert (
+                call('apps.multitenancy.tasks.process_resource_cleanup', args=[str(job.pk)], retry=False)
+                in delete_files_mock.call_args_list
+            )
 
     def test_nothing_happens_when_the_delete_is_refused(
         self,
@@ -131,6 +151,7 @@ class TestTenantDeletedNotifications:
             executed = delete_tenant(graphene_client, user, tenant)
 
         assert "errors" in executed
+        assert not ResourceCleanup.objects.exists()
         assert not Notification.objects.filter(type=NotificationType.TENANT_DELETED.value).exists()
         email_mock.assert_not_called()
         delete_files_mock.assert_not_called()
@@ -138,7 +159,7 @@ class TestTenantDeletedNotifications:
 
 class TestDeleteTenantFilesTask:
     def test_deletes_files_and_tolerates_missing_ones(self, mocker):
-        key_mock = mocker.patch("apps.multitenancy.tasks.get_backup_encryption_service")
+        key_mock = mocker.patch("apps.multitenancy.cleanup.get_backup_encryption_service")
         storage = get_exports_storage()
         backup_path = storage.save("backups/acme.xml.enc", ContentFile(b"encrypted"))
         export_path = storage.save("exports/acme-logs.zip", ContentFile(b"zip"))
@@ -147,7 +168,7 @@ class TestDeleteTenantFilesTask:
 
         assert not storage.exists(backup_path)
         assert not storage.exists(export_path)
-        key_mock.return_value.delete_tenant_key.assert_called_once_with("tenant-1")
+        key_mock.return_value.delete_tenant_key.assert_called_once_with("tenant-1", strict=True)
 
 
 class TestDeleteTenantKey:

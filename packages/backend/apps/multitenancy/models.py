@@ -1,15 +1,90 @@
 import hashid_field
+import uuid
 
 from django.db import models, IntegrityError, transaction
 from django.conf import settings
 from django.utils.text import slugify
 from django.db.models import UniqueConstraint, Q
 from django.core.cache import cache
+from django.utils import timezone
 
 from . import constants
 from .disabled_permissions import DISABLED_PERMISSION_CODES
 from .managers import TenantManager, TenantMembershipManager
 from common.models import TimestampedMixin
+
+
+class OrganizationDeletionDelivery(TimestampedMixin, models.Model):
+    """Independent per-recipient/channel outbox, surviving organization deletion."""
+
+    class Channel(models.TextChoices):
+        EMAIL = 'email', 'Email'
+        IN_APP = 'in_app', 'In-app notification'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization_id = models.CharField(max_length=64)
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='organization_deletion_deliveries'
+    )
+    issuer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='organization_deletion_deliveries_issued',
+    )
+    channel = models.CharField(max_length=16, choices=Channel.choices)
+    recipient_email = models.EmailField(blank=True)
+    language = models.CharField(max_length=16, default='en')
+    payload = models.JSONField(default=dict)
+    attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    lease_token = models.UUIDField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['next_attempt_at'], name='org_delivery_due_idx', condition=models.Q(completed_at__isnull=True)
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.organization_id}: {self.channel}'
+
+
+class ResourceCleanup(TimestampedMixin, models.Model):
+    """Durable deletion work and outcome history, independent of a deleted organization."""
+
+    class ResourceType(models.TextChoices):
+        EXPORT_FILE = 'export_file', 'Backup or activity export file'
+        DOCUMENT_FILE = 'document_file', 'Document file'
+        BACKUP_KEY = 'backup_key', 'Backup encryption key'
+        EXPORT_PREFIX = 'export_prefix', 'Organization backup or export directory'
+        DOCUMENT_PREFIX = 'document_prefix', 'Organization document directory'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Deliberately no FK: deleting the organization must never delete its cleanup work.
+    organization_id = models.CharField(max_length=64, blank=True)
+    resource_type = models.CharField(max_length=20, choices=ResourceType.choices)
+    resource_path = models.TextField(blank=True)
+    attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    lease_token = models.UUIDField(null=True, blank=True, editable=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['next_attempt_at'],
+                name='resource_cleanup_due_idx',
+                condition=models.Q(completed_at__isnull=True),
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.resource_type} cleanup {self.pk}'
 
 
 class Tenant(TimestampedMixin, models.Model):

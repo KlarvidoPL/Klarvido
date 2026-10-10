@@ -1,6 +1,9 @@
+import { getFragmentData } from '@sb/webapp-api-client/graphql';
+import { commonQueryCurrentUserFragment, useCommonQuery } from '@sb/webapp-api-client/providers';
 import { ConfirmDialog } from '@sb/webapp-core/components/confirmDialog';
 import { Paragraph } from '@sb/webapp-core/components/typography';
 import { Button, buttonVariants } from '@sb/webapp-core/components/ui/button';
+import { OtpInput } from '@sb/webapp-core/components/ui/otpInput';
 import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,16 +16,18 @@ export const TenantDangerZone = () => {
   // Permission check for delete organization
   const { hasPermission: canDelete, loading: permLoading } = usePermissionCheck('org.delete');
 
-  const { deleteTenant, loading } = useTenantDelete();
+  const { deleteTenant, loading, form } = useTenantDelete();
+  const { data: commonData, loading: userLoading } = useCommonQuery();
+  const currentUser = getFragmentData(commonQueryCurrentUserFragment, commonData?.currentUser);
+  const requiresOtp = currentUser?.otpEnabled === true && currentUser?.otpVerified === true;
+  const otpToken = form.watch('otpToken');
   const { data: currentTenant } = useCurrentTenant();
 
   const deleteConfirmationKeyword = intl.formatMessage({
     defaultMessage: 'DELETE',
     id: 'Tenant General Settings / Danger Zone / Confirm Dialog / Delete keyword',
   });
-  const deleteConfirmationText = currentTenant?.name
-    ? `${deleteConfirmationKeyword} ${currentTenant.name}`
-    : undefined;
+  const deleteConfirmationText = currentTenant?.name ? `${deleteConfirmationKeyword} ${currentTenant.name}` : undefined;
 
   // If user cannot delete, show a message explaining why
   const cannotDeleteMessage = !canDelete && !permLoading;
@@ -63,7 +68,33 @@ export const TenantDangerZone = () => {
           </div>
 
           <ConfirmDialog
-            onContinue={deleteTenant}
+            onContinue={() => deleteTenant(requiresOtp ? otpToken : undefined)}
+            closeOnContinue={false}
+            continueDisabled={loading || !canDelete || !!userLoading || (requiresOtp && otpToken.length !== 6)}
+            onOpenChange={() => form.reset()}
+            content={
+              requiresOtp && (
+                <div className="space-y-2">
+                  <OtpInput
+                    value={otpToken}
+                    onValueChange={(value) => {
+                      form.setValue('otpToken', value);
+                      form.clearErrors('otpToken');
+                    }}
+                    disabled={loading}
+                    label={intl.formatMessage({
+                      id: 'Auth / Change password / OTP label',
+                      defaultMessage: 'Authentication code',
+                    })}
+                  />
+                  {form.formState.errors.otpToken?.message && (
+                    <p role="alert" className="text-sm text-destructive dark:text-red-400">
+                      {form.formState.errors.otpToken.message}
+                    </p>
+                  )}
+                </div>
+              )
+            }
             variant="destructive"
             title={
               <FormattedMessage
@@ -79,7 +110,10 @@ export const TenantDangerZone = () => {
             }
             confirmationText={deleteConfirmationText}
           >
-            <Button disabled={!canDelete || loading || permLoading} className={buttonVariants({ variant: 'destructive' })}>
+            <Button
+              disabled={!canDelete || loading || permLoading}
+              className={buttonVariants({ variant: 'destructive' })}
+            >
               <FormattedMessage
                 defaultMessage="Delete organization"
                 id="Tenant General Settings / Danger Zone / Tenant Delete Button"

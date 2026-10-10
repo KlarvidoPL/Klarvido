@@ -10,4 +10,5 @@ class DemoItemAdmin(admin.ModelAdmin):
 
 @admin.register(models.DocumentDemoItem)
 class DocumentDemoItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "created_by")
+    list_display = ("id", "tenant", "created_by")
+    list_filter = ("tenant",)

@@ -4,8 +4,10 @@ import {
   commonQueryMembershipFragment,
   useCommonQuery,
 } from '@sb/webapp-api-client/providers';
+import { RoutesConfig } from '@sb/webapp-core/config/routes';
+import { useGenerateLocalePath } from '@sb/webapp-core/hooks';
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 
 import { useTenants } from '../../hooks/useTenants/useTenants.hook';
 import currentTenantContext from './currentTenantProvider.context';
@@ -27,7 +29,8 @@ export type TenantPathParams = {
 export const CurrentTenantProvider = ({ children }: CurrentTenantProviderProps) => {
   const tenants = useTenants();
   const params = useParams<TenantPathParams>();
-  const { data } = useCommonQuery();
+  const { data, loading, error } = useCommonQuery();
+  const generateLocalePath = useGenerateLocalePath();
   const storedState = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
   const profile = getFragmentData(commonQueryCurrentUserFragment, data?.currentUser);
@@ -39,17 +42,26 @@ export const CurrentTenantProvider = ({ children }: CurrentTenantProviderProps) 
   const currentMembership = getFragmentData(commonQueryMembershipFragment, currentTenant?.membership);
 
   useEffect(() => {
-    if (currentTenant && userId) {
+    if (currentTenant && userId && (!params.tenantId || currentTenant.id === params.tenantId)) {
       const { parsedStoredState: state } = parseStoredState(storedState, userId);
       state[userId] = currentTenant.id;
       setCurrentTenantStorageState(state);
     }
-  }, [currentTenant, storedState, userId]);
+  }, [currentTenant, storedState, userId, params.tenantId]);
 
-  const value = useMemo(
-    () => ({ data: currentTenant || null }),
-    [currentTenant]
-  );
+  const value = useMemo(() => ({ data: currentTenant || null }), [currentTenant]);
+
+  // A refreshed membership list can remove the active organization after another
+  // member deletes it. Redirect before child route guards handle the stale URL.
+  const lostActiveTenant =
+    !loading &&
+    !error &&
+    userId &&
+    params.tenantId &&
+    storedTenantId === params.tenantId &&
+    currentTenant?.id !== params.tenantId;
+
+  if (lostActiveTenant) return <Navigate to={generateLocalePath(RoutesConfig.home)} replace />;
 
   return <currentTenantContext.Provider value={value}>{children}</currentTenantContext.Provider>;
 };

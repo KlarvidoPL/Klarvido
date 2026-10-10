@@ -23,12 +23,17 @@ class CrudDemoItemSerializer(serializers.ModelSerializer):
 
 class DocumentDemoItemSerializer(serializers.ModelSerializer):
     id = hidrest.HashidSerializerCharField(source_field="users.User.id", read_only=True)
+    tenant_id = hidrest.HashidSerializerCharField()
     created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
     file = serializers.FileField(required=False)
 
     def validate(self, attrs):
-        if not self.instance and attrs["created_by"].documents.count() >= settings.USER_DOCUMENTS_NUMBER_LIMIT:
-            raise serializers.ValidationError(_("User has reached documents number limit."))
+        if (
+            not self.instance
+            and models.DocumentDemoItem.objects.filter(tenant_id=attrs['tenant_id']).count()
+            >= settings.USER_DOCUMENTS_NUMBER_LIMIT
+        ):
+            raise serializers.ValidationError(_("Organization has reached documents number limit."))
         return attrs
 
     def validate_file(self, file):
@@ -38,7 +43,7 @@ class DocumentDemoItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.DocumentDemoItem
-        fields = ("id", "file", "created_by")
+        fields = ("id", "tenant_id", "file", "created_by")
 
 
 class ContentfulDemoItemFavoriteSerializer(serializers.ModelSerializer):

@@ -6028,5 +6028,23 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "قم بتعيين كلمة مرورك"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "يمكن أن تأتي الأذونات المطلوبة من هذا الدور أو من دور آخر مُسنَد إلى العضو."
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "يتطلب: {permissions}."
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "غير متوفرة في هذا الدور."
+  },
+  "Activity Logs / Entity / document": {
+    "defaultMessage": "مستند"
+  },
+  "Documents / Organization list title": {
+    "defaultMessage": "مستندات المؤسسة"
+  },
+  "Documents / Organization list description": {
+    "defaultMessage": "عرض المستندات المشتركة مع مؤسستك وإدارتها"
   }
 }

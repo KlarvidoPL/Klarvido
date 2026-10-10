@@ -1,10 +1,7 @@
 from dataclasses import asdict
 
 from apps.multitenancy.disabled_permissions import DISABLED_PERMISSION_CODES
-import json
 
-from django.contrib.admin.models import LogEntry, DELETION
-from django.contrib.contenttypes.models import ContentType
 
 import graphene
 from graphene import relay
@@ -23,13 +20,10 @@ from common.graphql.acl.decorators import PERMISSION_DENIED_MESSAGE, permission_
 from common.action_logging.decorators import action_logged
 from common.action_logging.service import get_request_actor, log_action, log_delete
 from common.ratelimiting import graphql_ratelimit, RateLimitKey
-from apps.finances.services import subscriptions
-from apps.finances.serializers import CancelTenantActiveSubscriptionSerializer
 from . import models
-from . import notifications
 from . import serializers
-from . import tasks
 from .tokens import tenant_invitation_token
+from .services.deletion import delete_organization
 from .services.company_registry import lookup_company
 from .services.onboarding import CHOICES, clear_draft, save_draft_step, save_onboarding_step
 from .validators import validate_tax_id
@@ -542,6 +536,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
         model = models.Tenant
 
     class Input:
+        otp_token = graphene.String()
         id = graphene.String()
         # Resolved by TenantUserRoleMiddleware (with the membership check) into info.context.tenant - it never falls
         # back to the generic `id`, so without this the requires("org.delete") check has no tenant to evaluate
@@ -572,67 +567,7 @@ class DeleteTenantMutation(mutations.DeleteModelMutation):
         if tenant.type == ConstantsTenantType.DEFAULT:
             raise exceptions.GraphQlValidationError("Cannot delete default type tenant.")
 
-        # Gathered before the delete, since the cascade removes the memberships and the rows holding these paths
-        tenant_pk = str(tenant.pk)
-        tenant_name = tenant.name
-        deleter = info.context.user
-        members = [
-            membership.user
-            for membership in tenant.user_memberships.filter(is_accepted=True, user__isnull=False).select_related(
-                "user__profile"
-            )
-        ]
-        file_paths = [
-            *tenant.backuprecord_set.exclude(file_path="").values_list("file_path", flat=True),
-            *tenant.action_log_exports.exclude(file_path="").values_list("file_path", flat=True),
-        ]
-
-        with transaction.atomic():
-            log_delete(
-                tenant_id=tenant.pk,
-                entity_type="tenant",
-                instance=tenant,
-                actor_user=info.context.user,
-                actor_type=get_request_actor(info.context),
-            )
-
-            try:
-                schedule = subscriptions.get_schedule(tenant)
-                if schedule:
-                    cancel_subscription_serializer = CancelTenantActiveSubscriptionSerializer(
-                        instance=schedule, data={}
-                    )
-                    if cancel_subscription_serializer.is_valid():
-                        cancel_subscription_serializer.save()
-            except Exception as e:
-                import logging
-
-                logger = logging.getLogger(__name__)
-                logger.warning(f"Failed to cancel subscription for tenant {tenant.pk} during deletion: {e}")
-
-            LogEntry.objects.create(
-                user_id=info.context.user.pk,
-                content_type=ContentType.objects.get_for_model(models.Tenant),
-                object_id=tenant_pk,
-                object_repr=tenant_name[:200],
-                action_flag=DELETION,
-                change_message=json.dumps(
-                    {
-                        "operation": "organization_deleted",
-                        "organization_id": tenant_pk,
-                        "organization_name": tenant_name,
-                        "actor_email": deleter.email,
-                        "actor_type": get_request_actor(info.context),
-                    }
-                ),
-            )
-            tenant.delete()
-
-            # Only once the delete is committed: remove its files from storage and tell the members
-            transaction.on_commit(lambda: tasks.delete_tenant_files.delay(file_paths, tenant_pk))
-            transaction.on_commit(
-                lambda: notifications.send_tenant_deleted_notifications(tenant_name, deleter, members)
-            )
+        delete_organization(tenant.pk, info.context, otp_token=kwargs.get('otp_token'))
 
         close_old_connections()
 

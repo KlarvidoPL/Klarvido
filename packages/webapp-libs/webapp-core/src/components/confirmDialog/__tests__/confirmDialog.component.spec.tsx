@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { render } from '../../../tests/utils/rendering';
@@ -29,6 +29,29 @@ describe('ConfirmDialog: Component', () => {
   });
 
   describe('when open', () => {
+    it('keeps confirmation open after a failed async action and closes after success', async () => {
+      const onContinue = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      render(
+        <Component onContinue={onContinue} closeOnContinue={false} content={<p>Additional confirmation</p>}>
+          <button>trigger</button>
+        </Component>
+      );
+      await userEvent.click(screen.getByText('trigger'));
+      await userEvent.click(screen.getByText('Continue'));
+      expect(screen.getByText('Additional confirmation')).toBeInTheDocument();
+      await userEvent.click(screen.getByText('Continue'));
+      await waitFor(() => expect(screen.queryByText(title)).not.toBeInTheDocument());
+    });
+
+    it('disables Continue while an additional requirement is unmet', async () => {
+      render(
+        <Component continueDisabled>
+          <button>trigger</button>
+        </Component>
+      );
+      await userEvent.click(screen.getByText('trigger'));
+      expect(screen.getByText('Continue')).toBeDisabled();
+    });
     it('should continue', async () => {
       const trigger = 'trigger';
       const onContinue = jest.fn();

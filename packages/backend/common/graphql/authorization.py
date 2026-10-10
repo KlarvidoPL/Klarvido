@@ -95,7 +95,6 @@ def scope_queryset(queryset, info):
         "sso.ssosession": "user_id",
         "sso.userdevice": "user_id",
         "notifications.notification": "user_id",
-        "demo.documentdemoitem": "created_by_id",
         "demo.contentfuldemoitemfavorite": "user_id",
     }
     if label in owner_fields:
@@ -110,6 +109,7 @@ def scope_queryset(queryset, info):
     if label == "multitenancy.tenantmembershiprole":
         return queryset.filter(membership__tenant_id__in=tenant_ids(info, "members.view"))
     permissions = {
+        "demo.documentdemoitem": "features.documents.view",
         "demo.cruddemoitem": "features.crud.view",
         "multitenancy.organizationrole": "org.roles.view",
         "multitenancy.actionlog": "security.logs.view",

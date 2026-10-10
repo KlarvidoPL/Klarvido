@@ -6028,5 +6028,23 @@
   },
   "Email / Set Password / Title": {
     "defaultMessage": "设置您的密码"
+  },
+  "Roles / Permission dependencies hint": {
+    "defaultMessage": "所需权限可以来自此角色或分配给成员的其他角色。"
+  },
+  "Roles / Permission dependencies": {
+    "defaultMessage": "需要：{permissions}。"
+  },
+  "Roles / Permission dependencies missing": {
+    "defaultMessage": "此角色缺少所需权限。"
+  },
+  "Activity Logs / Entity / document": {
+    "defaultMessage": "文档"
+  },
+  "Documents / Organization list title": {
+    "defaultMessage": "组织文档"
+  },
+  "Documents / Organization list description": {
+    "defaultMessage": "查看和管理与您的组织共享的文档"
   }
 }
