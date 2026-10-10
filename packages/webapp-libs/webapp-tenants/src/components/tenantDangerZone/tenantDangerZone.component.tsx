@@ -88,7 +88,7 @@ export const TenantDangerZone = () => {
                     })}
                   />
                   {form.formState.errors.otpToken?.message && (
-                    <p role="alert" className="text-sm text-destructive">
+                    <p role="alert" className="text-sm text-destructive dark:text-red-400">
                       {form.formState.errors.otpToken.message}
                     </p>
                   )}
