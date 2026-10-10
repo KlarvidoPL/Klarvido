@@ -69,8 +69,8 @@ it('requires email confirmation and a fresh password, and keeps the dialog after
         result: {
           errors: [
             {
-              message: 'Ownership changed',
-              extensions: { confirmation: [{ message: 'Transfer ownership first', code: 'invalid' }] },
+              message: 'GraphQlValidationError',
+              extensions: { confirmation: [{ message: 'Transfer ownership first', code: 'last_owner' }] },
             },
           ],
         },
@@ -84,7 +84,7 @@ it('requires email confirmation and a fresh password, and keeps the dialog after
   await userEvent.type(screen.getByLabelText('Current password'), 'current-secret');
   await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
   await waitFor(() => expect(authorize).toHaveBeenCalledWith('account_delete', undefined, 'current-secret'));
-  expect(await screen.findByRole('alert')).toBeInTheDocument();
+  expect(await screen.findByRole('alert')).toHaveTextContent('Transfer ownership to another accepted member');
   expect(screen.getByRole('alertdialog')).toBeInTheDocument();
 });
 
@@ -120,7 +120,7 @@ it('requires OTP for passkey deletion and displays the backend OTP error in the 
         result: {
           errors: [
             {
-              message: 'Invalid code',
+              message: 'GraphQlValidationError',
               extensions: { otpToken: [{ message: 'Invalid code', code: 'otp_verification_failure' }] },
             },
           ],
@@ -137,5 +137,6 @@ it('requires OTP for passkey deletion and displays the backend OTP error in the 
   await userEvent.click(confirm);
   await waitFor(() => expect(authorize).toHaveBeenCalledWith('account_delete', undefined, undefined));
   expect(await screen.findByRole('alert')).toHaveClass('dark:text-red-400');
+  expect(screen.getByRole('alert')).toHaveTextContent('The verification code is invalid.');
   expect(screen.getByLabelText('Authentication code')).toHaveValue('');
 });

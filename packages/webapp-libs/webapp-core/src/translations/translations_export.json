@@ -2083,7 +2083,10 @@
       "Email / AccountDeleted / Title": "Account deleted",
       "Email / AccountDeleted / Text": "Your account has been permanently deleted and its access revoked. Personal file cleanup is being processed. Shared organization content and historical attribution remain. If you did not request this, contact support.",
       "Notifications / Member account deleted": "{name} deleted their account and left {tenant_name}.",
-      "Audit / Event / Account deletion": "Account deletion"
+      "Audit / Event / Account deletion": "Account deletion",
+      "Account deletion / Last administrator": "The last active administrator cannot delete their account.",
+      "Account deletion / Personal organization review": "Your personal organization requires administrator review before account deletion.",
+      "Account deletion / Confirmation mismatch": "Enter your exact account email address to confirm deletion."
     },
     "pl": {
       "Tenant invitation form / Email invalid": "Wprowadź poprawny adres e-mail",
@@ -4110,7 +4113,10 @@
       "Email / AccountDeleted / Title": "Konto usunięte",
       "Email / AccountDeleted / Text": "Twoje konto zostało trwale usunięte, a dostęp cofnięty. Trwa usuwanie plików osobistych. Wspólne dane organizacji i historyczne informacje o autorach pozostaną. Jeśli nie zlecono tej operacji, skontaktuj się z pomocą techniczną.",
       "Notifications / Member account deleted": "{name} usunął(-ęła) konto i opuścił(-a) organizację {tenant_name}.",
-      "Audit / Event / Account deletion": "Usunięcie konta"
+      "Audit / Event / Account deletion": "Usunięcie konta",
+      "Account deletion / Last administrator": "Ostatni aktywny administrator nie może usunąć swojego konta.",
+      "Account deletion / Personal organization review": "Przed usunięciem konta Twoja organizacja osobista wymaga sprawdzenia przez administratora.",
+      "Account deletion / Confirmation mismatch": "Wpisz dokładny adres e-mail swojego konta, aby potwierdzić usunięcie."
     },
     "de": {
       "Tenant invitation form / Email invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
@@ -6137,7 +6143,10 @@
       "Email / AccountDeleted / Title": "Konto gelöscht",
       "Email / AccountDeleted / Text": "Dein Konto wurde dauerhaft gelöscht und der Zugriff widerrufen. Persönliche Dateien werden entfernt. Gemeinsame Organisationsinhalte und historische Urheberangaben bleiben erhalten. Falls du dies nicht angefordert hast, kontaktiere den Support.",
       "Notifications / Member account deleted": "{name} hat das Konto gelöscht und {tenant_name} verlassen.",
-      "Audit / Event / Account deletion": "Kontolöschung"
+      "Audit / Event / Account deletion": "Kontolöschung",
+      "Account deletion / Last administrator": "Der letzte aktive Administrator kann sein Konto nicht löschen.",
+      "Account deletion / Personal organization review": "Ihre persönliche Organisation muss vor der Kontolöschung von einem Administrator geprüft werden.",
+      "Account deletion / Confirmation mismatch": "Geben Sie zur Bestätigung die genaue E-Mail-Adresse Ihres Kontos ein."
     },
     "es": {
       "Tenant invitation form / Email invalid": "Introduce una dirección de correo electrónico válida",
@@ -8164,7 +8173,10 @@
       "Email / AccountDeleted / Title": "Cuenta eliminada",
       "Email / AccountDeleted / Text": "Tu cuenta se eliminó permanentemente y se revocó su acceso. Se están eliminando los archivos personales. El contenido compartido de las organizaciones y la atribución histórica se conservan. Si no lo solicitaste, contacta con soporte.",
       "Notifications / Member account deleted": "{name} eliminó su cuenta y salió de {tenant_name}.",
-      "Audit / Event / Account deletion": "Eliminación de cuenta"
+      "Audit / Event / Account deletion": "Eliminación de cuenta",
+      "Account deletion / Last administrator": "El último administrador activo no puede eliminar su cuenta.",
+      "Account deletion / Personal organization review": "Un administrador debe revisar tu organización personal antes de eliminar la cuenta.",
+      "Account deletion / Confirmation mismatch": "Introduce la dirección de correo exacta de tu cuenta para confirmar la eliminación."
     },
     "zh": {
       "Tenant invitation form / Email invalid": "请输入有效的电子邮件地址",
@@ -10191,7 +10203,10 @@
       "Email / AccountDeleted / Title": "账户已删除",
       "Email / AccountDeleted / Text": "您的账户已永久删除，访问权限已撤销。个人文件正在清理。组织共享内容及历史操作归属信息将保留。如果您未申请此操作，请联系支持团队。",
       "Notifications / Member account deleted": "{name} 已删除账户并退出 {tenant_name}。",
-      "Audit / Event / Account deletion": "账户删除"
+      "Audit / Event / Account deletion": "账户删除",
+      "Account deletion / Last administrator": "最后一位活跃管理员无法删除自己的账户。",
+      "Account deletion / Personal organization review": "删除账户前，您的个人组织需要管理员审核。",
+      "Account deletion / Confirmation mismatch": "请输入账户的完整电子邮件地址以确认删除。"
     },
     "hi": {
       "Tenant invitation form / Email invalid": "कृपया एक मान्य ईमेल पता दर्ज करें",
@@ -12218,7 +12233,10 @@
       "Email / AccountDeleted / Title": "खाता हटा दिया गया",
       "Email / AccountDeleted / Text": "आपका खाता स्थायी रूप से हटा दिया गया है और पहुँच रद्द कर दी गई है। व्यक्तिगत फ़ाइलों की सफ़ाई जारी है। संगठन की साझा सामग्री और ऐतिहासिक कर्ता जानकारी बनी रहेगी। यदि आपने यह अनुरोध नहीं किया था, तो सहायता से संपर्क करें।",
       "Notifications / Member account deleted": "{name} ने अपना खाता हटा दिया और {tenant_name} छोड़ दिया।",
-      "Audit / Event / Account deletion": "खाता हटाना"
+      "Audit / Event / Account deletion": "खाता हटाना",
+      "Account deletion / Last administrator": "अंतिम सक्रिय व्यवस्थापक अपना खाता नहीं हटा सकता।",
+      "Account deletion / Personal organization review": "खाता हटाने से पहले व्यवस्थापक को आपके व्यक्तिगत संगठन की समीक्षा करनी होगी।",
+      "Account deletion / Confirmation mismatch": "हटाने की पुष्टि के लिए अपने खाते का सटीक ईमेल पता दर्ज करें।"
     },
     "ar": {
       "Tenant invitation form / Email invalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
@@ -14245,7 +14263,10 @@
       "Email / AccountDeleted / Title": "تم حذف الحساب",
       "Email / AccountDeleted / Text": "تم حذف حسابك نهائيًا وإلغاء الوصول إليه. تجري إزالة الملفات الشخصية. سيبقى المحتوى المشترك للمؤسسات وبيانات نسب الأنشطة السابقة. إذا لم تطلب ذلك، فاتصل بالدعم.",
       "Notifications / Member account deleted": "حذف {name} حسابه وغادر {tenant_name}.",
-      "Audit / Event / Account deletion": "حذف الحساب"
+      "Audit / Event / Account deletion": "حذف الحساب",
+      "Account deletion / Last administrator": "لا يمكن لآخر مسؤول نشط حذف حسابه.",
+      "Account deletion / Personal organization review": "تتطلب مؤسستك الشخصية مراجعة المسؤول قبل حذف الحساب.",
+      "Account deletion / Confirmation mismatch": "أدخل عنوان البريد الإلكتروني لحسابك تمامًا لتأكيد الحذف."
     },
     "fr": {
       "Tenant invitation form / Email invalid": "Veuillez saisir une adresse e-mail valide",
@@ -16272,7 +16293,10 @@
       "Email / AccountDeleted / Title": "Compte supprimé",
       "Email / AccountDeleted / Text": "Votre compte a été définitivement supprimé et son accès révoqué. La suppression des fichiers personnels est en cours. Les contenus partagés des organisations et les attributions historiques restent conservés. Si vous n’avez pas demandé cette action, contactez l’assistance.",
       "Notifications / Member account deleted": "{name} a supprimé son compte et quitté {tenant_name}.",
-      "Audit / Event / Account deletion": "Suppression du compte"
+      "Audit / Event / Account deletion": "Suppression du compte",
+      "Account deletion / Last administrator": "Le dernier administrateur actif ne peut pas supprimer son compte.",
+      "Account deletion / Personal organization review": "Votre organisation personnelle doit être examinée par un administrateur avant la suppression du compte.",
+      "Account deletion / Confirmation mismatch": "Saisissez l’adresse e-mail exacte de votre compte pour confirmer la suppression."
     }
   }
 }

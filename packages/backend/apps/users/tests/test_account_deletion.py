@@ -37,8 +37,10 @@ def test_last_owner_cannot_delete(user, tenant_factory, tenant_membership_factor
     tenant = tenant_factory(creator=user, type=TenantType.ORGANIZATION)
     tenant_membership_factory(user=user, tenant=tenant, role=TenantUserRole.OWNER)
     assert deletion_blockers(user) == [tenant]
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError) as error:
         delete_account(user.pk, request_for(user))
+    assert error.value.get_codes() == {'confirmation': ['last_owner']}
+    assert str(error.value) == 'GraphQlValidationError'
     assert User.objects.filter(pk=user.pk).exists()
     assert not AccountDeletion.objects.exists()
 

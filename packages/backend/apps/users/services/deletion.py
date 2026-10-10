@@ -4,7 +4,7 @@ from django.db import transaction
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
 from django.utils import timezone
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
 
 from apps.multitenancy.constants import ActionType, TenantType
 from apps.notifications.models import Notification
@@ -19,6 +19,7 @@ from apps.users.models import AccountDeletion, SecurityEmailOutbox, User, UserAv
 from apps.demo.models import DocumentDemoItem
 from apps.users.services.security import enqueue_email, record
 from common.action_logging.service import log_action
+from common.graphql.exceptions import GraphQlValidationError
 
 
 def deletion_blockers(user):
@@ -53,18 +54,27 @@ def delete_account(user_id, request, *, via_admin=False, restoration=False):
         and actor.otp_verified
         and getattr(request, '_account_deletion_otp', None) != (str(actor.pk), actor.otp_last_used_code_hash)
     ):
-        raise ValidationError({'otp_token': ['Fresh OTP confirmation is required.']})
+        raise GraphQlValidationError(
+            {'otp_token': ['Fresh OTP confirmation is required.']}, code='otp_verification_failure'
+        )
     if not restoration and deletion_blockers(account):
-        raise ValidationError({'confirmation': ['Transfer ownership or delete your organizations first.']})
+        raise GraphQlValidationError(
+            {'confirmation': ['Transfer ownership or delete your organizations first.']}, code='last_owner'
+        )
     if (
         account.is_superuser
         and not User.objects.filter(is_superuser=True, is_active=True).exclude(pk=account.pk).exists()
     ):
-        raise ValidationError({'confirmation': ['The last active administrator cannot delete their account.']})
+        raise GraphQlValidationError(
+            {'confirmation': ['The last active administrator cannot delete their account.']}, code='last_administrator'
+        )
     for tenant in tenants:
         if tenant.type == TenantType.DEFAULT:
             if tenant.creator_id != account.pk or tenant.user_memberships.exclude(user=account).exists():
-                raise ValidationError({'confirmation': ['Your personal organization requires administrator review.']})
+                raise GraphQlValidationError(
+                    {'confirmation': ['Your personal organization requires administrator review.']},
+                    code='personal_organization_review',
+                )
             delete_organization(tenant.pk, request, private_account_id=str(account.pk))
         else:
             departing_membership = tenant.user_memberships.filter(user=account).first()

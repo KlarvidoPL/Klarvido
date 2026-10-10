@@ -757,7 +757,9 @@ class DeleteAccountSerializer(serializers.Serializer):
         if not user.is_authenticated or not user.is_active:
             raise exceptions.PermissionDenied('permission_denied')
         if attrs['confirmation'] != user.email:
-            raise exceptions.ValidationError({'confirmation': ['Enter your email address to confirm.']})
+            raise GraphQlValidationError(
+                {'confirmation': ['Enter your email address to confirm.']}, code='confirmation_mismatch'
+            )
         if user.otp_enabled and user.otp_verified:
             try:
                 otp_services.validate_otp(user, attrs.get('otp_token', ''), request)

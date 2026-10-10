@@ -122,7 +122,12 @@ class UserAdmin(BaseUserAdmin):
                     request._account_deletion_otp = (str(request.user.pk), request.user.otp_last_used_code_hash)
                 return super().delete_view(request, object_id, extra_context=context)
             except (PermissionDenied, ValidationError, OTPVerificationFailure, OTPAttemptLimitExceeded) as exc:
-                context['deletion_error'] = str(exc)
+                if isinstance(exc, ValidationError) and isinstance(exc.detail, dict):
+                    context['deletion_error'] = ' '.join(
+                        str(message) for messages in exc.detail.values() for message in messages
+                    )
+                else:
+                    context['deletion_error'] = str(exc)
                 method, post = request.method, request.POST
                 request.method, request.POST = 'GET', request.POST.copy()
                 request.POST.clear()

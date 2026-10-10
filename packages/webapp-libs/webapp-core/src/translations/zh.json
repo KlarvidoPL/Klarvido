@@ -6091,5 +6091,14 @@
   },
   "Audit / Event / Account deletion": {
     "defaultMessage": "账户删除"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "最后一位活跃管理员无法删除自己的账户。"
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "删除账户前，您的个人组织需要管理员审核。"
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "请输入账户的完整电子邮件地址以确认删除。"
   }
 }

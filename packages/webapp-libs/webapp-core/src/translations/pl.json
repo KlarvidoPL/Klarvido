@@ -6091,5 +6091,14 @@
   },
   "Audit / Event / Account deletion": {
     "defaultMessage": "Usunięcie konta"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "Ostatni aktywny administrator nie może usunąć swojego konta."
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "Przed usunięciem konta Twoja organizacja osobista wymaga sprawdzenia przez administratora."
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "Wpisz dokładny adres e-mail swojego konta, aby potwierdzić usunięcie."
   }
 }

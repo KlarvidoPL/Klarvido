@@ -6091,5 +6091,14 @@
   },
   "Audit / Event / Account deletion": {
     "defaultMessage": "Suppression du compte"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "Le dernier administrateur actif ne peut pas supprimer son compte."
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "Votre organisation personnelle doit être examinée par un administrateur avant la suppression du compte."
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "Saisissez l’adresse e-mail exacte de votre compte pour confirmer la suppression."
   }
 }

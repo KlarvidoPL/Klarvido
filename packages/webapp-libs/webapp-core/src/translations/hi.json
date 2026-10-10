@@ -6091,5 +6091,14 @@
   },
   "Audit / Event / Account deletion": {
     "defaultMessage": "खाता हटाना"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "अंतिम सक्रिय व्यवस्थापक अपना खाता नहीं हटा सकता।"
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "खाता हटाने से पहले व्यवस्थापक को आपके व्यक्तिगत संगठन की समीक्षा करनी होगी।"
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "हटाने की पुष्टि के लिए अपने खाते का सटीक ईमेल पता दर्ज करें।"
   }
 }

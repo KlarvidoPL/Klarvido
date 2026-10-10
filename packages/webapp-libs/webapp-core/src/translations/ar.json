@@ -6091,5 +6091,14 @@
   },
   "Audit / Event / Account deletion": {
     "defaultMessage": "حذف الحساب"
+  },
+  "Account deletion / Last administrator": {
+    "defaultMessage": "لا يمكن لآخر مسؤول نشط حذف حسابه."
+  },
+  "Account deletion / Personal organization review": {
+    "defaultMessage": "تتطلب مؤسستك الشخصية مراجعة المسؤول قبل حذف الحساب."
+  },
+  "Account deletion / Confirmation mismatch": {
+    "defaultMessage": "أدخل عنوان البريد الإلكتروني لحسابك تمامًا لتأكيد الحذف."
   }
 }
