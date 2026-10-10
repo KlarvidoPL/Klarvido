@@ -2,7 +2,7 @@
 
 Account deletion is available in profile settings. Users confirm their email address and authenticate freshly with a password or passkey. Verified 2FA additionally requires a fresh OTP code. Social-only accounts without either credential use the existing verified password setup flow first. An ordinary login session is insufficient.
 
-An accepted last owner must promote another active accepted member or separately delete the shared organization. Ownership is the union of legacy OWNER memberships and RBAC system OWNER roles, counted once per user. `org.delete` alone is not ownership. Ownership-changing mutations and account deletion serialize on organization row locks. The last active administrator is also protected.
+An accepted last owner must promote another active accepted member or separately delete the shared organization. Ownership is the union of legacy OWNER memberships and RBAC system OWNER roles, counted once per user. `org.delete` alone is not ownership. Ownership-changing mutations and account deletion serialize on organization row locks. Superusers cannot delete accounts through Profile or be deleted through Django Admin. Superuser deletion requires `python manage.py delete_superuser --account-id <id> --administrator-id <id>`, with typed email confirmation and administrator password/OTP. The shared lifecycle and last-active-administrator protection still apply.
 
 ## Data removed
 

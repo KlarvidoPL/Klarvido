@@ -102,7 +102,7 @@ class UserAdmin(BaseUserAdmin):
     delete_confirmation_template = 'admin/users/user/delete_confirmation.html'
 
     def has_delete_permission(self, request, obj=None):
-        return request.user.is_active and request.user.is_superuser
+        return request.user.is_active and request.user.is_superuser and (obj is None or not obj.is_superuser)
 
     def delete_view(self, request, object_id, extra_context=None):
         context = dict(extra_context or {})

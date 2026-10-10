@@ -756,6 +756,8 @@ class DeleteAccountSerializer(serializers.Serializer):
         user = request.user
         if not user.is_authenticated or not user.is_active:
             raise exceptions.PermissionDenied('permission_denied')
+        if user.is_superuser:
+            raise exceptions.PermissionDenied('permission_denied')
         if attrs['confirmation'] != user.email:
             raise GraphQlValidationError(
                 {'confirmation': ['Enter your email address to confirm.']}, code='confirmation_mismatch'

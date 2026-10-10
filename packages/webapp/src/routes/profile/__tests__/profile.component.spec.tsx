@@ -61,6 +61,7 @@ describe('Profile: Component', () => {
     render(<Component />, { apolloMocks });
 
     expect(await screen.findByText(/superuser/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Delete account' })).not.toBeInTheDocument();
   });
 
   it('should show a success toast when resending the confirmation email', async () => {

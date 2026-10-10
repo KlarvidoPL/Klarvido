@@ -33,7 +33,7 @@ def deletion_blockers(user):
 
 
 @transaction.atomic
-def delete_account(user_id, request, *, via_admin=False, restoration=False):
+def delete_account(user_id, request, *, via_admin=False, restoration=False, via_management=False):
     # Organization first, account second: membership operations share this order.
     tenant_ids = Tenant.objects.filter(Q(user_memberships__user_id=user_id) | Q(creator_id=user_id)).values('pk')
     tenants = list(Tenant.objects.select_for_update().filter(pk__in=tenant_ids).order_by('pk'))
@@ -42,7 +42,9 @@ def delete_account(user_id, request, *, via_admin=False, restoration=False):
         list(User.objects.select_for_update().filter(is_superuser=True, is_active=True).order_by('pk'))
     account = User.objects.select_for_update().get(pk=user_id)
     actor = User.objects.select_for_update().get(pk=request.user.pk)
-    if via_admin or restoration:
+    if account.is_superuser and not (restoration or via_management):
+        raise PermissionDenied('Superuser accounts can only be deleted through the management command.')
+    if via_admin or restoration or via_management:
         if not actor.is_active or not actor.is_superuser:
             raise PermissionDenied('permission_denied')
     elif actor.pk != account.pk:

@@ -166,7 +166,7 @@ def test_old_pending_invitation_cannot_attach_to_new_registration(user, tenant_f
 def test_last_administrator_is_protected(user_factory):
     user = user_factory(is_superuser=True)
     with pytest.raises(ValidationError):
-        delete_account(user.pk, request_for(user))
+        delete_account(user.pk, request_for(user), via_management=True)
 
 
 def test_shared_personal_tenant_blocks_deletion(user, user_factory, tenant_membership_factory):
@@ -273,6 +273,32 @@ def test_admin_last_administrator_error_is_displayed(user_factory, settings):
         reverse('admin:users_user_delete', args=[str(administrator.pk)]),
         {'post': 'yes', 'password': administrator._faker_password},
     )
-    assert response.status_code == 200
-    assert b'last active administrator' in response.content
+    assert response.status_code == 403
     assert User.objects.filter(pk=administrator.pk).exists()
+
+
+@pytest.mark.parametrize('via_admin', [False, True])
+def test_superuser_deletion_blocked_even_when_another_admin_exists(user_factory, via_admin):
+    target = user_factory(is_superuser=True)
+    user_factory(is_superuser=True)
+    with pytest.raises(PermissionDenied):
+        delete_account(target.pk, request_for(target), via_admin=via_admin)
+    assert User.objects.filter(pk=target.pk).exists()
+
+
+def test_superuser_serializer_rejects_direct_api_deletion(user_factory):
+    target = user_factory(is_superuser=True)
+    user_factory(is_superuser=True)
+    serializer = DeleteAccountSerializer(data={'confirmation': target.email}, context={'request': request_for(target)})
+    with pytest.raises(PermissionDenied):
+        serializer.is_valid(raise_exception=True)
+
+
+def test_superuser_management_command_uses_shared_cleanup(user_factory, mocker):
+    target = user_factory(is_superuser=True)
+    operator = user_factory(is_superuser=True)
+    mocker.patch('builtins.input', return_value=target.email)
+    mocker.patch('apps.users.management.commands.delete_superuser.getpass', return_value=operator._faker_password)
+    call_command('delete_superuser', account_id=str(target.pk), administrator_id=str(operator.pk))
+    assert not User.objects.filter(pk=target.pk).exists()
+    assert AccountDeletion.objects.filter(account_id=str(target.pk)).exists()

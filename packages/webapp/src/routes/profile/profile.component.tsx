@@ -279,7 +279,7 @@ export const Profile = () => {
             <ActiveSessions />
           </CardContent>
         </Card>
-        <AccountDeletion />
+        {!currentUser?.isSuperuser && <AccountDeletion />}
       </div>
     </PageLayout>
   );
